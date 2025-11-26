@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { ArrowLeft, Plus, CheckCircle2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 interface NjangiCycle {
   id: string;
@@ -48,12 +50,12 @@ export default function FamilyNjangi() {
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { family, canManageFinances, isLoading: authLoading } = useFamilyAuth(familySlug);
   const [loading, setLoading] = useState(true);
   const [cycles, setCycles] = useState<NjangiCycle[]>([]);
   const [selectedCycle, setSelectedCycle] = useState<NjangiCycle | null>(null);
   const [participants, setParticipants] = useState<NjangiParticipant[]>([]);
   const [members, setMembers] = useState<FamilyMember[]>([]);
-  const [familyId, setFamilyId] = useState<string>("");
   const [isCycleDialogOpen, setIsCycleDialogOpen] = useState(false);
   const [isParticipantDialogOpen, setIsParticipantDialogOpen] = useState(false);
   const [cycleFormData, setCycleFormData] = useState({
@@ -64,8 +66,10 @@ export default function FamilyNjangi() {
   });
 
   useEffect(() => {
-    loadData();
-  }, [familySlug]);
+    if (family?.id) {
+      loadData();
+    }
+  }, [family?.id]);
 
   useEffect(() => {
     if (selectedCycle) {
@@ -74,32 +78,15 @@ export default function FamilyNjangi() {
   }, [selectedCycle]);
 
   const loadData = async () => {
+    if (!family) return;
+    
     try {
       setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate("/auth");
-        return;
-      }
-
-      const { data: familyData, error: familyError } = await supabase
-        .from("families")
-        .select("id")
-        .eq("slug", familySlug)
-        .single();
-
-      if (familyError || !familyData) {
-        toast({ title: "Error", description: "Family not found", variant: "destructive" });
-        navigate("/dashboard");
-        return;
-      }
-
-      setFamilyId(familyData.id);
 
       const { data: cyclesData, error: cyclesError } = await supabase
         .from("njangi_cycles")
         .select("*")
-        .eq("family_id", familyData.id)
+        .eq("family_id", family.id)
         .order("start_date", { ascending: false });
 
       if (cyclesError) throw cyclesError;
@@ -114,7 +101,7 @@ export default function FamilyNjangi() {
           id,
           profiles!inner(full_name)
         `)
-        .eq("family_id", familyData.id);
+        .eq("family_id", family.id);
 
       if (membersError) throw membersError;
       setMembers(membersData as any);
@@ -148,9 +135,11 @@ export default function FamilyNjangi() {
 
   const handleCreateCycle = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!family) return;
+    
     try {
       const { error } = await supabase.from("njangi_cycles").insert({
-        family_id: familyId,
+        family_id: family.id,
         name: cycleFormData.name,
         start_date: cycleFormData.start_date,
         amount_per_person: parseFloat(cycleFormData.amount_per_person),
@@ -193,18 +182,21 @@ export default function FamilyNjangi() {
     }
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-3xl font-bold">Njangi (Rotating Savings)</h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-3xl font-bold">Njangi (Rotating Savings)</h1>
+          </div>
+          <LanguageSwitcher />
         </div>
 
         <div className="flex justify-between items-center">
@@ -220,62 +212,64 @@ export default function FamilyNjangi() {
               </Button>
             ))}
           </div>
-          <Dialog open={isCycleDialogOpen} onOpenChange={setIsCycleDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                New Cycle
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create Njangi Cycle</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleCreateCycle} className="space-y-4">
-                <div>
-                  <Label htmlFor="name">Cycle Name</Label>
-                  <Input
-                    id="name"
-                    value={cycleFormData.name}
-                    onChange={(e) => setCycleFormData({ ...cycleFormData, name: e.target.value })}
-                    placeholder="e.g., 2025 Njangi"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="start_date">Start Date</Label>
-                  <Input
-                    id="start_date"
-                    type="date"
-                    value={cycleFormData.start_date}
-                    onChange={(e) => setCycleFormData({ ...cycleFormData, start_date: e.target.value })}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="amount">Amount Per Person (FCFA)</Label>
-                  <Input
-                    id="amount"
-                    type="number"
-                    min="0"
-                    step="1000"
-                    value={cycleFormData.amount_per_person}
-                    onChange={(e) => setCycleFormData({ ...cycleFormData, amount_per_person: e.target.value })}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="notes">Notes (optional)</Label>
-                  <Textarea
-                    id="notes"
-                    value={cycleFormData.notes}
-                    onChange={(e) => setCycleFormData({ ...cycleFormData, notes: e.target.value })}
-                  />
-                </div>
-                <Button type="submit" className="w-full">Create Cycle</Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+          {canManageFinances && (
+            <Dialog open={isCycleDialogOpen} onOpenChange={setIsCycleDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Cycle
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create Njangi Cycle</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleCreateCycle} className="space-y-4">
+                  <div>
+                    <Label htmlFor="name">Cycle Name</Label>
+                    <Input
+                      id="name"
+                      value={cycleFormData.name}
+                      onChange={(e) => setCycleFormData({ ...cycleFormData, name: e.target.value })}
+                      placeholder="e.g., 2025 Njangi"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="start_date">Start Date</Label>
+                    <Input
+                      id="start_date"
+                      type="date"
+                      value={cycleFormData.start_date}
+                      onChange={(e) => setCycleFormData({ ...cycleFormData, start_date: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="amount">Amount Per Person (FCFA)</Label>
+                    <Input
+                      id="amount"
+                      type="number"
+                      min="0"
+                      step="1000"
+                      value={cycleFormData.amount_per_person}
+                      onChange={(e) => setCycleFormData({ ...cycleFormData, amount_per_person: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="notes">Notes (optional)</Label>
+                    <Textarea
+                      id="notes"
+                      value={cycleFormData.notes}
+                      onChange={(e) => setCycleFormData({ ...cycleFormData, notes: e.target.value })}
+                    />
+                  </div>
+                  <Button type="submit" className="w-full">Create Cycle</Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
 
         {selectedCycle && (
@@ -304,10 +298,12 @@ export default function FamilyNjangi() {
             <Card>
               <div className="p-4 border-b flex justify-between items-center">
                 <h2 className="text-xl font-semibold">Payout Order</h2>
-                <Button variant="outline" size="sm">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Participant
-                </Button>
+                {canManageFinances && (
+                  <Button variant="outline" size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Participant
+                  </Button>
+                )}
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
@@ -353,7 +349,7 @@ export default function FamilyNjangi() {
                             )}
                           </td>
                           <td className="p-4 text-center">
-                            {!participant.is_paid && (
+                            {!participant.is_paid && canManageFinances && (
                               <Button
                                 size="sm"
                                 onClick={() => handleMarkPaid(participant.id)}

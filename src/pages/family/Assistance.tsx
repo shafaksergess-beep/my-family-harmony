@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { ArrowLeft, Plus, CheckCircle2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 interface AssistanceEvent {
   id: string;
@@ -52,10 +54,10 @@ export default function FamilyAssistance() {
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { family, canManageFinances, isLoading: authLoading } = useFamilyAuth(familySlug);
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState<AssistanceEvent[]>([]);
   const [members, setMembers] = useState<FamilyMember[]>([]);
-  const [familyId, setFamilyId] = useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     member_id: "",
@@ -69,31 +71,16 @@ export default function FamilyAssistance() {
   });
 
   useEffect(() => {
-    loadData();
-  }, [familySlug]);
+    if (family?.id) {
+      loadData();
+    }
+  }, [family?.id]);
 
   const loadData = async () => {
+    if (!family) return;
+    
     try {
       setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate("/auth");
-        return;
-      }
-
-      const { data: familyData, error: familyError } = await supabase
-        .from("families")
-        .select("id")
-        .eq("slug", familySlug)
-        .single();
-
-      if (familyError || !familyData) {
-        toast({ title: "Error", description: "Family not found", variant: "destructive" });
-        navigate("/dashboard");
-        return;
-      }
-
-      setFamilyId(familyData.id);
 
       const { data: eventsData, error: eventsError } = await supabase
         .from("assistance_events")
@@ -104,7 +91,7 @@ export default function FamilyAssistance() {
             profiles!inner(full_name)
           )
         `)
-        .eq("family_id", familyData.id)
+        .eq("family_id", family.id)
         .order("event_date", { ascending: false });
 
       if (eventsError) throw eventsError;
@@ -116,7 +103,7 @@ export default function FamilyAssistance() {
           id,
           profiles!inner(full_name)
         `)
-        .eq("family_id", familyData.id);
+        .eq("family_id", family.id);
 
       if (membersError) throw membersError;
       setMembers(membersData as any);
@@ -139,9 +126,11 @@ export default function FamilyAssistance() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!family) return;
+    
     try {
       const { error } = await supabase.from("assistance_events").insert({
-        family_id: familyId,
+        family_id: family.id,
         member_id: formData.member_id,
         event_type: formData.event_type,
         event_date: formData.event_date,
@@ -201,18 +190,21 @@ export default function FamilyAssistance() {
 
   const stats = calculateStats();
 
-  if (loading) {
+  if (authLoading || loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-3xl font-bold">Assistance Events</h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-3xl font-bold">Assistance Events</h1>
+          </div>
+          <LanguageSwitcher />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -232,127 +224,129 @@ export default function FamilyAssistance() {
 
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold">Events History</h2>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Record Event
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Record Assistance Event</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="member">Member</Label>
-                    <Select
-                      value={formData.member_id}
-                      onValueChange={(value) => setFormData({ ...formData, member_id: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select member" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {members.map((member) => (
-                          <SelectItem key={member.id} value={member.id}>
-                            {member.profiles.full_name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+          {canManageFinances && (
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Record Event
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Record Assistance Event</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="member">Member</Label>
+                      <Select
+                        value={formData.member_id}
+                        onValueChange={(value) => setFormData({ ...formData, member_id: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select member" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {members.map((member) => (
+                            <SelectItem key={member.id} value={member.id}>
+                              {member.profiles.full_name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="event_type">Event Type</Label>
+                      <Select
+                        value={formData.event_type}
+                        onValueChange={handleEventTypeChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select event type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(EVENT_TYPES).map(([key, value]) => (
+                            <SelectItem key={key} value={key}>
+                              {value.label} - {value.description}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <div>
-                    <Label htmlFor="event_type">Event Type</Label>
-                    <Select
-                      value={formData.event_type}
-                      onValueChange={handleEventTypeChange}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select event type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(EVENT_TYPES).map(([key, value]) => (
-                          <SelectItem key={key} value={key}>
-                            {value.label} - {value.description}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="event_date">Event Date</Label>
+                      <Input
+                        id="event_date"
+                        type="date"
+                        value={formData.event_date}
+                        onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="amount">Total Amount (FCFA)</Label>
+                      <Input
+                        id="amount"
+                        type="number"
+                        min="0"
+                        step="1000"
+                        value={formData.amount}
+                        onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                        required
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
+                  {formData.event_type === 'birth' && (
+                    <div>
+                      <Label htmlFor="contribution">Contribution Per Member (FCFA)</Label>
+                      <Input
+                        id="contribution"
+                        type="number"
+                        min="0"
+                        step="1000"
+                        value={formData.contribution_per_member}
+                        onChange={(e) => setFormData({ ...formData, contribution_per_member: e.target.value })}
+                      />
+                    </div>
+                  )}
+                  {(formData.event_type.includes('death') || formData.event_type.includes('external')) && (
+                    <div>
+                      <Label htmlFor="beneficiary">Beneficiary Name</Label>
+                      <Input
+                        id="beneficiary"
+                        value={formData.beneficiary_name}
+                        onChange={(e) => setFormData({ ...formData, beneficiary_name: e.target.value })}
+                      />
+                    </div>
+                  )}
+                  {formData.event_type === 'sickness' && (
+                    <div>
+                      <Label htmlFor="hospitalization">Hospitalization Days</Label>
+                      <Input
+                        id="hospitalization"
+                        type="number"
+                        min="5"
+                        value={formData.hospitalization_days}
+                        onChange={(e) => setFormData({ ...formData, hospitalization_days: e.target.value })}
+                      />
+                    </div>
+                  )}
                   <div>
-                    <Label htmlFor="event_date">Event Date</Label>
-                    <Input
-                      id="event_date"
-                      type="date"
-                      value={formData.event_date}
-                      onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
-                      required
+                    <Label htmlFor="notes">Notes (optional)</Label>
+                    <Textarea
+                      id="notes"
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="amount">Total Amount (FCFA)</Label>
-                    <Input
-                      id="amount"
-                      type="number"
-                      min="0"
-                      step="1000"
-                      value={formData.amount}
-                      onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                      required
-                    />
-                  </div>
-                </div>
-                {formData.event_type === 'birth' && (
-                  <div>
-                    <Label htmlFor="contribution">Contribution Per Member (FCFA)</Label>
-                    <Input
-                      id="contribution"
-                      type="number"
-                      min="0"
-                      step="1000"
-                      value={formData.contribution_per_member}
-                      onChange={(e) => setFormData({ ...formData, contribution_per_member: e.target.value })}
-                    />
-                  </div>
-                )}
-                {(formData.event_type.includes('death') || formData.event_type.includes('external')) && (
-                  <div>
-                    <Label htmlFor="beneficiary">Beneficiary Name</Label>
-                    <Input
-                      id="beneficiary"
-                      value={formData.beneficiary_name}
-                      onChange={(e) => setFormData({ ...formData, beneficiary_name: e.target.value })}
-                    />
-                  </div>
-                )}
-                {formData.event_type === 'sickness' && (
-                  <div>
-                    <Label htmlFor="hospitalization">Hospitalization Days</Label>
-                    <Input
-                      id="hospitalization"
-                      type="number"
-                      min="5"
-                      value={formData.hospitalization_days}
-                      onChange={(e) => setFormData({ ...formData, hospitalization_days: e.target.value })}
-                    />
-                  </div>
-                )}
-                <div>
-                  <Label htmlFor="notes">Notes (optional)</Label>
-                  <Textarea
-                    id="notes"
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  />
-                </div>
-                <Button type="submit" className="w-full">Record Event</Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+                  <Button type="submit" className="w-full">Record Event</Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
 
         <Card>
@@ -392,7 +386,7 @@ export default function FamilyAssistance() {
                         )}
                       </td>
                       <td className="p-4 text-center">
-                        {!event.is_paid && (
+                        {!event.is_paid && canManageFinances && (
                           <Button
                             size="sm"
                             onClick={() => handleMarkPaid(event.id)}
