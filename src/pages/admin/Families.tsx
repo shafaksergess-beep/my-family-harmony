@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, ArrowLeft, Building2, Users, Edit, Trash2 } from "lucide-react";
+import { Loader2, Plus, ArrowLeft, Building2, Users, Edit, Trash2, Shield, FileText } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -197,7 +197,15 @@ const AdminFamilies = () => {
               </div>
             </div>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => navigate("/admin/permissions")}>
+                <Shield className="w-4 h-4 mr-2" />
+                Permissions
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => navigate("/admin/activity-logs")}>
+                <FileText className="w-4 h-4 mr-2" />
+                Activity Logs
+              </Button>
               <LanguageSwitcher />
             
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
