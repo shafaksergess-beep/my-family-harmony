@@ -102,6 +102,48 @@ export type Database = {
           },
         ]
       }
+      agenda_item_votes: {
+        Row: {
+          agenda_item_id: string
+          created_at: string | null
+          id: string
+          member_id: string
+          updated_at: string | null
+          vote: string
+        }
+        Insert: {
+          agenda_item_id: string
+          created_at?: string | null
+          id?: string
+          member_id: string
+          updated_at?: string | null
+          vote: string
+        }
+        Update: {
+          agenda_item_id?: string
+          created_at?: string | null
+          id?: string
+          member_id?: string
+          updated_at?: string | null
+          vote?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_item_votes_agenda_item_id_fkey"
+            columns: ["agenda_item_id"]
+            isOneToOne: false
+            referencedRelation: "meeting_agenda_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agenda_item_votes_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assistance_events: {
         Row: {
           amount: number
@@ -963,6 +1005,47 @@ export type Database = {
             columns: ["meeting_id"]
             isOneToOne: false
             referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meeting_templates: {
+        Row: {
+          agenda_items: Json
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          family_id: string
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          agenda_items?: Json
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          family_id: string
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          agenda_items?: Json
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          family_id?: string
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_templates_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
             referencedColumns: ["id"]
           },
         ]

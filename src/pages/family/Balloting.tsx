@@ -106,14 +106,23 @@ const Balloting = () => {
       const shuffledMembers = shuffleArray(members);
       const assignments = [];
 
+      // Get house_name for hosting assignments
+      const { data: membersWithHouse } = await supabase
+        .from("family_members")
+        .select("id, house_name, profiles(full_name)")
+        .eq("family_id", family.id);
+
       // Assign members to months (12 months, cycling through members if needed)
       for (let month = 1; month <= 12; month++) {
         const memberIndex = (month - 1) % shuffledMembers.length;
         const member = shuffledMembers[memberIndex];
+        const memberWithHouse = membersWithHouse?.find(m => m.id === member.id);
+        
         assignments.push({
           month,
           member_id: member.id,
           member_name: member.profiles?.full_name || "Unknown",
+          house_name: memberWithHouse?.house_name || null,
         });
       }
 
@@ -145,6 +154,11 @@ const Balloting = () => {
         if (error) throw error;
       }
 
+      // If hosting assignments, sync with meetings
+      if (assignmentType === "hosting") {
+        await syncHostAssignments(assignments);
+      }
+
       toast({
         title: "Success",
         description: `${assignmentType === "hosting" ? "Hosting" : "Njangi"} schedule created successfully`,
@@ -159,6 +173,42 @@ const Balloting = () => {
         description: error.message || "Failed to create balloting",
         variant: "destructive",
       });
+    }
+  };
+
+  const syncHostAssignments = async (assignments: any[]) => {
+    if (!family) return;
+
+    try {
+      // Get all meetings for the selected year
+      const { data: meetings, error: meetingsError } = await supabase
+        .from("meetings")
+        .select("id, meeting_date")
+        .eq("family_id", family.id)
+        .gte("meeting_date", `${selectedYear}-01-01`)
+        .lte("meeting_date", `${selectedYear}-12-31`);
+
+      if (meetingsError) throw meetingsError;
+
+      // Update each meeting with the corresponding host
+      for (const meeting of meetings || []) {
+        const meetingMonth = new Date(meeting.meeting_date).getMonth() + 1;
+        const assignment = assignments.find(a => a.month === meetingMonth);
+        
+        if (assignment) {
+          await supabase
+            .from("meetings")
+            .update({ host_house: assignment.house_name || assignment.member_name })
+            .eq("id", meeting.id);
+        }
+      }
+
+      toast({
+        title: "Success",
+        description: "Host assignments synced to meetings",
+      });
+    } catch (error: any) {
+      console.error("Error syncing host assignments:", error);
     }
   };
 
