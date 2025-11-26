@@ -42,6 +42,9 @@ import DigestSettings from "./pages/admin/DigestSettings";
 import CustomizeDashboard from "./pages/admin/CustomizeDashboard";
 import AuditTrailEnhanced from "./pages/family/AuditTrailEnhanced";
 import Install from "./pages/Install";
+import Invitations from "./pages/family/Invitations";
+import Payments from "./pages/family/Payments";
+import AcceptInvitation from "./pages/AcceptInvitation";
 import FamilyReports from "./pages/family/Reports";
 import NotFound from "./pages/NotFound";
 
@@ -94,6 +97,10 @@ const App = () => (
           <Route path="/family/:familySlug/shares" element={<FamilyShares />} />
           <Route path="/family/:familySlug/members/:memberId" element={<MemberProfile />} />
           <Route path="/family/:familySlug/reports" element={<FamilyReports />} />
+          <Route path="/family/:familySlug/invitations" element={<Invitations />} />
+          <Route path="/family/:familySlug/payments" element={<Payments />} />
+          <Route path="/accept-invitation" element={<AcceptInvitation />} />
+          <Route path="/install" element={<Install />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

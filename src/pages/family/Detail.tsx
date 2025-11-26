@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { useParams, useNavigate } from "react-router-dom";
-import { Loader2, ArrowLeft, BarChart3, Calendar, Users, DollarSign, CreditCard, PiggyBank, RefreshCw, Heart, Award, TrendingUp, Bell, FileText } from "lucide-react";
+import { Loader2, ArrowLeft, BarChart3, Calendar, Users, DollarSign, CreditCard, PiggyBank, RefreshCw, Heart, Award, TrendingUp, Bell, FileText, Mail, Wallet } from "lucide-react";
 import FinancialWidget from "@/components/FinancialWidget";
 import { notificationManager } from "@/lib/notifications";
 import { useEffect } from "react";
@@ -143,6 +143,20 @@ const FamilyDetail = () => {
       icon: Award,
       path: `/family/${familySlug}/shares`,
       color: "text-yellow-600",
+    },
+    {
+      title: "Member Invitations",
+      description: "Invite new members to join the family",
+      icon: Mail,
+      path: `/family/${familySlug}/invitations`,
+      color: "text-blue-600",
+    },
+    {
+      title: "Payment Management",
+      description: "Track and verify member payments",
+      icon: Wallet,
+      path: `/family/${familySlug}/payments`,
+      color: "text-teal-600",
     },
   ];
 
