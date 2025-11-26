@@ -14,6 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      assistance_events: {
+        Row: {
+          amount: number
+          beneficiary_name: string | null
+          contribution_per_member: number | null
+          created_at: string | null
+          event_date: string
+          event_type: string
+          family_id: string
+          hospitalization_days: number | null
+          id: string
+          is_paid: boolean | null
+          member_id: string
+          notes: string | null
+          payment_date: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount?: number
+          beneficiary_name?: string | null
+          contribution_per_member?: number | null
+          created_at?: string | null
+          event_date: string
+          event_type: string
+          family_id: string
+          hospitalization_days?: number | null
+          id?: string
+          is_paid?: boolean | null
+          member_id: string
+          notes?: string | null
+          payment_date?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          beneficiary_name?: string | null
+          contribution_per_member?: number | null
+          created_at?: string | null
+          event_date?: string
+          event_type?: string
+          family_id?: string
+          hospitalization_days?: number | null
+          id?: string
+          is_paid?: boolean | null
+          member_id?: string
+          notes?: string | null
+          payment_date?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assistance_events_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assistance_events_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attendance: {
         Row: {
           check_in_time: string | null
@@ -367,6 +433,107 @@ export type Database = {
           },
         ]
       }
+      njangi_cycles: {
+        Row: {
+          amount_per_person: number
+          created_at: string | null
+          end_date: string | null
+          family_id: string
+          id: string
+          name: string
+          notes: string | null
+          start_date: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount_per_person?: number
+          created_at?: string | null
+          end_date?: string | null
+          family_id: string
+          id?: string
+          name: string
+          notes?: string | null
+          start_date: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount_per_person?: number
+          created_at?: string | null
+          end_date?: string | null
+          family_id?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          start_date?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "njangi_cycles_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      njangi_participants: {
+        Row: {
+          amount_received: number | null
+          created_at: string | null
+          cycle_id: string
+          id: string
+          is_paid: boolean | null
+          member_id: string
+          notes: string | null
+          payout_date: string | null
+          payout_order: number
+          updated_at: string | null
+        }
+        Insert: {
+          amount_received?: number | null
+          created_at?: string | null
+          cycle_id: string
+          id?: string
+          is_paid?: boolean | null
+          member_id: string
+          notes?: string | null
+          payout_date?: string | null
+          payout_order: number
+          updated_at?: string | null
+        }
+        Update: {
+          amount_received?: number | null
+          created_at?: string | null
+          cycle_id?: string
+          id?: string
+          is_paid?: boolean | null
+          member_id?: string
+          notes?: string | null
+          payout_date?: string | null
+          payout_order?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "njangi_participants_cycle_id_fkey"
+            columns: ["cycle_id"]
+            isOneToOne: false
+            referencedRelation: "njangi_cycles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "njangi_participants_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -402,6 +569,54 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      savings: {
+        Row: {
+          amount: number
+          created_at: string | null
+          family_id: string
+          id: string
+          member_id: string
+          month: string
+          notes: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount?: number
+          created_at?: string | null
+          family_id: string
+          id?: string
+          member_id: string
+          month: string
+          notes?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          family_id?: string
+          id?: string
+          member_id?: string
+          month?: string
+          notes?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "savings_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "savings_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       super_admins: {
         Row: {

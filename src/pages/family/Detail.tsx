@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, BarChart3, Calendar, Users, DollarSign, CreditCard, PiggyBank } from "lucide-react";
+import { Loader2, ArrowLeft, BarChart3, Calendar, Users, DollarSign, CreditCard, PiggyBank, RefreshCw, Heart } from "lucide-react";
 
 const FamilyDetail = () => {
   const { familySlug } = useParams();
@@ -117,6 +117,20 @@ const FamilyDetail = () => {
       icon: PiggyBank,
       path: `/family/${familySlug}/savings`,
       color: "text-cyan-600",
+    },
+    {
+      title: "Njangi",
+      description: "Manage rotating savings cycles",
+      icon: RefreshCw,
+      path: `/family/${familySlug}/njangi`,
+      color: "text-indigo-600",
+    },
+    {
+      title: "Assistance",
+      description: "Track birth, death, and sickness events",
+      icon: Heart,
+      path: `/family/${familySlug}/assistance`,
+      color: "text-pink-600",
     },
   ];
 
