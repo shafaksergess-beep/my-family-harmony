@@ -33,6 +33,9 @@ const handler = async (req: Request): Promise<Response> => {
     const sevenDaysFromNow = new Date(now);
     sevenDaysFromNow.setDate(now.getDate() + 7);
     
+    const fiveDaysFromNow = new Date(now);
+    fiveDaysFromNow.setDate(now.getDate() + 5);
+    
     const threeDaysFromNow = new Date(now);
     threeDaysFromNow.setDate(now.getDate() + 3);
     
@@ -53,6 +56,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const remindersSent = {
       seven_days: 0,
+      five_days: 0,
       three_days: 0,
       one_day: 0,
     };
@@ -66,6 +70,8 @@ const handler = async (req: Request): Promise<Response> => {
       let reminderType = "";
       if (daysUntilMeeting === 7) {
         reminderType = "7_days";
+      } else if (daysUntilMeeting === 5) {
+        reminderType = "5_days";
       } else if (daysUntilMeeting === 3) {
         reminderType = "3_days";
       } else if (daysUntilMeeting === 1) {
@@ -108,6 +114,7 @@ const handler = async (req: Request): Promise<Response> => {
         console.log(`Sent ${reminderType} reminder for meeting ${meeting.id}`);
         
         if (daysUntilMeeting === 7) remindersSent.seven_days++;
+        else if (daysUntilMeeting === 5) remindersSent.five_days++;
         else if (daysUntilMeeting === 3) remindersSent.three_days++;
         else if (daysUntilMeeting === 1) remindersSent.one_day++;
       } catch (error) {
