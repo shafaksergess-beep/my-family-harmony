@@ -25,6 +25,14 @@ const Index = () => {
         <div className="absolute inset-0 bg-[url('/lovable-uploads/pattern.svg')] opacity-10"></div>
         <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="max-w-4xl mx-auto text-center animate-fade-in">
+            <div className="mb-8">
+              <img 
+                src="/logo.jpg" 
+                alt="Family Together Logo" 
+                className="w-32 h-32 mx-auto rounded-full object-cover shadow-2xl border-4 border-primary-foreground/20"
+              />
+            </div>
+            
             <div className="mb-6 inline-flex items-center gap-3 bg-primary-foreground/10 backdrop-blur-sm px-6 py-3 rounded-full border border-primary-foreground/20">
               <Home className="w-5 h-5" />
               <span className="text-sm font-medium">Family Harmony Hub</span>

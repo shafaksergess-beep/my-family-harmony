@@ -127,10 +127,14 @@ const Auth = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <Home className="w-8 h-8 text-primary" />
-            <h1 className="text-3xl font-bold text-foreground">Family Together</h1>
+          <div className="mb-4">
+            <img 
+              src="/logo.jpg" 
+              alt="Family Together Logo" 
+              className="w-24 h-24 mx-auto rounded-full object-cover shadow-lg"
+            />
           </div>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Family Together</h1>
           <p className="text-muted-foreground">
             Manage your family reunion with ease
           </p>
