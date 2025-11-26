@@ -96,6 +96,20 @@ const FamilyDetail = () => {
       color: "text-purple-600",
     },
     {
+      title: "Balloting System",
+      description: "Random assignment for hosting and njangi schedules",
+      icon: RefreshCw,
+      path: `/family/${familySlug}/balloting`,
+      color: "text-violet-600",
+    },
+    {
+      title: "Attendance Analytics",
+      description: "View attendance trends and member statistics",
+      icon: BarChart3,
+      path: `/family/${familySlug}/attendance-analytics`,
+      color: "text-cyan-600",
+    },
+    {
       title: "Members",
       description: "View and manage family members",
       icon: Users,

@@ -225,6 +225,47 @@ export type Database = {
           },
         ]
       }
+      balloting_assignments: {
+        Row: {
+          assignment_type: string
+          assignments: Json
+          balloted_at: string | null
+          balloted_by: string | null
+          created_at: string | null
+          family_id: string
+          id: string
+          year: number
+        }
+        Insert: {
+          assignment_type: string
+          assignments: Json
+          balloted_at?: string | null
+          balloted_by?: string | null
+          created_at?: string | null
+          family_id: string
+          id?: string
+          year: number
+        }
+        Update: {
+          assignment_type?: string
+          assignments?: Json
+          balloted_at?: string | null
+          balloted_by?: string | null
+          created_at?: string | null
+          family_id?: string
+          id?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "balloting_assignments_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       budget_categories: {
         Row: {
           color: string | null
@@ -792,6 +833,91 @@ export type Database = {
             columns: ["member_id"]
             isOneToOne: false
             referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meeting_agenda_items: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          meeting_id: string
+          order_index: number
+          requires_vote: boolean | null
+          time_allocation: number | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          meeting_id: string
+          order_index?: number
+          requires_vote?: boolean | null
+          time_allocation?: number | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          meeting_id?: string
+          order_index?: number
+          requires_vote?: boolean | null
+          time_allocation?: number | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_agenda_items_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meeting_minutes: {
+        Row: {
+          action_items: Json | null
+          content: string
+          created_at: string | null
+          decisions_made: Json | null
+          id: string
+          meeting_id: string
+          recorded_by: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          action_items?: Json | null
+          content: string
+          created_at?: string | null
+          decisions_made?: Json | null
+          id?: string
+          meeting_id: string
+          recorded_by?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          action_items?: Json | null
+          content?: string
+          created_at?: string | null
+          decisions_made?: Json | null
+          id?: string
+          meeting_id?: string
+          recorded_by?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_minutes_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
             referencedColumns: ["id"]
           },
         ]

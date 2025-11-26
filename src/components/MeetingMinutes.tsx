@@ -1,0 +1,306 @@
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { FileText, Plus, Trash2, Save } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+
+interface Decision {
+  title: string;
+  description: string;
+}
+
+interface ActionItem {
+  task: string;
+  assignee: string;
+  deadline: string;
+}
+
+interface Minutes {
+  id?: string;
+  content: string;
+  decisions_made: Decision[];
+  action_items: ActionItem[];
+}
+
+interface MeetingMinutesProps {
+  meetingId: string;
+  canEdit: boolean;
+}
+
+export const MeetingMinutes = ({ meetingId, canEdit }: MeetingMinutesProps) => {
+  const { toast } = useToast();
+  const [minutes, setMinutes] = useState<Minutes>({
+    content: "",
+    decisions_made: [],
+    action_items: [],
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [newDecision, setNewDecision] = useState<Decision>({ title: "", description: "" });
+  const [newAction, setNewAction] = useState<ActionItem>({ task: "", assignee: "", deadline: "" });
+
+  useEffect(() => {
+    loadMinutes();
+  }, [meetingId]);
+
+  const loadMinutes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("meeting_minutes")
+        .select("*")
+        .eq("meeting_id", meetingId)
+        .maybeSingle();
+
+      if (error && error.code !== "PGRST116") throw error;
+
+      if (data) {
+        setMinutes({
+          id: data.id,
+          content: data.content || "",
+          decisions_made: (data.decisions_made as unknown as Decision[]) || [],
+          action_items: (data.action_items as unknown as ActionItem[]) || [],
+        });
+      }
+    } catch (error: any) {
+      console.error("Error loading minutes:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const payload = {
+        meeting_id: meetingId,
+        content: minutes.content,
+        decisions_made: minutes.decisions_made as any,
+        action_items: minutes.action_items as any,
+        recorded_by: (await supabase.auth.getUser()).data.user?.id,
+      };
+
+      if (minutes.id) {
+        const { error } = await supabase
+          .from("meeting_minutes")
+          .update(payload)
+          .eq("id", minutes.id);
+
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase
+          .from("meeting_minutes")
+          .insert(payload)
+          .select()
+          .single();
+
+        if (error) throw error;
+        setMinutes({ ...minutes, id: data.id });
+      }
+
+      toast({
+        title: "Success",
+        description: "Meeting minutes saved",
+      });
+    } catch (error: any) {
+      console.error("Error saving minutes:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save minutes",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAddDecision = () => {
+    if (!newDecision.title.trim()) return;
+    setMinutes({
+      ...minutes,
+      decisions_made: [...minutes.decisions_made, newDecision],
+    });
+    setNewDecision({ title: "", description: "" });
+  };
+
+  const handleAddAction = () => {
+    if (!newAction.task.trim()) return;
+    setMinutes({
+      ...minutes,
+      action_items: [...minutes.action_items, newAction],
+    });
+    setNewAction({ task: "", assignee: "", deadline: "" });
+  };
+
+  const handleRemoveDecision = (index: number) => {
+    setMinutes({
+      ...minutes,
+      decisions_made: minutes.decisions_made.filter((_, i) => i !== index),
+    });
+  };
+
+  const handleRemoveAction = (index: number) => {
+    setMinutes({
+      ...minutes,
+      action_items: minutes.action_items.filter((_, i) => i !== index),
+    });
+  };
+
+  if (loading) {
+    return <div>Loading minutes...</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              Meeting Minutes
+            </CardTitle>
+            {canEdit && (
+              <Button onClick={handleSave} disabled={saving}>
+                <Save className="w-4 h-4 mr-2" />
+                {saving ? "Saving..." : "Save Minutes"}
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Main Content */}
+          <div>
+            <Label htmlFor="content">Meeting Notes</Label>
+            <Textarea
+              id="content"
+              value={minutes.content}
+              onChange={(e) => setMinutes({ ...minutes, content: e.target.value })}
+              placeholder="Document the main discussions, topics covered, and general notes from the meeting..."
+              rows={8}
+              disabled={!canEdit}
+              className="mt-2"
+            />
+          </div>
+
+          {/* Decisions Made */}
+          <div>
+            <h4 className="font-semibold mb-3">Decisions Made</h4>
+            {minutes.decisions_made.length > 0 ? (
+              <div className="space-y-2 mb-4">
+                {minutes.decisions_made.map((decision, index) => (
+                  <div key={index} className="flex items-start justify-between p-3 border rounded-lg">
+                    <div className="flex-1">
+                      <p className="font-medium">{decision.title}</p>
+                      {decision.description && (
+                        <p className="text-sm text-muted-foreground mt-1">{decision.description}</p>
+                      )}
+                    </div>
+                    {canEdit && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveDecision(index)}
+                      >
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground mb-4">No decisions recorded yet</p>
+            )}
+
+            {canEdit && (
+              <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
+                <Input
+                  placeholder="Decision title"
+                  value={newDecision.title}
+                  onChange={(e) => setNewDecision({ ...newDecision, title: e.target.value })}
+                />
+                <Textarea
+                  placeholder="Decision description (optional)"
+                  value={newDecision.description}
+                  onChange={(e) => setNewDecision({ ...newDecision, description: e.target.value })}
+                  rows={2}
+                />
+                <Button onClick={handleAddDecision} variant="outline" size="sm">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Decision
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Action Items */}
+          <div>
+            <h4 className="font-semibold mb-3">Action Items</h4>
+            {minutes.action_items.length > 0 ? (
+              <div className="space-y-2 mb-4">
+                {minutes.action_items.map((action, index) => (
+                  <div key={index} className="flex items-start justify-between p-3 border rounded-lg">
+                    <div className="flex-1">
+                      <p className="font-medium">{action.task}</p>
+                      <div className="flex items-center gap-3 mt-1">
+                        {action.assignee && (
+                          <Badge variant="secondary">{action.assignee}</Badge>
+                        )}
+                        {action.deadline && (
+                          <span className="text-sm text-muted-foreground">
+                            Due: {new Date(action.deadline).toLocaleDateString()}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {canEdit && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveAction(index)}
+                      >
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground mb-4">No action items recorded yet</p>
+            )}
+
+            {canEdit && (
+              <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
+                <Input
+                  placeholder="Action item / task"
+                  value={newAction.task}
+                  onChange={(e) => setNewAction({ ...newAction, task: e.target.value })}
+                />
+                <div className="grid grid-cols-2 gap-3">
+                  <Input
+                    placeholder="Assignee"
+                    value={newAction.assignee}
+                    onChange={(e) => setNewAction({ ...newAction, assignee: e.target.value })}
+                  />
+                  <Input
+                    type="date"
+                    placeholder="Deadline"
+                    value={newAction.deadline}
+                    onChange={(e) => setNewAction({ ...newAction, deadline: e.target.value })}
+                  />
+                </div>
+                <Button onClick={handleAddAction} variant="outline" size="sm">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Action Item
+                </Button>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
