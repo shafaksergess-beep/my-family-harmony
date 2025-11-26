@@ -47,6 +47,8 @@ import Payments from "./pages/family/Payments";
 import AcceptInvitation from "./pages/AcceptInvitation";
 import MeetingReminders from "./pages/family/MeetingReminders";
 import PaymentIntegration from "./pages/family/PaymentIntegration";
+import ContributionAnalytics from "./pages/family/ContributionAnalytics";
+import ReminderSettings from "./pages/family/ReminderSettings";
 import FamilyReports from "./pages/family/Reports";
 import NotFound from "./pages/NotFound";
 
@@ -103,6 +105,8 @@ const App = () => (
           <Route path="/family/:familySlug/payments" element={<Payments />} />
           <Route path="/family/:familySlug/payment-integration" element={<PaymentIntegration />} />
           <Route path="/family/:familySlug/meeting-reminders" element={<MeetingReminders />} />
+          <Route path="/family/:familySlug/contribution-analytics" element={<ContributionAnalytics />} />
+          <Route path="/family/:familySlug/reminder-settings" element={<ReminderSettings />} />
           <Route path="/accept-invitation" element={<AcceptInvitation />} />
           <Route path="/install" element={<Install />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

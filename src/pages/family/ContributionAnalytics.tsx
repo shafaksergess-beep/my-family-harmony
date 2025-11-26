@@ -103,10 +103,12 @@ const ContributionAnalytics = () => {
       // Calculate member summaries
       const memberMap = new Map<string, MemberSummary>();
       enrichedContributions.forEach(contribution => {
+        const memberName = (contribution.family_members?.profiles as any)?.full_name || "Unknown";
+        
         if (!memberMap.has(contribution.member_id)) {
           memberMap.set(contribution.member_id, {
             member_id: contribution.member_id,
-            member_name: contribution.family_members?.profiles?.full_name || "Unknown",
+            member_name: memberName,
             total_paid: 0,
             total_outstanding: 0,
             late_count: 0,
@@ -315,14 +317,16 @@ const ContributionAnalytics = () => {
                   <p className="text-center text-muted-foreground py-8">No late payments</p>
                 ) : (
                   <div className="space-y-4">
-                    {latePayments.map(contribution => {
+                  {latePayments.map(contribution => {
                       const daysLate = Math.ceil(
                         (new Date().getTime() - new Date(contribution.contribution_date).getTime()) / (1000 * 60 * 60 * 24)
                       );
+                      const memberName = (contribution.family_members?.profiles as any)?.full_name || "Unknown";
+                      
                       return (
                         <div key={contribution.id} className="flex items-center justify-between p-4 border border-border rounded-lg">
                           <div>
-                            <p className="font-medium">{contribution.family_members?.profiles?.full_name}</p>
+                            <p className="font-medium">{memberName}</p>
                             <p className="text-sm text-muted-foreground">
                               Due: {new Date(contribution.contribution_date).toLocaleDateString()}
                             </p>
