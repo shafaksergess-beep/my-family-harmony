@@ -38,6 +38,10 @@ import Users from "./pages/admin/Users";
 import UserDetail from "./pages/admin/UserDetail";
 import RolePermissions from "./pages/admin/RolePermissions";
 import UserActivity from "./pages/admin/UserActivity";
+import DigestSettings from "./pages/admin/DigestSettings";
+import CustomizeDashboard from "./pages/admin/CustomizeDashboard";
+import AuditTrailEnhanced from "./pages/family/AuditTrailEnhanced";
+import Install from "./pages/Install";
 import FamilyReports from "./pages/family/Reports";
 import NotFound from "./pages/NotFound";
 
@@ -52,6 +56,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/install" element={<Install />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
@@ -64,9 +69,12 @@ const App = () => (
         <Route path="/admin/global-analytics" element={<GlobalAnalytics />} />
         <Route path="/admin/users" element={<Users />} />
         <Route path="/admin/users/:userId" element={<UserDetail />} />
+        <Route path="/admin/digest-settings" element={<DigestSettings />} />
+        <Route path="/admin/customize-dashboard" element={<CustomizeDashboard />} />
         <Route path="/admin/role-permissions" element={<RolePermissions />} />
         <Route path="/admin/user-activity" element={<UserActivity />} />
           <Route path="/family/:familySlug" element={<FamilyDetail />} />
+          <Route path="/family/:familySlug/audit-trail-enhanced" element={<AuditTrailEnhanced />} />
           <Route path="/family/:familySlug/analytics" element={<FamilyAnalytics />} />
           <Route path="/family/:familySlug/financial-analytics" element={<FinancialAnalytics />} />
           <Route path="/family/:familySlug/notifications" element={<Notifications />} />
