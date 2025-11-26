@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, DollarSign, CreditCard, PiggyBank, TrendingUp, ArrowUpDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
 
 interface MemberData {
   id: string;
@@ -428,6 +429,89 @@ export const MemberComparison = ({ familyId, members }: MemberComparisonProps) =
                   </TableRow>
                 </TableBody>
               </Table>
+            </div>
+
+            {/* Visual Charts */}
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Financial Comparison Chart</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={comparisonData.map(m => ({
+                      name: m.name.split(' ')[0], // First name only
+                      Contributions: m.totalContributions,
+                      Savings: m.totalSavings,
+                      Outstanding: m.outstandingLoans,
+                    }))}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                      <Legend />
+                      <Bar dataKey="Contributions" fill="hsl(var(--primary))" />
+                      <Bar dataKey="Savings" fill="hsl(var(--chart-2))" />
+                      <Bar dataKey="Outstanding" fill="hsl(var(--destructive))" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Performance Radar</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={400}>
+                    <RadarChart data={[
+                      {
+                        metric: 'Contributions',
+                        ...Object.fromEntries(comparisonData.map(m => [
+                          m.name.split(' ')[0],
+                          m.totalContributions / Math.max(...comparisonData.map(x => x.totalContributions)) * 100
+                        ]))
+                      },
+                      {
+                        metric: 'Savings',
+                        ...Object.fromEntries(comparisonData.map(m => [
+                          m.name.split(' ')[0],
+                          m.totalSavings / Math.max(...comparisonData.map(x => x.totalSavings)) * 100
+                        ]))
+                      },
+                      {
+                        metric: 'Attendance',
+                        ...Object.fromEntries(comparisonData.map(m => [
+                          m.name.split(' ')[0],
+                          m.attendanceRate
+                        ]))
+                      },
+                      {
+                        metric: 'Loan Compliance',
+                        ...Object.fromEntries(comparisonData.map(m => [
+                          m.name.split(' ')[0],
+                          m.totalLoans > 0 ? ((m.totalLoans - m.outstandingLoans) / m.totalLoans * 100) : 100
+                        ]))
+                      },
+                    ]}>
+                      <PolarGrid />
+                      <PolarAngleAxis dataKey="metric" />
+                      <PolarRadiusAxis angle={90} domain={[0, 100]} />
+                      {comparisonData.map((member, index) => (
+                        <Radar
+                          key={member.memberId}
+                          name={member.name.split(' ')[0]}
+                          dataKey={member.name.split(' ')[0]}
+                          stroke={`hsl(${(index * 360) / comparisonData.length}, 70%, 50%)`}
+                          fill={`hsl(${(index * 360) / comparisonData.length}, 70%, 50%)`}
+                          fillOpacity={0.3}
+                        />
+                      ))}
+                      <Legend />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
             </div>
 
             <div className="flex items-center gap-2 text-sm text-muted-foreground">

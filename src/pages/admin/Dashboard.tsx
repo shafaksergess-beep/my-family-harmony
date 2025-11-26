@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, Users, Building2, Activity, TrendingUp, Shield, FileText, BarChart3, PieChart, Mail, Download, Globe, Layout } from "lucide-react";
+import { Loader2, ArrowLeft, Users, Building2, Activity, TrendingUp, Shield, FileText, BarChart3, PieChart, Mail, Download, Globe, Layout, Trophy } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Badge } from "@/components/ui/badge";
 import ActivityWidget from "@/components/ActivityWidget";
@@ -568,6 +568,16 @@ const AdminDashboard = () => {
               <div className="flex flex-col items-center gap-2">
                 <Activity className="w-8 h-8" />
                 <span>User Activity</span>
+              </div>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto py-6"
+              onClick={() => navigate("/admin/leaderboard")}
+            >
+              <div className="flex flex-col items-center gap-2">
+                <Trophy className="w-8 h-8 text-yellow-500" />
+                <span>Leaderboard</span>
               </div>
             </Button>
             <Button

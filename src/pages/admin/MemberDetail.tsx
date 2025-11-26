@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { MemberActivityTimeline } from "@/components/MemberActivityTimeline";
 import { generateMemberReport } from "@/lib/pdfGenerator";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 interface MemberData {
   id: string;
@@ -337,6 +338,7 @@ const MemberDetail = () => {
             <TabsTrigger value="loans">Loans</TabsTrigger>
             <TabsTrigger value="savings">Savings</TabsTrigger>
             <TabsTrigger value="attendance">Attendance</TabsTrigger>
+            <TabsTrigger value="trends">Trends</TabsTrigger>
           </TabsList>
 
           <TabsContent value="contributions">
@@ -503,6 +505,53 @@ const MemberDetail = () => {
                 )}
               </CardContent>
             </Card>
+            </TabsContent>
+
+            <TabsContent value="trends">
+              <div className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Contribution Trends</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={contributions.slice(0, 12).reverse().map(c => ({
+                        date: new Date(c.contribution_date).toLocaleDateString('en-US', { month: 'short', year: '2-digit' }),
+                        amount: Number(c.amount),
+                        status: c.status
+                      }))}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" />
+                        <YAxis />
+                        <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                        <Legend />
+                        <Line type="monotone" dataKey="amount" stroke="hsl(var(--primary))" strokeWidth={2} name="Amount" />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Savings Growth</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={savings.slice(0, 12).reverse().map(s => ({
+                        month: new Date(s.month).toLocaleDateString('en-US', { month: 'short', year: '2-digit' }),
+                        amount: Number(s.amount)
+                      }))}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                        <Legend />
+                        <Bar dataKey="amount" fill="hsl(var(--chart-2))" name="Savings" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
