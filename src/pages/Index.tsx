@@ -1,8 +1,23 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Users, Calendar, DollarSign, TrendingUp, Heart, Shield, Home, PiggyBank, FileText, Award } from "lucide-react";
 
 const Index = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate("/dashboard");
+      }
+    };
+    checkAuth();
+  }, [navigate]);
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
