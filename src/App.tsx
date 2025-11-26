@@ -45,6 +45,7 @@ import Install from "./pages/Install";
 import Invitations from "./pages/family/Invitations";
 import Payments from "./pages/family/Payments";
 import AcceptInvitation from "./pages/AcceptInvitation";
+import MeetingReminders from "./pages/family/MeetingReminders";
 import FamilyReports from "./pages/family/Reports";
 import NotFound from "./pages/NotFound";
 
@@ -99,6 +100,7 @@ const App = () => (
           <Route path="/family/:familySlug/reports" element={<FamilyReports />} />
           <Route path="/family/:familySlug/invitations" element={<Invitations />} />
           <Route path="/family/:familySlug/payments" element={<Payments />} />
+          <Route path="/family/:familySlug/meeting-reminders" element={<MeetingReminders />} />
           <Route path="/accept-invitation" element={<AcceptInvitation />} />
           <Route path="/install" element={<Install />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

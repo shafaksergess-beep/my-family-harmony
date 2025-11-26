@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { useParams, useNavigate } from "react-router-dom";
-import { Loader2, ArrowLeft, BarChart3, Calendar, Users, DollarSign, CreditCard, PiggyBank, RefreshCw, Heart, Award, TrendingUp, Bell, FileText, Mail, Wallet } from "lucide-react";
+import { Loader2, ArrowLeft, BarChart3, Calendar, Users, DollarSign, CreditCard, PiggyBank, RefreshCw, Heart, Award, TrendingUp, Bell, FileText, Mail, Wallet, MessageSquare } from "lucide-react";
 import FinancialWidget from "@/components/FinancialWidget";
 import { notificationManager } from "@/lib/notifications";
 import { useEffect } from "react";
@@ -157,6 +157,13 @@ const FamilyDetail = () => {
       icon: Wallet,
       path: `/family/${familySlug}/payments`,
       color: "text-teal-600",
+    },
+    {
+      title: "Meeting Reminders",
+      description: "Send automated meeting notifications",
+      icon: MessageSquare,
+      path: `/family/${familySlug}/meeting-reminders`,
+      color: "text-purple-600",
     },
   ];
 
