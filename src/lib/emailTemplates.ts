@@ -48,7 +48,8 @@ export const getAdminActionEmailTemplate = ({
               <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                 <!-- Header -->
                 <tr>
-                  <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 8px 8px 0 0;">
+                  <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 8px 8px 0 0; text-align: center;">
+                    <img src="https://31382291-0546-4a70-a015-b86eb65a55a3.lovableproject.com/logo.jpg" alt="Family Together" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 16px; border: 3px solid rgba(255,255,255,0.3);" />
                     <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">
                       🔔 Admin Activity Alert
                     </h1>
@@ -166,6 +167,7 @@ export const getWelcomeEmailTemplate = (userName: string): string => {
               <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                 <tr>
                   <td style="padding: 40px; text-align: center;">
+                    <img src="https://31382291-0546-4a70-a015-b86eb65a55a3.lovableproject.com/logo.jpg" alt="Family Together" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
                     <h1 style="margin: 0 0 16px 0; color: #1f2937; font-size: 28px;">
                       Welcome to Family Together! 🎉
                     </h1>

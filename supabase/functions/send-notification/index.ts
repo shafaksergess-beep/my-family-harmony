@@ -110,6 +110,7 @@ const handler = async (req: Request): Promise<Response> => {
         </head>
         <body>
           <div class="header">
+            <img src="https://31382291-0546-4a70-a015-b86eb65a55a3.lovableproject.com/logo.jpg" alt="Family Together" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 16px; border: 3px solid rgba(255,255,255,0.3);" />
             <h1 style="margin: 0;">Family Together</h1>
             <p style="margin: 10px 0 0 0; opacity: 0.9;">${familyName}</p>
           </div>
