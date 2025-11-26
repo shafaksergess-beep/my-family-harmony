@@ -48,6 +48,29 @@ const ActivityLogs = () => {
     checkAuthAndLoadLogs();
   }, []);
 
+  // Real-time subscription for activity logs
+  useEffect(() => {
+    const channel = supabase
+      .channel('admin-logs-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'admin_logs'
+        },
+        () => {
+          // Reload logs when any change occurs
+          loadLogs();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
   const checkAuthAndLoadLogs = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
