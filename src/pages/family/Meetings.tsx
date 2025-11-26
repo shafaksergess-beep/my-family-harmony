@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { Loader2, ArrowLeft, Plus, Calendar, MapPin, Clock } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -25,8 +26,8 @@ const FamilyMeetings = () => {
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { family, isFamilyHead, isLoading: authLoading } = useFamilyAuth(familySlug);
   const [loading, setLoading] = useState(true);
-  const [family, setFamily] = useState<any>(null);
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -43,24 +44,13 @@ const FamilyMeetings = () => {
   }, [familySlug]);
 
   const loadData = async () => {
+    if (!family) return;
+    
     try {
-      const { data: familyData } = await supabase
-        .from("families")
-        .select("*")
-        .eq("slug", familySlug)
-        .single();
-      
-      if (!familyData) {
-        navigate("/dashboard");
-        return;
-      }
-      
-      setFamily(familyData);
-
       const { data: meetingsData } = await supabase
         .from("meetings")
         .select("*")
-        .eq("family_id", familyData.id)
+        .eq("family_id", family.id)
         .order("meeting_date", { ascending: false });
       
       setMeetings(meetingsData || []);
@@ -114,7 +104,7 @@ const FamilyMeetings = () => {
     }
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -138,7 +128,8 @@ const FamilyMeetings = () => {
               </div>
             </div>
             
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            {isFamilyHead && (
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="w-4 h-4 mr-2" />
@@ -224,6 +215,7 @@ const FamilyMeetings = () => {
                 </form>
               </DialogContent>
             </Dialog>
+            )}
           </div>
         </div>
       </header>
@@ -234,10 +226,12 @@ const FamilyMeetings = () => {
             <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
             <h3 className="text-xl font-semibold mb-2 text-foreground">No meetings scheduled</h3>
             <p className="text-muted-foreground mb-6">Create your first meeting to get started</p>
-            <Button onClick={() => setIsDialogOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Create Meeting
-            </Button>
+            {isFamilyHead && (
+              <Button onClick={() => setIsDialogOpen(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Create Meeting
+              </Button>
+            )}
           </Card>
         ) : (
           <div className="grid gap-4">

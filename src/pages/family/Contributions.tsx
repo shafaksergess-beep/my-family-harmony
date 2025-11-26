@@ -10,8 +10,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, DollarSign, TrendingUp } from "lucide-react";
+import { useFamilyAuth } from "@/hooks/useFamilyAuth";
+import { ArrowLeft, Plus, DollarSign, TrendingUp, Download, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { exportToCSV } from "@/lib/export";
 
 interface Contribution {
   id: string;
@@ -38,9 +40,10 @@ interface Member {
 }
 
 export default function Contributions() {
-  const { familyId } = useParams();
+  const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { family, canManageFinances, isLoading: authLoading } = useFamilyAuth(familySlug);
   const [contributions, setContributions] = useState<Contribution[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,13 +57,15 @@ export default function Contributions() {
   });
 
   useEffect(() => {
-    if (familyId) {
+    if (family) {
       fetchContributions();
       fetchMembers();
     }
-  }, [familyId]);
+  }, [family]);
 
   const fetchContributions = async () => {
+    if (!family) return;
+    
     try {
       const { data, error } = await supabase
         .from("contributions")
@@ -70,7 +75,7 @@ export default function Contributions() {
             profiles(full_name)
           )
         `)
-        .eq("family_id", familyId)
+        .eq("family_id", family.id)
         .order("contribution_date", { ascending: false });
 
       if (error) throw error;
@@ -87,11 +92,13 @@ export default function Contributions() {
   };
 
   const fetchMembers = async () => {
+    if (!family) return;
+    
     try {
       const { data, error } = await supabase
         .from("family_members")
         .select("id, profiles(full_name)")
-        .eq("family_id", familyId);
+        .eq("family_id", family.id);
 
       if (error) throw error;
       setMembers(data as any || []);
@@ -107,7 +114,7 @@ export default function Contributions() {
   const handleAddContribution = async () => {
     try {
       const { error } = await supabase.from("contributions").insert({
-        family_id: familyId,
+        family_id: family.id,
         member_id: newContribution.member_id,
         amount: parseFloat(newContribution.amount),
         contribution_date: newContribution.contribution_date,
@@ -168,24 +175,54 @@ export default function Contributions() {
     }
   };
 
+  const handleExport = () => {
+    const csvData = contributions.map((c) => ({
+      Member: c.family_members?.profiles?.full_name || "Unknown",
+      Amount: c.amount,
+      Date: format(new Date(c.contribution_date), "yyyy-MM-dd"),
+      Type: c.type,
+      Status: c.status,
+      "Payment Date": c.payment_date ? format(new Date(c.payment_date), "yyyy-MM-dd") : "N/A",
+      "Late Fine": c.late_fine || 0,
+      Notes: c.notes || "",
+    }));
+    exportToCSV(csvData, "contributions.csv");
+  };
+
   const totalContributions = contributions.reduce((sum, c) => sum + c.amount, 0);
   const paidContributions = contributions.filter((c) => c.status === "paid").reduce((sum, c) => sum + c.amount, 0);
   const pendingContributions = totalContributions - paidContributions;
 
-  if (loading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  if (authLoading || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familyId}`)}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-3xl font-bold">Contributions</h1>
-        </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border bg-card">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">Contributions</h1>
+                <p className="text-sm text-muted-foreground">Track monthly contributions and payments</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handleExport}>
+                <Download className="w-4 h-4 mr-2" />
+                Export CSV
+              </Button>
+              {canManageFinances && (
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" /> Add Contribution
@@ -250,14 +287,17 @@ export default function Contributions() {
                 />
               </div>
               <Button onClick={handleAddContribution} className="w-full">
-                Add Contribution
-              </Button>
+                  Add Contribution
+                </Button>
+              </DialogContent>
+            </Dialog>
+              )}
             </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+          </div>
+        </div>
+      </header>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <main className="container mx-auto px-4 py-8 space-y-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Contributions</CardTitle>
@@ -300,28 +340,31 @@ export default function Contributions() {
                   <p className="text-sm text-muted-foreground">
                     {format(new Date(contribution.contribution_date), "PPP")} • {contribution.type}
                   </p>
-                  {contribution.notes && <p className="text-sm text-muted-foreground">{contribution.notes}</p>}
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <p className="font-bold">{contribution.amount.toLocaleString()} FCFA</p>
-                    {contribution.late_fine && contribution.late_fine > 0 && (
-                      <p className="text-sm text-red-600">+{contribution.late_fine} fine</p>
-                    )}
+                    {contribution.notes && <p className="text-sm text-muted-foreground">{contribution.notes}</p>}
                   </div>
-                  {contribution.status === "pending" ? (
-                    <Button size="sm" onClick={() => handleMarkAsPaid(contribution.id)}>
-                      Mark Paid
-                    </Button>
-                  ) : (
-                    <Badge variant="default">Paid</Badge>
-                  )}
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <p className="font-bold">{contribution.amount.toLocaleString()} FCFA</p>
+                      {contribution.late_fine && contribution.late_fine > 0 && (
+                        <p className="text-sm text-red-600">+{contribution.late_fine} fine</p>
+                      )}
+                    </div>
+                    {contribution.status === "pending" && canManageFinances ? (
+                      <Button size="sm" onClick={() => handleMarkAsPaid(contribution.id)}>
+                        Mark Paid
+                      </Button>
+                    ) : (
+                      <Badge variant={contribution.status === "paid" ? "default" : "secondary"}>
+                        {contribution.status}
+                      </Badge>
+                    )}
                 </div>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
 }

@@ -1,73 +1,15 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { useFamilyAuth } from "@/hooks/useFamilyAuth";
+import { useParams, useNavigate } from "react-router-dom";
 import { Loader2, ArrowLeft, BarChart3, Calendar, Users, DollarSign, CreditCard, PiggyBank, RefreshCw, Heart, Award } from "lucide-react";
 
 const FamilyDetail = () => {
   const { familySlug } = useParams();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
-  const [family, setFamily] = useState<any>(null);
-  const [userRole, setUserRole] = useState<string>("");
+  const { family, userRole, isLoading } = useFamilyAuth(familySlug);
 
-  useEffect(() => {
-    loadFamily();
-  }, [familySlug]);
-
-  const loadFamily = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        navigate("/auth");
-        return;
-      }
-
-      const { data: familyData } = await supabase
-        .from("families")
-        .select("*")
-        .eq("slug", familySlug)
-        .single();
-      
-      if (!familyData) {
-        toast({
-          title: "Error",
-          description: "Family not found",
-          variant: "destructive",
-        });
-        navigate("/dashboard");
-        return;
-      }
-      
-      setFamily(familyData);
-
-      // Get user's role in this family
-      const { data: memberData } = await supabase
-        .from("family_members")
-        .select("role")
-        .eq("family_id", familyData.id)
-        .eq("user_id", session.user.id)
-        .single();
-      
-      if (memberData) {
-        setUserRole(memberData.role);
-      }
-    } catch (error) {
-      console.error("Error loading family:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load family details",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
