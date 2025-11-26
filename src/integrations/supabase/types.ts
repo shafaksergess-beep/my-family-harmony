@@ -834,6 +834,79 @@ export type Database = {
           },
         ]
       }
+      payment_plans: {
+        Row: {
+          amount_paid: number
+          contribution_id: string | null
+          created_at: string
+          end_date: string | null
+          family_id: string
+          frequency: string
+          id: string
+          installment_amount: number
+          member_id: string
+          notes: string | null
+          start_date: string
+          status: string
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          amount_paid?: number
+          contribution_id?: string | null
+          created_at?: string
+          end_date?: string | null
+          family_id: string
+          frequency?: string
+          id?: string
+          installment_amount: number
+          member_id: string
+          notes?: string | null
+          start_date: string
+          status?: string
+          total_amount: number
+          updated_at?: string
+        }
+        Update: {
+          amount_paid?: number
+          contribution_id?: string | null
+          created_at?: string
+          end_date?: string | null
+          family_id?: string
+          frequency?: string
+          id?: string
+          installment_amount?: number
+          member_id?: string
+          notes?: string | null
+          start_date?: string
+          status?: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_plans_contribution_id_fkey"
+            columns: ["contribution_id"]
+            isOneToOne: false
+            referencedRelation: "contributions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_plans_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_plans_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_reminders: {
         Row: {
           contribution_id: string

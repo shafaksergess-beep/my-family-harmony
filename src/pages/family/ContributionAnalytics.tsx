@@ -5,10 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, TrendingUp, AlertTriangle, Clock, DollarSign } from "lucide-react";
+import { Loader2, ArrowLeft, TrendingUp, AlertTriangle, Clock, DollarSign, Award } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { calculateCreditScore, getCreditScoreColor, getCreditScoreBadgeVariant } from "@/lib/creditScoring";
 
 interface Contribution {
   id: string;
@@ -20,6 +21,7 @@ interface Contribution {
   member_id: string;
   family_members: {
     profiles: { full_name: string };
+    joined_at: string;
   };
 }
 
@@ -30,6 +32,8 @@ interface MemberSummary {
   total_outstanding: number;
   late_count: number;
   on_time_count: number;
+  credit_score?: number;
+  credit_rating?: string;
 }
 
 const ContributionAnalytics = () => {
@@ -65,14 +69,27 @@ const ContributionAnalytics = () => {
       const memberIds = [...new Set((contributionsData || []).map(c => c.member_id))];
       const { data: membersData } = await supabase
         .from("family_members")
-        .select("id, profiles:user_id(full_name)")
+        .select("id, user_id, joined_at")
         .in("id", memberIds);
 
-      const membersMap = new Map(membersData?.map(m => [m.id, m]) || []);
+      const userIds = membersData?.map(m => m.user_id) || [];
+      const { data: profilesData } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", userIds);
+
+      const profilesMap = new Map(profilesData?.map(p => [p.id, p]) || []);
+      const membersMap = new Map(membersData?.map(m => [m.id, { ...m, profiles: profilesMap.get(m.user_id) }]) || []);
+
+      // Load loans for credit scoring
+      const { data: loansData } = await supabase
+        .from("loans")
+        .select("member_id, status, amount, amount_paid, due_date")
+        .eq("family_id", family.id);
       
       const enrichedContributions = (contributionsData || []).map(contribution => ({
         ...contribution,
-        family_members: membersMap.get(contribution.member_id) || { profiles: { full_name: "Unknown" } }
+        family_members: membersMap.get(contribution.member_id) || { profiles: { full_name: "Unknown" }, joined_at: new Date().toISOString() }
       }));
 
       setContributions(enrichedContributions as any);
@@ -100,10 +117,11 @@ const ContributionAnalytics = () => {
       const monthlyArray = Array.from(monthlyMap.values()).slice(0, 12).reverse();
       setMonthlyData(monthlyArray);
 
-      // Calculate member summaries
+      // Calculate member summaries with credit scores
       const memberMap = new Map<string, MemberSummary>();
       enrichedContributions.forEach(contribution => {
-        const memberName = (contribution.family_members?.profiles as any)?.full_name || "Unknown";
+        const memberData = membersMap.get(contribution.member_id);
+        const memberName = (memberData?.profiles as any)?.full_name || "Unknown";
         
         if (!memberMap.has(contribution.member_id)) {
           memberMap.set(contribution.member_id, {
@@ -129,6 +147,37 @@ const ContributionAnalytics = () => {
         } else {
           summary.total_outstanding += contribution.amount;
         }
+      });
+
+      // Calculate credit scores
+      memberMap.forEach((summary, memberId) => {
+        const memberContributions = enrichedContributions.filter(c => c.member_id === memberId);
+        const memberLoans = loansData?.filter(l => l.member_id === memberId) || [];
+        const memberData = membersMap.get(memberId);
+        
+        const joinedAt = memberData?.joined_at;
+        const monthsAsMember = joinedAt
+          ? Math.floor((new Date().getTime() - new Date(joinedAt).getTime()) / (1000 * 60 * 60 * 24 * 30))
+          : 0;
+
+        const totalFines = memberContributions
+          .filter(c => c.late_fine > 0)
+          .reduce((sum, c) => sum + c.late_fine, 0);
+
+        const creditScoreData = calculateCreditScore({
+          totalContributions: summary.on_time_count + summary.late_count,
+          paidOnTimeContributions: summary.on_time_count,
+          lateContributions: summary.late_count,
+          totalLoans: memberLoans.length,
+          repaidLoansOnTime: memberLoans.filter(l => l.status === "paid").length,
+          defaultedLoans: memberLoans.filter(l => l.status === "defaulted").length,
+          totalFines: totalFines,
+          monthsAsMember,
+          consecutiveMonthsPaid: summary.on_time_count,
+        });
+
+        summary.credit_score = creditScoreData.score;
+        summary.credit_rating = creditScoreData.rating;
       });
 
       setMemberSummaries(Array.from(memberMap.values()));
@@ -183,7 +232,7 @@ const ContributionAnalytics = () => {
             </Button>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Contribution Analytics</h1>
-              <p className="text-sm text-muted-foreground">Track payment trends and outstanding balances</p>
+              <p className="text-sm text-muted-foreground">Track payment trends and member credit scores</p>
             </div>
           </div>
         </div>
@@ -273,15 +322,30 @@ const ContributionAnalytics = () => {
           <TabsContent value="members">
             <Card>
               <CardHeader>
-                <CardTitle>Member Payment Analysis</CardTitle>
-                <CardDescription>Individual member contribution summaries</CardDescription>
+                <CardTitle>Member Payment Analysis with Credit Scores</CardTitle>
+                <CardDescription>Individual contribution tracking and creditworthiness</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {memberSummaries.map(summary => (
                     <div key={summary.member_id} className="flex items-center justify-between p-4 border border-border rounded-lg">
                       <div className="flex-1">
-                        <p className="font-medium">{summary.member_name}</p>
+                        <div className="flex items-center gap-3 mb-2">
+                          <p className="font-medium">{summary.member_name}</p>
+                          {summary.credit_score !== undefined && (
+                            <div className="flex items-center gap-2">
+                              <Badge variant={getCreditScoreBadgeVariant(summary.credit_rating || "")}>
+                                {summary.credit_rating}
+                              </Badge>
+                              <div className="flex items-center gap-1">
+                                <Award className={`h-4 w-4 ${getCreditScoreColor(summary.credit_score)}`} />
+                                <span className={`font-bold ${getCreditScoreColor(summary.credit_score)}`}>
+                                  {summary.credit_score}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                         <div className="flex gap-4 mt-1 text-sm text-muted-foreground">
                           <span>Paid: {summary.total_paid.toLocaleString()} FCFA</span>
                           {summary.total_outstanding > 0 && (
