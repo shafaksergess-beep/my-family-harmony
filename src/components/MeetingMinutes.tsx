@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { RealtimeChannel } from "@supabase/supabase-js";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -42,11 +43,79 @@ export const MeetingMinutes = ({ meetingId, canEdit }: MeetingMinutesProps) => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [activeEditors, setActiveEditors] = useState<string[]>([]);
+  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
   const [newDecision, setNewDecision] = useState<Decision>({ title: "", description: "" });
   const [newAction, setNewAction] = useState<ActionItem>({ task: "", assignee: "", deadline: "" });
 
   useEffect(() => {
     loadMinutes();
+    setupRealtimeCollaboration();
+
+    return () => {
+      if (channel) {
+        channel.unsubscribe();
+      }
+    };
+  }, [meetingId]);
+
+  const setupRealtimeCollaboration = useCallback(async () => {
+    if (!meetingId) return;
+
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Create a channel for this meeting
+    const meetingChannel = supabase.channel(`meeting_minutes:${meetingId}`, {
+      config: {
+        presence: {
+          key: user.id,
+        },
+      },
+    });
+
+    // Track who's viewing/editing
+    meetingChannel
+      .on('presence', { event: 'sync' }, () => {
+        const state = meetingChannel.presenceState();
+        const editors = Object.keys(state).filter(key => key !== user.id);
+        setActiveEditors(editors);
+      })
+      .on('presence', { event: 'join' }, ({ key }) => {
+        console.log('User joined:', key);
+      })
+      .on('presence', { event: 'leave' }, ({ key }) => {
+        console.log('User left:', key);
+      });
+
+    // Listen for realtime updates to minutes
+    meetingChannel
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'meeting_minutes',
+          filter: `meeting_id=eq.${meetingId}`,
+        },
+        (payload) => {
+          console.log('Minutes updated:', payload);
+          if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
+            loadMinutes();
+          }
+        }
+      )
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await meetingChannel.track({
+            user_id: user.id,
+            online_at: new Date().toISOString(),
+          });
+        }
+      });
+
+    setChannel(meetingChannel);
   }, [meetingId]);
 
   const loadMinutes = async () => {

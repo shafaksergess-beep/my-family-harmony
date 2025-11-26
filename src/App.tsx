@@ -26,6 +26,7 @@ import PDFReports from "./pages/family/PDFReports";
 import MeetingCheckIn from "./pages/family/MeetingCheckIn";
 import FamilyMeetings from "./pages/family/Meetings";
 import FamilyContributions from "./pages/family/Contributions";
+import ContributionSettings from "./pages/family/ContributionSettings";
 import FamilyLoans from "./pages/family/Loans";
 import FamilyAttendance from "./pages/family/Attendance";
 import FamilySavings from "./pages/family/Savings";
@@ -108,6 +109,7 @@ const App = () => (
           <Route path="/family/:familySlug/meetings/:meetingId/checkin" element={<MeetingCheckIn />} />
           <Route path="/family/:familySlug/meetings" element={<FamilyMeetings />} />
           <Route path="/family/:familySlug/contributions" element={<FamilyContributions />} />
+          <Route path="/family/:familySlug/contribution-settings" element={<ContributionSettings />} />
           <Route path="/family/:familySlug/loans" element={<FamilyLoans />} />
           <Route path="/family/:familySlug/attendance" element={<FamilyAttendance />} />
           <Route path="/family/:familySlug/savings" element={<FamilySavings />} />
