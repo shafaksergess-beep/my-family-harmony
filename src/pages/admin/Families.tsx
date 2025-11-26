@@ -5,7 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, ArrowLeft, Building2, Users, Edit, Trash2, Shield, FileText } from "lucide-react";
+import { Loader2, Plus, ArrowLeft, Building2, Users, Edit, Trash2, Shield, FileText, Download } from "lucide-react";
+import { logAdminActivity } from "@/lib/adminLogger";
+import { exportToCSV, formatFamiliesForExport } from "@/lib/export";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -100,20 +102,38 @@ const AdminFamilies = () => {
 
         if (error) throw error;
         
+        // Log activity
+        await logAdminActivity({
+          action_type: 'update',
+          entity_type: 'family',
+          entity_id: editingFamily.id,
+          details: { name: formData.name, slug: formData.slug }
+        });
+        
         toast({
           title: t("common.success"),
           description: t("admin.familyUpdated"),
         });
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("families")
           .insert({
             name: formData.name,
             slug: formData.slug,
             description: formData.description,
-          });
+          })
+          .select()
+          .single();
 
         if (error) throw error;
+        
+        // Log activity
+        await logAdminActivity({
+          action_type: 'create',
+          entity_type: 'family',
+          entity_id: data?.id,
+          details: { name: formData.name, slug: formData.slug }
+        });
         
         toast({
           title: t("common.success"),
@@ -151,12 +171,22 @@ const AdminFamilies = () => {
     }
 
     try {
+      const family = families.find(f => f.id === familyId);
+      
       const { error } = await supabase
         .from("families")
         .delete()
         .eq("id", familyId);
 
       if (error) throw error;
+      
+      // Log activity
+      await logAdminActivity({
+        action_type: 'delete',
+        entity_type: 'family',
+        entity_id: familyId,
+        details: { name: family?.name }
+      });
       
       toast({
         title: t("common.success"),
@@ -171,6 +201,22 @@ const AdminFamilies = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleExport = () => {
+    const formatted = formatFamiliesForExport(families);
+    exportToCSV(formatted, `families-${new Date().toISOString().split('T')[0]}`);
+    
+    logAdminActivity({
+      action_type: 'export',
+      entity_type: 'family',
+      details: { count: families.length }
+    });
+    
+    toast({
+      title: t("common.success"),
+      description: "Families exported successfully",
+    });
   };
 
   if (loading) {
@@ -198,6 +244,12 @@ const AdminFamilies = () => {
             </div>
             
             <div className="flex items-center gap-2">
+              {families.length > 0 && (
+                <Button variant="outline" size="sm" onClick={handleExport}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Export
+                </Button>
+              )}
               <Button variant="ghost" size="sm" onClick={() => navigate("/admin/permissions")}>
                 <Shield className="w-4 h-4 mr-2" />
                 Permissions

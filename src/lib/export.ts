@@ -83,3 +83,36 @@ export const formatAttendanceForExport = (attendance: any[]) => {
     'Excuse Reason': a.excuse_reason || '',
   }));
 };
+
+export const formatActivityLogsForExport = (logs: any[]) => {
+  return logs.map(log => ({
+    Date: new Date(log.created_at).toLocaleString(),
+    Admin: log.admin_profile?.full_name || 'Unknown',
+    Email: log.admin_profile?.email || 'N/A',
+    Action: log.action_type,
+    Entity: log.entity_type,
+    'Entity ID': log.entity_id || 'N/A',
+    Details: JSON.stringify(log.details || {}),
+    'IP Address': log.ip_address || 'N/A',
+  }));
+};
+
+export const formatFamiliesForExport = (families: any[]) => {
+  return families.map(f => ({
+    Name: f.name,
+    Slug: f.slug,
+    Description: f.description || '',
+    Status: f.is_active ? 'Active' : 'Inactive',
+    'Created At': new Date(f.created_at).toLocaleString(),
+  }));
+};
+
+export const formatMembersForExport = (members: any[]) => {
+  return members.map(m => ({
+    Name: m.profiles?.full_name || 'Unknown',
+    Email: m.profiles?.email || 'N/A',
+    Role: m.role,
+    House: m.house_name || 'N/A',
+    'Joined At': new Date(m.joined_at || m.created_at).toLocaleString(),
+  }));
+};
