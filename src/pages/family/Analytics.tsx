@@ -4,7 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { Loader2, ArrowLeft, TrendingUp, Users, DollarSign, PiggyBank, CreditCard, AlertCircle } from "lucide-react";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 interface KPIData {
   totalMembers: number;
@@ -21,8 +23,8 @@ const FamilyAnalytics = () => {
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { family, isLoading: authLoading } = useFamilyAuth(familySlug);
   const [loading, setLoading] = useState(true);
-  const [family, setFamily] = useState<any>(null);
   const [kpis, setKpis] = useState<KPIData>({
     totalMembers: 0,
     activeLoans: 0,
@@ -35,41 +37,27 @@ const FamilyAnalytics = () => {
   });
 
   useEffect(() => {
-    loadAnalytics();
-  }, [familySlug]);
+    if (family?.id) {
+      loadAnalytics();
+    }
+  }, [family?.id]);
 
   const loadAnalytics = async () => {
+    if (!family) return;
+    
     try {
-      // Get family
-      const { data: familyData } = await supabase
-        .from("families")
-        .select("*")
-        .eq("slug", familySlug)
-        .single();
-      
-      if (!familyData) {
-        toast({
-          title: "Error",
-          description: "Family not found",
-          variant: "destructive",
-        });
-        navigate("/dashboard");
-        return;
-      }
-      
-      setFamily(familyData);
 
       // Get member count
       const { count: memberCount } = await supabase
         .from("family_members")
         .select("*", { count: "exact", head: true })
-        .eq("family_id", familyData.id);
+        .eq("family_id", family.id);
 
       // Get active loans
       const { data: loansData, count: loansCount } = await supabase
         .from("loans")
         .select("amount", { count: "exact" })
-        .eq("family_id", familyData.id)
+        .eq("family_id", family.id)
         .eq("status", "active");
 
       const totalLoansAmount = loansData?.reduce((sum, loan) => sum + Number(loan.amount), 0) || 0;
@@ -78,7 +66,7 @@ const FamilyAnalytics = () => {
       const { data: contributionsData } = await supabase
         .from("contributions")
         .select("amount, status")
-        .eq("family_id", familyData.id);
+        .eq("family_id", family.id);
 
       const totalContributions = contributionsData?.filter(c => c.status === "paid").reduce((sum, c) => sum + Number(c.amount), 0) || 0;
       const pendingContributions = contributionsData?.filter(c => c.status === "pending").length || 0;
@@ -87,7 +75,7 @@ const FamilyAnalytics = () => {
       const { data: savingsData } = await supabase
         .from("contributions")
         .select("amount")
-        .eq("family_id", familyData.id)
+        .eq("family_id", family.id)
         .eq("type", "savings")
         .eq("status", "paid");
 
@@ -97,7 +85,7 @@ const FamilyAnalytics = () => {
       const { count: meetingsCount } = await supabase
         .from("meetings")
         .select("*", { count: "exact", head: true })
-        .eq("family_id", familyData.id)
+        .eq("family_id", family.id)
         .eq("is_completed", true);
 
       // Calculate cash at hand (simplified)
@@ -125,7 +113,7 @@ const FamilyAnalytics = () => {
     }
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -182,15 +170,18 @@ const FamilyAnalytics = () => {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">{family?.name} - Analytics</h1>
-              <p className="text-sm text-muted-foreground">Key performance indicators and insights</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">{family?.name} - Analytics</h1>
+                <p className="text-sm text-muted-foreground">Key performance indicators and insights</p>
+              </div>
             </div>
+            <LanguageSwitcher />
           </div>
         </div>
       </header>

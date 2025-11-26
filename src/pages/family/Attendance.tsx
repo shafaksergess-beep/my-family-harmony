@@ -10,8 +10,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { ArrowLeft, CheckCircle, XCircle, Clock } from "lucide-react";
 import { format, differenceInMinutes } from "date-fns";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 interface Attendance {
   id: string;
@@ -45,11 +47,12 @@ interface Meeting {
 }
 
 export default function Attendance() {
-  const { familyId } = useParams();
+  const { familySlug } = useParams();
   const [searchParams] = useSearchParams();
   const meetingId = searchParams.get("meeting");
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { family, isFamilyHead, isLoading: authLoading } = useFamilyAuth(familySlug);
   const [attendance, setAttendance] = useState<Attendance[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [meeting, setMeeting] = useState<Meeting | null>(null);
@@ -58,12 +61,12 @@ export default function Attendance() {
   const [selectedMember, setSelectedMember] = useState<string>("");
 
   useEffect(() => {
-    if (familyId && meetingId) {
+    if (family?.id && meetingId) {
       fetchMeeting();
       fetchAttendance();
       fetchMembers();
     }
-  }, [familyId, meetingId]);
+  }, [family?.id, meetingId]);
 
   const fetchMeeting = async () => {
     try {
@@ -110,11 +113,13 @@ export default function Attendance() {
   };
 
   const fetchMembers = async () => {
+    if (!family) return;
+    
     try {
       const { data, error } = await supabase
         .from("family_members")
         .select("id, profiles(full_name)")
-        .eq("family_id", familyId);
+        .eq("family_id", family.id);
 
       if (error) throw error;
       setMembers(data as any || []);
@@ -236,22 +241,25 @@ export default function Attendance() {
     totalFines: attendance.reduce((sum, a) => sum + (a.fine_amount || 0), 0),
   };
 
-  if (loading || !meeting) {
+  if (authLoading || loading || !meeting) {
     return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familyId}/meetings`)}>
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">Attendance Tracking</h1>
-          <p className="text-muted-foreground">
-            {format(new Date(meeting.meeting_date), "PPP")} at {meeting.meeting_time}
-          </p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}/meetings`)}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Attendance Tracking</h1>
+            <p className="text-muted-foreground">
+              {format(new Date(meeting.meeting_date), "PPP")} at {meeting.meeting_time}
+            </p>
+          </div>
         </div>
+        <LanguageSwitcher />
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
@@ -341,15 +349,16 @@ export default function Attendance() {
                         Check In
                       </Button>
                     ) : null}
-                    <Dialog open={isDialogOpen && selectedMember === member.id} onOpenChange={(open) => {
-                      setIsDialogOpen(open);
-                      if (open) setSelectedMember(member.id);
-                    }}>
-                      <DialogTrigger asChild>
-                        <Button size="sm" variant="outline">
-                          Mark
-                        </Button>
-                      </DialogTrigger>
+                    {isFamilyHead && (
+                      <Dialog open={isDialogOpen && selectedMember === member.id} onOpenChange={(open) => {
+                        setIsDialogOpen(open);
+                        if (open) setSelectedMember(member.id);
+                      }}>
+                        <DialogTrigger asChild>
+                          <Button size="sm" variant="outline">
+                            Mark
+                          </Button>
+                        </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
                           <DialogTitle>Update Attendance - {member.profiles?.full_name || "Unknown"}</DialogTitle>
@@ -378,6 +387,7 @@ export default function Attendance() {
                         </div>
                       </DialogContent>
                     </Dialog>
+                    )}
                   </div>
                 </div>
               );
