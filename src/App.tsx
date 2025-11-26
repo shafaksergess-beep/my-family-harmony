@@ -33,6 +33,7 @@ import FamilyShares from "./pages/family/Shares";
 import MemberProfile from "./pages/family/MemberProfile";
 import Members from "./pages/family/Members";
 import EmailSettings from "./pages/family/EmailSettings";
+import GlobalAnalytics from "./pages/admin/GlobalAnalytics";
 import FamilyReports from "./pages/family/Reports";
 import NotFound from "./pages/NotFound";
 
@@ -56,6 +57,7 @@ const App = () => (
         <Route path="/admin/activity-logs" element={<ActivityLogs />} />
         <Route path="/admin/email-reports" element={<EmailReports />} />
         <Route path="/admin/export-scheduler" element={<ExportScheduler />} />
+        <Route path="/admin/global-analytics" element={<GlobalAnalytics />} />
           <Route path="/family/:familySlug" element={<FamilyDetail />} />
           <Route path="/family/:familySlug/analytics" element={<FamilyAnalytics />} />
           <Route path="/family/:familySlug/financial-analytics" element={<FinancialAnalytics />} />
