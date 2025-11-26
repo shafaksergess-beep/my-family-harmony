@@ -12,6 +12,7 @@ import { MeetingAgendaBuilder } from "@/components/MeetingAgendaBuilder";
 import { MeetingMinutes } from "@/components/MeetingMinutes";
 import { AttendancePredictions } from "@/components/AttendancePredictions";
 import { AgendaVoting } from "@/components/AgendaVoting";
+import { LiveMemberStatus } from "@/components/LiveMemberStatus";
 
 interface Meeting {
   id: string;
@@ -185,6 +186,9 @@ const MeetingDetail = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Live Member Status */}
+        <LiveMemberStatus meetingId={meeting.id} familyId={family?.id || ""} />
 
         {/* Tabs for Agenda, Minutes, Predictions */}
         <Tabs defaultValue="agenda" className="space-y-6">

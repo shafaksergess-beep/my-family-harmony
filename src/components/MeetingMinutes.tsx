@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Plus, Trash2, Save } from "lucide-react";
+import { FileText, Plus, Trash2, Save, Sparkles, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface Decision {
@@ -41,6 +41,7 @@ export const MeetingMinutes = ({ meetingId, canEdit }: MeetingMinutesProps) => {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [newDecision, setNewDecision] = useState<Decision>({ title: "", description: "" });
   const [newAction, setNewAction] = useState<ActionItem>({ task: "", assignee: "", deadline: "" });
 
@@ -70,6 +71,73 @@ export const MeetingMinutes = ({ meetingId, canEdit }: MeetingMinutesProps) => {
       console.error("Error loading minutes:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGenerateSummary = async () => {
+    if (!minutes.content) {
+      toast({
+        title: "No content",
+        description: "Please add meeting minutes first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setGenerating(true);
+    try {
+      // Fetch agenda items
+      const { data: agendaData } = await supabase
+        .from("meeting_agenda_items")
+        .select("title, description")
+        .eq("meeting_id", meetingId)
+        .order("order_index");
+
+      const { data: summaryData, error: summaryError } = await supabase.functions.invoke(
+        "generate-meeting-summary",
+        {
+          body: {
+            meetingContent: minutes.content,
+            agendaItems: agendaData || [],
+            actionItems: minutes.action_items,
+          },
+        }
+      );
+
+      if (summaryError) throw summaryError;
+
+      if (summaryData?.error) {
+        toast({
+          title: "AI Error",
+          description: summaryData.error,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Append the AI summary to the content
+      const summary = summaryData.summary;
+      setMinutes(prev => {
+        const separator = "\n\n---\n\n## AI-Generated Summary\n\n";
+        return {
+          ...prev,
+          content: prev.content + separator + summary
+        };
+      });
+
+      toast({
+        title: "Summary Generated",
+        description: "AI summary has been added to the meeting minutes",
+      });
+    } catch (error: any) {
+      console.error("Error generating summary:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to generate summary",
+        variant: "destructive",
+      });
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -164,10 +232,29 @@ export const MeetingMinutes = ({ meetingId, canEdit }: MeetingMinutesProps) => {
               Meeting Minutes
             </CardTitle>
             {canEdit && (
-              <Button onClick={handleSave} disabled={saving}>
-                <Save className="w-4 h-4 mr-2" />
-                {saving ? "Saving..." : "Save Minutes"}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={handleGenerateSummary}
+                  disabled={generating || !minutes.content}
+                >
+                  {generating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      AI Summary
+                    </>
+                  )}
+                </Button>
+                <Button onClick={handleSave} disabled={saving}>
+                  <Save className="w-4 h-4 mr-2" />
+                  {saving ? "Saving..." : "Save Minutes"}
+                </Button>
+              </div>
             )}
           </div>
         </CardHeader>
