@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
 import { Resend } from "https://esm.sh/resend@4.0.0";
+import { checkRateLimit, recordRequest, getIpAddress } from "../_shared/rateLimiter.ts";
+import { verifyRecaptchaToken } from "../_shared/recaptcha.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -11,6 +13,7 @@ const corsHeaders = {
 
 interface InvitationRequest {
   invitationId: string;
+  recaptchaToken?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -19,6 +22,23 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Rate limiting check
+    const ipAddress = getIpAddress(req);
+    const rateLimitCheck = checkRateLimit(ipAddress);
+    
+    if (rateLimitCheck.isBlocked) {
+      const minutesBlocked = Math.ceil((rateLimitCheck.blockedUntil! - Date.now()) / 60000);
+      return new Response(
+        JSON.stringify({ 
+          error: `Too many requests. Please try again in ${minutesBlocked} minute(s).` 
+        }),
+        {
+          status: 429,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_ANON_KEY") ?? "",
@@ -29,7 +49,24 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
 
-    const { invitationId }: InvitationRequest = await req.json();
+    const { invitationId, recaptchaToken }: InvitationRequest = await req.json();
+
+    // Verify reCAPTCHA token if provided
+    if (recaptchaToken) {
+      const recaptchaResult = await verifyRecaptchaToken(recaptchaToken, "invite", 0.5);
+      if (!recaptchaResult.success) {
+        return new Response(
+          JSON.stringify({ error: "Security verification failed. Please try again." }),
+          {
+            status: 403,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
+      }
+    }
+
+    // Record the request for rate limiting
+    recordRequest(ipAddress);
 
     // Fetch invitation details
     const { data: invitation, error: invError } = await supabaseClient

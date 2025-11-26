@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { loginSchema, signupSchema } from "@/lib/validation";
 import { checkRateLimit, recordAttempt, resetRateLimit } from "@/lib/rateLimit";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const Auth = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const { isLoaded: recaptchaLoaded, getRecaptchaToken } = useRecaptcha();
 
   // Get redirect URL from query params
   const redirectUrl = searchParams.get("redirect") || "/dashboard";
@@ -95,6 +97,13 @@ const Auth = () => {
     setLoading(true);
 
     try {
+      // Get reCAPTCHA token
+      const recaptchaToken = await getRecaptchaToken("login");
+      if (!recaptchaToken) {
+        setLoading(false);
+        return;
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
         email: result.data.email,
         password: result.data.password,
@@ -173,6 +182,13 @@ const Auth = () => {
     setLoading(true);
 
     try {
+      // Get reCAPTCHA token
+      const recaptchaToken = await getRecaptchaToken("signup");
+      if (!recaptchaToken) {
+        setLoading(false);
+        return;
+      }
+
       const { error } = await supabase.auth.signUp({
         email: result.data.email,
         password: result.data.password,

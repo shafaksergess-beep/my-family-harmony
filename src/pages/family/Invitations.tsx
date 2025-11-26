@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ArrowLeft, Mail, Check, X, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 interface Invitation {
   id: string;
@@ -26,6 +27,7 @@ const Invitations = () => {
   const navigate = useNavigate();
   const { family, isFamilyHead, isLoading } = useFamilyAuth(familySlug);
   const { toast } = useToast();
+  const { getRecaptchaToken } = useRecaptcha();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -70,6 +72,13 @@ const Invitations = () => {
 
     setSending(true);
     try {
+      // Get reCAPTCHA token
+      const recaptchaToken = await getRecaptchaToken("invite");
+      if (!recaptchaToken) {
+        setSending(false);
+        return;
+      }
+
       // Generate invitation token
       const token = crypto.randomUUID();
       const expiresAt = new Date();
@@ -94,9 +103,12 @@ const Invitations = () => {
 
       if (invError) throw invError;
 
-      // Send invitation email
+      // Send invitation email with reCAPTCHA token
       const { error: emailError } = await supabase.functions.invoke("send-invitation", {
-        body: { invitationId: invitation.id },
+        body: { 
+          invitationId: invitation.id,
+          recaptchaToken,
+        },
       });
 
       if (emailError) throw emailError;
