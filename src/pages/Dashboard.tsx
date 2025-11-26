@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, LogOut, Plus, Users, Building2, Shield, FileText, User as UserIcon } from "lucide-react";
+import { Loader2, LogOut, Plus, Users, Building2, Shield, FileText, User as UserIcon, Activity } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 interface UserFamily {
@@ -142,7 +142,15 @@ const Dashboard = () => {
                 </p>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <Button
+                variant="default"
+                className="justify-start"
+                onClick={() => navigate("/admin/dashboard")}
+              >
+                <Activity className="w-4 h-4 mr-2" />
+                Dashboard
+              </Button>
               <Button
                 variant="outline"
                 className="justify-start"

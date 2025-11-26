@@ -107,7 +107,8 @@ const AdminFamilies = () => {
           action_type: 'update',
           entity_type: 'family',
           entity_id: editingFamily.id,
-          details: { name: formData.name, slug: formData.slug }
+          details: { name: formData.name, slug: formData.slug },
+          sendNotification: false
         });
         
         toast({
@@ -132,7 +133,8 @@ const AdminFamilies = () => {
           action_type: 'create',
           entity_type: 'family',
           entity_id: data?.id,
-          details: { name: formData.name, slug: formData.slug }
+          details: { name: formData.name, slug: formData.slug },
+          sendNotification: true
         });
         
         toast({
@@ -185,7 +187,8 @@ const AdminFamilies = () => {
         action_type: 'delete',
         entity_type: 'family',
         entity_id: familyId,
-        details: { name: family?.name }
+        details: { name: family?.name },
+        sendNotification: true
       });
       
       toast({

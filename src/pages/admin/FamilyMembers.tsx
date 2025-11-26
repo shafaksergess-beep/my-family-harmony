@@ -119,7 +119,8 @@ const FamilyMembers = () => {
           family_name: family?.name,
           user_name: user?.full_name,
           role: formData.role 
-        }
+        },
+        sendNotification: true
       });
       
       toast({
@@ -161,7 +162,8 @@ const FamilyMembers = () => {
         details: { 
           family_name: family?.name,
           member_name: member?.profiles?.full_name 
-        }
+        },
+        sendNotification: true
       });
       
       toast({
