@@ -43,23 +43,30 @@ export async function logAdminActivity(params: LogActivityParams) {
 
 async function sendAdminNotification(params: LogActivityParams, adminEmail: string) {
   try {
-    const actionText = `${params.action_type.toUpperCase()} ${params.entity_type}`;
-    const detailsText = params.details 
-      ? `<br/><strong>Details:</strong> ${JSON.stringify(params.details, null, 2).replace(/\n/g, '<br/>')}`
-      : '';
+    const { getAdminActionEmailTemplate } = await import('./emailTemplates');
+    
+    const { data: { session } } = await supabase.auth.getSession();
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', session?.user?.id || '')
+      .single();
+
+    const htmlContent = getAdminActionEmailTemplate({
+      adminName: profile?.full_name || 'Admin User',
+      actionType: params.action_type,
+      entityType: params.entity_type,
+      entityId: params.entity_id || undefined,
+      details: params.details,
+      timestamp: new Date().toISOString(),
+    });
 
     await supabase.functions.invoke('send-notification', {
       body: {
         to: [adminEmail],
-        subject: `Admin Action: ${actionText}`,
-        message: `
-          <h2>Admin Activity Notification</h2>
-          <p><strong>Action:</strong> ${actionText}</p>
-          <p><strong>Entity ID:</strong> ${params.entity_id || 'N/A'}</p>
-          ${detailsText}
-          <p><small>Timestamp: ${new Date().toLocaleString()}</small></p>
-        `,
-        type: 'general'
+        subject: `🔔 Admin Action: ${params.action_type.toUpperCase()} ${params.entity_type}`,
+        message: htmlContent,
+        type: 'admin_action'
       }
     });
   } catch (error) {
