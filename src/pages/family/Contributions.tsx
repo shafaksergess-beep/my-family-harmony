@@ -14,6 +14,7 @@ import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { ArrowLeft, Plus, DollarSign, TrendingUp, Download, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { exportToCSV } from "@/lib/export";
+import BulkPaymentMenu from "@/components/BulkPaymentMenu";
 
 interface Contribution {
   id: string;
@@ -217,6 +218,14 @@ export default function Contributions() {
               </div>
             </div>
             <div className="flex gap-2">
+              {canManageFinances && (
+                <BulkPaymentMenu
+                  members={members}
+                  familyId={family?.id || ''}
+                  contributionDate={format(new Date(), "yyyy-MM-dd")}
+                  onSuccess={fetchContributions}
+                />
+              )}
               <Button variant="outline" onClick={handleExport}>
                 <Download className="w-4 h-4 mr-2" />
                 Export CSV
