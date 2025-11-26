@@ -6,8 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
-import { Loader2, ArrowLeft, User, DollarSign, CreditCard, PiggyBank, Award } from "lucide-react";
+import { Loader2, ArrowLeft, User, DollarSign, CreditCard, PiggyBank, Award, TrendingUp, Calendar, AlertCircle } from "lucide-react";
 import MemberTimeline from "@/components/MemberTimeline";
+import { calculateCreditScore } from "@/lib/creditScoring";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 
 interface MemberData {
   profile: {
@@ -34,6 +37,12 @@ interface MemberData {
     count: number;
     value: number;
   };
+  credit_score?: number;
+  attendance_rate?: number;
+  contributions_history?: any[];
+  loans_history?: any[];
+  savings_history?: any[];
+  attendance_history?: any[];
 }
 
 const MemberProfile = () => {
@@ -82,7 +91,7 @@ const MemberProfile = () => {
       // Get loans summary
       const { data: loans } = await supabase
         .from("loans")
-        .select("amount, amount_paid")
+        .select("amount, amount_paid, status")
         .eq("member_id", memberId);
 
       const loansSummary = {
@@ -106,22 +115,71 @@ const MemberProfile = () => {
       const { data: shares } = await supabase
         .from("shares")
         .select("share_value")
-        .eq("member_id", memberId)
-        .eq("is_active", true);
+        .eq("member_id", memberId);
 
       const sharesSummary = {
         count: shares?.length || 0,
         value: shares?.reduce((sum, s) => sum + s.share_value, 0) || 0,
       };
 
+      // Get attendance history
+      const { data: attendance } = await supabase
+        .from("attendance")
+        .select("*, meetings(meeting_date)")
+        .eq("member_id", memberId)
+        .order('meetings(meeting_date)', { ascending: false })
+        .limit(10);
+
+      const attendanceRate = attendance
+        ? (attendance.filter(a => a.status === 'present').length / attendance.length) * 100
+        : 0;
+
+      // Get detailed histories
+      const { data: contributionsHistory } = await supabase
+        .from("contributions")
+        .select("*")
+        .eq("member_id", memberId)
+        .order('contribution_date', { ascending: false });
+
+      const { data: loansHistory } = await supabase
+        .from("loans")
+        .select("*")
+        .eq("member_id", memberId)
+        .order('created_at', { ascending: false });
+
+      const { data: savingsHistory } = await supabase
+        .from("savings")
+        .select("*")
+        .eq("member_id", memberId)
+        .order('month', { ascending: false });
+
+      // Calculate credit score
+      const creditScoreResult = calculateCreditScore({
+        totalContributions: contributions?.length || 0,
+        paidOnTimeContributions: contributions?.filter(c => c.status === 'paid').length || 0,
+        lateContributions: contributions?.filter(c => c.status !== 'paid').length || 0,
+        totalLoans: loans?.length || 0,
+        repaidLoansOnTime: loans?.filter(l => l.amount_paid >= l.amount).length || 0,
+        defaultedLoans: loans?.filter(l => l.status === 'defaulted').length || 0,
+        totalFines: 0,
+        monthsAsMember: savings?.length || 0,
+        consecutiveMonthsPaid: contributions?.length || 0,
+      });
+
       setMemberData({
-        profile: memberInfo.profiles as any,
+        profile: (memberInfo.profiles as any),
         role: memberInfo.role,
         house_name: memberInfo.house_name,
         contributions_summary: contributionsSummary,
         loans_summary: loansSummary,
         savings_summary: savingsSummary,
         shares_summary: sharesSummary,
+        credit_score: creditScoreResult.score,
+        attendance_rate: attendanceRate,
+        contributions_history: contributionsHistory || [],
+        loans_history: loansHistory || [],
+        savings_history: savingsHistory || [],
+        attendance_history: attendance || [],
       });
     } catch (error: any) {
       console.error("Error loading member data:", error);
@@ -205,6 +263,45 @@ const MemberProfile = () => {
 
         {/* Financial Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Credit Score Card */}
+          {memberData.credit_score !== undefined && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                  Credit Score
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <div className="text-5xl font-bold text-primary mb-2">
+                      {memberData.credit_score}
+                    </div>
+                    <Progress value={memberData.credit_score} className="h-2 mb-2" />
+                    <p className="text-sm text-muted-foreground">
+                      {memberData.credit_score >= 80 ? 'Excellent' :
+                       memberData.credit_score >= 60 ? 'Good' :
+                       memberData.credit_score >= 40 ? 'Fair' : 'Needs Improvement'}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground">Attendance</p>
+                      <p className="text-lg font-semibold">{memberData.attendance_rate?.toFixed(0)}%</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground">On-Time Payments</p>
+                      <p className="text-lg font-semibold">
+                        {((memberData.contributions_summary.paid / memberData.contributions_summary.total) * 100 || 0).toFixed(0)}%
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Contributions */}
           <Card>
             <CardHeader>

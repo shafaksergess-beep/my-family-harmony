@@ -200,6 +200,13 @@ const FamilyDetail = () => {
       path: `/family/${familySlug}/email-reports`,
       color: "text-blue-600",
     },
+    {
+      title: "Export Scheduler",
+      description: "Schedule automated report exports",
+      icon: Calendar,
+      path: `/family/${familySlug}/export-scheduler`,
+      color: "text-purple-600",
+    },
   ];
 
   return (
