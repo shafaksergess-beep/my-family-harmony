@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, Plus, Trash2, Shield, Download, Edit } from "lucide-react";
+import { Loader2, ArrowLeft, Plus, Trash2, Shield, Download, Edit, Phone, Calendar, Briefcase, Home, User } from "lucide-react";
 import { logAdminActivity } from "@/lib/adminLogger";
 import { exportToCSV, formatMembersForExport } from "@/lib/export";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -20,9 +20,14 @@ interface FamilyMember {
   user_id: string;
   role: string;
   house_name: string | null;
+  is_house_representative: boolean | null;
+  joined_at: string | null;
   profiles: {
     full_name: string;
     email: string;
+    phone: string | null;
+    is_working: boolean | null;
+    avatar_url: string | null;
   } | null;
 }
 
@@ -66,7 +71,9 @@ const FamilyMembers = () => {
           user_id,
           role,
           house_name,
-          profiles!inner (full_name, email)
+          is_house_representative,
+          joined_at,
+          profiles!inner (full_name, email, phone, is_working, avatar_url)
         `)
         .eq("family_id", familyId);
       
@@ -357,9 +364,26 @@ const FamilyMembers = () => {
               <Card key={member.id}>
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="text-lg">{member.profiles?.full_name || 'Unknown'}</CardTitle>
-                      <p className="text-sm text-muted-foreground">{member.profiles?.email || 'No email'}</p>
+                    <div className="flex items-center gap-3">
+                      {member.profiles?.avatar_url && (
+                        <img 
+                          src={member.profiles.avatar_url} 
+                          alt={member.profiles.full_name || 'User'} 
+                          className="w-12 h-12 rounded-full object-cover"
+                        />
+                      )}
+                      <div>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          {member.profiles?.full_name || 'Unknown'}
+                          {member.is_house_representative && (
+                            <Badge variant="secondary" className="text-xs">
+                              <Home className="w-3 h-3 mr-1" />
+                              House Rep
+                            </Badge>
+                          )}
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground">{member.profiles?.email || 'No email'}</p>
+                      </div>
                     </div>
                     <div className="flex gap-2">
                       <Button 
@@ -382,7 +406,7 @@ const FamilyMembers = () => {
                   </div>
                 </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {editMemberId === member.id ? (
                     <div className="space-y-2">
                       <Label>Change Role</Label>
@@ -430,12 +454,34 @@ const FamilyMembers = () => {
                       )}
                     </div>
                   )}
-                  {member.house_name && (
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    {member.profiles?.phone && (
+                      <div className="flex items-center gap-2">
+                        <Phone className="w-4 h-4 text-muted-foreground" />
+                        <span>{member.profiles.phone}</span>
+                      </div>
+                    )}
+                    
+                    {member.house_name && (
+                      <div className="flex items-center gap-2">
+                        <Home className="w-4 h-4 text-muted-foreground" />
+                        <span>{member.house_name}</span>
+                      </div>
+                    )}
+                    
+                    {member.joined_at && (
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-muted-foreground" />
+                        <span>Joined: {new Date(member.joined_at).toLocaleDateString()}</span>
+                      </div>
+                    )}
+                    
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">{t("admin.house")}: </span>
-                      <span className="text-sm">{member.house_name}</span>
+                      <Briefcase className="w-4 h-4 text-muted-foreground" />
+                      <span>{member.profiles?.is_working ? 'Working' : 'Not Working'}</span>
                     </div>
-                  )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
