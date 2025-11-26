@@ -179,6 +179,27 @@ const FamilyDetail = () => {
       path: `/family/${familySlug}/reminder-settings`,
       color: "text-gray-600",
     },
+    {
+      title: "Financial Forecasting",
+      description: "Predict cash flow and future finances",
+      icon: TrendingUp,
+      path: `/family/${familySlug}/forecasting`,
+      color: "text-emerald-600",
+    },
+    {
+      title: "Payment Plans",
+      description: "Manage installment payment arrangements",
+      icon: Calendar,
+      path: `/family/${familySlug}/payment-plans`,
+      color: "text-amber-600",
+    },
+    {
+      title: "Email Reports",
+      description: "Configure automated email digests",
+      icon: Mail,
+      path: `/family/${familySlug}/email-reports`,
+      color: "text-blue-600",
+    },
   ];
 
   return (
