@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { assistanceEventSchema, type AssistanceEventInput } from "@/lib/validation";
 
 interface AssistanceEvent {
   id: string;
@@ -69,6 +70,7 @@ export default function FamilyAssistance() {
     contribution_per_member: "",
     notes: "",
   });
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (family?.id) {
@@ -127,18 +129,56 @@ export default function FamilyAssistance() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!family) return;
+    setValidationErrors({});
+    
+    // Map event types to validation schema format
+    const eventTypeMap: Record<string, string> = {
+      birth: "birth",
+      member_death: "death",
+      spouse_death: "death",
+      child_death: "death",
+      external_wonya: "external_support",
+      external_other: "external_support",
+      sickness: "sickness",
+    };
+    
+    // Validate input
+    const validationResult = assistanceEventSchema.safeParse({
+      memberId: formData.member_id,
+      eventType: eventTypeMap[formData.event_type] || formData.event_type,
+      eventDate: formData.event_date,
+      amount: parseFloat(formData.amount),
+      beneficiaryName: formData.beneficiary_name || undefined,
+      hospitalizationDays: formData.hospitalization_days ? parseInt(formData.hospitalization_days) : undefined,
+      notes: formData.notes || undefined,
+    });
+
+    if (!validationResult.success) {
+      const errors: Record<string, string> = {};
+      validationResult.error.errors.forEach((err) => {
+        const field = err.path[0] as string;
+        errors[field] = err.message;
+      });
+      setValidationErrors(errors);
+      toast({
+        title: "Validation Error",
+        description: "Please check the form for errors",
+        variant: "destructive",
+      });
+      return;
+    }
     
     try {
       const { error } = await supabase.from("assistance_events").insert({
         family_id: family.id,
-        member_id: formData.member_id,
+        member_id: validationResult.data.memberId,
         event_type: formData.event_type,
-        event_date: formData.event_date,
-        amount: parseFloat(formData.amount),
+        event_date: validationResult.data.eventDate,
+        amount: validationResult.data.amount,
         contribution_per_member: formData.contribution_per_member ? parseFloat(formData.contribution_per_member) : null,
-        beneficiary_name: formData.beneficiary_name || null,
-        hospitalization_days: formData.hospitalization_days ? parseInt(formData.hospitalization_days) : null,
-        notes: formData.notes || null,
+        beneficiary_name: validationResult.data.beneficiaryName || null,
+        hospitalization_days: validationResult.data.hospitalizationDays || null,
+        notes: validationResult.data.notes || null,
       });
 
       if (error) throw error;
@@ -155,6 +195,7 @@ export default function FamilyAssistance() {
         contribution_per_member: "",
         notes: "",
       });
+      setValidationErrors({});
       loadData();
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -242,9 +283,12 @@ export default function FamilyAssistance() {
                       <Label htmlFor="member">Member</Label>
                       <Select
                         value={formData.member_id}
-                        onValueChange={(value) => setFormData({ ...formData, member_id: value })}
+                        onValueChange={(value) => {
+                          setFormData({ ...formData, member_id: value });
+                          setValidationErrors({ ...validationErrors, memberId: "" });
+                        }}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className={validationErrors.memberId ? "border-red-500" : ""}>
                           <SelectValue placeholder="Select member" />
                         </SelectTrigger>
                         <SelectContent>
@@ -255,14 +299,20 @@ export default function FamilyAssistance() {
                           ))}
                         </SelectContent>
                       </Select>
+                      {validationErrors.memberId && (
+                        <p className="text-sm text-red-500 mt-1">{validationErrors.memberId}</p>
+                      )}
                     </div>
                     <div>
                       <Label htmlFor="event_type">Event Type</Label>
                       <Select
                         value={formData.event_type}
-                        onValueChange={handleEventTypeChange}
+                        onValueChange={(value) => {
+                          handleEventTypeChange(value);
+                          setValidationErrors({ ...validationErrors, eventType: "" });
+                        }}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className={validationErrors.eventType ? "border-red-500" : ""}>
                           <SelectValue placeholder="Select event type" />
                         </SelectTrigger>
                         <SelectContent>
@@ -273,6 +323,9 @@ export default function FamilyAssistance() {
                           ))}
                         </SelectContent>
                       </Select>
+                      {validationErrors.eventType && (
+                        <p className="text-sm text-red-500 mt-1">{validationErrors.eventType}</p>
+                      )}
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -282,9 +335,16 @@ export default function FamilyAssistance() {
                         id="event_date"
                         type="date"
                         value={formData.event_date}
-                        onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
+                        onChange={(e) => {
+                          setFormData({ ...formData, event_date: e.target.value });
+                          setValidationErrors({ ...validationErrors, eventDate: "" });
+                        }}
+                        className={validationErrors.eventDate ? "border-red-500" : ""}
                         required
                       />
+                      {validationErrors.eventDate && (
+                        <p className="text-sm text-red-500 mt-1">{validationErrors.eventDate}</p>
+                      )}
                     </div>
                     <div>
                       <Label htmlFor="amount">Total Amount (FCFA)</Label>
@@ -294,9 +354,16 @@ export default function FamilyAssistance() {
                         min="0"
                         step="1000"
                         value={formData.amount}
-                        onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                        onChange={(e) => {
+                          setFormData({ ...formData, amount: e.target.value });
+                          setValidationErrors({ ...validationErrors, amount: "" });
+                        }}
+                        className={validationErrors.amount ? "border-red-500" : ""}
                         required
                       />
+                      {validationErrors.amount && (
+                        <p className="text-sm text-red-500 mt-1">{validationErrors.amount}</p>
+                      )}
                     </div>
                   </div>
                   {formData.event_type === 'birth' && (
@@ -314,24 +381,39 @@ export default function FamilyAssistance() {
                   )}
                   {(formData.event_type.includes('death') || formData.event_type.includes('external')) && (
                     <div>
-                      <Label htmlFor="beneficiary">Beneficiary Name</Label>
+                      <Label htmlFor="beneficiary">Beneficiary Name (optional)</Label>
                       <Input
                         id="beneficiary"
                         value={formData.beneficiary_name}
-                        onChange={(e) => setFormData({ ...formData, beneficiary_name: e.target.value })}
+                        onChange={(e) => {
+                          setFormData({ ...formData, beneficiary_name: e.target.value });
+                          setValidationErrors({ ...validationErrors, beneficiaryName: "" });
+                        }}
+                        maxLength={100}
+                        className={validationErrors.beneficiaryName ? "border-red-500" : ""}
                       />
+                      {validationErrors.beneficiaryName && (
+                        <p className="text-sm text-red-500 mt-1">{validationErrors.beneficiaryName}</p>
+                      )}
                     </div>
                   )}
                   {formData.event_type === 'sickness' && (
                     <div>
-                      <Label htmlFor="hospitalization">Hospitalization Days</Label>
+                      <Label htmlFor="hospitalization">Hospitalization Days (min 5)</Label>
                       <Input
                         id="hospitalization"
                         type="number"
                         min="5"
                         value={formData.hospitalization_days}
-                        onChange={(e) => setFormData({ ...formData, hospitalization_days: e.target.value })}
+                        onChange={(e) => {
+                          setFormData({ ...formData, hospitalization_days: e.target.value });
+                          setValidationErrors({ ...validationErrors, hospitalizationDays: "" });
+                        }}
+                        className={validationErrors.hospitalizationDays ? "border-red-500" : ""}
                       />
+                      {validationErrors.hospitalizationDays && (
+                        <p className="text-sm text-red-500 mt-1">{validationErrors.hospitalizationDays}</p>
+                      )}
                     </div>
                   )}
                   <div>
@@ -339,8 +421,16 @@ export default function FamilyAssistance() {
                     <Textarea
                       id="notes"
                       value={formData.notes}
-                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                      onChange={(e) => {
+                        setFormData({ ...formData, notes: e.target.value });
+                        setValidationErrors({ ...validationErrors, notes: "" });
+                      }}
+                      maxLength={500}
+                      className={validationErrors.notes ? "border-red-500" : ""}
                     />
+                    {validationErrors.notes && (
+                      <p className="text-sm text-red-500 mt-1">{validationErrors.notes}</p>
+                    )}
                   </div>
                   <Button type="submit" className="w-full">Record Event</Button>
                 </form>
