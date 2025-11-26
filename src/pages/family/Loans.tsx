@@ -15,6 +15,7 @@ import { ArrowLeft, Plus, DollarSign, TrendingUp, Clock, Download, Loader2 } fro
 import { format } from "date-fns";
 import { exportToCSV } from "@/lib/export";
 import { loanSchema, type LoanInput } from "@/lib/validation";
+import { LoanPaymentForm } from "@/components/LoanPaymentForm";
 
 interface Loan {
   id: string;
@@ -489,23 +490,46 @@ export default function Loans() {
                       </div>
                     )}
                   </div>
-                  {loan.status === "disbursed" && (
-                    <div className="bg-muted p-2 rounded text-sm">
-                      <p>Paid: {totalPaid.toLocaleString()} FCFA | Remaining: {remaining.toLocaleString()} FCFA</p>
+                   {loan.status === "disbursed" && (
+                    <div className="space-y-2">
+                      <div className="bg-muted p-2 rounded text-sm">
+                        <p>Paid: {totalPaid.toLocaleString()} FCFA | Remaining: {remaining.toLocaleString()} FCFA</p>
+                      </div>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button size="sm" variant="outline" className="w-full">
+                            Record Payment
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Record Loan Payment</DialogTitle>
+                          </DialogHeader>
+                          <LoanPaymentForm 
+                            loan={loan} 
+                            onSuccess={fetchLoans}
+                            totalOwed={totalOwed}
+                            totalPaid={totalPaid}
+                            remaining={remaining}
+                          />
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   )}
-                  <div className="flex gap-2">
-                    {loan.status === "pending" && (
-                      <Button size="sm" onClick={() => handleApproveLoan(loan.id)}>
-                        Approve
-                      </Button>
-                    )}
-                    {loan.status === "approved" && (
-                      <Button size="sm" onClick={() => handleDisburseLoan(loan.id, loan.amount, loan.term_months)}>
-                        Disburse
-                      </Button>
-                    )}
-                  </div>
+                  {canManageLoans && (
+                    <div className="flex gap-2">
+                      {loan.status === "pending" && (
+                        <Button size="sm" onClick={() => handleApproveLoan(loan.id)}>
+                          Approve
+                        </Button>
+                      )}
+                      {loan.status === "approved" && (
+                        <Button size="sm" onClick={() => handleDisburseLoan(loan.id, loan.amount, loan.term_months)}>
+                          Disburse
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}
