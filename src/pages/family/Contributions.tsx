@@ -223,74 +223,75 @@ export default function Contributions() {
               </Button>
               {canManageFinances && (
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" /> Add Contribution
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Record New Contribution</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label>Member</Label>
-                <Select value={newContribution.member_id} onValueChange={(value) => setNewContribution({ ...newContribution, member_id: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select member" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {members.map((member) => (
-                      <SelectItem key={member.id} value={member.id}>
-                        {member.profiles?.full_name || "Unknown"}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Amount (FCFA)</Label>
-                <Input
-                  type="number"
-                  value={newContribution.amount}
-                  onChange={(e) => setNewContribution({ ...newContribution, amount: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label>Date</Label>
-                <Input
-                  type="date"
-                  value={newContribution.contribution_date}
-                  onChange={(e) => setNewContribution({ ...newContribution, contribution_date: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label>Type</Label>
-                <Select value={newContribution.type} onValueChange={(value) => setNewContribution({ ...newContribution, type: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="mandatory">Mandatory</SelectItem>
-                    <SelectItem value="savings">Individual Savings</SelectItem>
-                    <SelectItem value="njangi">Njangi</SelectItem>
-                    <SelectItem value="share">Share Purchase</SelectItem>
-                    <SelectItem value="fine">Fine</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Notes</Label>
-                <Textarea
-                  value={newContribution.notes}
-                  onChange={(e) => setNewContribution({ ...newContribution, notes: e.target.value })}
-                />
-              </div>
-              <Button onClick={handleAddContribution} className="w-full">
-                  Add Contribution
-                </Button>
-              </DialogContent>
-            </Dialog>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Plus className="mr-2 h-4 w-4" /> Add Contribution
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Record New Contribution</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div>
+                        <Label>Member</Label>
+                        <Select value={newContribution.member_id} onValueChange={(value) => setNewContribution({ ...newContribution, member_id: value })}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select member" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {members.map((member) => (
+                              <SelectItem key={member.id} value={member.id}>
+                                {member.profiles?.full_name || "Unknown"}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Amount (FCFA)</Label>
+                        <Input
+                          type="number"
+                          value={newContribution.amount}
+                          onChange={(e) => setNewContribution({ ...newContribution, amount: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <Label>Date</Label>
+                        <Input
+                          type="date"
+                          value={newContribution.contribution_date}
+                          onChange={(e) => setNewContribution({ ...newContribution, contribution_date: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <Label>Type</Label>
+                        <Select value={newContribution.type} onValueChange={(value) => setNewContribution({ ...newContribution, type: value })}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="mandatory">Mandatory</SelectItem>
+                            <SelectItem value="savings">Individual Savings</SelectItem>
+                            <SelectItem value="njangi">Njangi</SelectItem>
+                            <SelectItem value="share">Share Purchase</SelectItem>
+                            <SelectItem value="fine">Fine</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Notes</Label>
+                        <Textarea
+                          value={newContribution.notes}
+                          onChange={(e) => setNewContribution({ ...newContribution, notes: e.target.value })}
+                        />
+                      </div>
+                      <Button onClick={handleAddContribution} className="w-full">
+                        Add Contribution
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               )}
             </div>
           </div>
@@ -298,48 +299,49 @@ export default function Contributions() {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Contributions</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalContributions.toLocaleString()} FCFA</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Paid</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{paidContributions.toLocaleString()} FCFA</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{pendingContributions.toLocaleString()} FCFA</div>
-          </CardContent>
-        </Card>
-      </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Contributions</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalContributions.toLocaleString()} FCFA</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Paid</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">{paidContributions.toLocaleString()} FCFA</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pending</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-orange-600">{pendingContributions.toLocaleString()} FCFA</div>
+            </CardContent>
+          </Card>
+        </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Contribution History</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {contributions.map((contribution) => (
-              <div key={contribution.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="space-y-1">
-                  <p className="font-medium">{contribution.family_members?.profiles?.full_name || "Unknown"}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {format(new Date(contribution.contribution_date), "PPP")} • {contribution.type}
-                  </p>
+        <Card>
+          <CardHeader>
+            <CardTitle>Contribution History</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {contributions.map((contribution) => (
+                <div key={contribution.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="space-y-1">
+                    <p className="font-medium">{contribution.family_members?.profiles?.full_name || "Unknown"}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {format(new Date(contribution.contribution_date), "PPP")} • {contribution.type}
+                    </p>
                     {contribution.notes && <p className="text-sm text-muted-foreground">{contribution.notes}</p>}
                   </div>
                   <div className="flex items-center gap-4">
@@ -358,8 +360,8 @@ export default function Contributions() {
                         {contribution.status}
                       </Badge>
                     )}
+                  </div>
                 </div>
-              </div>
               ))}
             </div>
           </CardContent>
