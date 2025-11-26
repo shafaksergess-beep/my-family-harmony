@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { Loader2, ArrowLeft, Plus, Trash2, Shield } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { Badge } from "@/components/ui/badge";
 
 interface FamilyMember {
   id: string;
@@ -25,6 +28,7 @@ const FamilyMembers = () => {
   const { familyId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [family, setFamily] = useState<any>(null);
   const [members, setMembers] = useState<FamilyMember[]>([]);
@@ -77,8 +81,8 @@ const FamilyMembers = () => {
     } catch (error) {
       console.error("Error loading data:", error);
       toast({
-        title: "Error",
-        description: "Failed to load data",
+        title: t("common.error"),
+        description: t("admin.loadFailed"),
         variant: "destructive",
       });
     } finally {
@@ -102,8 +106,8 @@ const FamilyMembers = () => {
       if (error) throw error;
       
       toast({
-        title: "Success",
-        description: "Member added successfully",
+        title: t("common.success"),
+        description: t("admin.memberAdded"),
       });
 
       setIsDialogOpen(false);
@@ -112,15 +116,15 @@ const FamilyMembers = () => {
     } catch (error: any) {
       console.error("Error adding member:", error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to add member",
+        title: t("common.error"),
+        description: error.message || t("admin.addMemberFailed"),
         variant: "destructive",
       });
     }
   };
 
   const handleRemoveMember = async (memberId: string) => {
-    if (!confirm("Are you sure you want to remove this member?")) return;
+    if (!confirm(t("admin.removeMemberConfirm"))) return;
 
     try {
       const { error } = await supabase
@@ -131,15 +135,15 @@ const FamilyMembers = () => {
       if (error) throw error;
       
       toast({
-        title: "Success",
-        description: "Member removed successfully",
+        title: t("common.success"),
+        description: t("admin.memberRemoved"),
       });
       loadData();
     } catch (error: any) {
       console.error("Error removing member:", error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to remove member",
+        title: t("common.error"),
+        description: error.message || t("admin.removeMemberFailed"),
         variant: "destructive",
       });
     }
@@ -161,77 +165,81 @@ const FamilyMembers = () => {
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate("/admin/families")}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t("common.back")}
               </Button>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">{family?.name} - Members</h1>
-                <p className="text-sm text-muted-foreground">Manage family members and roles</p>
+                <h1 className="text-2xl font-bold text-foreground">{family?.name} - {t("admin.members")}</h1>
+                <p className="text-sm text-muted-foreground">{t("admin.manageFamilyMembers")}</p>
               </div>
             </div>
             
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Member
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add Family Member</DialogTitle>
-                  <DialogDescription>
-                    Add an existing user to this family
-                  </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleAddMember} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="user">User</Label>
-                    <Select value={formData.user_id} onValueChange={(value) => setFormData({ ...formData, user_id: value })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a user" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {allUsers.filter(u => !members.find(m => m.user_id === u.id)).map((user) => (
-                          <SelectItem key={user.id} value={user.id}>
-                            {user.full_name} ({user.email})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="role">Role</Label>
-                    <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="member">Member</SelectItem>
-                        <SelectItem value="family_head">Family Head</SelectItem>
-                        <SelectItem value="treasurer">Treasurer</SelectItem>
-                        <SelectItem value="loan_committee">Loan Committee</SelectItem>
-                        <SelectItem value="guest">Guest</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="house">House Name (Optional)</Label>
-                    <Input
-                      id="house"
-                      value={formData.house_name}
-                      onChange={(e) => setFormData({ ...formData, house_name: e.target.value })}
-                      placeholder="e.g., House A"
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2">
-                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="submit">Add Member</Button>
-                  </div>
-                </form>
-              </DialogContent>
-            </Dialog>
+            <div className="flex items-center gap-4">
+              <LanguageSwitcher />
+            
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="w-4 h-4 mr-2" />
+                    {t("admin.addMember")}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>{t("admin.addFamilyMember")}</DialogTitle>
+                    <DialogDescription>
+                      {t("admin.addExistingUser")}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleAddMember} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="user">{t("admin.selectUser")}</Label>
+                      <Select value={formData.user_id} onValueChange={(value) => setFormData({ ...formData, user_id: value })}>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("admin.selectUser")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {allUsers.filter(u => !members.find(m => m.user_id === u.id)).map((user) => (
+                            <SelectItem key={user.id} value={user.id}>
+                              {user.full_name} ({user.email})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="role">{t("admin.role")}</Label>
+                      <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="member">{t("roles.member")}</SelectItem>
+                          <SelectItem value="family_head">{t("roles.family_head")}</SelectItem>
+                          <SelectItem value="treasurer">{t("roles.treasurer")}</SelectItem>
+                          <SelectItem value="loan_committee">{t("roles.loan_committee")}</SelectItem>
+                          <SelectItem value="guest">{t("roles.guest")}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="house">{t("admin.houseName")}</Label>
+                      <Input
+                        id="house"
+                        value={formData.house_name}
+                        onChange={(e) => setFormData({ ...formData, house_name: e.target.value })}
+                        placeholder={t("admin.houseNamePlaceholder")}
+                      />
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                        {t("common.cancel")}
+                      </Button>
+                      <Button type="submit">{t("admin.addMember")}</Button>
+                    </div>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </div>
       </header>
@@ -252,16 +260,29 @@ const FamilyMembers = () => {
                   </div>
                 </CardHeader>
               <CardContent>
-                <div className="flex gap-4">
-                  <div>
-                    <span className="text-sm font-medium">Role: </span>
-                    <span className="text-sm px-2 py-1 rounded bg-primary/10 text-primary">
-                      {member.role.replace("_", " ").toUpperCase()}
-                    </span>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-medium">{t("admin.role")}: </span>
+                    <Badge variant="secondary">
+                      <Shield className="w-3 h-3 mr-1" />
+                      {t(`roles.${member.role}`)}
+                    </Badge>
+                    {member.role === 'family_head' && (
+                      <Badge variant="outline" className="text-xs">{t("roles.canManageMembers")}</Badge>
+                    )}
+                    {(member.role === 'treasurer' || member.role === 'family_head') && (
+                      <Badge variant="outline" className="text-xs">{t("roles.canManageFinances")}</Badge>
+                    )}
+                    {member.role === 'loan_committee' && (
+                      <Badge variant="outline" className="text-xs">{t("roles.canApproveLoans")}</Badge>
+                    )}
+                    {member.role === 'guest' && (
+                      <Badge variant="outline" className="text-xs">{t("roles.canViewOnly")}</Badge>
+                    )}
                   </div>
                   {member.house_name && (
-                    <div>
-                      <span className="text-sm font-medium">House: </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">{t("admin.house")}: </span>
                       <span className="text-sm">{member.house_name}</span>
                     </div>
                   )}
