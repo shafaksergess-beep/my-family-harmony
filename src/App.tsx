@@ -16,6 +16,9 @@ import EmailReports from "./pages/admin/EmailReports";
 import ExportScheduler from "./pages/admin/ExportScheduler";
 import FamilyDetail from "./pages/family/Detail";
 import FamilyAnalytics from "./pages/family/Analytics";
+import FinancialAnalytics from "./pages/family/FinancialAnalytics";
+import Notifications from "./pages/family/Notifications";
+import AuditTrail from "./pages/family/AuditTrail";
 import FamilyMeetings from "./pages/family/Meetings";
 import FamilyContributions from "./pages/family/Contributions";
 import FamilyLoans from "./pages/family/Loans";
@@ -50,6 +53,9 @@ const App = () => (
         <Route path="/admin/export-scheduler" element={<ExportScheduler />} />
           <Route path="/family/:familySlug" element={<FamilyDetail />} />
           <Route path="/family/:familySlug/analytics" element={<FamilyAnalytics />} />
+          <Route path="/family/:familySlug/financial-analytics" element={<FinancialAnalytics />} />
+          <Route path="/family/:familySlug/notifications" element={<Notifications />} />
+          <Route path="/family/:familySlug/audit-trail" element={<AuditTrail />} />
           <Route path="/family/:familySlug/meetings" element={<FamilyMeetings />} />
           <Route path="/family/:familySlug/contributions" element={<FamilyContributions />} />
           <Route path="/family/:familySlug/loans" element={<FamilyLoans />} />

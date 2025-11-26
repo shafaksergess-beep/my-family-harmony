@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { useParams, useNavigate } from "react-router-dom";
-import { Loader2, ArrowLeft, BarChart3, Calendar, Users, DollarSign, CreditCard, PiggyBank, RefreshCw, Heart, Award } from "lucide-react";
+import { Loader2, ArrowLeft, BarChart3, Calendar, Users, DollarSign, CreditCard, PiggyBank, RefreshCw, Heart, Award, TrendingUp, Bell, FileText } from "lucide-react";
 
 const FamilyDetail = () => {
   const { familySlug } = useParams();
@@ -24,6 +24,27 @@ const FamilyDetail = () => {
       icon: BarChart3,
       path: `/family/${familySlug}/analytics`,
       color: "text-blue-600",
+    },
+    {
+      title: "Financial Analytics",
+      description: "Detailed financial metrics and trends",
+      icon: TrendingUp,
+      path: `/family/${familySlug}/financial-analytics`,
+      color: "text-green-600",
+    },
+    {
+      title: "Notifications",
+      description: "Role-based alerts and updates",
+      icon: Bell,
+      path: `/family/${familySlug}/notifications`,
+      color: "text-violet-600",
+    },
+    {
+      title: "Audit Trail",
+      description: "Track all changes and actions",
+      icon: FileText,
+      path: `/family/${familySlug}/audit-trail`,
+      color: "text-slate-600",
     },
     {
       title: "Financial Reports",
