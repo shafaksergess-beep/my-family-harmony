@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MeetingAgendaBuilder } from "@/components/MeetingAgendaBuilder";
 import { MeetingMinutes } from "@/components/MeetingMinutes";
+import { AttendancePredictions } from "@/components/AttendancePredictions";
+import { AgendaVoting } from "@/components/AgendaVoting";
 
 interface Meeting {
   id: string;
@@ -26,15 +28,35 @@ const MeetingDetail = () => {
   const { familySlug, meetingId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { family, isFamilyHead, isLoading: authLoading } = useFamilyAuth(familySlug);
+  const { family, isFamilyHead, userId, isLoading: authLoading } = useFamilyAuth(familySlug);
   const [loading, setLoading] = useState(true);
   const [meeting, setMeeting] = useState<Meeting | null>(null);
+  const [currentMemberId, setCurrentMemberId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (family && meetingId) {
+    if (family && meetingId && userId) {
       loadMeeting();
+      loadCurrentMember();
     }
-  }, [family, meetingId]);
+  }, [family, meetingId, userId]);
+
+  const loadCurrentMember = async () => {
+    if (!family || !userId) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("family_members")
+        .select("id")
+        .eq("family_id", family.id)
+        .eq("user_id", userId)
+        .single();
+
+      if (error) throw error;
+      setCurrentMemberId(data?.id || null);
+    } catch (error: any) {
+      console.error("Error loading member:", error);
+    }
+  };
 
   const loadMeeting = async () => {
     if (!family || !meetingId) return;
@@ -164,19 +186,24 @@ const MeetingDetail = () => {
           </CardContent>
         </Card>
 
-        {/* Tabs for Agenda and Minutes */}
+        {/* Tabs for Agenda, Minutes, Predictions */}
         <Tabs defaultValue="agenda" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="agenda">Agenda Builder</TabsTrigger>
+            <TabsTrigger value="agenda">Agenda & Voting</TabsTrigger>
             <TabsTrigger value="minutes">Meeting Minutes</TabsTrigger>
+            <TabsTrigger value="predictions">Attendance Predictions</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="agenda">
+          <TabsContent value="agenda" className="space-y-6">
             <MeetingAgendaBuilder meetingId={meeting.id} canEdit={isFamilyHead} />
           </TabsContent>
 
           <TabsContent value="minutes">
             <MeetingMinutes meetingId={meeting.id} canEdit={isFamilyHead} />
+          </TabsContent>
+
+          <TabsContent value="predictions">
+            <AttendancePredictions familyId={family?.id || ""} meetingDate={meeting.meeting_date} />
           </TabsContent>
         </Tabs>
       </main>

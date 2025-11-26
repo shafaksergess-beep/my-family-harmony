@@ -28,6 +28,8 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
   const { toast } = useToast();
   const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [templates, setTemplates] = useState<any[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
   const [newItem, setNewItem] = useState<AgendaItem>({
     title: "",
     description: "",
@@ -38,7 +40,67 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
 
   useEffect(() => {
     loadAgenda();
+    loadTemplates();
   }, [meetingId]);
+
+  const loadTemplates = async () => {
+    try {
+      const { data: meeting } = await supabase
+        .from("meetings")
+        .select("family_id")
+        .eq("id", meetingId)
+        .single();
+
+      if (!meeting) return;
+
+      const { data, error } = await supabase
+        .from("meeting_templates")
+        .select("*")
+        .eq("family_id", meeting.family_id)
+        .order("name");
+
+      if (error) throw error;
+      setTemplates(data || []);
+    } catch (error: any) {
+      console.error("Error loading templates:", error);
+    }
+  };
+
+  const applyTemplate = async (templateId: string) => {
+    try {
+      const template = templates.find(t => t.id === templateId);
+      if (!template || !template.agenda_items) return;
+
+      // Add all items from template
+      for (const item of template.agenda_items) {
+        await supabase
+          .from("meeting_agenda_items")
+          .insert({
+            meeting_id: meetingId,
+            title: item.title,
+            description: item.description,
+            time_allocation: item.time_allocation,
+            requires_vote: item.requires_vote,
+            order_index: agendaItems.length + template.agenda_items.indexOf(item),
+          });
+      }
+
+      toast({
+        title: "Success",
+        description: "Template applied to agenda",
+      });
+
+      setSelectedTemplate("");
+      loadAgenda();
+    } catch (error: any) {
+      console.error("Error applying template:", error);
+      toast({
+        title: "Error",
+        description: "Failed to apply template",
+        variant: "destructive",
+      });
+    }
+  };
 
   const loadAgenda = async () => {
     try {
@@ -191,6 +253,30 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
         {canEdit && (
           <div className="space-y-4 pt-4 border-t">
             <h4 className="font-semibold">Add Agenda Item</h4>
+            
+            {/* Template Selector */}
+            {templates.length > 0 && (
+              <div className="flex gap-2">
+                <select
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                  value={selectedTemplate}
+                  onChange={(e) => setSelectedTemplate(e.target.value)}
+                >
+                  <option value="">Select a template...</option>
+                  {templates.map((template) => (
+                    <option key={template.id} value={template.id}>
+                      {template.name}
+                    </option>
+                  ))}
+                </select>
+                <Button
+                  onClick={() => selectedTemplate && applyTemplate(selectedTemplate)}
+                  disabled={!selectedTemplate}
+                >
+                  Apply Template
+                </Button>
+              </div>
+            )}
             <div className="space-y-3">
               <div>
                 <Label htmlFor="title">Title</Label>

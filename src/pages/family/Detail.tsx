@@ -110,6 +110,13 @@ const FamilyDetail = () => {
       color: "text-cyan-600",
     },
     {
+      title: "Meeting Templates",
+      description: "Create reusable meeting agenda templates",
+      icon: FileText,
+      path: `/family/${familySlug}/meeting-templates`,
+      color: "text-purple-600",
+    },
+    {
       title: "Members",
       description: "View and manage family members",
       icon: Users,

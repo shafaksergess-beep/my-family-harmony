@@ -60,6 +60,7 @@ import BudgetPlanning from "./pages/family/BudgetPlanning";
 import Balloting from "./pages/family/Balloting";
 import AttendanceAnalytics from "./pages/family/AttendanceAnalytics";
 import MeetingDetail from "./pages/family/MeetingDetail";
+import MeetingTemplates from "./pages/family/MeetingTemplates";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -114,6 +115,7 @@ const App = () => (
           <Route path="/family/:familySlug/shares" element={<FamilyShares />} />
           <Route path="/family/:familySlug/balloting" element={<Balloting />} />
           <Route path="/family/:familySlug/attendance-analytics" element={<AttendanceAnalytics />} />
+          <Route path="/family/:familySlug/meeting-templates" element={<MeetingTemplates />} />
           <Route path="/family/:familySlug/members/:memberId" element={<MemberProfile />} />
           <Route path="/family/:familySlug/reports" element={<FamilyReports />} />
           <Route path="/family/:familySlug/invitations" element={<Invitations />} />
