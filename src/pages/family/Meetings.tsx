@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { meetingSchema, type MeetingInput } from "@/lib/validation";
 
 interface Meeting {
   id: string;
@@ -38,6 +39,7 @@ const FamilyMeetings = () => {
     host_house: "",
     agenda: "",
   });
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     loadData();
@@ -68,13 +70,44 @@ const FamilyMeetings = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setValidationErrors({});
+    
+    // Validate input
+    const validationResult = meetingSchema.safeParse({
+      meetingDate: formData.meeting_date,
+      meetingTime: formData.meeting_time,
+      location: formData.location || undefined,
+      hostHouse: formData.host_house || undefined,
+      agenda: formData.agenda || undefined,
+      meetingType: formData.meeting_type,
+    });
+
+    if (!validationResult.success) {
+      const errors: Record<string, string> = {};
+      validationResult.error.errors.forEach((err) => {
+        const field = err.path[0] as string;
+        errors[field] = err.message;
+      });
+      setValidationErrors(errors);
+      toast({
+        title: "Validation Error",
+        description: "Please check the form for errors",
+        variant: "destructive",
+      });
+      return;
+    }
     
     try {
       const { error } = await supabase
         .from("meetings")
         .insert({
           family_id: family.id,
-          ...formData,
+          meeting_date: validationResult.data.meetingDate,
+          meeting_time: validationResult.data.meetingTime,
+          meeting_type: validationResult.data.meetingType,
+          location: validationResult.data.location || null,
+          host_house: validationResult.data.hostHouse || null,
+          agenda: validationResult.data.agenda || null,
         });
 
       if (error) throw error;
@@ -93,6 +126,7 @@ const FamilyMeetings = () => {
         host_house: "",
         agenda: "",
       });
+      setValidationErrors({});
       loadData();
     } catch (error: any) {
       console.error("Error creating meeting:", error);
@@ -151,9 +185,16 @@ const FamilyMeetings = () => {
                         id="date"
                         type="date"
                         value={formData.meeting_date}
-                        onChange={(e) => setFormData({ ...formData, meeting_date: e.target.value })}
+                        onChange={(e) => {
+                          setFormData({ ...formData, meeting_date: e.target.value });
+                          setValidationErrors({ ...validationErrors, meetingDate: "" });
+                        }}
+                        className={validationErrors.meetingDate ? "border-red-500" : ""}
                         required
                       />
+                      {validationErrors.meetingDate && (
+                        <p className="text-sm text-red-500">{validationErrors.meetingDate}</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="time">Meeting Time</Label>
@@ -161,50 +202,91 @@ const FamilyMeetings = () => {
                         id="time"
                         type="time"
                         value={formData.meeting_time}
-                        onChange={(e) => setFormData({ ...formData, meeting_time: e.target.value })}
+                        onChange={(e) => {
+                          setFormData({ ...formData, meeting_time: e.target.value });
+                          setValidationErrors({ ...validationErrors, meetingTime: "" });
+                        }}
+                        className={validationErrors.meetingTime ? "border-red-500" : ""}
                         required
                       />
+                      {validationErrors.meetingTime && (
+                        <p className="text-sm text-red-500">{validationErrors.meetingTime}</p>
+                      )}
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="type">Meeting Type</Label>
-                    <Select value={formData.meeting_type} onValueChange={(value) => setFormData({ ...formData, meeting_type: value })}>
-                      <SelectTrigger>
+                    <Select 
+                      value={formData.meeting_type} 
+                      onValueChange={(value) => {
+                        setFormData({ ...formData, meeting_type: value });
+                        setValidationErrors({ ...validationErrors, meetingType: "" });
+                      }}
+                    >
+                      <SelectTrigger className={validationErrors.meetingType ? "border-red-500" : ""}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="regular">Regular</SelectItem>
-                        <SelectItem value="extraordinary">Extraordinary</SelectItem>
+                        <SelectItem value="emergency">Emergency</SelectItem>
+                        <SelectItem value="special">Special</SelectItem>
                       </SelectContent>
                     </Select>
+                    {validationErrors.meetingType && (
+                      <p className="text-sm text-red-500">{validationErrors.meetingType}</p>
+                    )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="location">Location</Label>
+                    <Label htmlFor="location">Location (optional)</Label>
                     <Input
                       id="location"
                       value={formData.location}
-                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                      onChange={(e) => {
+                        setFormData({ ...formData, location: e.target.value });
+                        setValidationErrors({ ...validationErrors, location: "" });
+                      }}
                       placeholder="Meeting location"
+                      maxLength={200}
+                      className={validationErrors.location ? "border-red-500" : ""}
                     />
+                    {validationErrors.location && (
+                      <p className="text-sm text-red-500">{validationErrors.location}</p>
+                    )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="host">Host House</Label>
+                    <Label htmlFor="host">Host House (optional)</Label>
                     <Input
                       id="host"
                       value={formData.host_house}
-                      onChange={(e) => setFormData({ ...formData, host_house: e.target.value })}
+                      onChange={(e) => {
+                        setFormData({ ...formData, host_house: e.target.value });
+                        setValidationErrors({ ...validationErrors, hostHouse: "" });
+                      }}
                       placeholder="Host house name"
+                      maxLength={100}
+                      className={validationErrors.hostHouse ? "border-red-500" : ""}
                     />
+                    {validationErrors.hostHouse && (
+                      <p className="text-sm text-red-500">{validationErrors.hostHouse}</p>
+                    )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="agenda">Agenda</Label>
+                    <Label htmlFor="agenda">Agenda (optional)</Label>
                     <Textarea
                       id="agenda"
                       value={formData.agenda}
-                      onChange={(e) => setFormData({ ...formData, agenda: e.target.value })}
+                      onChange={(e) => {
+                        setFormData({ ...formData, agenda: e.target.value });
+                        setValidationErrors({ ...validationErrors, agenda: "" });
+                      }}
                       placeholder="Meeting agenda"
                       rows={3}
+                      maxLength={1000}
+                      className={validationErrors.agenda ? "border-red-500" : ""}
                     />
+                    {validationErrors.agenda && (
+                      <p className="text-sm text-red-500">{validationErrors.agenda}</p>
+                    )}
                   </div>
                   <div className="flex justify-end gap-2">
                     <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>

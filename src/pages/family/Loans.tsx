@@ -14,6 +14,7 @@ import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { ArrowLeft, Plus, DollarSign, TrendingUp, Clock, Download, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { exportToCSV } from "@/lib/export";
+import { loanSchema, type LoanInput } from "@/lib/validation";
 
 interface Loan {
   id: string;
@@ -59,6 +60,7 @@ export default function Loans() {
     term_months: "4",
     notes: "",
   });
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (family?.id) {
@@ -112,14 +114,42 @@ export default function Loans() {
   };
 
   const handleRequestLoan = async () => {
+    setValidationErrors({});
+    
+    // Validate input
+    const validationResult = loanSchema.safeParse({
+      memberId: newLoan.member_id,
+      amount: parseFloat(newLoan.amount),
+      purpose: newLoan.purpose,
+      termMonths: parseInt(newLoan.term_months),
+      interestRate: family?.loan_interest_rate || 2.5,
+      notes: newLoan.notes || undefined,
+    });
+
+    if (!validationResult.success) {
+      const errors: Record<string, string> = {};
+      validationResult.error.errors.forEach((err) => {
+        const field = err.path[0] as string;
+        errors[field] = err.message;
+      });
+      setValidationErrors(errors);
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: "Please check the form for errors",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase.from("loans").insert({
         family_id: family!.id,
-        member_id: newLoan.member_id,
-        amount: parseFloat(newLoan.amount),
-        purpose: newLoan.purpose,
-        term_months: parseInt(newLoan.term_months),
-        notes: newLoan.notes || null,
+        member_id: validationResult.data.memberId,
+        amount: validationResult.data.amount,
+        purpose: validationResult.data.purpose,
+        term_months: validationResult.data.termMonths,
+        interest_rate: validationResult.data.interestRate,
+        notes: validationResult.data.notes || null,
         status: "pending",
       });
 
@@ -138,6 +168,7 @@ export default function Loans() {
         term_months: "4",
         notes: "",
       });
+      setValidationErrors({});
       fetchLoans();
     } catch (error: any) {
       toast({
@@ -249,8 +280,14 @@ export default function Loans() {
             <div className="space-y-4">
               <div>
                 <Label>Member</Label>
-                <Select value={newLoan.member_id} onValueChange={(value) => setNewLoan({ ...newLoan, member_id: value })}>
-                  <SelectTrigger>
+                <Select 
+                  value={newLoan.member_id} 
+                  onValueChange={(value) => {
+                    setNewLoan({ ...newLoan, member_id: value });
+                    setValidationErrors({ ...validationErrors, memberId: "" });
+                  }}
+                >
+                  <SelectTrigger className={validationErrors.memberId ? "border-red-500" : ""}>
                     <SelectValue placeholder="Select member" />
                   </SelectTrigger>
                   <SelectContent>
@@ -261,28 +298,53 @@ export default function Loans() {
                     ))}
                   </SelectContent>
                 </Select>
+                {validationErrors.memberId && (
+                  <p className="text-sm text-red-500 mt-1">{validationErrors.memberId}</p>
+                )}
               </div>
               <div>
                 <Label>Amount (FCFA, minimum 50,000)</Label>
                 <Input
                   type="number"
                   min="50000"
+                  step="1000"
                   value={newLoan.amount}
-                  onChange={(e) => setNewLoan({ ...newLoan, amount: e.target.value })}
+                  onChange={(e) => {
+                    setNewLoan({ ...newLoan, amount: e.target.value });
+                    setValidationErrors({ ...validationErrors, amount: "" });
+                  }}
+                  className={validationErrors.amount ? "border-red-500" : ""}
                 />
+                {validationErrors.amount && (
+                  <p className="text-sm text-red-500 mt-1">{validationErrors.amount}</p>
+                )}
               </div>
               <div>
-                <Label>Purpose</Label>
+                <Label>Purpose (min 10 characters)</Label>
                 <Input
                   value={newLoan.purpose}
-                  onChange={(e) => setNewLoan({ ...newLoan, purpose: e.target.value })}
+                  onChange={(e) => {
+                    setNewLoan({ ...newLoan, purpose: e.target.value });
+                    setValidationErrors({ ...validationErrors, purpose: "" });
+                  }}
                   placeholder="Reason for loan"
+                  maxLength={500}
+                  className={validationErrors.purpose ? "border-red-500" : ""}
                 />
+                {validationErrors.purpose && (
+                  <p className="text-sm text-red-500 mt-1">{validationErrors.purpose}</p>
+                )}
               </div>
               <div>
-                <Label>Term (months)</Label>
-                <Select value={newLoan.term_months} onValueChange={(value) => setNewLoan({ ...newLoan, term_months: value })}>
-                  <SelectTrigger>
+                <Label>Term (months, max 12)</Label>
+                <Select 
+                  value={newLoan.term_months} 
+                  onValueChange={(value) => {
+                    setNewLoan({ ...newLoan, term_months: value });
+                    setValidationErrors({ ...validationErrors, termMonths: "" });
+                  }}
+                >
+                  <SelectTrigger className={validationErrors.termMonths ? "border-red-500" : ""}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -291,15 +353,27 @@ export default function Loans() {
                     <SelectItem value="3">3 months</SelectItem>
                     <SelectItem value="4">4 months (default)</SelectItem>
                     <SelectItem value="6">6 months</SelectItem>
+                    <SelectItem value="12">12 months</SelectItem>
                   </SelectContent>
                 </Select>
+                {validationErrors.termMonths && (
+                  <p className="text-sm text-red-500 mt-1">{validationErrors.termMonths}</p>
+                )}
               </div>
               <div>
-                <Label>Notes</Label>
+                <Label>Notes (optional)</Label>
                 <Textarea
                   value={newLoan.notes}
-                  onChange={(e) => setNewLoan({ ...newLoan, notes: e.target.value })}
+                  onChange={(e) => {
+                    setNewLoan({ ...newLoan, notes: e.target.value });
+                    setValidationErrors({ ...validationErrors, notes: "" });
+                  }}
+                  maxLength={500}
+                  className={validationErrors.notes ? "border-red-500" : ""}
                 />
+                {validationErrors.notes && (
+                  <p className="text-sm text-red-500 mt-1">{validationErrors.notes}</p>
+                )}
               </div>
               <div className="bg-muted p-3 rounded">
                 <p className="text-sm">

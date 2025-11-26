@@ -15,6 +15,7 @@ import { ArrowLeft, Plus, DollarSign, TrendingUp, Download, Loader2 } from "luci
 import { format } from "date-fns";
 import { exportToCSV } from "@/lib/export";
 import BulkPaymentMenu from "@/components/BulkPaymentMenu";
+import { contributionSchema, type ContributionInput } from "@/lib/validation";
 
 interface Contribution {
   id: string;
@@ -53,9 +54,10 @@ export default function Contributions() {
     member_id: "",
     amount: "",
     contribution_date: format(new Date(), "yyyy-MM-dd"),
-    type: "mandatory",
+    type: "monthly",
     notes: "",
   });
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (family) {
@@ -113,14 +115,40 @@ export default function Contributions() {
   };
 
   const handleAddContribution = async () => {
+    setValidationErrors({});
+    
+    // Validate input
+    const validationResult = contributionSchema.safeParse({
+      memberId: newContribution.member_id,
+      amount: parseFloat(newContribution.amount),
+      contributionDate: newContribution.contribution_date,
+      type: newContribution.type,
+      notes: newContribution.notes || undefined,
+    });
+
+    if (!validationResult.success) {
+      const errors: Record<string, string> = {};
+      validationResult.error.errors.forEach((err) => {
+        const field = err.path[0] as string;
+        errors[field] = err.message;
+      });
+      setValidationErrors(errors);
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: "Please check the form for errors",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase.from("contributions").insert({
         family_id: family.id,
-        member_id: newContribution.member_id,
-        amount: parseFloat(newContribution.amount),
-        contribution_date: newContribution.contribution_date,
-        type: newContribution.type,
-        notes: newContribution.notes || null,
+        member_id: validationResult.data.memberId,
+        amount: validationResult.data.amount,
+        contribution_date: validationResult.data.contributionDate,
+        type: validationResult.data.type,
+        notes: validationResult.data.notes || null,
         status: "pending",
       });
 
@@ -136,9 +164,10 @@ export default function Contributions() {
         member_id: "",
         amount: "",
         contribution_date: format(new Date(), "yyyy-MM-dd"),
-        type: "mandatory",
+        type: "monthly",
         notes: "",
       });
+      setValidationErrors({});
       fetchContributions();
     } catch (error: any) {
       toast({
@@ -244,8 +273,14 @@ export default function Contributions() {
                     <div className="space-y-4">
                       <div>
                         <Label>Member</Label>
-                        <Select value={newContribution.member_id} onValueChange={(value) => setNewContribution({ ...newContribution, member_id: value })}>
-                          <SelectTrigger>
+                        <Select 
+                          value={newContribution.member_id} 
+                          onValueChange={(value) => {
+                            setNewContribution({ ...newContribution, member_id: value });
+                            setValidationErrors({ ...validationErrors, memberId: "" });
+                          }}
+                        >
+                          <SelectTrigger className={validationErrors.memberId ? "border-red-500" : ""}>
                             <SelectValue placeholder="Select member" />
                           </SelectTrigger>
                           <SelectContent>
@@ -256,44 +291,79 @@ export default function Contributions() {
                             ))}
                           </SelectContent>
                         </Select>
+                        {validationErrors.memberId && (
+                          <p className="text-sm text-red-500 mt-1">{validationErrors.memberId}</p>
+                        )}
                       </div>
                       <div>
                         <Label>Amount (FCFA)</Label>
                         <Input
                           type="number"
+                          min="0"
+                          step="0.01"
                           value={newContribution.amount}
-                          onChange={(e) => setNewContribution({ ...newContribution, amount: e.target.value })}
+                          onChange={(e) => {
+                            setNewContribution({ ...newContribution, amount: e.target.value });
+                            setValidationErrors({ ...validationErrors, amount: "" });
+                          }}
+                          className={validationErrors.amount ? "border-red-500" : ""}
                         />
+                        {validationErrors.amount && (
+                          <p className="text-sm text-red-500 mt-1">{validationErrors.amount}</p>
+                        )}
                       </div>
                       <div>
                         <Label>Date</Label>
                         <Input
                           type="date"
                           value={newContribution.contribution_date}
-                          onChange={(e) => setNewContribution({ ...newContribution, contribution_date: e.target.value })}
+                          onChange={(e) => {
+                            setNewContribution({ ...newContribution, contribution_date: e.target.value });
+                            setValidationErrors({ ...validationErrors, contributionDate: "" });
+                          }}
+                          className={validationErrors.contributionDate ? "border-red-500" : ""}
                         />
+                        {validationErrors.contributionDate && (
+                          <p className="text-sm text-red-500 mt-1">{validationErrors.contributionDate}</p>
+                        )}
                       </div>
                       <div>
                         <Label>Type</Label>
-                        <Select value={newContribution.type} onValueChange={(value) => setNewContribution({ ...newContribution, type: value })}>
-                          <SelectTrigger>
+                        <Select 
+                          value={newContribution.type} 
+                          onValueChange={(value) => {
+                            setNewContribution({ ...newContribution, type: value });
+                            setValidationErrors({ ...validationErrors, type: "" });
+                          }}
+                        >
+                          <SelectTrigger className={validationErrors.type ? "border-red-500" : ""}>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="mandatory">Mandatory</SelectItem>
-                            <SelectItem value="savings">Individual Savings</SelectItem>
-                            <SelectItem value="njangi">Njangi</SelectItem>
-                            <SelectItem value="share">Share Purchase</SelectItem>
+                            <SelectItem value="monthly">Monthly</SelectItem>
+                            <SelectItem value="special">Special</SelectItem>
                             <SelectItem value="fine">Fine</SelectItem>
+                            <SelectItem value="loan_repayment">Loan Repayment</SelectItem>
                           </SelectContent>
                         </Select>
+                        {validationErrors.type && (
+                          <p className="text-sm text-red-500 mt-1">{validationErrors.type}</p>
+                        )}
                       </div>
                       <div>
-                        <Label>Notes</Label>
+                        <Label>Notes (optional)</Label>
                         <Textarea
+                          maxLength={500}
                           value={newContribution.notes}
-                          onChange={(e) => setNewContribution({ ...newContribution, notes: e.target.value })}
+                          onChange={(e) => {
+                            setNewContribution({ ...newContribution, notes: e.target.value });
+                            setValidationErrors({ ...validationErrors, notes: "" });
+                          }}
+                          className={validationErrors.notes ? "border-red-500" : ""}
                         />
+                        {validationErrors.notes && (
+                          <p className="text-sm text-red-500 mt-1">{validationErrors.notes}</p>
+                        )}
                       </div>
                       <Button onClick={handleAddContribution} className="w-full">
                         Add Contribution
