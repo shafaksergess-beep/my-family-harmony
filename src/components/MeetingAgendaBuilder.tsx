@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, GripVertical, Clock } from "lucide-react";
+import { Plus, Trash2, GripVertical, Clock, Save } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface AgendaItem {
   id?: string;
@@ -30,6 +31,10 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
   const [loading, setLoading] = useState(true);
   const [templates, setTemplates] = useState<any[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
+  const [templateName, setTemplateName] = useState("");
+  const [templateDescription, setTemplateDescription] = useState("");
+  const [familyId, setFamilyId] = useState<string>("");
   const [newItem, setNewItem] = useState<AgendaItem>({
     title: "",
     description: "",
@@ -52,6 +57,8 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
         .single();
 
       if (!meeting) return;
+
+      setFamilyId(meeting.family_id);
 
       const { data, error } = await supabase
         .from("meeting_templates")
@@ -97,6 +104,63 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
       toast({
         title: "Error",
         description: "Failed to apply template",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const saveAsTemplate = async () => {
+    if (!templateName.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a template name",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (agendaItems.length === 0) {
+      toast({
+        title: "Error",
+        description: "No agenda items to save",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const templateItems = agendaItems.map(item => ({
+        title: item.title,
+        description: item.description,
+        time_allocation: item.time_allocation,
+        requires_vote: item.requires_vote,
+      }));
+
+      const { error } = await supabase
+        .from("meeting_templates")
+        .insert({
+          family_id: familyId,
+          name: templateName,
+          description: templateDescription,
+          agenda_items: templateItems,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Agenda saved as template",
+      });
+
+      setTemplateName("");
+      setTemplateDescription("");
+      setIsSaveDialogOpen(false);
+      loadTemplates();
+    } catch (error: any) {
+      console.error("Error saving template:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save template",
         variant: "destructive",
       });
     }
@@ -198,10 +262,57 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Meeting Agenda</CardTitle>
-          <Badge variant="outline">
-            <Clock className="w-3 h-3 mr-1" />
-            {totalTime} minutes total
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline">
+              <Clock className="w-3 h-3 mr-1" />
+              {totalTime} minutes total
+            </Badge>
+            {canEdit && agendaItems.length > 0 && (
+              <Dialog open={isSaveDialogOpen} onOpenChange={setIsSaveDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="outline">
+                    <Save className="w-4 h-4 mr-2" />
+                    Save as Template
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Save Agenda as Template</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="template-name">Template Name</Label>
+                      <Input
+                        id="template-name"
+                        value={templateName}
+                        onChange={(e) => setTemplateName(e.target.value)}
+                        placeholder="e.g., Monthly Financial Review"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="template-desc">Description (optional)</Label>
+                      <Textarea
+                        id="template-desc"
+                        value={templateDescription}
+                        onChange={(e) => setTemplateDescription(e.target.value)}
+                        placeholder="Brief description of this template"
+                        rows={2}
+                      />
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <Button variant="outline" onClick={() => setIsSaveDialogOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={saveAsTemplate}>
+                        <Save className="w-4 h-4 mr-2" />
+                        Save Template
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">

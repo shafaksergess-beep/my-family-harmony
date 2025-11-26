@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { TrendingUp, TrendingDown, Minus, Bell } from "lucide-react";
 
 interface AttendancePredictionsProps {
   familyId: string;
   meetingDate: string;
+  meetingId: string;
 }
 
 interface Prediction {
@@ -16,9 +19,11 @@ interface Prediction {
   predicted_attendance: "likely" | "unlikely" | "uncertain";
 }
 
-export const AttendancePredictions = ({ familyId, meetingDate }: AttendancePredictionsProps) => {
+export const AttendancePredictions = ({ familyId, meetingDate, meetingId }: AttendancePredictionsProps) => {
+  const { toast } = useToast();
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sendingNotifications, setSendingNotifications] = useState(false);
 
   useEffect(() => {
     calculatePredictions();
@@ -99,6 +104,31 @@ export const AttendancePredictions = ({ familyId, meetingDate }: AttendancePredi
     }
   };
 
+  const sendNotificationsToUnlikely = async () => {
+    setSendingNotifications(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-attendance-predictions', {
+        body: { meetingId }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Sent attendance reminders to ${data.notified} member(s)`,
+      });
+    } catch (error: any) {
+      console.error("Error sending notifications:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send notifications",
+        variant: "destructive",
+      });
+    } finally {
+      setSendingNotifications(false);
+    }
+  };
+
   if (loading) {
     return <div>Calculating predictions...</div>;
   }
@@ -109,10 +139,24 @@ export const AttendancePredictions = ({ familyId, meetingDate }: AttendancePredi
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Attendance Predictions</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Based on historical attendance patterns
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Attendance Predictions</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Based on historical attendance patterns
+            </p>
+          </div>
+          {unlikelyCount > 0 && (
+            <Button 
+              onClick={sendNotificationsToUnlikely}
+              disabled={sendingNotifications}
+              size="sm"
+            >
+              <Bell className="w-4 h-4 mr-2" />
+              {sendingNotifications ? "Sending..." : `Notify ${unlikelyCount} Unlikely`}
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex gap-4 mb-4">
