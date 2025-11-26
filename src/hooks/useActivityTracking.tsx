@@ -18,18 +18,16 @@ export const useActivityTracking = () => {
     familyId,
   }: ActivityParams) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      await supabase.from("activity_logs").insert({
-        user_id: session?.user?.id || null,
-        family_id: familyId || null,
-        action_type: actionType,
-        entity_type: entityType || null,
-        entity_id: entityId || null,
-        details: details || null,
-        ip_address: null, // Could be populated from an API
-        user_agent: navigator.userAgent,
+      // Use secure server-side logging function
+      const { error } = await supabase.rpc('log_activity', {
+        p_action_type: actionType,
+        p_entity_type: entityType || null,
+        p_entity_id: entityId || null,
+        p_family_id: familyId || null,
+        p_details: details || null,
       });
+
+      if (error) throw error;
     } catch (error) {
       console.error("Error logging activity:", error);
     }

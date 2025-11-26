@@ -144,18 +144,21 @@ export default function AuditTrailEnhanced() {
 
       if (error) throw error;
 
-      // Log the rollback action
-      await supabase.from("activity_logs").insert({
-        user_id: (await supabase.auth.getUser()).data.user?.id,
-        family_id: family.id,
-        action_type: "rollback",
-        entity_type,
-        entity_id,
-        details: {
+      // Log the rollback action using secure server-side function
+      const { error: logError } = await supabase.rpc('log_activity', {
+        p_action_type: "rollback",
+        p_entity_type: entity_type,
+        p_entity_id: entity_id,
+        p_family_id: family.id,
+        p_details: {
           rolled_back_from: selectedLog.id,
           restored_state: details.before,
         },
       });
+
+      if (logError) {
+        console.error("Failed to log rollback:", logError);
+      }
 
       toast({
         title: "Success",
