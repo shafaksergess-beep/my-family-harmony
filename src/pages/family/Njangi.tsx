@@ -95,16 +95,31 @@ export default function FamilyNjangi() {
         setSelectedCycle(cyclesData[0]);
       }
 
+      // Fetch family members
       const { data: membersData, error: membersError } = await supabase
         .from("family_members")
-        .select(`
-          id,
-          profiles!inner(full_name)
-        `)
+        .select("id, user_id")
         .eq("family_id", family.id);
 
       if (membersError) throw membersError;
-      setMembers(membersData as any);
+
+      // Fetch profiles
+      const userIds = membersData?.map(m => m.user_id) || [];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Merge data
+      const userIdToProfile = new Map(profilesData?.map(p => [p.id, p]) || []);
+      const enrichedMembers = membersData?.map(member => ({
+        id: member.id,
+        profiles: userIdToProfile.get(member.user_id) || { full_name: "Unknown" }
+      })) || [];
+
+      setMembers(enrichedMembers as any);
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {
@@ -114,20 +129,46 @@ export default function FamilyNjangi() {
 
   const loadParticipants = async (cycleId: string) => {
     try {
-      const { data, error } = await supabase
+      // Fetch participants
+      const { data: participantsData, error: participantsError } = await supabase
         .from("njangi_participants")
-        .select(`
-          *,
-          family_members!inner(
-            id,
-            profiles!inner(full_name)
-          )
-        `)
+        .select("*")
         .eq("cycle_id", cycleId)
         .order("payout_order", { ascending: true });
 
-      if (error) throw error;
-      setParticipants(data as any);
+      if (participantsError) throw participantsError;
+
+      // Fetch family members
+      const memberIds = participantsData?.map(p => p.member_id) || [];
+      const { data: membersData, error: membersError } = await supabase
+        .from("family_members")
+        .select("id, user_id")
+        .in("id", memberIds);
+
+      if (membersError) throw membersError;
+
+      // Fetch profiles
+      const userIds = membersData?.map(m => m.user_id) || [];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Merge data
+      const memberIdToUserId = new Map(membersData?.map(m => [m.id, m.user_id]) || []);
+      const userIdToProfile = new Map(profilesData?.map(p => [p.id, p]) || []);
+
+      const enrichedParticipants = participantsData?.map(participant => ({
+        ...participant,
+        family_members: {
+          id: participant.member_id,
+          profiles: userIdToProfile.get(memberIdToUserId.get(participant.member_id)!) || { full_name: "Unknown" }
+        }
+      })) || [];
+
+      setParticipants(enrichedParticipants as any);
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     }

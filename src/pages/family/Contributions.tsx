@@ -70,19 +70,45 @@ export default function Contributions() {
     if (!family) return;
     
     try {
-      const { data, error } = await supabase
+      // Fetch contributions
+      const { data: contributionsData, error: contributionsError } = await supabase
         .from("contributions")
-        .select(`
-          *,
-          family_members(
-            profiles(full_name)
-          )
-        `)
+        .select("*")
         .eq("family_id", family.id)
         .order("contribution_date", { ascending: false });
 
-      if (error) throw error;
-      setContributions(data as any || []);
+      if (contributionsError) throw contributionsError;
+
+      // Fetch family members
+      const memberIds = [...new Set(contributionsData?.map(c => c.member_id) || [])];
+      const { data: membersData, error: membersError } = await supabase
+        .from("family_members")
+        .select("id, user_id")
+        .in("id", memberIds);
+
+      if (membersError) throw membersError;
+
+      // Fetch profiles
+      const userIds = membersData?.map(m => m.user_id) || [];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Merge data
+      const memberIdToUserId = new Map(membersData?.map(m => [m.id, m.user_id]) || []);
+      const userIdToProfile = new Map(profilesData?.map(p => [p.id, p]) || []);
+
+      const enrichedContributions = contributionsData?.map(contribution => ({
+        ...contribution,
+        family_members: {
+          profiles: userIdToProfile.get(memberIdToUserId.get(contribution.member_id)!) || { full_name: "Unknown" }
+        }
+      })) || [];
+
+      setContributions(enrichedContributions as any);
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -98,13 +124,31 @@ export default function Contributions() {
     if (!family) return;
     
     try {
-      const { data, error } = await supabase
+      // Fetch family members
+      const { data: membersData, error: membersError } = await supabase
         .from("family_members")
-        .select("id, profiles(full_name)")
+        .select("id, user_id")
         .eq("family_id", family.id);
 
-      if (error) throw error;
-      setMembers(data as any || []);
+      if (membersError) throw membersError;
+
+      // Fetch profiles
+      const userIds = membersData?.map(m => m.user_id) || [];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Merge data
+      const userIdToProfile = new Map(profilesData?.map(p => [p.id, p]) || []);
+      const enrichedMembers = membersData?.map(member => ({
+        id: member.id,
+        profiles: userIdToProfile.get(member.user_id) || { full_name: "Unknown" }
+      })) || [];
+
+      setMembers(enrichedMembers as any);
     } catch (error: any) {
       toast({
         variant: "destructive",
