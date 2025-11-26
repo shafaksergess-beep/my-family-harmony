@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, Plus, Trash2, Shield, Download, Edit, Phone, Calendar, Briefcase, Home, User } from "lucide-react";
+import { Loader2, ArrowLeft, Plus, Trash2, Shield, Download, Edit, Phone, Calendar, Briefcase, Home, User, Search, Filter, Eye, CheckSquare, Square } from "lucide-react";
 import { logAdminActivity } from "@/lib/adminLogger";
 import { exportToCSV, formatMembersForExport } from "@/lib/export";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface FamilyMember {
   id: string;
@@ -47,6 +48,13 @@ const FamilyMembers = () => {
     role: "member",
     house_name: "",
   });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [houseFilter, setHouseFilter] = useState<string>("all");
+  const [selectedMembers, setSelectedMembers] = useState<Set<string>>(new Set());
+  const [bulkAction, setBulkAction] = useState<string>("");
+  const [bulkRole, setBulkRole] = useState<string>("");
+  const [bulkHouse, setBulkHouse] = useState<string>("");
 
   useEffect(() => {
     loadData();
@@ -255,6 +263,100 @@ const FamilyMembers = () => {
     });
   };
 
+  const toggleMemberSelection = (memberId: string) => {
+    const newSelection = new Set(selectedMembers);
+    if (newSelection.has(memberId)) {
+      newSelection.delete(memberId);
+    } else {
+      newSelection.add(memberId);
+    }
+    setSelectedMembers(newSelection);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedMembers.size === filteredMembers.length) {
+      setSelectedMembers(new Set());
+    } else {
+      setSelectedMembers(new Set(filteredMembers.map(m => m.id)));
+    }
+  };
+
+  const handleBulkAction = async () => {
+    if (!bulkAction || selectedMembers.size === 0) return;
+
+    try {
+      if (bulkAction === "role" && bulkRole) {
+        // Bulk role assignment
+        const updates = Array.from(selectedMembers).map(memberId => 
+          supabase.from("family_members").update({ role: bulkRole as any }).eq("id", memberId)
+        );
+        await Promise.all(updates);
+        
+        toast({
+          title: t("common.success"),
+          description: `Updated role for ${selectedMembers.size} members`,
+        });
+      } else if (bulkAction === "house" && bulkHouse) {
+        // Bulk house assignment
+        const updates = Array.from(selectedMembers).map(memberId => 
+          supabase.from("family_members").update({ house_name: bulkHouse }).eq("id", memberId)
+        );
+        await Promise.all(updates);
+        
+        toast({
+          title: t("common.success"),
+          description: `Updated house for ${selectedMembers.size} members`,
+        });
+      } else if (bulkAction === "export") {
+        // Export selected members
+        const selectedMemberData = members.filter(m => selectedMembers.has(m.id));
+        const formatted = formatMembersForExport(selectedMemberData);
+        exportToCSV(formatted, `${family?.slug}-selected-members-${new Date().toISOString().split('T')[0]}`);
+        
+        toast({
+          title: t("common.success"),
+          description: `Exported ${selectedMembers.size} members`,
+        });
+      }
+
+      await logAdminActivity({
+        action_type: 'update',
+        entity_type: 'family_member',
+        details: { 
+          family_name: family?.name,
+          action: bulkAction,
+          count: selectedMembers.size 
+        }
+      });
+
+      setSelectedMembers(new Set());
+      setBulkAction("");
+      setBulkRole("");
+      setBulkHouse("");
+      loadData();
+    } catch (error: any) {
+      console.error("Bulk action error:", error);
+      toast({
+        title: t("common.error"),
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const filteredMembers = members.filter(member => {
+    const matchesSearch = 
+      member.profiles?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      member.profiles?.email?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesRole = roleFilter === "all" || member.role === roleFilter;
+    const matchesHouse = houseFilter === "all" || member.house_name === houseFilter;
+    
+    return matchesSearch && matchesRole && matchesHouse;
+  });
+
+  const uniqueHouses = Array.from(new Set(members.map(m => m.house_name).filter(Boolean)));
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -285,7 +387,7 @@ const FamilyMembers = () => {
               {members.length > 0 && (
                 <Button variant="outline" size="sm" onClick={handleExport}>
                   <Download className="w-4 h-4 mr-2" />
-                  Export
+                  Export All
                 </Button>
               )}
               <LanguageSwitcher />
@@ -359,12 +461,112 @@ const FamilyMembers = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Search and Filters */}
+        <div className="mb-6 space-y-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Search members by name or email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <SelectTrigger className="w-full md:w-48">
+                <Filter className="w-4 h-4 mr-2" />
+                <SelectValue placeholder="Filter by role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Roles</SelectItem>
+                <SelectItem value="family_head">Family Head</SelectItem>
+                <SelectItem value="treasurer">Treasurer</SelectItem>
+                <SelectItem value="loan_committee">Loan Committee</SelectItem>
+                <SelectItem value="member">Member</SelectItem>
+                <SelectItem value="guest">Guest</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={houseFilter} onValueChange={setHouseFilter}>
+              <SelectTrigger className="w-full md:w-48">
+                <Home className="w-4 h-4 mr-2" />
+                <SelectValue placeholder="Filter by house" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Houses</SelectItem>
+                {uniqueHouses.map(house => (
+                  <SelectItem key={house} value={house!}>{house}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                checked={selectedMembers.size === filteredMembers.length && filteredMembers.length > 0}
+                onCheckedChange={toggleSelectAll}
+              />
+              <span className="text-sm text-muted-foreground">
+                {selectedMembers.size > 0 ? `${selectedMembers.size} selected` : "Select all"}
+              </span>
+            </div>
+            
+            {selectedMembers.size > 0 && (
+              <div className="flex items-center gap-2">
+                <Select value={bulkAction} onValueChange={setBulkAction}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Bulk action" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="role">Assign Role</SelectItem>
+                    <SelectItem value="house">Assign House</SelectItem>
+                    <SelectItem value="export">Export Selected</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                {bulkAction === "role" && (
+                  <Select value={bulkRole} onValueChange={setBulkRole}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="member">Member</SelectItem>
+                      <SelectItem value="family_head">Family Head</SelectItem>
+                      <SelectItem value="treasurer">Treasurer</SelectItem>
+                      <SelectItem value="loan_committee">Loan Committee</SelectItem>
+                      <SelectItem value="guest">Guest</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+                
+                {bulkAction === "house" && (
+                  <Input
+                    placeholder="House name"
+                    value={bulkHouse}
+                    onChange={(e) => setBulkHouse(e.target.value)}
+                    className="w-40"
+                  />
+                )}
+                
+                <Button onClick={handleBulkAction} disabled={!bulkAction || (bulkAction === "role" && !bulkRole) || (bulkAction === "house" && !bulkHouse)}>
+                  Apply
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+
         <div className="grid gap-4">
-            {members.map((member) => (
+            {filteredMembers.map((member) => (
               <Card key={member.id}>
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
+                      <Checkbox
+                        checked={selectedMembers.has(member.id)}
+                        onCheckedChange={() => toggleMemberSelection(member.id)}
+                      />
                       {member.profiles?.avatar_url && (
                         <img 
                           src={member.profiles.avatar_url} 
@@ -386,6 +588,14 @@ const FamilyMembers = () => {
                       </div>
                     </div>
                     <div className="flex gap-2">
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        onClick={() => navigate(`/admin/families/${familyId}/members/${member.id}`)}
+                        title="View details"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
                       <Button 
                         size="icon" 
                         variant="ghost" 
