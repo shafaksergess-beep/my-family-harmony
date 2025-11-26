@@ -7,8 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Search, User, Phone, Mail, Download } from "lucide-react";
+import { ArrowLeft, Search, User, Phone, Mail, Download, UserCog } from "lucide-react";
 import { exportMembersToCSV } from "@/lib/export";
+import { useFamilyAuth } from "@/hooks/useFamilyAuth";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 interface Member {
   id: string;
@@ -29,11 +33,16 @@ const Members = () => {
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { canManageMembers } = useFamilyAuth(familySlug);
   const [loading, setLoading] = useState(true);
   const [members, setMembers] = useState<Member[]>([]);
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [familyName, setFamilyName] = useState("");
+  const [familyId, setFamilyId] = useState("");
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [newRole, setNewRole] = useState<"family_head" | "treasurer" | "loan_committee" | "member" | "guest">("member");
+  const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false);
 
   useEffect(() => {
     loadMembers();
@@ -64,6 +73,7 @@ const Members = () => {
       }
 
       setFamilyName(family.name);
+      setFamilyId(family.id);
 
       // Fetch family members
       const { data: membersData, error: membersError } = await supabase
@@ -147,6 +157,41 @@ const Members = () => {
       .join(" ");
   };
 
+  const handleRoleChange = async () => {
+    if (!selectedMember || !newRole) return;
+
+    try {
+      const { error } = await supabase
+        .from("family_members")
+        .update({ role: newRole })
+        .eq("id", selectedMember.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Role Updated",
+        description: `${selectedMember.profiles.full_name} is now a ${getRoleLabel(newRole)}`,
+      });
+
+      setIsRoleDialogOpen(false);
+      setSelectedMember(null);
+      setNewRole("member");
+      loadMembers();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const openRoleDialog = (member: Member) => {
+    setSelectedMember(member);
+    setNewRole(member.role as any);
+    setIsRoleDialogOpen(true);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -174,14 +219,16 @@ const Members = () => {
               </p>
             </div>
           </div>
-          <Button
-            variant="outline"
-            onClick={() => exportMembersToCSV(filteredMembers)}
-            disabled={filteredMembers.length === 0}
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Export CSV
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => exportMembersToCSV(filteredMembers)}
+              disabled={filteredMembers.length === 0}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
+            </Button>
+          </div>
         </div>
 
         <div className="relative">
@@ -196,11 +243,7 @@ const Members = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredMembers.map((member) => (
-            <Link
-              key={member.id}
-              to={`/family/${familySlug}/members/${member.id}`}
-            >
-              <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
+            <Card key={member.id} className="p-6 hover:shadow-lg transition-shadow relative group">
                 <div className="space-y-4">
                   <div className="flex items-start justify-between">
                     <Avatar className="h-16 w-16">
@@ -223,8 +266,9 @@ const Members = () => {
                     </Badge>
                   </div>
 
+                <Link to={`/family/${familySlug}/members/${member.id}`}>
                   {member.house_name && (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground hover:underline">
                       House: {member.house_name}
                     </p>
                   )}
@@ -249,9 +293,9 @@ const Members = () => {
                       Working Member
                     </Badge>
                   )}
-                </div>
-              </Card>
-            </Link>
+                </Link>
+              </div>
+            </Card>
           ))}
         </div>
 
@@ -264,6 +308,42 @@ const Members = () => {
           </Card>
         )}
       </div>
+
+      <Dialog open={isRoleDialogOpen} onOpenChange={setIsRoleDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Assign Role</DialogTitle>
+          </DialogHeader>
+          {selectedMember && (
+            <div className="space-y-4">
+              <div className="p-4 bg-muted rounded">
+                <p className="font-medium">{selectedMember.profiles.full_name}</p>
+                <p className="text-sm text-muted-foreground">
+                  Current Role: {getRoleLabel(selectedMember.role)}
+                </p>
+              </div>
+              <div>
+                <Label>New Role</Label>
+                <Select value={newRole} onValueChange={(value) => setNewRole(value as typeof newRole)}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="family_head">Family Head</SelectItem>
+                    <SelectItem value="treasurer">Treasurer</SelectItem>
+                    <SelectItem value="loan_committee">Loan Committee</SelectItem>
+                    <SelectItem value="member">Member</SelectItem>
+                    <SelectItem value="guest">Guest</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button onClick={handleRoleChange} className="w-full">
+                Update Role
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

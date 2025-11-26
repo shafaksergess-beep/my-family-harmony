@@ -29,6 +29,7 @@ import FamilyContributions from "./pages/family/Contributions";
 import ContributionSettings from "./pages/family/ContributionSettings";
 import FinancialSettings from "./pages/family/FinancialSettings";
 import FamilyLoans from "./pages/family/Loans";
+import LoanCommitteeDashboard from "./pages/family/LoanCommitteeDashboard";
 import FamilyAttendance from "./pages/family/Attendance";
 import FamilySavings from "./pages/family/Savings";
 import FamilyNjangi from "./pages/family/Njangi";
@@ -114,6 +115,7 @@ const App = () => (
           <Route path="/family/:familySlug/contribution-settings" element={<ContributionSettings />} />
           <Route path="/family/:familySlug/financial-settings" element={<FinancialSettings />} />
           <Route path="/family/:familySlug/loans" element={<FamilyLoans />} />
+          <Route path="/family/:familySlug/loan-committee" element={<LoanCommitteeDashboard />} />
           <Route path="/family/:familySlug/attendance" element={<FamilyAttendance />} />
           <Route path="/family/:familySlug/savings" element={<FamilySavings />} />
           <Route path="/family/:familySlug/njangi" element={<FamilyNjangi />} />

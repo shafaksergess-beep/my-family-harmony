@@ -152,6 +152,13 @@ const FamilyDetail = () => {
       color: "text-red-600",
     },
     {
+      title: "Loan Committee",
+      description: "Review and approve loan requests",
+      icon: Users,
+      path: `/family/${familySlug}/loan-committee`,
+      color: "text-purple-600",
+    },
+    {
       title: "Savings",
       description: "Track individual member savings",
       icon: PiggyBank,
