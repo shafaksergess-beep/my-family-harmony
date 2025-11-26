@@ -1,1 +1,7 @@
 project_id = "nskulyhcaogrfekojyyb"
+
+[functions.schedule-meeting-reminders]
+verify_jwt = false
+
+[functions.mobile-money-webhook]
+verify_jwt = false
