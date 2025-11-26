@@ -194,6 +194,13 @@ const FamilyDetail = () => {
       color: "text-amber-600",
     },
     {
+      title: "Budget Planning",
+      description: "Track expenses and manage budgets",
+      icon: Wallet,
+      path: `/family/${familySlug}/budget`,
+      color: "text-green-600",
+    },
+    {
       title: "Email Reports",
       description: "Configure automated email digests",
       icon: Mail,

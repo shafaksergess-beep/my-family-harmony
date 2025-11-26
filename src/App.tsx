@@ -54,6 +54,7 @@ import PaymentPlans from "./pages/family/PaymentPlans";
 import FamilyEmailReports from "./pages/family/EmailReports";
 import FamilyReports from "./pages/family/Reports";
 import FamilyExportScheduler from "./pages/family/ExportScheduler";
+import BudgetPlanning from "./pages/family/BudgetPlanning";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -115,6 +116,7 @@ const App = () => (
           <Route path="/family/:familySlug/payment-plans" element={<PaymentPlans />} />
           <Route path="/family/:familySlug/email-reports" element={<FamilyEmailReports />} />
           <Route path="/family/:familySlug/export-scheduler" element={<FamilyExportScheduler />} />
+          <Route path="/family/:familySlug/budget" element={<BudgetPlanning />} />
           <Route path="/accept-invitation" element={<AcceptInvitation />} />
           <Route path="/install" element={<Install />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
