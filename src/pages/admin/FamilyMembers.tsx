@@ -74,12 +74,22 @@ const FamilyMembers = () => {
         profiles: Array.isArray(m.profiles) ? m.profiles[0] : m.profiles
       })) as FamilyMember[]);
 
-      // Load all users
+      // Load all users and all assigned user IDs
       const { data: usersData } = await supabase
         .from("profiles")
         .select("id, full_name, email");
       
-      setAllUsers(usersData || []);
+      // Get all user IDs that are already members of ANY family
+      const { data: allAssignedMembers } = await supabase
+        .from("family_members")
+        .select("user_id");
+      
+      const assignedUserIds = new Set(allAssignedMembers?.map(m => m.user_id) || []);
+      
+      // Filter to show only unassigned users
+      const unassignedUsers = (usersData || []).filter(user => !assignedUserIds.has(user.id));
+      
+      setAllUsers(unassignedUsers);
     } catch (error) {
       console.error("Error loading data:", error);
       toast({
@@ -252,7 +262,7 @@ const FamilyMembers = () => {
                           <SelectValue placeholder={t("admin.selectUser")} />
                         </SelectTrigger>
                         <SelectContent>
-                          {allUsers.filter(u => !members.find(m => m.user_id === u.id)).map((user) => (
+                          {allUsers.map((user) => (
                             <SelectItem key={user.id} value={user.id}>
                               {user.full_name} ({user.email})
                             </SelectItem>

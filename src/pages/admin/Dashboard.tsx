@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, Users, Building2, Activity, TrendingUp, Shield, FileText, BarChart3, PieChart } from "lucide-react";
+import { Loader2, ArrowLeft, Users, Building2, Activity, TrendingUp, Shield, FileText, BarChart3, PieChart, Mail, Download } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, BarChart, Bar, PieChart as RechartsPie, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
@@ -495,7 +495,7 @@ const AdminDashboard = () => {
         </Card>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mt-8">
           <Button
             variant="outline"
             className="h-auto py-6"
@@ -513,7 +513,7 @@ const AdminDashboard = () => {
           >
             <div className="flex flex-col items-center gap-2">
               <Shield className="w-8 h-8" />
-              <span>View Permissions</span>
+              <span>Permissions</span>
             </div>
           </Button>
           <Button
@@ -524,6 +524,26 @@ const AdminDashboard = () => {
             <div className="flex flex-col items-center gap-2">
               <FileText className="w-8 h-8" />
               <span>Activity Logs</span>
+            </div>
+          </Button>
+          <Button
+            variant="outline"
+            className="h-auto py-6"
+            onClick={() => navigate("/admin/email-reports")}
+          >
+            <div className="flex flex-col items-center gap-2">
+              <Mail className="w-8 h-8" />
+              <span>Email Reports</span>
+            </div>
+          </Button>
+          <Button
+            variant="outline"
+            className="h-auto py-6"
+            onClick={() => navigate("/admin/export-scheduler")}
+          >
+            <div className="flex flex-col items-center gap-2">
+              <Download className="w-8 h-8" />
+              <span>Export Scheduler</span>
             </div>
           </Button>
         </div>

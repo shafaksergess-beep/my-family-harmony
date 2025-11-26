@@ -12,6 +12,8 @@ import AdminFamilies from "./pages/admin/Families";
 import FamilyMembers from "./pages/admin/FamilyMembers";
 import Permissions from "./pages/admin/Permissions";
 import ActivityLogs from "./pages/admin/ActivityLogs";
+import EmailReports from "./pages/admin/EmailReports";
+import ExportScheduler from "./pages/admin/ExportScheduler";
 import FamilyDetail from "./pages/family/Detail";
 import FamilyAnalytics from "./pages/family/Analytics";
 import FamilyMeetings from "./pages/family/Meetings";
@@ -44,6 +46,8 @@ const App = () => (
         <Route path="/admin/families/:familyId/members" element={<FamilyMembers />} />
         <Route path="/admin/permissions" element={<Permissions />} />
         <Route path="/admin/activity-logs" element={<ActivityLogs />} />
+        <Route path="/admin/email-reports" element={<EmailReports />} />
+        <Route path="/admin/export-scheduler" element={<ExportScheduler />} />
           <Route path="/family/:familySlug" element={<FamilyDetail />} />
           <Route path="/family/:familySlug/analytics" element={<FamilyAnalytics />} />
           <Route path="/family/:familySlug/meetings" element={<FamilyMeetings />} />
