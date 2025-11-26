@@ -647,13 +647,17 @@ export type Database = {
           contribution_scope: string | null
           created_at: string | null
           description: string | null
+          fine_after_30min: number | null
+          fine_after_60min: number | null
           heritage_info: string | null
           id: string
           is_active: boolean | null
+          lateness_tolerance_minutes: number | null
           loan_interest_rate: number | null
           logo_url: string | null
           mandatory_contribution: number | null
           meeting_day: string | null
+          meeting_frequency: string | null
           meeting_time: string | null
           name: string
           njangi_amount: number | null
@@ -666,13 +670,17 @@ export type Database = {
           contribution_scope?: string | null
           created_at?: string | null
           description?: string | null
+          fine_after_30min?: number | null
+          fine_after_60min?: number | null
           heritage_info?: string | null
           id?: string
           is_active?: boolean | null
+          lateness_tolerance_minutes?: number | null
           loan_interest_rate?: number | null
           logo_url?: string | null
           mandatory_contribution?: number | null
           meeting_day?: string | null
+          meeting_frequency?: string | null
           meeting_time?: string | null
           name: string
           njangi_amount?: number | null
@@ -685,13 +693,17 @@ export type Database = {
           contribution_scope?: string | null
           created_at?: string | null
           description?: string | null
+          fine_after_30min?: number | null
+          fine_after_60min?: number | null
           heritage_info?: string | null
           id?: string
           is_active?: boolean | null
+          lateness_tolerance_minutes?: number | null
           loan_interest_rate?: number | null
           logo_url?: string | null
           mandatory_contribution?: number | null
           meeting_day?: string | null
+          meeting_frequency?: string | null
           meeting_time?: string | null
           name?: string
           njangi_amount?: number | null
@@ -1112,6 +1124,48 @@ export type Database = {
             columns: ["family_id"]
             isOneToOne: false
             referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      member_wallets: {
+        Row: {
+          balance: number
+          created_at: string | null
+          family_id: string
+          id: string
+          member_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          balance?: number
+          created_at?: string | null
+          family_id: string
+          id?: string
+          member_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          balance?: number
+          created_at?: string | null
+          family_id?: string
+          id?: string
+          member_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_wallets_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_wallets_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
             referencedColumns: ["id"]
           },
         ]
@@ -1706,6 +1760,47 @@ export type Database = {
             columns: ["member_id"]
             isOneToOne: false
             referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wallet_transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          description: string | null
+          id: string
+          reference_id: string | null
+          reference_type: string | null
+          transaction_type: string
+          wallet_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          transaction_type: string
+          wallet_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          transaction_type?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "member_wallets"
             referencedColumns: ["id"]
           },
         ]

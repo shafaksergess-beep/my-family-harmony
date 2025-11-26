@@ -62,6 +62,7 @@ import Balloting from "./pages/family/Balloting";
 import AttendanceAnalytics from "./pages/family/AttendanceAnalytics";
 import MeetingDetail from "./pages/family/MeetingDetail";
 import MeetingTemplates from "./pages/family/MeetingTemplates";
+import MeetingSettings from "./pages/family/MeetingSettings";
 import MeetingAnalyticsDashboard from "./pages/family/MeetingAnalyticsDashboard";
 import NotFound from "./pages/NotFound";
 
@@ -120,6 +121,7 @@ const App = () => (
           <Route path="/family/:familySlug/attendance-analytics" element={<AttendanceAnalytics />} />
           <Route path="/family/:familySlug/meeting-analytics" element={<MeetingAnalyticsDashboard />} />
           <Route path="/family/:familySlug/meeting-templates" element={<MeetingTemplates />} />
+          <Route path="/family/:familySlug/meeting-settings" element={<MeetingSettings />} />
           <Route path="/family/:familySlug/members/:memberId" element={<MemberProfile />} />
           <Route path="/family/:familySlug/reports" element={<FamilyReports />} />
           <Route path="/family/:familySlug/invitations" element={<Invitations />} />
