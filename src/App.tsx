@@ -19,6 +19,9 @@ import FamilyAnalytics from "./pages/family/Analytics";
 import FinancialAnalytics from "./pages/family/FinancialAnalytics";
 import Notifications from "./pages/family/Notifications";
 import AuditTrail from "./pages/family/AuditTrail";
+import MemberDetail from "./pages/family/MemberDetail";
+import PDFReports from "./pages/family/PDFReports";
+import MeetingCheckIn from "./pages/family/MeetingCheckIn";
 import FamilyMeetings from "./pages/family/Meetings";
 import FamilyContributions from "./pages/family/Contributions";
 import FamilyLoans from "./pages/family/Loans";
@@ -56,6 +59,9 @@ const App = () => (
           <Route path="/family/:familySlug/financial-analytics" element={<FinancialAnalytics />} />
           <Route path="/family/:familySlug/notifications" element={<Notifications />} />
           <Route path="/family/:familySlug/audit-trail" element={<AuditTrail />} />
+          <Route path="/family/:familySlug/members/:memberId" element={<MemberDetail />} />
+          <Route path="/family/:familySlug/pdf-reports" element={<PDFReports />} />
+          <Route path="/family/:familySlug/meetings/:meetingId/checkin" element={<MeetingCheckIn />} />
           <Route path="/family/:familySlug/meetings" element={<FamilyMeetings />} />
           <Route path="/family/:familySlug/contributions" element={<FamilyContributions />} />
           <Route path="/family/:familySlug/loans" element={<FamilyLoans />} />

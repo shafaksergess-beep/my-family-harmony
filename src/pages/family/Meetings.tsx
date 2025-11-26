@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
-import { Loader2, ArrowLeft, Plus, Calendar, MapPin, Clock } from "lucide-react";
+import { Loader2, ArrowLeft, Plus, Calendar, MapPin, Clock, QrCode } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -236,7 +236,7 @@ const FamilyMeetings = () => {
         ) : (
           <div className="grid gap-4">
             {meetings.map((meeting) => (
-              <Card key={meeting.id} className="hover:shadow-lg transition-all cursor-pointer" onClick={() => navigate(`/family/${familySlug}/meetings/${meeting.id}`)}>
+              <Card key={meeting.id} className="hover:shadow-lg transition-all">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center gap-2">
@@ -266,7 +266,7 @@ const FamilyMeetings = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <div className="flex items-center gap-2 text-sm">
                       <span className="font-medium">Type:</span>
                       <span className="capitalize">{meeting.meeting_type}</span>
@@ -277,6 +277,24 @@ const FamilyMeetings = () => {
                         <span>{meeting.host_house}</span>
                       </div>
                     )}
+                    <div className="flex gap-2 mt-4">
+                      <Button 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => navigate(`/family/${familySlug}/meetings/${meeting.id}`)}
+                      >
+                        View Details
+                      </Button>
+                      {!meeting.is_completed && (
+                        <Button 
+                          className="flex-1"
+                          onClick={() => navigate(`/family/${familySlug}/meetings/${meeting.id}/checkin`)}
+                        >
+                          <QrCode className="w-4 h-4 mr-2" />
+                          Check In
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
