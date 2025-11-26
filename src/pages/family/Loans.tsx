@@ -61,11 +61,11 @@ export default function Loans() {
   });
 
   useEffect(() => {
-    if (familyId) {
+    if (family?.id) {
       fetchLoans();
       fetchMembers();
     }
-  }, [familyId]);
+  }, [family?.id]);
 
   const fetchLoans = async () => {
     try {
@@ -77,7 +77,7 @@ export default function Loans() {
             profiles(full_name)
           )
         `)
-        .eq("family_id", familyId)
+        .eq("family_id", family!.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -98,7 +98,7 @@ export default function Loans() {
       const { data, error } = await supabase
         .from("family_members")
         .select("id, profiles(full_name)")
-        .eq("family_id", familyId);
+        .eq("family_id", family!.id);
 
       if (error) throw error;
       setMembers(data as any || []);
@@ -114,7 +114,7 @@ export default function Loans() {
   const handleRequestLoan = async () => {
     try {
       const { error } = await supabase.from("loans").insert({
-        family_id: familyId,
+        family_id: family!.id,
         member_id: newLoan.member_id,
         amount: parseFloat(newLoan.amount),
         purpose: newLoan.purpose,
@@ -231,7 +231,7 @@ export default function Loans() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familyId}`)}>
+          <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${family?.id}`)}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <h1 className="text-3xl font-bold">Loan Management</h1>
