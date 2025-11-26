@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, FileText, Filter } from "lucide-react";
+import { Loader2, ArrowLeft, FileText, Filter, Download } from "lucide-react";
+import { exportToCSV, formatActivityLogsForExport } from "@/lib/export";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -136,6 +137,15 @@ const ActivityLogs = () => {
   const uniqueActions = [...new Set(logs.map((log) => log.action_type))];
   const uniqueEntities = [...new Set(logs.map((log) => log.entity_type))];
 
+  const handleExport = () => {
+    const formatted = formatActivityLogsForExport(filteredLogs);
+    exportToCSV(formatted, `activity-logs-${new Date().toISOString().split('T')[0]}`);
+    toast({
+      title: t("common.success"),
+      description: "Activity logs exported successfully",
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -163,7 +173,15 @@ const ActivityLogs = () => {
               </div>
             </div>
             
-            <LanguageSwitcher />
+            <div className="flex items-center gap-2">
+              {filteredLogs.length > 0 && (
+                <Button variant="outline" size="sm" onClick={handleExport}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Export
+                </Button>
+              )}
+              <LanguageSwitcher />
+            </div>
           </div>
         </div>
       </header>

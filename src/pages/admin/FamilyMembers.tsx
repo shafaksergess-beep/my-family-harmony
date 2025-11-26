@@ -5,7 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, Plus, Trash2, Shield } from "lucide-react";
+import { Loader2, ArrowLeft, Plus, Trash2, Shield, Download } from "lucide-react";
+import { logAdminActivity } from "@/lib/adminLogger";
+import { exportToCSV, formatMembersForExport } from "@/lib/export";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -94,16 +96,31 @@ const FamilyMembers = () => {
     e.preventDefault();
     
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("family_members")
         .insert([{
           family_id: familyId,
           user_id: formData.user_id,
           role: formData.role as any,
           house_name: formData.house_name || null,
-        }]);
+        }])
+        .select()
+        .single();
 
       if (error) throw error;
+      
+      // Log activity
+      const user = allUsers.find(u => u.id === formData.user_id);
+      await logAdminActivity({
+        action_type: 'create',
+        entity_type: 'family_member',
+        entity_id: data?.id,
+        details: { 
+          family_name: family?.name,
+          user_name: user?.full_name,
+          role: formData.role 
+        }
+      });
       
       toast({
         title: t("common.success"),
@@ -127,12 +144,25 @@ const FamilyMembers = () => {
     if (!confirm(t("admin.removeMemberConfirm"))) return;
 
     try {
+      const member = members.find(m => m.id === memberId);
+      
       const { error } = await supabase
         .from("family_members")
         .delete()
         .eq("id", memberId);
 
       if (error) throw error;
+      
+      // Log activity
+      await logAdminActivity({
+        action_type: 'delete',
+        entity_type: 'family_member',
+        entity_id: memberId,
+        details: { 
+          family_name: family?.name,
+          member_name: member?.profiles?.full_name 
+        }
+      });
       
       toast({
         title: t("common.success"),
@@ -147,6 +177,22 @@ const FamilyMembers = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleExport = () => {
+    const formatted = formatMembersForExport(members);
+    exportToCSV(formatted, `${family?.slug}-members-${new Date().toISOString().split('T')[0]}`);
+    
+    logAdminActivity({
+      action_type: 'export',
+      entity_type: 'family_member',
+      details: { family_name: family?.name, count: members.length }
+    });
+    
+    toast({
+      title: t("common.success"),
+      description: "Members exported successfully",
+    });
   };
 
   if (loading) {
@@ -174,6 +220,12 @@ const FamilyMembers = () => {
             </div>
             
             <div className="flex items-center gap-4">
+              {members.length > 0 && (
+                <Button variant="outline" size="sm" onClick={handleExport}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Export
+                </Button>
+              )}
               <LanguageSwitcher />
             
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
