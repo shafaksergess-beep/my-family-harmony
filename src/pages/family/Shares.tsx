@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { ArrowLeft, Plus, TrendingUp } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 interface Share {
   id: string;
@@ -46,11 +48,11 @@ export default function FamilyShares() {
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { family, canManageFinances, isLoading: authLoading } = useFamilyAuth(familySlug);
   const [loading, setLoading] = useState(true);
   const [shares, setShares] = useState<Share[]>([]);
   const [dividends, setDividends] = useState<Dividend[]>([]);
   const [members, setMembers] = useState<FamilyMember[]>([]);
-  const [familyId, setFamilyId] = useState<string>("");
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isDividendDialogOpen, setIsDividendDialogOpen] = useState(false);
   const [shareFormData, setShareFormData] = useState({
@@ -69,31 +71,16 @@ export default function FamilyShares() {
   });
 
   useEffect(() => {
-    loadData();
-  }, [familySlug]);
+    if (family?.id) {
+      loadData();
+    }
+  }, [family?.id]);
 
   const loadData = async () => {
+    if (!family) return;
+    
     try {
       setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate("/auth");
-        return;
-      }
-
-      const { data: familyData, error: familyError } = await supabase
-        .from("families")
-        .select("id, share_value")
-        .eq("slug", familySlug)
-        .single();
-
-      if (familyError || !familyData) {
-        toast({ title: "Error", description: "Family not found", variant: "destructive" });
-        navigate("/dashboard");
-        return;
-      }
-
-      setFamilyId(familyData.id);
 
       const { data: sharesData, error: sharesError } = await supabase
         .from("shares")
@@ -104,7 +91,7 @@ export default function FamilyShares() {
             profiles!inner(full_name)
           )
         `)
-        .eq("family_id", familyData.id)
+        .eq("family_id", family.id)
         .order("purchase_date", { ascending: false });
 
       if (sharesError) throw sharesError;
@@ -113,7 +100,7 @@ export default function FamilyShares() {
       const { data: dividendsData, error: dividendsError } = await supabase
         .from("dividends")
         .select("*")
-        .eq("family_id", familyData.id)
+        .eq("family_id", family.id)
         .order("period_year", { ascending: false });
 
       if (dividendsError) throw dividendsError;
@@ -125,7 +112,7 @@ export default function FamilyShares() {
           id,
           profiles!inner(full_name)
         `)
-        .eq("family_id", familyData.id);
+        .eq("family_id", family.id);
 
       if (membersError) throw membersError;
       setMembers(membersData as any);
@@ -138,9 +125,11 @@ export default function FamilyShares() {
 
   const handleCreateShare = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!family) return;
+    
     try {
       const { error } = await supabase.from("shares").insert({
-        family_id: familyId,
+        family_id: family.id,
         member_id: shareFormData.member_id,
         share_number: shareFormData.share_number,
         purchase_date: shareFormData.purchase_date,
@@ -167,13 +156,15 @@ export default function FamilyShares() {
 
   const handleCreateDividend = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!family) return;
+    
     try {
       const activeShares = shares.filter(s => s.is_active).length;
       const amountPerShare = parseFloat(dividendFormData.amount_per_share);
       const totalAmount = activeShares * amountPerShare;
 
       const { error } = await supabase.from("dividends").insert({
-        family_id: familyId,
+        family_id: family.id,
         period_year: parseInt(dividendFormData.period_year),
         period_quarter: dividendFormData.period_quarter ? parseInt(dividendFormData.period_quarter) : null,
         amount_per_share: amountPerShare,
@@ -215,18 +206,21 @@ export default function FamilyShares() {
     totalDividends: dividends.filter(d => d.is_paid).reduce((sum, d) => sum + parseFloat(d.total_amount.toString()), 0),
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-3xl font-bold">Shares & Dividends</h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-3xl font-bold">Shares & Dividends</h1>
+          </div>
+          <LanguageSwitcher />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -254,13 +248,14 @@ export default function FamilyShares() {
           <TabsContent value="shares">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Share Register</h2>
-              <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Issue Share
-                  </Button>
-                </DialogTrigger>
+              {canManageFinances && (
+                <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Issue Share
+                    </Button>
+                  </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Issue New Share</DialogTitle>
@@ -328,6 +323,7 @@ export default function FamilyShares() {
                   </form>
                 </DialogContent>
               </Dialog>
+              )}
             </div>
 
             <Card>
@@ -377,13 +373,14 @@ export default function FamilyShares() {
           <TabsContent value="dividends">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Dividend History</h2>
-              <Dialog open={isDividendDialogOpen} onOpenChange={setIsDividendDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button>
-                    <TrendingUp className="h-4 w-4 mr-2" />
-                    Declare Dividend
-                  </Button>
-                </DialogTrigger>
+              {canManageFinances && (
+                <Dialog open={isDividendDialogOpen} onOpenChange={setIsDividendDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <TrendingUp className="h-4 w-4 mr-2" />
+                      Declare Dividend
+                    </Button>
+                  </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Declare Dividend</DialogTitle>
@@ -454,6 +451,7 @@ export default function FamilyShares() {
                   </form>
                 </DialogContent>
               </Dialog>
+              )}
             </div>
 
             <Card>
