@@ -36,6 +36,8 @@ import EmailSettings from "./pages/family/EmailSettings";
 import GlobalAnalytics from "./pages/admin/GlobalAnalytics";
 import Users from "./pages/admin/Users";
 import UserDetail from "./pages/admin/UserDetail";
+import RolePermissions from "./pages/admin/RolePermissions";
+import UserActivity from "./pages/admin/UserActivity";
 import FamilyReports from "./pages/family/Reports";
 import NotFound from "./pages/NotFound";
 
@@ -62,6 +64,8 @@ const App = () => (
         <Route path="/admin/global-analytics" element={<GlobalAnalytics />} />
         <Route path="/admin/users" element={<Users />} />
         <Route path="/admin/users/:userId" element={<UserDetail />} />
+        <Route path="/admin/role-permissions" element={<RolePermissions />} />
+        <Route path="/admin/user-activity" element={<UserActivity />} />
           <Route path="/family/:familySlug" element={<FamilyDetail />} />
           <Route path="/family/:familySlug/analytics" element={<FamilyAnalytics />} />
           <Route path="/family/:familySlug/financial-analytics" element={<FinancialAnalytics />} />

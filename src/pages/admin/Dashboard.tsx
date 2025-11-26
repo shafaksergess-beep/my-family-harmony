@@ -530,26 +530,36 @@ const AdminDashboard = () => {
               <span>User Management</span>
             </div>
           </Button>
-          <Button
-            variant="outline"
-            className="h-auto py-6"
-            onClick={() => navigate("/admin/permissions")}
-          >
-            <div className="flex flex-col items-center gap-2">
-              <Shield className="w-8 h-8" />
-              <span>Permissions</span>
-            </div>
-          </Button>
-          <Button
-            variant="outline"
-            className="h-auto py-6"
-            onClick={() => navigate("/admin/activity-logs")}
-          >
-            <div className="flex flex-col items-center gap-2">
-              <FileText className="w-8 h-8" />
-              <span>Activity Logs</span>
-            </div>
-          </Button>
+            <Button
+              variant="outline"
+              className="h-auto py-6"
+              onClick={() => navigate("/admin/role-permissions")}
+            >
+              <div className="flex flex-col items-center gap-2">
+                <Shield className="w-8 h-8" />
+                <span>Role Permissions</span>
+              </div>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto py-6"
+              onClick={() => navigate("/admin/user-activity")}
+            >
+              <div className="flex flex-col items-center gap-2">
+                <Activity className="w-8 h-8" />
+                <span>User Activity</span>
+              </div>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto py-6"
+              onClick={() => navigate("/admin/activity-logs")}
+            >
+              <div className="flex flex-col items-center gap-2">
+                <FileText className="w-8 h-8" />
+                <span>Admin Logs</span>
+              </div>
+            </Button>
           <Button
             variant="outline"
             className="h-auto py-6"

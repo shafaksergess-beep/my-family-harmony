@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Database } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,7 +45,14 @@ export default function Users() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
   const [families, setFamilies] = useState<any[]>([]);
+  const [bulkImportData, setBulkImportData] = useState("");
+  const [importResults, setImportResults] = useState<{
+    success: number;
+    failed: number;
+    errors: string[];
+  } | null>(null);
   
   // New user form state
   const [newUser, setNewUser] = useState({
@@ -227,6 +235,98 @@ export default function Users() {
     }
   };
 
+  const handleBulkImport = async () => {
+    try {
+      const lines = bulkImportData.trim().split("\n");
+      const results = { success: 0, failed: 0, errors: [] as string[] };
+
+      // Skip header row
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        const [email, password, full_name, phone, family_name, role] = line
+          .split(",")
+          .map((s) => s.trim().replace(/^"|"$/g, ""));
+
+        try {
+          // Find family by name if provided
+          let familyId = "";
+          if (family_name) {
+            const family = families.find((f) => f.name === family_name);
+            if (family) {
+              familyId = family.id;
+            } else {
+              throw new Error(`Family "${family_name}" not found`);
+            }
+          }
+
+          // Create user
+          const { data: authData, error: authError } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                full_name,
+              },
+            },
+          });
+
+          if (authError) throw authError;
+
+          if (authData.user) {
+            // Update profile with phone
+            if (phone) {
+              await supabase
+                .from("profiles")
+                .update({ phone })
+                .eq("id", authData.user.id);
+            }
+
+            // Add to family if provided
+            if (familyId) {
+              await supabase.from("family_members").insert([{
+                user_id: authData.user.id,
+                family_id: familyId,
+                role: (role || "member") as Database["public"]["Enums"]["user_role"],
+              }]);
+            }
+
+            results.success++;
+          }
+        } catch (error: any) {
+          results.failed++;
+          results.errors.push(
+            `Row ${i}: ${email} - ${error.message || "Unknown error"}`
+          );
+        }
+      }
+
+      setImportResults(results);
+      
+      if (results.success > 0) {
+        toast({
+          title: "Import Complete",
+          description: `Successfully imported ${results.success} users. ${results.failed} failed.`,
+        });
+        fetchUsers();
+      } else {
+        toast({
+          title: "Import Failed",
+          description: "No users were imported successfully",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      console.error("Error importing users:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to import users",
+        variant: "destructive",
+      });
+    }
+  };
+
   const filteredUsers = users.filter(user =>
     user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -250,13 +350,82 @@ export default function Users() {
             </div>
           </div>
 
-          <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <UserPlus className="mr-2 h-4 w-4" />
-                Add User
-              </Button>
-            </DialogTrigger>
+          <div className="flex gap-2">
+            <Dialog open={isBulkImportOpen} onOpenChange={setIsBulkImportOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Bulk Import
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Bulk Import Users</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label>CSV Format (paste data below)</Label>
+                    <div className="text-xs text-muted-foreground bg-muted p-2 rounded font-mono">
+                      email,password,full_name,phone,family_name,role
+                      <br />
+                      user1@example.com,password123,John Doe,+1234567890,Smith Family,member
+                      <br />
+                      user2@example.com,password456,Jane Smith,,Jones Family,treasurer
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="bulk_data">CSV Data</Label>
+                    <textarea
+                      id="bulk_data"
+                      value={bulkImportData}
+                      onChange={(e) => setBulkImportData(e.target.value)}
+                      placeholder="Paste CSV data here..."
+                      className="w-full h-64 p-2 border rounded font-mono text-sm"
+                    />
+                  </div>
+                  {importResults && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-4">
+                        <Badge className="bg-green-500">
+                          {importResults.success} Successful
+                        </Badge>
+                        <Badge className="bg-red-500">
+                          {importResults.failed} Failed
+                        </Badge>
+                      </div>
+                      {importResults.errors.length > 0 && (
+                        <div className="text-xs text-red-500 space-y-1 max-h-32 overflow-y-auto">
+                          {importResults.errors.map((error, idx) => (
+                            <div key={idx}>{error}</div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsBulkImportOpen(false);
+                      setBulkImportData("");
+                      setImportResults(null);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button onClick={handleBulkImport}>Import Users</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Add User
+                </Button>
+              </DialogTrigger>
             <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle>Create New User</DialogTitle>
@@ -349,6 +518,7 @@ export default function Users() {
               </div>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         <Card>
