@@ -34,6 +34,8 @@ import MemberProfile from "./pages/family/MemberProfile";
 import Members from "./pages/family/Members";
 import EmailSettings from "./pages/family/EmailSettings";
 import GlobalAnalytics from "./pages/admin/GlobalAnalytics";
+import Users from "./pages/admin/Users";
+import UserDetail from "./pages/admin/UserDetail";
 import FamilyReports from "./pages/family/Reports";
 import NotFound from "./pages/NotFound";
 
@@ -58,6 +60,8 @@ const App = () => (
         <Route path="/admin/email-reports" element={<EmailReports />} />
         <Route path="/admin/export-scheduler" element={<ExportScheduler />} />
         <Route path="/admin/global-analytics" element={<GlobalAnalytics />} />
+        <Route path="/admin/users" element={<Users />} />
+        <Route path="/admin/users/:userId" element={<UserDetail />} />
           <Route path="/family/:familySlug" element={<FamilyDetail />} />
           <Route path="/family/:familySlug/analytics" element={<FamilyAnalytics />} />
           <Route path="/family/:familySlug/financial-analytics" element={<FinancialAnalytics />} />

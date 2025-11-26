@@ -523,6 +523,16 @@ const AdminDashboard = () => {
           <Button
             variant="outline"
             className="h-auto py-6"
+            onClick={() => navigate("/admin/users")}
+          >
+            <div className="flex flex-col items-center gap-2">
+              <Users className="w-8 h-8" />
+              <span>User Management</span>
+            </div>
+          </Button>
+          <Button
+            variant="outline"
+            className="h-auto py-6"
             onClick={() => navigate("/admin/permissions")}
           >
             <div className="flex flex-col items-center gap-2">
