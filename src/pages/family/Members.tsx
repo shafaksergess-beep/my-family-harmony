@@ -65,29 +65,39 @@ const Members = () => {
 
       setFamilyName(family.name);
 
+      // Fetch family members
       const { data: membersData, error: membersError } = await supabase
         .from("family_members")
-        .select(`
-          id,
-          user_id,
-          role,
-          house_name,
-          is_house_representative,
-          profiles!inner(
-            full_name,
-            email,
-            phone,
-            avatar_url,
-            is_working
-          )
-        `)
+        .select("id, user_id, role, house_name, is_house_representative")
         .eq("family_id", family.id)
         .order("role");
 
       if (membersError) throw membersError;
 
-      setMembers(membersData as any);
-      setFilteredMembers(membersData as any);
+      // Fetch profiles separately
+      const userIds = membersData?.map(m => m.user_id) || [];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name, email, phone, avatar_url, is_working")
+        .in("id", userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Merge data
+      const profilesMap = new Map(profilesData?.map(p => [p.id, p]) || []);
+      const mergedData = membersData?.map(member => ({
+        ...member,
+        profiles: profilesMap.get(member.user_id) || {
+          full_name: "Unknown",
+          email: null,
+          phone: null,
+          avatar_url: null,
+          is_working: false,
+        },
+      })) || [];
+
+      setMembers(mergedData as any);
+      setFilteredMembers(mergedData as any);
     } catch (error: any) {
       console.error("Error loading members:", error);
       toast({

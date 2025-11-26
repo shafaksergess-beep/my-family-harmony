@@ -46,14 +46,32 @@ const Invitations = () => {
     if (!family) return;
 
     try {
-      const { data, error } = await supabase
+      // Fetch invitations
+      const { data: invitationsData, error: invError } = await supabase
         .from("invitations")
-        .select("*, profiles:invited_by(full_name)")
+        .select("*")
         .eq("family_id", family.id)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
-      setInvitations(data || []);
+      if (invError) throw invError;
+
+      // Fetch profiles for invited_by users
+      const invitedByIds = [...new Set(invitationsData?.map(i => i.invited_by) || [])];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", invitedByIds);
+
+      if (profilesError) throw profilesError;
+
+      // Merge data
+      const profilesMap = new Map(profilesData?.map(p => [p.id, p]) || []);
+      const mergedData = invitationsData?.map(inv => ({
+        ...inv,
+        profiles: profilesMap.get(inv.invited_by) || { full_name: "Unknown" },
+      })) || [];
+
+      setInvitations(mergedData as any);
     } catch (error) {
       console.error("Error loading invitations:", error);
       toast({

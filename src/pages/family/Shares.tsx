@@ -82,20 +82,46 @@ export default function FamilyShares() {
     try {
       setLoading(true);
 
+      // Fetch shares
       const { data: sharesData, error: sharesError } = await supabase
         .from("shares")
-        .select(`
-          *,
-          family_members!inner(
-            id,
-            profiles!inner(full_name)
-          )
-        `)
+        .select("*")
         .eq("family_id", family.id)
         .order("purchase_date", { ascending: false });
 
       if (sharesError) throw sharesError;
-      setShares(sharesData as any);
+
+      // Fetch family members
+      const memberIds = [...new Set(sharesData?.map(s => s.member_id) || [])];
+      const { data: membersData, error: membersError } = await supabase
+        .from("family_members")
+        .select("id, user_id")
+        .in("id", memberIds);
+
+      if (membersError) throw membersError;
+
+      // Fetch profiles
+      const userIds = membersData?.map(m => m.user_id) || [];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Merge data
+      const memberIdToUserId = new Map(membersData?.map(m => [m.id, m.user_id]) || []);
+      const userIdToProfile = new Map(profilesData?.map(p => [p.id, p]) || []);
+
+      const enrichedShares = sharesData?.map(share => ({
+        ...share,
+        family_members: {
+          id: share.member_id,
+          profiles: userIdToProfile.get(memberIdToUserId.get(share.member_id)!) || { full_name: "Unknown" }
+        }
+      })) || [];
+
+      setShares(enrichedShares as any);
 
       const { data: dividendsData, error: dividendsError } = await supabase
         .from("dividends")
@@ -106,16 +132,29 @@ export default function FamilyShares() {
       if (dividendsError) throw dividendsError;
       setDividends(dividendsData);
 
-      const { data: membersData, error: membersError } = await supabase
+      // Fetch all members for dropdown
+      const { data: allMembersData, error: allMembersError } = await supabase
         .from("family_members")
-        .select(`
-          id,
-          profiles!inner(full_name)
-        `)
+        .select("id, user_id")
         .eq("family_id", family.id);
 
-      if (membersError) throw membersError;
-      setMembers(membersData as any);
+      if (allMembersError) throw allMembersError;
+
+      const allUserIds = allMembersData?.map(m => m.user_id) || [];
+      const { data: allProfilesData, error: allProfilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", allUserIds);
+
+      if (allProfilesError) throw allProfilesError;
+
+      const allUserIdToProfile = new Map(allProfilesData?.map(p => [p.id, p]) || []);
+      const allEnrichedMembers = allMembersData?.map(member => ({
+        id: member.id,
+        profiles: allUserIdToProfile.get(member.user_id) || { full_name: "Unknown" }
+      })) || [];
+
+      setMembers(allEnrichedMembers as any);
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {

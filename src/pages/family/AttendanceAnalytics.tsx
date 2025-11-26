@@ -45,22 +45,6 @@ const AttendanceAnalytics = () => {
     if (!family) return;
 
     try {
-      // Fetch all attendance records with member info
-      const { data: attendanceData, error: attendanceError } = await supabase
-        .from("attendance")
-        .select(`
-          *,
-          family_members!inner(
-            id,
-            family_id,
-            profiles(full_name)
-          ),
-          meetings!inner(family_id)
-        `)
-        .eq("meetings.family_id", family.id);
-
-      if (attendanceError) throw attendanceError;
-
       // Fetch all meetings
       const { data: meetingsData, error: meetingsError } = await supabase
         .from("meetings")
@@ -69,12 +53,42 @@ const AttendanceAnalytics = () => {
 
       if (meetingsError) throw meetingsError;
 
+      // Fetch family members
+      const { data: familyMembersData, error: membersError } = await supabase
+        .from("family_members")
+        .select("id, user_id")
+        .eq("family_id", family.id);
+
+      if (membersError) throw membersError;
+
+      // Fetch profiles
+      const userIds = familyMembersData?.map(m => m.user_id) || [];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Create member ID to name mapping
+      const memberIdToUserId = new Map(familyMembersData?.map(m => [m.id, m.user_id]) || []);
+      const userIdToName = new Map(profilesData?.map(p => [p.id, p.full_name]) || []);
+
+      // Fetch all attendance records
+      const { data: attendanceData, error: attendanceError } = await supabase
+        .from("attendance")
+        .select("*")
+        .in("member_id", familyMembersData?.map(m => m.id) || []);
+
+      if (attendanceError) throw attendanceError;
+
       // Calculate stats per member
       const membersMap = new Map<string, MemberStats>();
 
       attendanceData?.forEach((record: any) => {
         const memberId = record.member_id;
-        const memberName = record.family_members?.profiles?.full_name || "Unknown";
+        const userId = memberIdToUserId.get(memberId);
+        const memberName = userId ? userIdToName.get(userId) || "Unknown" : "Unknown";
 
         if (!membersMap.has(memberId)) {
           membersMap.set(memberId, {
