@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,9 +11,13 @@ import { Home, Loader2 } from "lucide-react";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
+
+  // Get redirect URL from query params
+  const redirectUrl = searchParams.get("redirect") || "/dashboard";
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState("");
@@ -30,7 +34,7 @@ const Auth = () => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate("/dashboard");
+        navigate(redirectUrl);
       }
       setCheckingAuth(false);
     };
@@ -40,12 +44,12 @@ const Auth = () => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) {
-        navigate("/dashboard");
+        navigate(redirectUrl);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, redirectUrl]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
