@@ -306,10 +306,15 @@ const Payments = () => {
             <CardTitle>Payment Transactions</CardTitle>
             <CardDescription>View all payment transactions for your family</CardDescription>
           </CardHeader>
-          <CardContent>
-            {payments.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">No payments recorded yet</p>
-            ) : (
+            <CardContent>
+              {payments.length === 0 ? (
+                <div className="text-center py-8 space-y-4">
+                  <p className="text-muted-foreground">No payments recorded yet</p>
+                  <Button variant="outline" onClick={() => navigate(`/family/${familySlug}/payment-integration`)}>
+                    Set Up Mobile Money Integration
+                  </Button>
+                </div>
+              ) : (
               <div className="space-y-4">
                 {payments.map((payment) => (
                   <div
