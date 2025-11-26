@@ -659,6 +659,8 @@ export type Database = {
           meeting_day: string | null
           meeting_frequency: string | null
           meeting_time: string | null
+          min_loan_amount: number | null
+          min_savings_amount: number | null
           name: string
           njangi_amount: number | null
           primary_language: string | null
@@ -682,6 +684,8 @@ export type Database = {
           meeting_day?: string | null
           meeting_frequency?: string | null
           meeting_time?: string | null
+          min_loan_amount?: number | null
+          min_savings_amount?: number | null
           name: string
           njangi_amount?: number | null
           primary_language?: string | null
@@ -705,6 +709,8 @@ export type Database = {
           meeting_day?: string | null
           meeting_frequency?: string | null
           meeting_time?: string | null
+          min_loan_amount?: number | null
+          min_savings_amount?: number | null
           name?: string
           njangi_amount?: number | null
           primary_language?: string | null

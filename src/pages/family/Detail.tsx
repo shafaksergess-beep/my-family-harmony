@@ -236,6 +236,13 @@ const FamilyDetail = () => {
       color: "text-green-600",
     },
     {
+      title: "Financial Settings",
+      description: "Configure savings, loans, njangi & shares",
+      icon: Settings,
+      path: `/family/${familySlug}/financial-settings`,
+      color: "text-orange-600",
+    },
+    {
       title: "Email Reports",
       description: "Configure automated email digests",
       icon: Mail,

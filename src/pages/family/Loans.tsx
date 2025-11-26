@@ -116,40 +116,52 @@ export default function Loans() {
   const handleRequestLoan = async () => {
     setValidationErrors({});
     
-    // Validate input
-    const validationResult = loanSchema.safeParse({
-      memberId: newLoan.member_id,
-      amount: parseFloat(newLoan.amount),
-      purpose: newLoan.purpose,
-      termMonths: parseInt(newLoan.term_months),
-      interestRate: family?.loan_interest_rate || 2.5,
-      notes: newLoan.notes || undefined,
-    });
+    // Check for ongoing loans
+    const hasOngoingLoan = loans.some(
+      (loan) => 
+        loan.family_members?.profiles?.full_name && 
+        loan.status === "disbursed" && 
+        members.find(m => m.id === newLoan.member_id)?.profiles?.full_name === loan.family_members.profiles.full_name
+    );
 
-    if (!validationResult.success) {
-      const errors: Record<string, string> = {};
-      validationResult.error.errors.forEach((err) => {
-        const field = err.path[0] as string;
-        errors[field] = err.message;
-      });
-      setValidationErrors(errors);
+    if (hasOngoingLoan) {
       toast({
         variant: "destructive",
-        title: "Validation Error",
-        description: "Please check the form for errors",
+        title: "Loan Request Denied",
+        description: "This member already has an ongoing loan. Please clear existing loan before requesting a new one.",
       });
+      return;
+    }
+
+    const minLoanAmount = family?.min_loan_amount || 50000;
+    const amount = parseFloat(newLoan.amount);
+
+    // Manual validation with dynamic minimum
+    if (!newLoan.member_id) {
+      setValidationErrors({ memberId: "Member is required" });
+      toast({ variant: "destructive", title: "Validation Error", description: "Please select a member" });
+      return;
+    }
+    if (!newLoan.amount || amount < minLoanAmount) {
+      setValidationErrors({ amount: `Minimum loan amount is ${minLoanAmount.toLocaleString()} FCFA` });
+      toast({ variant: "destructive", title: "Validation Error", description: `Minimum loan amount is ${minLoanAmount.toLocaleString()} FCFA` });
+      return;
+    }
+    if (!newLoan.purpose || newLoan.purpose.length < 10) {
+      setValidationErrors({ purpose: "Purpose must be at least 10 characters" });
+      toast({ variant: "destructive", title: "Validation Error", description: "Please provide a detailed purpose" });
       return;
     }
 
     try {
       const { error } = await supabase.from("loans").insert({
         family_id: family!.id,
-        member_id: validationResult.data.memberId,
-        amount: validationResult.data.amount,
-        purpose: validationResult.data.purpose,
-        term_months: validationResult.data.termMonths,
-        interest_rate: validationResult.data.interestRate,
-        notes: validationResult.data.notes || null,
+        member_id: newLoan.member_id,
+        amount: parseFloat(newLoan.amount),
+        purpose: newLoan.purpose,
+        term_months: parseInt(newLoan.term_months),
+        interest_rate: family?.loan_interest_rate || 2.5,
+        notes: newLoan.notes || null,
         status: "pending",
       });
 
@@ -303,10 +315,10 @@ export default function Loans() {
                 )}
               </div>
               <div>
-                <Label>Amount (FCFA, minimum 50,000)</Label>
+                <Label>Amount (FCFA, minimum {(family?.min_loan_amount || 50000).toLocaleString()})</Label>
                 <Input
                   type="number"
-                  min="50000"
+                  min={family?.min_loan_amount || 50000}
                   step="1000"
                   value={newLoan.amount}
                   onChange={(e) => {
@@ -377,11 +389,11 @@ export default function Loans() {
               </div>
               <div className="bg-muted p-3 rounded">
                 <p className="text-sm">
-                  Interest Rate: 2.5% per month<br />
+                  Interest Rate: {family?.loan_interest_rate || 2.5}% per month<br />
                   {newLoan.amount && newLoan.term_months && (
                     <>
-                      Estimated Interest: {((parseFloat(newLoan.amount) * 2.5 * parseInt(newLoan.term_months)) / 100).toLocaleString()} FCFA<br />
-                      Total Repayment: {(parseFloat(newLoan.amount) + (parseFloat(newLoan.amount) * 2.5 * parseInt(newLoan.term_months)) / 100).toLocaleString()} FCFA
+                      Estimated Interest: {((parseFloat(newLoan.amount) * (family?.loan_interest_rate || 2.5) * parseInt(newLoan.term_months)) / 100).toLocaleString()} FCFA<br />
+                      Total Repayment: {(parseFloat(newLoan.amount) + (parseFloat(newLoan.amount) * (family?.loan_interest_rate || 2.5) * parseInt(newLoan.term_months)) / 100).toLocaleString()} FCFA
                     </>
                   )}
                 </p>
