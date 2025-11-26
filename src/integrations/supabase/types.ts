@@ -936,7 +936,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_family_head: {
+        Args: { check_family_id: string; check_user_id: string }
+        Returns: boolean
+      }
       is_super_admin: { Args: { check_user_id: string }; Returns: boolean }
+      user_belongs_to_family: {
+        Args: { check_family_id: string; check_user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       user_role:
