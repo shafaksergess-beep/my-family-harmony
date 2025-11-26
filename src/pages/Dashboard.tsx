@@ -103,13 +103,21 @@ const Dashboard = () => {
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">
-                Welcome, {profile?.full_name || "User"}!
-              </h1>
-              {isSuperAdmin && (
-                <p className="text-sm text-secondary font-medium">Super Administrator</p>
-              )}
+            <div className="flex items-center gap-4">
+              <img 
+                src="/logo.jpg" 
+                alt="Family Together Logo" 
+                className="w-12 h-12 rounded-full object-cover shadow-md cursor-pointer"
+                onClick={() => navigate("/dashboard")}
+              />
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">
+                  Welcome, {profile?.full_name || "User"}!
+                </h1>
+                {isSuperAdmin && (
+                  <p className="text-sm text-secondary font-medium">Super Administrator</p>
+                )}
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" onClick={() => navigate("/profile")}>
