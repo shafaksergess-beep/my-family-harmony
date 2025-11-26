@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { useParams, useNavigate } from "react-router-dom";
-import { Loader2, ArrowLeft, BarChart3, Calendar, Users, DollarSign, CreditCard, PiggyBank, RefreshCw, Heart, Award, TrendingUp, Bell, FileText, Mail, Wallet, MessageSquare } from "lucide-react";
+import { Loader2, ArrowLeft, BarChart3, Calendar, Users, DollarSign, CreditCard, PiggyBank, RefreshCw, Heart, Award, TrendingUp, Bell, FileText, Mail, Wallet, MessageSquare, Settings } from "lucide-react";
 import FinancialWidget from "@/components/FinancialWidget";
 import { notificationManager } from "@/lib/notifications";
 import { useEffect } from "react";
@@ -164,6 +164,20 @@ const FamilyDetail = () => {
       icon: MessageSquare,
       path: `/family/${familySlug}/meeting-reminders`,
       color: "text-purple-600",
+    },
+    {
+      title: "Contribution Analytics",
+      description: "Track payment trends and late payments",
+      icon: TrendingUp,
+      path: `/family/${familySlug}/contribution-analytics`,
+      color: "text-indigo-600",
+    },
+    {
+      title: "Reminder Settings",
+      description: "Configure late payment reminder escalation",
+      icon: Settings,
+      path: `/family/${familySlug}/reminder-settings`,
+      color: "text-gray-600",
     },
   ];
 
