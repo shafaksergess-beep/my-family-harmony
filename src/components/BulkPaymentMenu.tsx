@@ -14,6 +14,8 @@ import {
 import { CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { contributionSchema } from "@/lib/validation";
+import { z } from "zod";
 
 interface Member {
   id: string;
@@ -63,22 +65,59 @@ export default function BulkPaymentMenu({ members, familyId, contributionDate, o
       return;
     }
 
+    // Validate the number of selected members to prevent abuse
+    if (selectedMembers.size > 100) {
+      toast({
+        title: "Too many selections",
+        description: "Please select up to 100 members at a time",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
       const payments = Array.from(selectedMembers).map(memberId => ({
-        family_id: familyId,
-        member_id: memberId,
+        memberId,
         amount: 25000,
-        contribution_date: contributionDate,
+        contributionDate: contributionDate,
+        type: "monthly" as const,
+        notes: undefined,
+      }));
+
+      // Validate all payments before submitting
+      const validationErrors: string[] = [];
+      payments.forEach((payment, index) => {
+        const result = contributionSchema.safeParse(payment);
+        if (!result.success) {
+          validationErrors.push(`Payment ${index + 1}: ${result.error.errors[0].message}`);
+        }
+      });
+
+      if (validationErrors.length > 0) {
+        toast({
+          title: "Validation Error",
+          description: validationErrors.join(", "),
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Insert validated payments
+      const insertPayments = payments.map(p => ({
+        family_id: familyId,
+        member_id: p.memberId,
+        amount: p.amount,
+        contribution_date: p.contributionDate,
         payment_date: new Date().toISOString(),
         status: 'paid',
-        type: 'monthly',
+        type: p.type,
       }));
 
       const { error } = await supabase
         .from('contributions')
-        .insert(payments);
+        .insert(insertPayments);
 
       if (error) throw error;
 
@@ -94,7 +133,7 @@ export default function BulkPaymentMenu({ members, familyId, contributionDate, o
       console.error('Error recording bulk payments:', error);
       toast({
         title: "Error",
-        description: "Failed to record payments",
+        description: error instanceof Error ? error.message : "Failed to record payments",
         variant: "destructive",
       });
     } finally {
