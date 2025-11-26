@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Search, User, Phone, Mail } from "lucide-react";
+import { ArrowLeft, Search, User, Phone, Mail, Download } from "lucide-react";
+import { exportMembersToCSV } from "@/lib/export";
 
 interface Member {
   id: string;
@@ -163,6 +164,14 @@ const Members = () => {
               </p>
             </div>
           </div>
+          <Button
+            variant="outline"
+            onClick={() => exportMembersToCSV(filteredMembers)}
+            disabled={filteredMembers.length === 0}
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
+          </Button>
         </div>
 
         <div className="relative">

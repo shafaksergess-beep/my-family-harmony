@@ -116,3 +116,91 @@ export const formatMembersForExport = (members: any[]) => {
     'Joined At': new Date(m.joined_at || m.created_at).toLocaleString(),
   }));
 };
+
+export const exportMembersToCSV = (members: any[]) => {
+  const exportData = members.map((member) => ({
+    "Full Name": member.profiles?.full_name || member.profile?.full_name || "",
+    "Email": member.profiles?.email || member.profile?.email || "",
+    "Phone": member.profiles?.phone || member.profile?.phone || "",
+    "Role": member.role,
+    "House Name": member.house_name || "",
+    "House Representative": member.is_house_representative ? "Yes" : "No",
+    "Working": member.profiles?.is_working || member.profile?.is_working ? "Yes" : "No",
+  }));
+
+  exportToCSV(exportData, `family-members-${new Date().toISOString().split("T")[0]}`);
+};
+
+export const exportContributionsToCSV = (contributions: any[]) => {
+  const exportData = contributions.map((contrib) => ({
+    "Member": contrib.member?.profiles?.full_name || "",
+    "Amount": contrib.amount,
+    "Type": contrib.type,
+    "Status": contrib.status,
+    "Contribution Date": contrib.contribution_date,
+    "Payment Date": contrib.payment_date || "",
+    "Late Fine": contrib.late_fine || 0,
+    "Notes": contrib.notes || "",
+  }));
+
+  exportToCSV(exportData, `contributions-${new Date().toISOString().split("T")[0]}`);
+};
+
+export const exportLoansToCSV = (loans: any[]) => {
+  const exportData = loans.map((loan) => ({
+    "Member": loan.member?.profiles?.full_name || "",
+    "Amount": loan.amount,
+    "Interest Rate": loan.interest_rate,
+    "Term (Months)": loan.term_months,
+    "Status": loan.status,
+    "Amount Paid": loan.amount_paid || 0,
+    "Interest Paid": loan.interest_paid || 0,
+    "Purpose": loan.purpose,
+    "Approved At": loan.approved_at || "",
+    "Due Date": loan.due_date || "",
+  }));
+
+  exportToCSV(exportData, `loans-${new Date().toISOString().split("T")[0]}`);
+};
+
+export const exportSavingsToCSV = (savings: any[]) => {
+  const exportData = savings.map((saving) => ({
+    "Member": saving.member?.profiles?.full_name || "",
+    "Amount": saving.amount,
+    "Month": saving.month,
+    "Notes": saving.notes || "",
+  }));
+
+  exportToCSV(exportData, `savings-${new Date().toISOString().split("T")[0]}`);
+};
+
+export const exportFinancialSummaryToCSV = (summary: any) => {
+  const exportData = [
+    {
+      "Metric": "Total Contributions",
+      "Value": summary.totalContributions || 0,
+    },
+    {
+      "Metric": "Total Savings",
+      "Value": summary.totalSavings || 0,
+    },
+    {
+      "Metric": "Total Loans",
+      "Value": summary.totalLoans || 0,
+    },
+    {
+      "Metric": "Outstanding Loans",
+      "Value": summary.outstandingLoans || 0,
+    },
+    {
+      "Metric": "Total Shares Value",
+      "Value": summary.totalSharesValue || 0,
+    },
+    {
+      "Metric": "Total Dividends",
+      "Value": summary.totalDividends || 0,
+    },
+  ];
+
+  exportToCSV(exportData, `financial-summary-${new Date().toISOString().split("T")[0]}`);
+};
