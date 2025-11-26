@@ -197,6 +197,116 @@ export type Database = {
           },
         ]
       }
+      dividend_payments: {
+        Row: {
+          amount: number
+          created_at: string | null
+          dividend_id: string
+          id: string
+          is_paid: boolean | null
+          member_id: string
+          notes: string | null
+          payment_date: string | null
+          shares_owned: number
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          dividend_id: string
+          id?: string
+          is_paid?: boolean | null
+          member_id: string
+          notes?: string | null
+          payment_date?: string | null
+          shares_owned: number
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          dividend_id?: string
+          id?: string
+          is_paid?: boolean | null
+          member_id?: string
+          notes?: string | null
+          payment_date?: string | null
+          shares_owned?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dividend_payments_dividend_id_fkey"
+            columns: ["dividend_id"]
+            isOneToOne: false
+            referencedRelation: "dividends"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dividend_payments_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dividends: {
+        Row: {
+          amount_per_share: number
+          created_at: string | null
+          family_id: string
+          id: string
+          is_paid: boolean | null
+          notes: string | null
+          payment_date: string | null
+          period_quarter: number | null
+          period_year: number
+          source_description: string | null
+          total_amount: number
+          total_shares: number
+          updated_at: string | null
+        }
+        Insert: {
+          amount_per_share?: number
+          created_at?: string | null
+          family_id: string
+          id?: string
+          is_paid?: boolean | null
+          notes?: string | null
+          payment_date?: string | null
+          period_quarter?: number | null
+          period_year: number
+          source_description?: string | null
+          total_amount?: number
+          total_shares: number
+          updated_at?: string | null
+        }
+        Update: {
+          amount_per_share?: number
+          created_at?: string | null
+          family_id?: string
+          id?: string
+          is_paid?: boolean | null
+          notes?: string | null
+          payment_date?: string | null
+          period_quarter?: number | null
+          period_year?: number
+          source_description?: string | null
+          total_amount?: number
+          total_shares?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dividends_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       families: {
         Row: {
           created_at: string | null
@@ -611,6 +721,60 @@ export type Database = {
           },
           {
             foreignKeyName: "savings_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shares: {
+        Row: {
+          created_at: string | null
+          family_id: string
+          id: string
+          is_active: boolean | null
+          member_id: string
+          notes: string | null
+          purchase_date: string
+          share_number: string
+          share_value: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          family_id: string
+          id?: string
+          is_active?: boolean | null
+          member_id: string
+          notes?: string | null
+          purchase_date: string
+          share_number: string
+          share_value?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          family_id?: string
+          id?: string
+          is_active?: boolean | null
+          member_id?: string
+          notes?: string | null
+          purchase_date?: string
+          share_number?: string
+          share_value?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shares_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shares_member_id_fkey"
             columns: ["member_id"]
             isOneToOne: false
             referencedRelation: "family_members"

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Plus, Download } from "lucide-react";
+import { exportToCSV, formatSavingsForExport } from "@/lib/export";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -136,6 +137,12 @@ export default function FamilySavings() {
     }
   };
 
+  const handleExport = () => {
+    const exportData = formatSavingsForExport(savings);
+    exportToCSV(exportData, `savings_${new Date().toISOString().split('T')[0]}`);
+    toast({ title: "Success", description: "Savings exported to CSV" });
+  };
+
   const calculateStats = () => {
     const totalSavings = savings.reduce((sum, s) => sum + parseFloat(s.amount.toString()), 0);
     const uniqueMembers = new Set(savings.map(s => s.member_id)).size;
@@ -180,7 +187,7 @@ export default function FamilySavings() {
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold">Savings History</h2>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={handleExport}>
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>

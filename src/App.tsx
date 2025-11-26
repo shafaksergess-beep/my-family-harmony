@@ -17,6 +17,7 @@ import FamilyAttendance from "./pages/family/Attendance";
 import FamilySavings from "./pages/family/Savings";
 import FamilyNjangi from "./pages/family/Njangi";
 import FamilyAssistance from "./pages/family/Assistance";
+import FamilyShares from "./pages/family/Shares";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/family/:familySlug/savings" element={<FamilySavings />} />
           <Route path="/family/:familySlug/njangi" element={<FamilyNjangi />} />
           <Route path="/family/:familySlug/assistance" element={<FamilyAssistance />} />
+          <Route path="/family/:familySlug/shares" element={<FamilyShares />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
