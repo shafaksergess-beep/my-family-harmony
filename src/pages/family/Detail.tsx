@@ -3,11 +3,32 @@ import { Button } from "@/components/ui/button";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { useParams, useNavigate } from "react-router-dom";
 import { Loader2, ArrowLeft, BarChart3, Calendar, Users, DollarSign, CreditCard, PiggyBank, RefreshCw, Heart, Award, TrendingUp, Bell, FileText } from "lucide-react";
+import FinancialWidget from "@/components/FinancialWidget";
+import { notificationManager } from "@/lib/notifications";
+import { useEffect } from "react";
 
 const FamilyDetail = () => {
   const { familySlug } = useParams();
   const navigate = useNavigate();
-  const { family, userRole, isLoading } = useFamilyAuth(familySlug);
+  const { family, userRole, userId, isLoading } = useFamilyAuth(familySlug);
+
+  useEffect(() => {
+    const requestNotificationPermission = async () => {
+      await notificationManager.requestPermission();
+    };
+    requestNotificationPermission();
+  }, []);
+
+  useEffect(() => {
+    if (family && userRole && userId) {
+      const cleanup = notificationManager.setupRealtimeListeners(
+        family.id,
+        userRole,
+        userId
+      );
+      return cleanup;
+    }
+  }, [family, userRole, userId]);
 
   if (isLoading) {
     return (
@@ -138,7 +159,9 @@ const FamilyDetail = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 space-y-6">
+        {family && <FinancialWidget familyId={family.id} />}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {modules.map((module, index) => (
             <Card 

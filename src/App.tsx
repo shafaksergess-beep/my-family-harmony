@@ -31,6 +31,7 @@ import FamilyNjangi from "./pages/family/Njangi";
 import FamilyAssistance from "./pages/family/Assistance";
 import FamilyShares from "./pages/family/Shares";
 import MemberProfile from "./pages/family/MemberProfile";
+import Members from "./pages/family/Members";
 import FamilyReports from "./pages/family/Reports";
 import NotFound from "./pages/NotFound";
 
@@ -59,7 +60,8 @@ const App = () => (
           <Route path="/family/:familySlug/financial-analytics" element={<FinancialAnalytics />} />
           <Route path="/family/:familySlug/notifications" element={<Notifications />} />
           <Route path="/family/:familySlug/audit-trail" element={<AuditTrail />} />
-          <Route path="/family/:familySlug/members/:memberId" element={<MemberDetail />} />
+          <Route path="/family/:familySlug/members" element={<Members />} />
+          <Route path="/family/:familySlug/members/:memberId" element={<MemberProfile />} />
           <Route path="/family/:familySlug/pdf-reports" element={<PDFReports />} />
           <Route path="/family/:familySlug/meetings/:meetingId/checkin" element={<MeetingCheckIn />} />
           <Route path="/family/:familySlug/meetings" element={<FamilyMeetings />} />
