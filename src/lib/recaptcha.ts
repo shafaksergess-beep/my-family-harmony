@@ -4,8 +4,8 @@
  * Get your key from: https://www.google.com/recaptcha/admin
  */
 
-// TODO: Replace with your actual reCAPTCHA v3 site key
-export const RECAPTCHA_SITE_KEY = "YOUR_RECAPTCHA_SITE_KEY_HERE";
+// reCAPTCHA v3 site key (safe to expose publicly)
+export const RECAPTCHA_SITE_KEY = "6LeJVxksAAAAABY93KGo4h14CHaW2HnRrdSjJnwQ";
 
 /**
  * Load reCAPTCHA script dynamically
