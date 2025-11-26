@@ -1,17 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { 
-  Users, 
-  Calendar, 
-  DollarSign, 
-  TrendingUp, 
-  Heart, 
-  Shield,
-  Home,
-  PiggyBank,
-  FileText,
-  Award
-} from "lucide-react";
+import { Users, Calendar, DollarSign, TrendingUp, Heart, Shield, Home, PiggyBank, FileText, Award } from "lucide-react";
 
 const Index = () => {
   return (
@@ -23,30 +12,28 @@ const Index = () => {
           <div className="max-w-4xl mx-auto text-center animate-fade-in">
             <div className="mb-6 inline-flex items-center gap-3 bg-primary-foreground/10 backdrop-blur-sm px-6 py-3 rounded-full border border-primary-foreground/20">
               <Home className="w-5 h-5" />
-              <span className="text-sm font-medium">Wonya Kotto Family Reunion</span>
+              <span className="text-sm font-medium">Family Harmony Hub</span>
             </div>
-            
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-              Family Together
-            </h1>
-            
+
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">Family Together</h1>
+
             <p className="text-xl md:text-2xl mb-8 text-primary-foreground/90 max-w-2xl mx-auto">
               Uniting heritage, managing prosperity, building our collective future
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-secondary text-secondary-foreground hover:bg-secondary-hover shadow-lg hover:shadow-xl transition-all text-lg px-8 py-6"
-                onClick={() => window.location.href = '/auth'}
+                onClick={() => (window.location.href = "/auth")}
               >
                 Get Started
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
+              <Button
+                size="lg"
+                variant="outline"
                 className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 text-lg px-8 py-6"
-                onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })}
               >
                 Learn More
               </Button>
@@ -57,20 +44,19 @@ const Index = () => {
               <button className="px-4 py-2 rounded-lg bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-all border border-primary-foreground/20">
                 English
               </button>
-              <button className="px-4 py-2 rounded-lg hover:bg-primary-foreground/10 transition-all">
-                Français
-              </button>
-              <button className="px-4 py-2 rounded-lg hover:bg-primary-foreground/10 transition-all">
-                Bota
-              </button>
+              <button className="px-4 py-2 rounded-lg hover:bg-primary-foreground/10 transition-all">Français</button>
+              <button className="px-4 py-2 rounded-lg hover:bg-primary-foreground/10 transition-all">Bota</button>
             </div>
           </div>
         </div>
-        
+
         {/* Decorative bottom wave */}
         <div className="absolute bottom-0 left-0 right-0">
           <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0V120Z" fill="hsl(var(--background))"/>
+            <path
+              d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0V120Z"
+              fill="hsl(var(--background))"
+            />
           </svg>
         </div>
       </section>
@@ -107,9 +93,7 @@ const Index = () => {
       <section id="features" className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-foreground">
-              Complete Family Management
-            </h2>
+            <h2 className="text-4xl font-bold mb-4 text-foreground">Complete Family Management</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Everything your family needs to thrive together, digitized and automated
             </p>
@@ -161,13 +145,11 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <Shield className="w-16 h-16 mx-auto mb-6 text-primary" />
-            <h2 className="text-4xl font-bold mb-6 text-foreground">
-              Rooted in Heritage, Built for Tomorrow
-            </h2>
+            <h2 className="text-4xl font-bold mb-6 text-foreground">Rooted in Heritage, Built for Tomorrow</h2>
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              The descendants of Wonya Kotto carry forward a legacy of unity, shared property, 
-              education, and Christian values. Our app honors these traditions while embracing 
-              modern tools to strengthen family bonds and secure our collective prosperity.
+              The descendants of Wonya Kotto carry forward a legacy of unity, shared property, education, and Christian
+              values. Our app honors these traditions while embracing modern tools to strengthen family bonds and secure
+              our collective prosperity.
             </p>
             <div className="flex flex-wrap justify-center gap-6 text-sm">
               <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border border-border">
@@ -190,16 +172,14 @@ const Index = () => {
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-primary to-primary-hover text-primary-foreground">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-6">
-            Ready to Strengthen Your Family Bonds?
-          </h2>
+          <h2 className="text-4xl font-bold mb-6">Ready to Strengthen Your Family Bonds?</h2>
           <p className="text-xl mb-8 text-primary-foreground/90 max-w-2xl mx-auto">
             Join us in building a prosperous future together
           </p>
-          <Button 
+          <Button
             size="lg"
             className="bg-secondary text-secondary-foreground hover:bg-secondary-hover shadow-xl hover:shadow-2xl transition-all text-lg px-10 py-6 animate-glow"
-            onClick={() => window.location.href = '/auth'}
+            onClick={() => (window.location.href = "/auth")}
           >
             Get Started Today
           </Button>
@@ -210,8 +190,8 @@ const Index = () => {
       <footer className="bg-card border-t border-border py-12">
         <div className="container mx-auto px-4">
           <div className="text-center text-muted-foreground">
-            <p className="mb-2">© 2025 Wonya Kotto Family Reunion</p>
-            <p className="text-sm">Powered by Family Together</p>
+            <p className="mb-2">© 2025 Family Harmony</p>
+            <p className="text-sm">Powered by SoftSerge</p>
           </div>
         </div>
       </footer>
@@ -235,7 +215,9 @@ const FeatureCard = ({ icon, title, description, color }: FeatureCardProps) => {
 
   return (
     <Card className={`p-8 transition-all hover:shadow-xl border-2 ${colorClasses[color]} group`}>
-      <div className={`mb-4 ${color === "primary" ? "text-primary" : color === "secondary" ? "text-secondary" : "text-accent"} group-hover:scale-110 transition-transform`}>
+      <div
+        className={`mb-4 ${color === "primary" ? "text-primary" : color === "secondary" ? "text-secondary" : "text-accent"} group-hover:scale-110 transition-transform`}
+      >
         {icon}
       </div>
       <h3 className="text-xl font-bold mb-3 text-foreground">{title}</h3>
