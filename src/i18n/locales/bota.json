@@ -1,0 +1,158 @@
+{
+  "common": {
+    "back": "Bɛka",
+    "loading": "Ndɨŋə...",
+    "save": "Kumɛn",
+    "cancel": "Swaŋ",
+    "delete": "Fuŋ",
+    "edit": "Chaŋ",
+    "add": "Nam",
+    "export": "Tum CSV",
+    "welcome": "Ndu nɛm",
+    "logout": "Tum"
+  },
+  "dashboard": {
+    "title": "Ndu fɔn",
+    "yourFamilies": "Mbɔŋ awo",
+    "noFamilies": "Mbɔŋ yaa nde",
+    "noFamiliesDesc": "Wo yaa ndə mbɔŋ ko.",
+    "openFamily": "Pɛn Mbɔŋ",
+    "superAdminPanel": "Fɔn Nkɛm",
+    "manageFamilies": "Kwɛn Mbɔŋ"
+  },
+  "family": {
+    "analytics": "Fɔn Nkɛmɛn",
+    "analyticsDesc": "Nyɛn makwa ma mbɔŋ",
+    "meetings": "Mkwam",
+    "meetingsDesc": "Kunə mkwam ma mbɔŋ",
+    "members": "Batu",
+    "membersDesc": "Nyɛn ɛnə kwɛn batu ba mbɔŋ",
+    "contributions": "Mankwa",
+    "contributionsDesc": "Kwɛn mankwa ma nsaŋ",
+    "loans": "Ndu",
+    "loansDesc": "Kwɛn ndu ɛnə ndɨsɛm",
+    "savings": "Ndɨkɔŋ",
+    "savingsDesc": "Kwɛn ndɨkɔŋ ba batu",
+    "njangi": "Njangi",
+    "njangiDesc": "Kwɛn mankwa ma njangi",
+    "assistance": "Nkɛmɛ",
+    "assistanceDesc": "Kwɛn botu, nswɔ ɛnə nkwaŋ",
+    "shares": "Mankwa ɛnə Ndɨfɨnə",
+    "sharesDesc": "Kwɛn mankwa ɛnə ndɨfɨnə"
+  },
+  "contributions": {
+    "title": "Mankwa",
+    "description": "Kwɛn mankwa ma nsaŋ",
+    "addContribution": "Nam Nkwa",
+    "recordNew": "Kumɛn Nkwa Nchɔm",
+    "member": "Ntu",
+    "amount": "Ntam (FCFA)",
+    "date": "Mbɔŋ",
+    "type": "Nkɛmɛ",
+    "notes": "Makɛn",
+    "status": "Nyɛn",
+    "total": "Mankwa Wɔsɔ",
+    "paid": "Afɨnə",
+    "pending": "Anə ndɨsɛm",
+    "history": "Makɛn ma Mankwa",
+    "markPaid": "Kunə Afɨnə",
+    "types": {
+      "mandatory": "Nkɛmɛn",
+      "savings": "Ndɨkɔŋ Ntu",
+      "njangi": "Njangi",
+      "share": "Nsɔm Nkwa",
+      "fine": "Nkwɔŋ"
+    }
+  },
+  "loans": {
+    "title": "Ndu",
+    "description": "Kwɛn ndu ɛnə ndɨsɛm",
+    "requestLoan": "Kunə Ndu",
+    "newRequest": "Ndu Nchɔm",
+    "purpose": "Nkɛmɛn",
+    "termMonths": "Nsaŋ (Nsaŋ)",
+    "interestRate": "Ntam Ndɨsɛm",
+    "totalLoans": "Ndu Wɔsɔ",
+    "outstanding": "Anə ndɨsɛm",
+    "approve": "Fɨnə",
+    "disburse": "Tum",
+    "status": {
+      "pending": "Anə ndɨsɛm",
+      "approved": "Afɨnə",
+      "disbursed": "Atumə",
+      "completed": "Awɔsə"
+    }
+  },
+  "savings": {
+    "title": "Ndɨkɔŋ Batu",
+    "description": "Kwɛn ndɨkɔŋ ma nsaŋ ba batu",
+    "addSaving": "Nam Ndɨkɔŋ",
+    "recordNew": "Kumɛn Ndɨkɔŋ Nchɔm",
+    "month": "Nsaŋ",
+    "totalSavings": "Ndɨkɔŋ Wɔsɔ",
+    "monthsContributed": "Nsaŋ Afɨnə"
+  },
+  "njangi": {
+    "title": "Njangi",
+    "description": "Mankwa ma njangi",
+    "createCycle": "Kunə Nkɛmɛn",
+    "newCycle": "Nkɛmɛn Njangi Nchɔm",
+    "cycleName": "Ndɨm Nkɛmɛn",
+    "startDate": "Mbɔŋ Nkwa",
+    "amountPerPerson": "Ntam ba Ntu",
+    "addParticipant": "Nam Ntu",
+    "payoutOrder": "Nkɛmɛn Ndɨsɛm",
+    "markPaid": "Kunə Afɨnə",
+    "status": {
+      "active": "Anə nkɛmɛn",
+      "completed": "Awɔsə"
+    }
+  },
+  "assistance": {
+    "title": "Nkɛmɛ",
+    "description": "Kwɛn makɛn ma nkɛmɛ ma mbɔŋ",
+    "addEvent": "Nam Makɛn",
+    "newEvent": "Makɛn Nchɔm ma Nkɛmɛ",
+    "eventType": "Nkɛmɛn Makɛn",
+    "eventDate": "Mbɔŋ Makɛn",
+    "beneficiaryName": "Ndɨm Ntu",
+    "contributionPerMember": "Nkwa ba Ntu",
+    "hospitalizationDays": "Nsaŋ Nkwaŋ",
+    "types": {
+      "birth": "Botu",
+      "death_member": "Nswɔ - Ntu",
+      "death_spouse": "Nswɔ - Nkwɛn",
+      "death_child": "Nswɔ - Nwanə",
+      "sickness": "Nkwaŋ",
+      "external": "Nkɛmɛ Ndɨndɨ"
+    }
+  },
+  "shares": {
+    "title": "Mankwa ɛnə Ndɨfɨnə",
+    "description": "Kwɛn mankwa ɛnə ndɨfɨnə",
+    "issueShare": "Tum Nkwa",
+    "declareDividend": "Kunə Ndɨfɨnə",
+    "shareValue": "Ntam Nkwa",
+    "totalShares": "Mankwa Wɔsɔ",
+    "activeShares": "Mankwa Anə Nkɛmɛn"
+  },
+  "meetings": {
+    "title": "Mkwam",
+    "description": "Kunə mkwam ma mbɔŋ",
+    "createMeeting": "Kunə Nkwam",
+    "scheduleNew": "Kunə Nkwam Nchɔm",
+    "meetingDate": "Mbɔŋ Nkwam",
+    "meetingTime": "Ngɔŋ Nkwam",
+    "location": "Ndɨndɨ",
+    "hostHouse": "Ndu Nkwɛn",
+    "agenda": "Makɛn",
+    "type": {
+      "regular": "Nkɛmɛn",
+      "extraordinary": "Nchɔm"
+    },
+    "status": {
+      "upcoming": "Anə ndum",
+      "completed": "Awɔsə"
+    }
+  }
+}

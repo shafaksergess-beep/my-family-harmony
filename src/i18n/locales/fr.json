@@ -1,0 +1,158 @@
+{
+  "common": {
+    "back": "Retour",
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "export": "Exporter CSV",
+    "welcome": "Bienvenue",
+    "logout": "Déconnexion"
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "yourFamilies": "Vos Familles",
+    "noFamilies": "Aucune famille",
+    "noFamiliesDesc": "Vous n'avez pas encore été ajouté à une famille.",
+    "openFamily": "Ouvrir la Famille",
+    "superAdminPanel": "Panneau Super Admin",
+    "manageFamilies": "Gérer les Familles"
+  },
+  "family": {
+    "analytics": "Tableau d'Analyse",
+    "analyticsDesc": "Voir les KPI financiers et les statistiques familiales",
+    "meetings": "Réunions",
+    "meetingsDesc": "Programmer et suivre les réunions familiales",
+    "members": "Membres",
+    "membersDesc": "Voir et gérer les membres de la famille",
+    "contributions": "Contributions",
+    "contributionsDesc": "Suivre les contributions et paiements mensuels",
+    "loans": "Prêts",
+    "loansDesc": "Gérer les demandes et remboursements de prêts",
+    "savings": "Épargnes",
+    "savingsDesc": "Suivre l'épargne individuelle des membres",
+    "njangi": "Njangi",
+    "njangiDesc": "Gérer les cycles d'épargne rotative",
+    "assistance": "Assistance",
+    "assistanceDesc": "Suivre les naissances, décès et maladies",
+    "shares": "Actions & Dividendes",
+    "sharesDesc": "Gérer les actions et distributions de dividendes"
+  },
+  "contributions": {
+    "title": "Contributions",
+    "description": "Suivre les contributions et paiements mensuels",
+    "addContribution": "Ajouter Contribution",
+    "recordNew": "Enregistrer Nouvelle Contribution",
+    "member": "Membre",
+    "amount": "Montant (FCFA)",
+    "date": "Date",
+    "type": "Type",
+    "notes": "Notes",
+    "status": "Statut",
+    "total": "Total des Contributions",
+    "paid": "Payé",
+    "pending": "En attente",
+    "history": "Historique des Contributions",
+    "markPaid": "Marquer Payé",
+    "types": {
+      "mandatory": "Obligatoire",
+      "savings": "Épargne Individuelle",
+      "njangi": "Njangi",
+      "share": "Achat d'Actions",
+      "fine": "Amende"
+    }
+  },
+  "loans": {
+    "title": "Prêts",
+    "description": "Gérer les demandes et remboursements de prêts",
+    "requestLoan": "Demander un Prêt",
+    "newRequest": "Nouvelle Demande de Prêt",
+    "purpose": "Objectif",
+    "termMonths": "Durée (Mois)",
+    "interestRate": "Taux d'Intérêt",
+    "totalLoans": "Total des Prêts",
+    "outstanding": "En cours",
+    "approve": "Approuver",
+    "disburse": "Décaisser",
+    "status": {
+      "pending": "En attente",
+      "approved": "Approuvé",
+      "disbursed": "Décaissé",
+      "completed": "Terminé"
+    }
+  },
+  "savings": {
+    "title": "Épargnes Individuelles",
+    "description": "Suivre l'épargne mensuelle optionnelle par membre",
+    "addSaving": "Ajouter Épargne",
+    "recordNew": "Enregistrer Nouvelle Épargne",
+    "month": "Mois",
+    "totalSavings": "Total Épargnes",
+    "monthsContributed": "Mois Contribués"
+  },
+  "njangi": {
+    "title": "Njangi",
+    "description": "Système d'épargne rotative",
+    "createCycle": "Créer Cycle",
+    "newCycle": "Nouveau Cycle Njangi",
+    "cycleName": "Nom du Cycle",
+    "startDate": "Date de Début",
+    "amountPerPerson": "Montant par Personne",
+    "addParticipant": "Ajouter Participant",
+    "payoutOrder": "Ordre de Paiement",
+    "markPaid": "Marquer Payé",
+    "status": {
+      "active": "Actif",
+      "completed": "Terminé"
+    }
+  },
+  "assistance": {
+    "title": "Assistance",
+    "description": "Suivre les événements d'assistance familiale",
+    "addEvent": "Ajouter Événement",
+    "newEvent": "Nouvel Événement d'Assistance",
+    "eventType": "Type d'Événement",
+    "eventDate": "Date de l'Événement",
+    "beneficiaryName": "Nom du Bénéficiaire",
+    "contributionPerMember": "Contribution par Membre",
+    "hospitalizationDays": "Jours d'Hospitalisation",
+    "types": {
+      "birth": "Naissance",
+      "death_member": "Décès - Membre",
+      "death_spouse": "Décès - Conjoint",
+      "death_child": "Décès - Enfant",
+      "sickness": "Maladie",
+      "external": "Soutien Externe"
+    }
+  },
+  "shares": {
+    "title": "Actions & Dividendes",
+    "description": "Gérer les actions et distributions de dividendes",
+    "issueShare": "Émettre Action",
+    "declareDividend": "Déclarer Dividende",
+    "shareValue": "Valeur de l'Action",
+    "totalShares": "Total Actions",
+    "activeShares": "Actions Actives"
+  },
+  "meetings": {
+    "title": "Réunions",
+    "description": "Programmer et suivre les réunions familiales",
+    "createMeeting": "Créer Réunion",
+    "scheduleNew": "Programmer Nouvelle Réunion",
+    "meetingDate": "Date de Réunion",
+    "meetingTime": "Heure de Réunion",
+    "location": "Lieu",
+    "hostHouse": "Maison Hôte",
+    "agenda": "Ordre du Jour",
+    "type": {
+      "regular": "Régulière",
+      "extraordinary": "Extraordinaire"
+    },
+    "status": {
+      "upcoming": "À venir",
+      "completed": "Terminée"
+    }
+  }
+}
