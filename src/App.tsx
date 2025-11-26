@@ -6,8 +6,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
 import AdminFamilies from "./pages/admin/Families";
 import FamilyMembers from "./pages/admin/FamilyMembers";
+import Permissions from "./pages/admin/Permissions";
+import ActivityLogs from "./pages/admin/ActivityLogs";
 import FamilyDetail from "./pages/family/Detail";
 import FamilyAnalytics from "./pages/family/Analytics";
 import FamilyMeetings from "./pages/family/Meetings";
@@ -34,8 +37,11 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/admin/families" element={<AdminFamilies />} />
           <Route path="/admin/families/:familyId/members" element={<FamilyMembers />} />
+          <Route path="/admin/permissions" element={<Permissions />} />
+          <Route path="/admin/activity-logs" element={<ActivityLogs />} />
           <Route path="/family/:familySlug" element={<FamilyDetail />} />
           <Route path="/family/:familySlug/analytics" element={<FamilyAnalytics />} />
           <Route path="/family/:familySlug/meetings" element={<FamilyMeetings />} />

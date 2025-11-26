@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, LogOut, Plus, Users, Building2 } from "lucide-react";
+import { Loader2, LogOut, Plus, Users, Building2, Shield, FileText, User as UserIcon } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 interface UserFamily {
@@ -112,6 +112,10 @@ const Dashboard = () => {
               )}
             </div>
             <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => navigate("/profile")}>
+                <UserIcon className="w-4 h-4 mr-2" />
+                Profile
+              </Button>
               <LanguageSwitcher />
               <Button variant="ghost" onClick={handleLogout}>
                 <LogOut className="w-4 h-4 mr-2" />
@@ -127,7 +131,7 @@ const Dashboard = () => {
         {/* Super Admin Section */}
         {isSuperAdmin && (
           <Card className="p-6 mb-8 border-secondary/30 bg-gradient-to-r from-secondary/5 to-secondary/10">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
                   <Building2 className="w-5 h-5 text-secondary" />
@@ -137,12 +141,31 @@ const Dashboard = () => {
                   Manage all families and system-wide settings
                 </p>
               </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <Button
-                variant="secondary"
+                variant="outline"
+                className="justify-start"
                 onClick={() => navigate("/admin/families")}
               >
-                <Plus className="w-4 h-4 mr-2" />
+                <Building2 className="w-4 h-4 mr-2" />
                 Manage Families
+              </Button>
+              <Button
+                variant="outline"
+                className="justify-start"
+                onClick={() => navigate("/admin/permissions")}
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                Permissions Overview
+              </Button>
+              <Button
+                variant="outline"
+                className="justify-start"
+                onClick={() => navigate("/admin/activity-logs")}
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Activity Logs
               </Button>
             </div>
           </Card>
