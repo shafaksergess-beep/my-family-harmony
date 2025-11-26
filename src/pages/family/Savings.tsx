@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
-import { ArrowLeft, Plus, Download } from "lucide-react";
+import { ArrowLeft, Plus, Download, DollarSign } from "lucide-react";
 import { exportToCSV, formatSavingsForExport } from "@/lib/export";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -47,7 +47,7 @@ export default function FamilySavings() {
   const [formData, setFormData] = useState({
     member_id: "",
     month: new Date().toISOString().slice(0, 7),
-    amount: "5000",
+    amount: family?.min_savings_amount?.toString() || "5000",
     notes: "",
   });
 
@@ -155,7 +155,7 @@ export default function FamilySavings() {
       setFormData({
         member_id: "",
         month: new Date().toISOString().slice(0, 7),
-        amount: "5000",
+        amount: family?.min_savings_amount?.toString() || "5000",
         notes: "",
       });
       loadData();
@@ -198,6 +198,23 @@ export default function FamilySavings() {
           </div>
           <LanguageSwitcher />
         </div>
+
+        <Card className="p-6 bg-primary/5 border-primary/20">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">
+                Recommended Monthly Savings (Optional)
+              </p>
+              <p className="text-2xl font-bold text-primary">
+                {(family?.min_savings_amount || 5000).toLocaleString()} FCFA
+              </p>
+            </div>
+            <DollarSign className="h-8 w-8 text-primary opacity-50" />
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            Savings are encouraged but not mandatory
+          </p>
+        </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="p-6">
@@ -263,7 +280,9 @@ export default function FamilySavings() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="amount">Amount (FCFA)</Label>
+                    <Label htmlFor="amount">
+                      Amount (FCFA, recommended: {(family?.min_savings_amount || 5000).toLocaleString()})
+                    </Label>
                     <Input
                       id="amount"
                       type="number"
@@ -273,6 +292,9 @@ export default function FamilySavings() {
                       onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                       required
                     />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Any amount is acceptable; this is optional
+                    </p>
                   </div>
                   <div>
                     <Label htmlFor="notes">Notes (optional)</Label>
