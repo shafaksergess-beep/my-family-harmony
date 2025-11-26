@@ -113,7 +113,15 @@ export default function UserDetail() {
 
       if (membershipError) throw membershipError;
 
-      setMemberships(membershipData as any || []);
+      // Transform the data to match our interface (families -> family)
+      const transformedMemberships = (membershipData || []).map((m: any) => ({
+        id: m.id,
+        family_id: m.family_id,
+        role: m.role,
+        family: Array.isArray(m.families) ? m.families[0] : m.families,
+      }));
+
+      setMemberships(transformedMemberships);
     } catch (error) {
       console.error("Error fetching user details:", error);
       toast({
