@@ -31,6 +31,16 @@ const AcceptInvitation = () => {
     }
 
     try {
+      // Check authentication first
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        // Redirect to auth with return URL
+        navigate(`/auth?redirect=/accept-invitation?token=${token}`);
+        return;
+      }
+
+      // Now load invitation (user is authenticated)
       const { data, error } = await supabase
         .from("invitations")
         .select("*, families:family_id(name)")
@@ -38,7 +48,7 @@ const AcceptInvitation = () => {
         .single();
 
       if (error || !data) {
-        throw new Error("Invitation not found");
+        throw new Error("Invitation not found or you don't have access to it");
       }
 
       if (data.status !== "pending") {
