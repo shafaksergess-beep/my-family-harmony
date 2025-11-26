@@ -5,12 +5,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, Download, Mail, Phone, Calendar, Briefcase, Home, Shield, DollarSign, TrendingUp, PiggyBank, CreditCard } from "lucide-react";
+import { Loader2, ArrowLeft, Download, Mail, Phone, Calendar, Briefcase, Home, Shield, DollarSign, TrendingUp, PiggyBank, CreditCard, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { MemberActivityTimeline } from "@/components/MemberActivityTimeline";
+import { generateMemberReport } from "@/lib/pdfGenerator";
 
 interface MemberData {
   id: string;
@@ -151,6 +153,24 @@ const MemberDetail = () => {
     ? (attendance.filter(a => a.status === 'present').length / attendance.length * 100).toFixed(1) 
     : 0;
 
+  const handleExportPDF = () => {
+    if (!member) return;
+    
+    generateMemberReport({
+      memberName: member.profiles?.full_name || 'Unknown',
+      familyName: family?.name || 'Unknown Family',
+      contributions,
+      loans,
+      savings,
+      attendance,
+    });
+
+    toast({
+      title: "Success",
+      description: "Member report downloaded successfully",
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -178,7 +198,13 @@ const MemberDetail = () => {
                 Back to Members
               </Button>
             </div>
-            <LanguageSwitcher />
+            <div className="flex items-center gap-2">
+              <Button variant="outline" onClick={handleExportPDF}>
+                <FileText className="w-4 h-4 mr-2" />
+                Export PDF
+              </Button>
+              <LanguageSwitcher />
+            </div>
           </div>
         </div>
       </header>
@@ -303,7 +329,9 @@ const MemberDetail = () => {
         </div>
 
         {/* Detailed Tabs */}
-        <Tabs defaultValue="contributions" className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <Tabs defaultValue="contributions" className="space-y-4">
           <TabsList>
             <TabsTrigger value="contributions">Contributions</TabsTrigger>
             <TabsTrigger value="loans">Loans</TabsTrigger>
@@ -475,8 +503,21 @@ const MemberDetail = () => {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {/* Activity Timeline */}
+        <div className="lg:col-span-1">
+          <MemberActivityTimeline
+            joinedDate={member.joined_at}
+            contributions={contributions}
+            loans={loans}
+            savings={savings}
+            attendance={attendance}
+          />
+        </div>
+      </div>
       </main>
     </div>
   );
