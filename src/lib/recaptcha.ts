@@ -43,11 +43,14 @@ export const executeRecaptcha = async (action: string): Promise<string> => {
   }
 
   try {
-    await (window as any).grecaptcha.ready();
-    const token = await (window as any).grecaptcha.execute(RECAPTCHA_SITE_KEY, {
-      action,
+    return new Promise((resolve, reject) => {
+      (window as any).grecaptcha.ready(() => {
+        (window as any).grecaptcha
+          .execute(RECAPTCHA_SITE_KEY, { action })
+          .then((token: string) => resolve(token))
+          .catch((error: Error) => reject(error));
+      });
     });
-    return token;
   } catch (error) {
     console.error("reCAPTCHA execution failed:", error);
     throw new Error("Failed to execute reCAPTCHA");
