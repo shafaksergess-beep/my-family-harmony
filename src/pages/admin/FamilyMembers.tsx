@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, Plus, Trash2, Shield, Download } from "lucide-react";
+import { Loader2, ArrowLeft, Plus, Trash2, Shield, Download, Edit } from "lucide-react";
 import { logAdminActivity } from "@/lib/adminLogger";
 import { exportToCSV, formatMembersForExport } from "@/lib/export";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -36,6 +36,7 @@ const FamilyMembers = () => {
   const [members, setMembers] = useState<FamilyMember[]>([]);
   const [allUsers, setAllUsers] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editMemberId, setEditMemberId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     user_id: "",
     role: "member",
@@ -191,6 +192,46 @@ const FamilyMembers = () => {
     }
   };
 
+  const handleUpdateMemberRole = async (memberId: string, newRole: string) => {
+    try {
+      const member = members.find(m => m.id === memberId);
+      
+      const { error } = await supabase
+        .from("family_members")
+        .update({ role: newRole as any })
+        .eq("id", memberId);
+
+      if (error) throw error;
+
+      await logAdminActivity({
+        action_type: 'update',
+        entity_type: 'family_member',
+        entity_id: memberId,
+        details: { 
+          family_name: family?.name,
+          member_name: member?.profiles?.full_name,
+          new_role: newRole 
+        },
+        sendNotification: true
+      });
+
+      toast({
+        title: t("common.success"),
+        description: "Member role updated successfully",
+      });
+      
+      setEditMemberId(null);
+      loadData();
+    } catch (error: any) {
+      console.error("Error updating role:", error);
+      toast({
+        title: t("common.error"),
+        description: error.message || "Failed to update member role",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleExport = () => {
     const formatted = formatMembersForExport(members);
     exportToCSV(formatted, `${family?.slug}-members-${new Date().toISOString().split('T')[0]}`);
@@ -227,7 +268,9 @@ const FamilyMembers = () => {
               </Button>
               <div>
                 <h1 className="text-2xl font-bold text-foreground">{family?.name} - {t("admin.members")}</h1>
-                <p className="text-sm text-muted-foreground">{t("admin.manageFamilyMembers")}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t("admin.manageFamilyMembers")} • {members.length} members
+                </p>
               </div>
             </div>
             
@@ -318,32 +361,75 @@ const FamilyMembers = () => {
                       <CardTitle className="text-lg">{member.profiles?.full_name || 'Unknown'}</CardTitle>
                       <p className="text-sm text-muted-foreground">{member.profiles?.email || 'No email'}</p>
                     </div>
-                    <Button size="icon" variant="ghost" onClick={() => handleRemoveMember(member.id)}>
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        onClick={() => setEditMemberId(member.id)}
+                        title="Change role"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        onClick={() => handleRemoveMember(member.id)}
+                        title="Remove member"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-medium">{t("admin.role")}: </span>
-                    <Badge variant="secondary">
-                      <Shield className="w-3 h-3 mr-1" />
-                      {t(`roles.${member.role}`)}
-                    </Badge>
-                    {member.role === 'family_head' && (
-                      <Badge variant="outline" className="text-xs">{t("roles.canManageMembers")}</Badge>
-                    )}
-                    {(member.role === 'treasurer' || member.role === 'family_head') && (
-                      <Badge variant="outline" className="text-xs">{t("roles.canManageFinances")}</Badge>
-                    )}
-                    {member.role === 'loan_committee' && (
-                      <Badge variant="outline" className="text-xs">{t("roles.canApproveLoans")}</Badge>
-                    )}
-                    {member.role === 'guest' && (
-                      <Badge variant="outline" className="text-xs">{t("roles.canViewOnly")}</Badge>
-                    )}
-                  </div>
+                  {editMemberId === member.id ? (
+                    <div className="space-y-2">
+                      <Label>Change Role</Label>
+                      <Select
+                        defaultValue={member.role}
+                        onValueChange={(value) => handleUpdateMemberRole(member.id, value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="member">Member</SelectItem>
+                          <SelectItem value="family_head">Family Head</SelectItem>
+                          <SelectItem value="treasurer">Treasurer</SelectItem>
+                          <SelectItem value="loan_committee">Loan Committee</SelectItem>
+                          <SelectItem value="guest">Guest</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => setEditMemberId(null)}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-medium">{t("admin.role")}: </span>
+                      <Badge variant="secondary">
+                        <Shield className="w-3 h-3 mr-1" />
+                        {t(`roles.${member.role}`)}
+                      </Badge>
+                      {member.role === 'family_head' && (
+                        <Badge variant="outline" className="text-xs">{t("roles.canManageMembers")}</Badge>
+                      )}
+                      {(member.role === 'treasurer' || member.role === 'family_head') && (
+                        <Badge variant="outline" className="text-xs">{t("roles.canManageFinances")}</Badge>
+                      )}
+                      {member.role === 'loan_committee' && (
+                        <Badge variant="outline" className="text-xs">{t("roles.canApproveLoans")}</Badge>
+                      )}
+                      {member.role === 'guest' && (
+                        <Badge variant="outline" className="text-xs">{t("roles.canViewOnly")}</Badge>
+                      )}
+                    </div>
+                  )}
                   {member.house_name && (
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">{t("admin.house")}: </span>

@@ -5,9 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, Users, Building2, Activity, TrendingUp, Shield, FileText, BarChart3, PieChart, Mail, Download } from "lucide-react";
+import { Loader2, ArrowLeft, Users, Building2, Activity, TrendingUp, Shield, FileText, BarChart3, PieChart, Mail, Download, Globe } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Badge } from "@/components/ui/badge";
+import ActivityWidget from "@/components/ActivityWidget";
 import { LineChart, Line, BarChart, Bar, PieChart as RechartsPie, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
@@ -354,6 +355,9 @@ const AdminDashboard = () => {
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Activity Widget */}
+          <ActivityWidget limit={15} />
+          
           {/* Activity Trend Chart */}
           <Card>
             <CardHeader>
@@ -495,7 +499,7 @@ const AdminDashboard = () => {
         </Card>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mt-8">
           <Button
             variant="outline"
             className="h-auto py-6"
@@ -504,6 +508,16 @@ const AdminDashboard = () => {
             <div className="flex flex-col items-center gap-2">
               <Building2 className="w-8 h-8" />
               <span>Manage Families</span>
+            </div>
+          </Button>
+          <Button
+            variant="outline"
+            className="h-auto py-6"
+            onClick={() => navigate("/admin/global-analytics")}
+          >
+            <div className="flex flex-col items-center gap-2">
+              <Globe className="w-8 h-8" />
+              <span>Global Analytics</span>
             </div>
           </Button>
           <Button
