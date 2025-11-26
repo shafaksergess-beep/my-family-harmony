@@ -158,6 +158,39 @@ export class NotificationManager {
       )
       .subscribe();
 
+    // Listen to meeting reminders
+    const remindersChannel = supabase
+      .channel(`meeting-reminders-${familyId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "meeting_reminders",
+          filter: `family_id=eq.${familyId}`,
+        },
+        async (payload) => {
+          // Fetch meeting details for the reminder
+          const { data: meeting } = await supabase
+            .from("meetings")
+            .select("*")
+            .eq("id", payload.new.meeting_id)
+            .single();
+
+          if (meeting) {
+            const daysText = payload.new.days_before === 1 ? "tomorrow" : `in ${payload.new.days_before} days`;
+            this.showNotification({
+              title: "Meeting Reminder",
+              message: `Family meeting ${daysText} at ${meeting.meeting_time}`,
+              type: "meeting",
+              familyId,
+              link: `/family/${familyId}/meetings/${meeting.id}`,
+            });
+          }
+        }
+      )
+      .subscribe();
+
     // Listen to assistance events
     const assistanceChannel = supabase
       .channel(`assistance-${familyId}`)
@@ -185,6 +218,7 @@ export class NotificationManager {
       supabase.removeChannel(contributionsChannel);
       supabase.removeChannel(loansChannel);
       supabase.removeChannel(meetingsChannel);
+      supabase.removeChannel(remindersChannel);
       supabase.removeChannel(assistanceChannel);
     };
   }

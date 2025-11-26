@@ -104,10 +104,57 @@ const handler = async (req: Request): Promise<Response> => {
       );
 
     const results = await Promise.allSettled(emailPromises);
-    const successCount = results.filter((r) => r.status === "fulfilled").length;
-    const failureCount = results.filter((r) => r.status === "rejected").length;
+    const emailSuccessCount = results.filter((r) => r.status === "fulfilled").length;
+    const emailFailureCount = results.filter((r) => r.status === "rejected").length;
 
-    console.log(`Meeting reminders sent: ${successCount} successful, ${failureCount} failed`);
+    console.log(`Email reminders sent: ${emailSuccessCount} successful, ${emailFailureCount} failed`);
+
+    // Send SMS notifications using Twilio
+    const twilioAccountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
+    const twilioAuthToken = Deno.env.get("TWILIO_AUTH_TOKEN");
+    const twilioPhoneNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
+
+    let smsSuccessCount = 0;
+    let smsFailureCount = 0;
+
+    if (twilioAccountSid && twilioAuthToken && twilioPhoneNumber) {
+      const smsMessage = `${familyName} Meeting Reminder\nDate: ${meetingDate}\nTime: ${meetingTime}${meeting.location ? `\nLocation: ${meeting.location}` : ""}${meeting.host_house ? `\nHost: ${meeting.host_house}` : ""}\nPlease attend on time to avoid fines.`;
+
+      const smsPromises = members
+        .filter((member) => member.profiles?.phone)
+        .map(async (member) => {
+          const authString = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
+          const response = await fetch(
+            `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`,
+            {
+              method: "POST",
+              headers: {
+                "Authorization": `Basic ${authString}`,
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body: new URLSearchParams({
+                To: member.profiles.phone,
+                From: twilioPhoneNumber,
+                Body: smsMessage,
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`Failed to send SMS to ${member.profiles.phone}`);
+          }
+
+          return response.json();
+        });
+
+      const smsResults = await Promise.allSettled(smsPromises);
+      smsSuccessCount = smsResults.filter((r) => r.status === "fulfilled").length;
+      smsFailureCount = smsResults.filter((r) => r.status === "rejected").length;
+
+      console.log(`SMS reminders sent: ${smsSuccessCount} successful, ${smsFailureCount} failed`);
+    } else {
+      console.log("Twilio credentials not configured, skipping SMS notifications");
+    }
 
     // Record that reminder was sent
     await supabaseClient.from("meeting_reminders").insert({
@@ -123,8 +170,14 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(
       JSON.stringify({
         success: true,
-        sent: successCount,
-        failed: failureCount,
+        email: {
+          sent: emailSuccessCount,
+          failed: emailFailureCount,
+        },
+        sms: {
+          sent: smsSuccessCount,
+          failed: smsFailureCount,
+        },
       }),
       {
         status: 200,
