@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@4.0.0";
+import { checkRateLimit, recordRequest, getIpAddress } from "../_shared/rateLimiter.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -28,6 +29,25 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Rate limiting check
+    const ipAddress = getIpAddress(req);
+    const rateLimitCheck = checkRateLimit(ipAddress);
+    
+    if (rateLimitCheck.isBlocked) {
+      const minutesBlocked = Math.ceil((rateLimitCheck.blockedUntil! - Date.now()) / 60000);
+      return new Response(
+        JSON.stringify({ 
+          error: `Too many requests. Please try again in ${minutesBlocked} minute(s).` 
+        }),
+        {
+          status: 429,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    // Record the request for rate limiting
+    recordRequest(ipAddress);
     const {
       to,
       subject,
