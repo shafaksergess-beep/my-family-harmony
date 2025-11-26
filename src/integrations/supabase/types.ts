@@ -355,6 +355,7 @@ export type Database = {
           contribution_date: string
           created_at: string | null
           family_id: string
+          house_id: string | null
           id: string
           late_fine: number | null
           member_id: string
@@ -369,6 +370,7 @@ export type Database = {
           contribution_date: string
           created_at?: string | null
           family_id: string
+          house_id?: string | null
           id?: string
           late_fine?: number | null
           member_id: string
@@ -383,6 +385,7 @@ export type Database = {
           contribution_date?: string
           created_at?: string | null
           family_id?: string
+          house_id?: string | null
           id?: string
           late_fine?: number | null
           member_id?: string
@@ -641,6 +644,7 @@ export type Database = {
       }
       families: {
         Row: {
+          contribution_scope: string | null
           created_at: string | null
           description: string | null
           heritage_info: string | null
@@ -659,6 +663,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          contribution_scope?: string | null
           created_at?: string | null
           description?: string | null
           heritage_info?: string | null
@@ -677,6 +682,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          contribution_scope?: string | null
           created_at?: string | null
           description?: string | null
           heritage_info?: string | null

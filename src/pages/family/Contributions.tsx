@@ -50,8 +50,11 @@ export default function Contributions() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [contributionScope, setContributionScope] = useState<"member" | "house">("member");
+  const [houses, setHouses] = useState<string[]>([]);
   const [newContribution, setNewContribution] = useState({
     member_id: "",
+    house_id: "",
     amount: "",
     contribution_date: format(new Date(), "yyyy-MM-dd"),
     type: "monthly",
@@ -61,10 +64,43 @@ export default function Contributions() {
 
   useEffect(() => {
     if (family) {
+      fetchFamilySettings();
       fetchContributions();
       fetchMembers();
     }
   }, [family]);
+
+  const fetchFamilySettings = async () => {
+    if (!family) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from("families")
+        .select("contribution_scope")
+        .eq("id", family.id)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        setContributionScope((data.contribution_scope as "member" | "house") || "member");
+      }
+
+      // Fetch unique houses
+      const { data: membersData } = await supabase
+        .from("family_members")
+        .select("house_name")
+        .eq("family_id", family.id)
+        .not("house_name", "is", null);
+
+      if (membersData) {
+        const uniqueHouses = [...new Set(membersData.map(m => m.house_name).filter(Boolean))];
+        setHouses(uniqueHouses as string[]);
+      }
+    } catch (error) {
+      console.error("Error fetching family settings:", error);
+    }
+  };
 
   const fetchContributions = async () => {
     if (!family) return;
@@ -162,13 +198,28 @@ export default function Contributions() {
     setValidationErrors({});
     
     // Validate input
-    const validationResult = contributionSchema.safeParse({
-      memberId: newContribution.member_id,
+    const validationData: any = {
       amount: parseFloat(newContribution.amount),
       contributionDate: newContribution.contribution_date,
       type: newContribution.type,
       notes: newContribution.notes || undefined,
-    });
+    };
+
+    if (contributionScope === "house") {
+      if (!newContribution.house_id) {
+        setValidationErrors({ houseId: "House is required" });
+        toast({
+          title: "Validation Error",
+          description: "Please select a house",
+          variant: "destructive",
+        });
+        return;
+      }
+    } else {
+      validationData.memberId = newContribution.member_id;
+    }
+
+    const validationResult = contributionSchema.safeParse(validationData);
 
     if (!validationResult.success) {
       const errors: Record<string, string> = {};
@@ -186,15 +237,24 @@ export default function Contributions() {
     }
 
     try {
-      const { error } = await supabase.from("contributions").insert({
+      const contributionData: any = {
         family_id: family.id,
-        member_id: validationResult.data.memberId,
         amount: validationResult.data.amount,
         contribution_date: validationResult.data.contributionDate,
         type: validationResult.data.type,
         notes: validationResult.data.notes || null,
         status: "pending",
-      });
+      };
+
+      if (contributionScope === "house") {
+        contributionData.house_id = newContribution.house_id;
+        contributionData.member_id = null;
+      } else {
+        contributionData.member_id = validationResult.data.memberId;
+        contributionData.house_id = null;
+      }
+
+      const { error } = await supabase.from("contributions").insert(contributionData);
 
       if (error) throw error;
 
@@ -206,6 +266,7 @@ export default function Contributions() {
       setIsDialogOpen(false);
       setNewContribution({
         member_id: "",
+        house_id: "",
         amount: "",
         contribution_date: format(new Date(), "yyyy-MM-dd"),
         type: "monthly",

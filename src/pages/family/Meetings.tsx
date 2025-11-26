@@ -52,8 +52,10 @@ const FamilyMeetings = () => {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    loadData();
-  }, [familySlug]);
+    if (family) {
+      loadData();
+    }
+  }, [family]);
 
   const loadData = async () => {
     if (!family) return;
