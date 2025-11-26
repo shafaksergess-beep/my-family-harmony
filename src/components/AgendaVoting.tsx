@@ -26,6 +26,27 @@ export const AgendaVoting = ({ agendaItemId, requiresVote, currentMemberId }: Ag
 
   useEffect(() => {
     loadVotes();
+
+    // Set up realtime subscription for vote updates
+    const channel = supabase
+      .channel(`votes-${agendaItemId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'agenda_item_votes',
+          filter: `agenda_item_id=eq.${agendaItemId}`
+        },
+        () => {
+          loadVotes();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [agendaItemId]);
 
   const loadVotes = async () => {

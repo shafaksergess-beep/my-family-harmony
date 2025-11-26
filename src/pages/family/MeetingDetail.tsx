@@ -203,7 +203,11 @@ const MeetingDetail = () => {
           </TabsContent>
 
           <TabsContent value="predictions">
-            <AttendancePredictions familyId={family?.id || ""} meetingDate={meeting.meeting_date} />
+            <AttendancePredictions 
+              familyId={family?.id || ""} 
+              meetingDate={meeting.meeting_date}
+              meetingId={meeting.id}
+            />
           </TabsContent>
         </Tabs>
       </main>
