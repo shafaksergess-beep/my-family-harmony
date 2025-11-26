@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { MemberComparison } from "@/components/MemberComparison";
 
 interface FamilyMember {
   id: string;
@@ -384,6 +385,7 @@ const FamilyMembers = () => {
             </div>
             
             <div className="flex items-center gap-4">
+              <MemberComparison familyId={familyId!} members={members} />
               {members.length > 0 && (
                 <Button variant="outline" size="sm" onClick={handleExport}>
                   <Download className="w-4 h-4 mr-2" />
