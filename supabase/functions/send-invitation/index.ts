@@ -1,0 +1,95 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
+import { Resend } from "https://esm.sh/resend@4.0.0";
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+interface InvitationRequest {
+  invitationId: string;
+}
+
+const handler = async (req: Request): Promise<Response> => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      {
+        global: {
+          headers: { Authorization: req.headers.get("Authorization")! },
+        },
+      }
+    );
+
+    const { invitationId }: InvitationRequest = await req.json();
+
+    // Fetch invitation details
+    const { data: invitation, error: invError } = await supabaseClient
+      .from("invitations")
+      .select(`
+        *,
+        families:family_id(name),
+        profiles:invited_by(full_name)
+      `)
+      .eq("id", invitationId)
+      .single();
+
+    if (invError || !invitation) {
+      throw new Error("Invitation not found");
+    }
+
+    const familyName = invitation.families?.name || "the family";
+    const inviterName = invitation.profiles?.full_name || "A family member";
+    const acceptUrl = `${Deno.env.get("SUPABASE_URL")?.replace("/v1", "")}/accept-invitation?token=${invitation.token}`;
+
+    const emailResponse = await resend.emails.send({
+      from: "Family Together <onboarding@resend.dev>",
+      to: [invitation.email],
+      subject: `You're invited to join ${familyName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #333;">You're Invited!</h1>
+          <p>Hello,</p>
+          <p><strong>${inviterName}</strong> has invited you to join <strong>${familyName}</strong> on Family Together.</p>
+          <p>Your role will be: <strong>${invitation.role.replace("_", " ").toUpperCase()}</strong></p>
+          <div style="margin: 30px 0;">
+            <a href="${acceptUrl}" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+              Accept Invitation
+            </a>
+          </div>
+          <p style="color: #666; font-size: 14px;">This invitation will expire on ${new Date(invitation.expires_at).toLocaleDateString()}.</p>
+          <p style="color: #666; font-size: 14px;">If you didn't expect this invitation, you can safely ignore this email.</p>
+        </div>
+      `,
+    });
+
+    console.log("Invitation email sent:", emailResponse);
+
+    return new Response(
+      JSON.stringify({ success: true, data: emailResponse }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      }
+    );
+  } catch (error: any) {
+    console.error("Error sending invitation:", error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      }
+    );
+  }
+};
+
+serve(handler);
