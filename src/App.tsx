@@ -11,6 +11,7 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminFamilies from "./pages/admin/Families";
 import FamilyMembers from "./pages/admin/FamilyMembers";
 import AdminMemberDetail from "./pages/admin/MemberDetail";
+import MemberLeaderboard from "./pages/admin/MemberLeaderboard";
 import Permissions from "./pages/admin/Permissions";
 import ActivityLogs from "./pages/admin/ActivityLogs";
 import EmailReports from "./pages/admin/EmailReports";
@@ -74,8 +75,9 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/families" element={<AdminFamilies />} />
-        <Route path="/admin/families/:familyId/members" element={<FamilyMembers />} />
-        <Route path="/admin/families/:familyId/members/:memberId" element={<AdminMemberDetail />} />
+          <Route path="/admin/families/:familyId/members" element={<FamilyMembers />} />
+          <Route path="/admin/families/:familyId/members/:memberId" element={<AdminMemberDetail />} />
+          <Route path="/admin/leaderboard" element={<MemberLeaderboard />} />
         <Route path="/admin/permissions" element={<Permissions />} />
         <Route path="/admin/activity-logs" element={<ActivityLogs />} />
         <Route path="/admin/email-reports" element={<EmailReports />} />
