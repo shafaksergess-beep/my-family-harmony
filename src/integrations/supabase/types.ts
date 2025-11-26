@@ -834,6 +834,51 @@ export type Database = {
           },
         ]
       }
+      payment_reminders: {
+        Row: {
+          contribution_id: string
+          created_at: string
+          days_late: number
+          family_id: string
+          id: string
+          reminder_type: string
+          sent_at: string
+        }
+        Insert: {
+          contribution_id: string
+          created_at?: string
+          days_late: number
+          family_id: string
+          id?: string
+          reminder_type: string
+          sent_at?: string
+        }
+        Update: {
+          contribution_id?: string
+          created_at?: string
+          days_late?: number
+          family_id?: string
+          id?: string
+          reminder_type?: string
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_reminders_contribution_id_fkey"
+            columns: ["contribution_id"]
+            isOneToOne: false
+            referencedRelation: "contributions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_reminders_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_transactions: {
         Row: {
           amount: number
