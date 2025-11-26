@@ -81,8 +81,10 @@ export default function AuditTrailEnhanced() {
 
   const fetchAuditLogs = async () => {
     try {
+      // Use activity_logs_safe view to exclude sensitive tracking data (IP, user agent)
+      // Only super admins should query activity_logs table directly
       const { data, error } = await supabase
-        .from("activity_logs")
+        .from("activity_logs_safe")
         .select(`*`)
         .eq("family_id", family.id)
         .order("created_at", { ascending: false })
