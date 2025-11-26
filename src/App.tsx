@@ -11,6 +11,9 @@ import FamilyMembers from "./pages/admin/FamilyMembers";
 import FamilyDetail from "./pages/family/Detail";
 import FamilyAnalytics from "./pages/family/Analytics";
 import FamilyMeetings from "./pages/family/Meetings";
+import FamilyContributions from "./pages/family/Contributions";
+import FamilyLoans from "./pages/family/Loans";
+import FamilyAttendance from "./pages/family/Attendance";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +33,9 @@ const App = () => (
           <Route path="/family/:familySlug" element={<FamilyDetail />} />
           <Route path="/family/:familySlug/analytics" element={<FamilyAnalytics />} />
           <Route path="/family/:familySlug/meetings" element={<FamilyMeetings />} />
+          <Route path="/family/:familySlug/contributions" element={<FamilyContributions />} />
+          <Route path="/family/:familySlug/loans" element={<FamilyLoans />} />
+          <Route path="/family/:familySlug/attendance" element={<FamilyAttendance />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
