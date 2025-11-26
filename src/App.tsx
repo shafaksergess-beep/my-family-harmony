@@ -6,6 +6,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import AdminFamilies from "./pages/admin/Families";
+import FamilyMembers from "./pages/admin/FamilyMembers";
+import FamilyDetail from "./pages/family/Detail";
+import FamilyAnalytics from "./pages/family/Analytics";
+import FamilyMeetings from "./pages/family/Meetings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +25,11 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin/families" element={<AdminFamilies />} />
+          <Route path="/admin/families/:familyId/members" element={<FamilyMembers />} />
+          <Route path="/family/:familySlug" element={<FamilyDetail />} />
+          <Route path="/family/:familySlug/analytics" element={<FamilyAnalytics />} />
+          <Route path="/family/:familySlug/meetings" element={<FamilyMeetings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

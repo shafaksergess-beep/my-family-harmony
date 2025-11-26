@@ -14,6 +14,123 @@ export type Database = {
   }
   public: {
     Tables: {
+      attendance: {
+        Row: {
+          check_in_time: string | null
+          created_at: string | null
+          excuse_reason: string | null
+          fine_amount: number | null
+          id: string
+          lateness_minutes: number | null
+          meeting_id: string
+          member_id: string
+          notes: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          check_in_time?: string | null
+          created_at?: string | null
+          excuse_reason?: string | null
+          fine_amount?: number | null
+          id?: string
+          lateness_minutes?: number | null
+          meeting_id: string
+          member_id: string
+          notes?: string | null
+          status: string
+          updated_at?: string | null
+        }
+        Update: {
+          check_in_time?: string | null
+          created_at?: string | null
+          excuse_reason?: string | null
+          fine_amount?: number | null
+          id?: string
+          lateness_minutes?: number | null
+          meeting_id?: string
+          member_id?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contributions: {
+        Row: {
+          amount: number
+          contribution_date: string
+          created_at: string | null
+          family_id: string
+          id: string
+          late_fine: number | null
+          member_id: string
+          notes: string | null
+          payment_date: string | null
+          status: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          contribution_date: string
+          created_at?: string | null
+          family_id: string
+          id?: string
+          late_fine?: number | null
+          member_id: string
+          notes?: string | null
+          payment_date?: string | null
+          status?: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          contribution_date?: string
+          created_at?: string | null
+          family_id?: string
+          id?: string
+          late_fine?: number | null
+          member_id?: string
+          notes?: string | null
+          payment_date?: string | null
+          status?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contributions_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contributions_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       families: {
         Row: {
           created_at: string | null
@@ -115,6 +232,141 @@ export type Database = {
           },
         ]
       }
+      loans: {
+        Row: {
+          amount: number
+          amount_paid: number | null
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string | null
+          disbursed_at: string | null
+          due_date: string | null
+          family_id: string
+          id: string
+          interest_paid: number | null
+          interest_rate: number
+          member_id: string
+          notes: string | null
+          purpose: string
+          status: string
+          term_months: number
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          amount_paid?: number | null
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          disbursed_at?: string | null
+          due_date?: string | null
+          family_id: string
+          id?: string
+          interest_paid?: number | null
+          interest_rate?: number
+          member_id: string
+          notes?: string | null
+          purpose: string
+          status?: string
+          term_months?: number
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          amount_paid?: number | null
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          disbursed_at?: string | null
+          due_date?: string | null
+          family_id?: string
+          id?: string
+          interest_paid?: number | null
+          interest_rate?: number
+          member_id?: string
+          notes?: string | null
+          purpose?: string
+          status?: string
+          term_months?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loans_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loans_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loans_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meetings: {
+        Row: {
+          agenda: string | null
+          created_at: string | null
+          family_id: string
+          host_house: string | null
+          id: string
+          is_completed: boolean | null
+          location: string | null
+          meeting_date: string
+          meeting_time: string
+          meeting_type: string
+          notes: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          agenda?: string | null
+          created_at?: string | null
+          family_id: string
+          host_house?: string | null
+          id?: string
+          is_completed?: boolean | null
+          location?: string | null
+          meeting_date: string
+          meeting_time?: string
+          meeting_type?: string
+          notes?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          agenda?: string | null
+          created_at?: string | null
+          family_id?: string
+          host_house?: string | null
+          id?: string
+          is_completed?: boolean | null
+          location?: string | null
+          meeting_date?: string
+          meeting_time?: string
+          meeting_type?: string
+          notes?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meetings_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -168,6 +420,79 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          balance_after: number | null
+          category: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          family_id: string
+          id: string
+          member_id: string | null
+          notes: string | null
+          reference_id: string | null
+          reference_type: string | null
+          transaction_date: string
+          type: string
+        }
+        Insert: {
+          amount: number
+          balance_after?: number | null
+          category: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          family_id: string
+          id?: string
+          member_id?: string | null
+          notes?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
+          transaction_date?: string
+          type: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number | null
+          category?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          family_id?: string
+          id?: string
+          member_id?: string | null
+          notes?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
+          transaction_date?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
