@@ -115,6 +115,7 @@ const handler = async (req: Request): Promise<Response> => {
         <body>
           <div class="container">
             <div class="header">
+              <img src="https://31382291-0546-4a70-a015-b86eb65a55a3.lovableproject.com/logo.jpg" alt="Family Together" style="width: 70px; height: 70px; border-radius: 50%; margin-bottom: 16px; border: 3px solid rgba(255,255,255,0.3);" />
               <h1>${family.name}</h1>
               <p>${period === "weekly" ? "Weekly" : "Monthly"} Digest</p>
               <p>${startDate.toLocaleDateString()} - ${now.toLocaleDateString()}</p>
