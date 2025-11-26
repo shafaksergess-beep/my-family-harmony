@@ -33,6 +33,13 @@ const FamilyDetail = () => {
       color: "text-green-600",
     },
     {
+      title: "PDF Reports",
+      description: "Generate and download financial reports",
+      icon: FileText,
+      path: `/family/${familySlug}/pdf-reports`,
+      color: "text-red-600",
+    },
+    {
       title: "Notifications",
       description: "Role-based alerts and updates",
       icon: Bell,
