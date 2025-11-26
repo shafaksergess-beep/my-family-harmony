@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { loginSchema, signupSchema } from "@/lib/validation";
+import { checkRateLimit, recordAttempt, resetRateLimit } from "@/lib/rateLimit";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -79,6 +80,18 @@ const Auth = () => {
       return;
     }
 
+    // Check rate limit
+    const rateLimitCheck = checkRateLimit(result.data.email);
+    if (rateLimitCheck.isBlocked) {
+      const minutes = Math.ceil(rateLimitCheck.remainingTime! / 60);
+      toast({
+        title: "Too many attempts",
+        description: `Please wait ${minutes} minute(s) before trying again`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -87,7 +100,19 @@ const Auth = () => {
         password: result.data.password,
       });
 
-      if (error) throw error;
+      if (error) {
+        // Record failed attempt
+        recordAttempt(result.data.email);
+        
+        const remainingAttempts = checkRateLimit(result.data.email).attemptsRemaining;
+        throw new Error(
+          error.message + 
+          (remainingAttempts !== undefined ? ` (${remainingAttempts} attempts remaining)` : "")
+        );
+      }
+
+      // Reset rate limit on successful login
+      resetRateLimit(result.data.email);
 
       toast({
         title: "Welcome back!",
@@ -133,6 +158,18 @@ const Auth = () => {
       return;
     }
 
+    // Check rate limit for signup attempts
+    const rateLimitCheck = checkRateLimit(result.data.email);
+    if (rateLimitCheck.isBlocked) {
+      const minutes = Math.ceil(rateLimitCheck.remainingTime! / 60);
+      toast({
+        title: "Too many attempts",
+        description: `Please wait ${minutes} minute(s) before trying again`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -148,7 +185,14 @@ const Auth = () => {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        // Record failed attempt
+        recordAttempt(result.data.email);
+        throw error;
+      }
+
+      // Reset rate limit on successful signup
+      resetRateLimit(result.data.email);
 
       toast({
         title: "Account created!",

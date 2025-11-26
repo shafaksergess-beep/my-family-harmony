@@ -39,6 +39,25 @@ const BulkActionsMenu = ({
   const [loading, setLoading] = useState(false);
 
   const handleBulkDelete = async () => {
+    // Validate selection count to prevent abuse
+    if (selectedIds.length === 0) {
+      toast({
+        title: "No selection",
+        description: "No items selected for deletion",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (selectedIds.length > 100) {
+      toast({
+        title: "Too many selections",
+        description: "Please select up to 100 items at a time",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -85,6 +104,25 @@ const BulkActionsMenu = ({
   };
 
   const handleBulkEmail = async () => {
+    // Validate selection count to prevent spam
+    if (selectedIds.length === 0) {
+      toast({
+        title: "No selection",
+        description: "No members selected for email",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (selectedIds.length > 50) {
+      toast({
+        title: "Too many recipients",
+        description: "Please select up to 50 members at a time to prevent spam",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -104,6 +142,18 @@ const BulkActionsMenu = ({
         toast({
           title: "No Emails",
           description: "No email addresses found for selected members",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate email addresses
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const invalidEmails = emails.filter(email => !emailRegex.test(email));
+      if (invalidEmails.length > 0) {
+        toast({
+          title: "Invalid Emails",
+          description: `Found ${invalidEmails.length} invalid email address(es)`,
           variant: "destructive",
         });
         return;
