@@ -110,6 +110,13 @@ const FamilyDetail = () => {
       color: "text-cyan-600",
     },
     {
+      title: "Meeting Analytics",
+      description: "Track meeting frequency and participation trends",
+      icon: Calendar,
+      path: `/family/${familySlug}/meeting-analytics`,
+      color: "text-blue-600",
+    },
+    {
       title: "Meeting Templates",
       description: "Create reusable meeting agenda templates",
       icon: FileText,
