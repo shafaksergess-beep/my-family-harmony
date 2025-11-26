@@ -32,6 +32,7 @@ import FamilyAssistance from "./pages/family/Assistance";
 import FamilyShares from "./pages/family/Shares";
 import MemberProfile from "./pages/family/MemberProfile";
 import Members from "./pages/family/Members";
+import EmailSettings from "./pages/family/EmailSettings";
 import FamilyReports from "./pages/family/Reports";
 import NotFound from "./pages/NotFound";
 
@@ -62,6 +63,7 @@ const App = () => (
           <Route path="/family/:familySlug/audit-trail" element={<AuditTrail />} />
           <Route path="/family/:familySlug/members" element={<Members />} />
           <Route path="/family/:familySlug/members/:memberId" element={<MemberProfile />} />
+          <Route path="/family/:familySlug/email-settings" element={<EmailSettings />} />
           <Route path="/family/:familySlug/pdf-reports" element={<PDFReports />} />
           <Route path="/family/:familySlug/meetings/:meetingId/checkin" element={<MeetingCheckIn />} />
           <Route path="/family/:familySlug/meetings" element={<FamilyMeetings />} />

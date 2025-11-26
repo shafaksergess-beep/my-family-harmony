@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { Loader2, ArrowLeft, User, DollarSign, CreditCard, PiggyBank, Award } from "lucide-react";
+import MemberTimeline from "@/components/MemberTimeline";
 
 interface MemberData {
   profile: {
@@ -292,6 +293,9 @@ const MemberProfile = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Timeline */}
+        {family && <MemberTimeline memberId={memberId!} familyId={family.id} />}
       </main>
     </div>
   );

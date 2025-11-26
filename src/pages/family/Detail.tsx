@@ -68,6 +68,13 @@ const FamilyDetail = () => {
       color: "text-violet-600",
     },
     {
+      title: "Email Settings",
+      description: "Configure email notifications",
+      icon: Bell,
+      path: `/family/${familySlug}/email-settings`,
+      color: "text-indigo-600",
+    },
+    {
       title: "Audit Trail",
       description: "Track all changes and actions",
       icon: FileText,
