@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 interface Family {
   id: string;
@@ -22,6 +24,7 @@ interface Family {
 const AdminFamilies = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [families, setFamilies] = useState<Family[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -52,8 +55,8 @@ const AdminFamilies = () => {
 
     if (!superAdminData) {
       toast({
-        title: "Access Denied",
-        description: "You don't have permission to access this page.",
+        title: t("admin.accessDenied"),
+        description: t("admin.noPermission"),
         variant: "destructive",
       });
       navigate("/dashboard");
@@ -72,8 +75,8 @@ const AdminFamilies = () => {
     } catch (error) {
       console.error("Error loading families:", error);
       toast({
-        title: "Error",
-        description: "Failed to load families",
+        title: t("common.error"),
+        description: t("admin.loadFailed"),
         variant: "destructive",
       });
     } finally {
@@ -98,8 +101,8 @@ const AdminFamilies = () => {
         if (error) throw error;
         
         toast({
-          title: "Success",
-          description: "Family updated successfully",
+          title: t("common.success"),
+          description: t("admin.familyUpdated"),
         });
       } else {
         const { error } = await supabase
@@ -113,8 +116,8 @@ const AdminFamilies = () => {
         if (error) throw error;
         
         toast({
-          title: "Success",
-          description: "Family created successfully",
+          title: t("common.success"),
+          description: t("admin.familyCreated"),
         });
       }
 
@@ -125,8 +128,8 @@ const AdminFamilies = () => {
     } catch (error: any) {
       console.error("Error saving family:", error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to save family",
+        title: t("common.error"),
+        description: error.message || t("admin.saveFailed"),
         variant: "destructive",
       });
     }
@@ -143,7 +146,7 @@ const AdminFamilies = () => {
   };
 
   const handleDelete = async (familyId: string) => {
-    if (!confirm("Are you sure you want to delete this family? This action cannot be undone.")) {
+    if (!confirm(t("admin.deleteConfirm"))) {
       return;
     }
 
@@ -156,15 +159,15 @@ const AdminFamilies = () => {
       if (error) throw error;
       
       toast({
-        title: "Success",
-        description: "Family deleted successfully",
+        title: t("common.success"),
+        description: t("admin.familyDeleted"),
       });
       loadFamilies();
     } catch (error: any) {
       console.error("Error deleting family:", error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to delete family",
+        title: t("common.error"),
+        description: error.message || t("admin.deleteFailed"),
         variant: "destructive",
       });
     }
@@ -186,73 +189,77 @@ const AdminFamilies = () => {
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate("/dashboard")}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t("common.back")}
               </Button>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">Family Management</h1>
-                <p className="text-sm text-muted-foreground">Manage all families in the system</p>
+                <h1 className="text-2xl font-bold text-foreground">{t("admin.familyManagement")}</h1>
+                <p className="text-sm text-muted-foreground">{t("admin.familyManagementDesc")}</p>
               </div>
             </div>
             
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button onClick={() => {
-                  setEditingFamily(null);
-                  setFormData({ name: "", slug: "", description: "" });
-                }}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Family
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>{editingFamily ? "Edit Family" : "Create New Family"}</DialogTitle>
-                  <DialogDescription>
-                    {editingFamily ? "Update family information" : "Add a new family to the system"}
-                  </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Family Name</Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="Enter family name"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="slug">Slug (URL-friendly)</Label>
-                    <Input
-                      id="slug"
-                      value={formData.slug}
-                      onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') })}
-                      placeholder="family-name"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      placeholder="Brief description of the family"
-                      rows={3}
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2">
-                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="submit">
-                      {editingFamily ? "Update" : "Create"}
-                    </Button>
-                  </div>
-                </form>
-              </DialogContent>
-            </Dialog>
+            <div className="flex items-center gap-4">
+              <LanguageSwitcher />
+            
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button onClick={() => {
+                    setEditingFamily(null);
+                    setFormData({ name: "", slug: "", description: "" });
+                  }}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    {t("admin.createFamily")}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>{editingFamily ? t("admin.editFamily") : t("admin.createNewFamily")}</DialogTitle>
+                    <DialogDescription>
+                      {editingFamily ? t("admin.updateFamilyInfo") : t("admin.addNewFamily")}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">{t("admin.familyName")}</Label>
+                      <Input
+                        id="name"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        placeholder={t("admin.familyName")}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="slug">{t("admin.slug")}</Label>
+                      <Input
+                        id="slug"
+                        value={formData.slug}
+                        onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') })}
+                        placeholder="family-name"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="description">{t("admin.description")}</Label>
+                      <Textarea
+                        id="description"
+                        value={formData.description}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        placeholder={t("admin.descriptionPlaceholder")}
+                        rows={3}
+                      />
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                        {t("common.cancel")}
+                      </Button>
+                      <Button type="submit">
+                        {editingFamily ? t("common.edit") : t("common.create")}
+                      </Button>
+                    </div>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </div>
       </header>
@@ -261,11 +268,11 @@ const AdminFamilies = () => {
         {families.length === 0 ? (
           <Card className="p-12 text-center">
             <Building2 className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-xl font-semibold mb-2 text-foreground">No families yet</h3>
-            <p className="text-muted-foreground mb-6">Create your first family to get started</p>
+            <h3 className="text-xl font-semibold mb-2 text-foreground">{t("admin.noFamiliesYet")}</h3>
+            <p className="text-muted-foreground mb-6">{t("admin.createFirstFamily")}</p>
             <Button onClick={() => setIsDialogOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
-              Create Family
+              {t("admin.createFamily")}
             </Button>
           </Card>
         ) : (
@@ -285,18 +292,18 @@ const AdminFamilies = () => {
                     </div>
                   </div>
                   <CardTitle>{family.name}</CardTitle>
-                  <CardDescription>{family.description || "No description"}</CardDescription>
+                  <CardDescription>{family.description || t("admin.noDescription")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm">
-                      <span className="font-medium">Slug:</span>
+                      <span className="font-medium">{t("admin.slug")}:</span>
                       <code className="bg-muted px-2 py-1 rounded text-xs">{family.slug}</code>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
-                      <span className="font-medium">Status:</span>
+                      <span className="font-medium">{t("admin.status")}:</span>
                       <span className={`px-2 py-1 rounded text-xs ${family.is_active ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                        {family.is_active ? 'Active' : 'Inactive'}
+                        {family.is_active ? t("admin.active") : t("admin.inactive")}
                       </span>
                     </div>
                   </div>
@@ -307,13 +314,13 @@ const AdminFamilies = () => {
                       onClick={() => navigate(`/admin/families/${family.id}/members`)}
                     >
                       <Users className="w-4 h-4 mr-2" />
-                      Members
+                      {t("admin.members")}
                     </Button>
                     <Button 
                       className="flex-1" 
                       onClick={() => navigate(`/family/${family.slug}/analytics`)}
                     >
-                      Analytics
+                      {t("admin.analytics")}
                     </Button>
                   </div>
                 </CardContent>
