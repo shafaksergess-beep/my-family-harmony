@@ -38,6 +38,7 @@ const Index = () => {
               <Button 
                 size="lg" 
                 className="bg-secondary text-secondary-foreground hover:bg-secondary-hover shadow-lg hover:shadow-xl transition-all text-lg px-8 py-6"
+                onClick={() => window.location.href = '/auth'}
               >
                 Get Started
               </Button>
@@ -45,6 +46,7 @@ const Index = () => {
                 size="lg" 
                 variant="outline" 
                 className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 text-lg px-8 py-6"
+                onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
               >
                 Learn More
               </Button>
@@ -102,7 +104,7 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20">
+      <section id="features" className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-foreground">
@@ -197,6 +199,7 @@ const Index = () => {
           <Button 
             size="lg"
             className="bg-secondary text-secondary-foreground hover:bg-secondary-hover shadow-xl hover:shadow-2xl transition-all text-lg px-10 py-6 animate-glow"
+            onClick={() => window.location.href = '/auth'}
           >
             Get Started Today
           </Button>
