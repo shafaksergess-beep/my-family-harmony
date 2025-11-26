@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { ArrowLeft, Plus, Download } from "lucide-react";
 import { exportToCSV, formatSavingsForExport } from "@/lib/export";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -11,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 interface Saving {
   id: string;
@@ -37,10 +39,10 @@ export default function FamilySavings() {
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { family, canManageFinances, isLoading: authLoading } = useFamilyAuth(familySlug);
   const [loading, setLoading] = useState(true);
   const [savings, setSavings] = useState<Saving[]>([]);
   const [members, setMembers] = useState<FamilyMember[]>([]);
-  const [familyId, setFamilyId] = useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     member_id: "",
@@ -50,31 +52,16 @@ export default function FamilySavings() {
   });
 
   useEffect(() => {
-    loadData();
-  }, [familySlug]);
+    if (family?.id) {
+      loadData();
+    }
+  }, [family?.id]);
 
   const loadData = async () => {
+    if (!family) return;
+    
     try {
       setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate("/auth");
-        return;
-      }
-
-      const { data: familyData, error: familyError } = await supabase
-        .from("families")
-        .select("id")
-        .eq("slug", familySlug)
-        .single();
-
-      if (familyError || !familyData) {
-        toast({ title: "Error", description: "Family not found", variant: "destructive" });
-        navigate("/dashboard");
-        return;
-      }
-
-      setFamilyId(familyData.id);
 
       const { data: savingsData, error: savingsError } = await supabase
         .from("savings")
@@ -85,7 +72,7 @@ export default function FamilySavings() {
             profiles!inner(full_name)
           )
         `)
-        .eq("family_id", familyData.id)
+        .eq("family_id", family.id)
         .order("month", { ascending: false });
 
       if (savingsError) throw savingsError;
@@ -97,7 +84,7 @@ export default function FamilySavings() {
           id,
           profiles!inner(full_name)
         `)
-        .eq("family_id", familyData.id);
+        .eq("family_id", family.id);
 
       if (membersError) throw membersError;
       setMembers(membersData as any);
@@ -111,10 +98,11 @@ export default function FamilySavings() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (!family) return;
       const monthDate = `${formData.month}-01`;
       
       const { error } = await supabase.from("savings").insert({
-        family_id: familyId,
+        family_id: family.id,
         member_id: formData.member_id,
         month: monthDate,
         amount: parseFloat(formData.amount),
@@ -155,18 +143,21 @@ export default function FamilySavings() {
 
   const stats = calculateStats();
 
-  if (loading) {
+  if (authLoading || loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-3xl font-bold">Individual Savings</h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-3xl font-bold">Individual Savings</h1>
+          </div>
+          <LanguageSwitcher />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -191,13 +182,14 @@ export default function FamilySavings() {
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Savings
-                </Button>
-              </DialogTrigger>
+            {canManageFinances && (
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Savings
+                  </Button>
+                </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Add Savings Record</DialogTitle>
@@ -255,6 +247,7 @@ export default function FamilySavings() {
                 </form>
               </DialogContent>
             </Dialog>
+            )}
           </div>
         </div>
 

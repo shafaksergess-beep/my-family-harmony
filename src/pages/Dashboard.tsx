@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, LogOut, Plus, Users, Building2 } from "lucide-react";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 interface UserFamily {
   family_id: string;
@@ -110,10 +111,13 @@ const Dashboard = () => {
                 <p className="text-sm text-secondary font-medium">Super Administrator</p>
               )}
             </div>
-            <Button variant="ghost" onClick={handleLogout}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher />
+              <Button variant="ghost" onClick={handleLogout}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
       </header>
