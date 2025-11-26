@@ -1564,6 +1564,16 @@ export type Database = {
         Returns: boolean
       }
       is_super_admin: { Args: { check_user_id: string }; Returns: boolean }
+      log_activity: {
+        Args: {
+          p_action_type: string
+          p_details?: Json
+          p_entity_id?: string
+          p_entity_type?: string
+          p_family_id?: string
+        }
+        Returns: string
+      }
       user_belongs_to_family: {
         Args: { check_family_id: string; check_user_id: string }
         Returns: boolean
