@@ -5,9 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, Users, Building2, Activity, TrendingUp, Shield, FileText } from "lucide-react";
+import { Loader2, ArrowLeft, Users, Building2, Activity, TrendingUp, Shield, FileText, BarChart3, PieChart } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Badge } from "@/components/ui/badge";
+import { LineChart, Line, BarChart, Bar, PieChart as RechartsPie, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 interface DashboardStats {
   totalFamilies: number;
@@ -16,6 +18,17 @@ interface DashboardStats {
   totalAdmins: number;
   recentActivity: number;
   todayActivity: number;
+}
+
+interface ActivityData {
+  date: string;
+  count: number;
+}
+
+interface ActionDistribution {
+  action: string;
+  count: number;
+  fill: string;
 }
 
 interface RecentLog {
@@ -42,6 +55,8 @@ const AdminDashboard = () => {
     todayActivity: 0,
   });
   const [recentLogs, setRecentLogs] = useState<RecentLog[]>([]);
+  const [activityData, setActivityData] = useState<ActivityData[]>([]);
+  const [actionDistribution, setActionDistribution] = useState<ActionDistribution[]>([]);
 
   useEffect(() => {
     checkAuthAndLoadStats();
@@ -125,6 +140,41 @@ const AdminDashboard = () => {
         .gte("created_at", todayStart.toISOString());
       
       const todayActivityCount = todayActivity?.length || 0;
+
+      // Get all logs for charts
+      const { data: allLogs } = await supabase
+        .from("admin_logs")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      // Process activity data for last 7 days
+      if (allLogs) {
+        const last7Days = Array.from({ length: 7 }, (_, i) => {
+          const date = new Date();
+          date.setDate(date.getDate() - (6 - i));
+          return date.toISOString().split('T')[0];
+        });
+
+        const activityByDay = last7Days.map(date => ({
+          date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          count: allLogs.filter(log => log.created_at.startsWith(date)).length
+        }));
+        setActivityData(activityByDay);
+
+        // Process action distribution
+        const actionCounts = allLogs.reduce((acc, log) => {
+          acc[log.action_type] = (acc[log.action_type] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>);
+
+        const colors = ['#10b981', '#3b82f6', '#ef4444', '#f59e0b', '#8b5cf6'];
+        const distribution = Object.entries(actionCounts).map(([action, count], index) => ({
+          action,
+          count,
+          fill: colors[index % colors.length]
+        }));
+        setActionDistribution(distribution);
+      }
 
       // Get recent logs with profiles
       const { data: logs } = await supabase
@@ -298,6 +348,96 @@ const AdminDashboard = () => {
               <p className="text-xs text-muted-foreground">
                 Average family size
               </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Activity Trend Chart */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5" />
+                Activity Trend (Last 7 Days)
+              </CardTitle>
+              <CardDescription>Daily administrative actions</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer
+                config={{
+                  count: {
+                    label: "Actions",
+                    color: "hsl(var(--primary))",
+                  },
+                }}
+                className="h-[300px]"
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={activityData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis 
+                      dataKey="date" 
+                      stroke="hsl(var(--muted-foreground))"
+                      fontSize={12}
+                    />
+                    <YAxis 
+                      stroke="hsl(var(--muted-foreground))"
+                      fontSize={12}
+                    />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Line 
+                      type="monotone" 
+                      dataKey="count" 
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth={2}
+                      dot={{ fill: "hsl(var(--primary))", r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+
+          {/* Action Distribution Chart */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <PieChart className="w-5 h-5" />
+                Action Distribution
+              </CardTitle>
+              <CardDescription>Breakdown by action type</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer
+                config={actionDistribution.reduce((acc, item) => ({
+                  ...acc,
+                  [item.action]: {
+                    label: item.action,
+                    color: item.fill,
+                  },
+                }), {})}
+                className="h-[300px]"
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  <RechartsPie>
+                    <Pie
+                      data={actionDistribution}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ action, percent }) => `${action} ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={80}
+                      dataKey="count"
+                    >
+                      {actionDistribution.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                  </RechartsPie>
+                </ResponsiveContainer>
+              </ChartContainer>
             </CardContent>
           </Card>
         </div>

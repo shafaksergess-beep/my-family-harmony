@@ -10,7 +10,11 @@ import { exportToCSV, formatActivityLogsForExport } from "@/lib/export";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon, Search, X } from "lucide-react";
 
 interface AdminLog {
   id: string;
@@ -35,6 +39,10 @@ const ActivityLogs = () => {
   const [logs, setLogs] = useState<AdminLog[]>([]);
   const [filterAction, setFilterAction] = useState<string>("all");
   const [filterEntity, setFilterEntity] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [dateFrom, setDateFrom] = useState<Date | undefined>();
+  const [dateTo, setDateTo] = useState<Date | undefined>();
+  const [filterAdmin, setFilterAdmin] = useState<string>("all");
 
   useEffect(() => {
     checkAuthAndLoadLogs();
@@ -129,13 +137,58 @@ const ActivityLogs = () => {
   };
 
   const filteredLogs = logs.filter((log) => {
+    // Action filter
     if (filterAction !== "all" && log.action_type !== filterAction) return false;
+    
+    // Entity filter
     if (filterEntity !== "all" && log.entity_type !== filterEntity) return false;
+    
+    // Admin filter
+    if (filterAdmin !== "all" && log.admin_user_id !== filterAdmin) return false;
+    
+    // Date range filter
+    if (dateFrom && new Date(log.created_at) < dateFrom) return false;
+    if (dateTo) {
+      const endOfDay = new Date(dateTo);
+      endOfDay.setHours(23, 59, 59, 999);
+      if (new Date(log.created_at) > endOfDay) return false;
+    }
+    
+    // Search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const matchesAdmin = log.admin_profile?.full_name?.toLowerCase().includes(query) ||
+                          log.admin_profile?.email?.toLowerCase().includes(query);
+      const matchesDetails = JSON.stringify(log.details || {}).toLowerCase().includes(query);
+      const matchesId = log.entity_id?.toLowerCase().includes(query);
+      if (!matchesAdmin && !matchesDetails && !matchesId) return false;
+    }
+    
     return true;
   });
 
   const uniqueActions = [...new Set(logs.map((log) => log.action_type))];
   const uniqueEntities = [...new Set(logs.map((log) => log.entity_type))];
+  const uniqueAdmins = Array.from(
+    new Map(
+      logs
+        .filter(log => log.admin_profile)
+        .map(log => [log.admin_user_id, log.admin_profile])
+    ).entries()
+  );
+
+  const clearFilters = () => {
+    setFilterAction("all");
+    setFilterEntity("all");
+    setFilterAdmin("all");
+    setSearchQuery("");
+    setDateFrom(undefined);
+    setDateTo(undefined);
+  };
+
+  const hasActiveFilters = filterAction !== "all" || filterEntity !== "all" || 
+                          filterAdmin !== "all" || searchQuery !== "" || 
+                          dateFrom !== undefined || dateTo !== undefined;
 
   const handleExport = () => {
     const formatted = formatActivityLogsForExport(filteredLogs);
@@ -196,8 +249,20 @@ const ActivityLogs = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex gap-4">
-              <div className="flex-1">
+            <div className="space-y-4">
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by admin name, email, entity ID, or details..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+              {/* Filter Row 1 */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Select value={filterAction} onValueChange={setFilterAction}>
                   <SelectTrigger>
                     <SelectValue placeholder="Filter by action" />
@@ -211,8 +276,7 @@ const ActivityLogs = () => {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-              <div className="flex-1">
+
                 <Select value={filterEntity} onValueChange={setFilterEntity}>
                   <SelectTrigger>
                     <SelectValue placeholder="Filter by entity" />
@@ -226,7 +290,77 @@ const ActivityLogs = () => {
                     ))}
                   </SelectContent>
                 </Select>
+
+                <Select value={filterAdmin} onValueChange={setFilterAdmin}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Filter by admin" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Admins</SelectItem>
+                    {uniqueAdmins.map(([id, profile]) => (
+                      <SelectItem key={id} value={id}>
+                        {profile?.full_name || 'Unknown'}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
+
+              {/* Filter Row 2 - Date Range */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="justify-start text-left font-normal"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {dateFrom ? format(dateFrom, "PPP") : "From date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={dateFrom}
+                      onSelect={setDateFrom}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="justify-start text-left font-normal"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {dateTo ? format(dateTo, "PPP") : "To date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={dateTo}
+                      onSelect={setDateTo}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Clear Filters Button */}
+              {hasActiveFilters && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="w-full"
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Clear All Filters
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
