@@ -26,6 +26,13 @@ const FamilyDetail = () => {
       color: "text-blue-600",
     },
     {
+      title: "Financial Reports",
+      description: "View trends and charts over time",
+      icon: BarChart3,
+      path: `/family/${familySlug}/reports`,
+      color: "text-indigo-600",
+    },
+    {
       title: "Meetings",
       description: "Schedule and track family meetings",
       icon: Calendar,

@@ -10,8 +10,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, DollarSign, TrendingUp, Clock } from "lucide-react";
+import { useFamilyAuth } from "@/hooks/useFamilyAuth";
+import { ArrowLeft, Plus, DollarSign, TrendingUp, Clock, Download, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { exportToCSV } from "@/lib/export";
 
 interface Loan {
   id: string;
@@ -42,9 +44,10 @@ interface Member {
 }
 
 export default function Loans() {
-  const { familyId } = useParams();
+  const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { family, canManageLoans, isLoading: authLoading } = useFamilyAuth(familySlug);
   const [loans, setLoans] = useState<Loan[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);

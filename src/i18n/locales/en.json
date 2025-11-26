@@ -1,0 +1,158 @@
+{
+  "common": {
+    "back": "Back",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "export": "Export CSV",
+    "welcome": "Welcome",
+    "logout": "Logout"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "yourFamilies": "Your Families",
+    "noFamilies": "No families yet",
+    "noFamiliesDesc": "You haven't been added to any family yet.",
+    "openFamily": "Open Family",
+    "superAdminPanel": "Super Admin Panel",
+    "manageFamilies": "Manage Families"
+  },
+  "family": {
+    "analytics": "Analytics Dashboard",
+    "analyticsDesc": "View financial KPIs and family statistics",
+    "meetings": "Meetings",
+    "meetingsDesc": "Schedule and track family meetings",
+    "members": "Members",
+    "membersDesc": "View and manage family members",
+    "contributions": "Contributions",
+    "contributionsDesc": "Track monthly contributions and payments",
+    "loans": "Loans",
+    "loansDesc": "Manage loan requests and repayments",
+    "savings": "Savings",
+    "savingsDesc": "Track individual member savings",
+    "njangi": "Njangi",
+    "njangiDesc": "Manage rotating savings cycles",
+    "assistance": "Assistance",
+    "assistanceDesc": "Track birth, death, and sickness events",
+    "shares": "Shares & Dividends",
+    "sharesDesc": "Manage shares and dividend distributions"
+  },
+  "contributions": {
+    "title": "Contributions",
+    "description": "Track monthly contributions and payments",
+    "addContribution": "Add Contribution",
+    "recordNew": "Record New Contribution",
+    "member": "Member",
+    "amount": "Amount (FCFA)",
+    "date": "Date",
+    "type": "Type",
+    "notes": "Notes",
+    "status": "Status",
+    "total": "Total Contributions",
+    "paid": "Paid",
+    "pending": "Pending",
+    "history": "Contribution History",
+    "markPaid": "Mark Paid",
+    "types": {
+      "mandatory": "Mandatory",
+      "savings": "Individual Savings",
+      "njangi": "Njangi",
+      "share": "Share Purchase",
+      "fine": "Fine"
+    }
+  },
+  "loans": {
+    "title": "Loans",
+    "description": "Manage loan requests and repayments",
+    "requestLoan": "Request Loan",
+    "newRequest": "New Loan Request",
+    "purpose": "Purpose",
+    "termMonths": "Term (Months)",
+    "interestRate": "Interest Rate",
+    "totalLoans": "Total Loans",
+    "outstanding": "Outstanding",
+    "approve": "Approve",
+    "disburse": "Disburse",
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "disbursed": "Disbursed",
+      "completed": "Completed"
+    }
+  },
+  "savings": {
+    "title": "Individual Savings",
+    "description": "Track optional monthly savings per member",
+    "addSaving": "Add Saving",
+    "recordNew": "Record New Saving",
+    "month": "Month",
+    "totalSavings": "Total Savings",
+    "monthsContributed": "Months Contributed"
+  },
+  "njangi": {
+    "title": "Njangi",
+    "description": "Rotating savings scheme",
+    "createCycle": "Create Cycle",
+    "newCycle": "New Njangi Cycle",
+    "cycleName": "Cycle Name",
+    "startDate": "Start Date",
+    "amountPerPerson": "Amount Per Person",
+    "addParticipant": "Add Participant",
+    "payoutOrder": "Payout Order",
+    "markPaid": "Mark Paid",
+    "status": {
+      "active": "Active",
+      "completed": "Completed"
+    }
+  },
+  "assistance": {
+    "title": "Assistance",
+    "description": "Track family assistance events",
+    "addEvent": "Add Event",
+    "newEvent": "New Assistance Event",
+    "eventType": "Event Type",
+    "eventDate": "Event Date",
+    "beneficiaryName": "Beneficiary Name",
+    "contributionPerMember": "Contribution Per Member",
+    "hospitalizationDays": "Hospitalization Days",
+    "types": {
+      "birth": "Birth",
+      "death_member": "Death - Member",
+      "death_spouse": "Death - Spouse",
+      "death_child": "Death - Child",
+      "sickness": "Sickness",
+      "external": "External Support"
+    }
+  },
+  "shares": {
+    "title": "Shares & Dividends",
+    "description": "Manage shares and dividend distributions",
+    "issueShare": "Issue Share",
+    "declareDividend": "Declare Dividend",
+    "shareValue": "Share Value",
+    "totalShares": "Total Shares",
+    "activeShares": "Active Shares"
+  },
+  "meetings": {
+    "title": "Meetings",
+    "description": "Schedule and track family meetings",
+    "createMeeting": "Create Meeting",
+    "scheduleNew": "Schedule New Meeting",
+    "meetingDate": "Meeting Date",
+    "meetingTime": "Meeting Time",
+    "location": "Location",
+    "hostHouse": "Host House",
+    "agenda": "Agenda",
+    "type": {
+      "regular": "Regular",
+      "extraordinary": "Extraordinary"
+    },
+    "status": {
+      "upcoming": "Upcoming",
+      "completed": "Completed"
+    }
+  }
+}
