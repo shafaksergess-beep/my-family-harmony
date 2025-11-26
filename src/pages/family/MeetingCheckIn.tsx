@@ -144,33 +144,71 @@ const MeetingCheckIn = () => {
       const meetingDateTime = new Date(`${meeting.meeting_date}T${meeting.meeting_time}`);
       const latenessMinutes = Math.max(0, Math.floor((checkInTime.getTime() - meetingDateTime.getTime()) / 60000));
       
-      // Calculate fine based on lateness
+      // Get family fine configuration
+      const toleranceMinutes = family.lateness_tolerance_minutes || 30;
+      const fine30 = family.fine_after_30min || 500;
+      const fine60 = family.fine_after_60min || 1000;
+      
+      // Calculate fine based on lateness and tolerance
       let fineAmount = 0;
-      if (latenessMinutes > 60) {
-        fineAmount = 1000; // 1000 FCFA for more than 1 hour late
-      } else if (latenessMinutes > 30) {
-        fineAmount = 500; // 500 FCFA for 30-60 minutes late
+      if (latenessMinutes > toleranceMinutes && latenessMinutes <= 60) {
+        fineAmount = fine30;
+      } else if (latenessMinutes > 60) {
+        fineAmount = fine60;
       }
 
-      const { error } = await supabase
+      // Insert attendance record
+      const { data: attendanceRecord, error: attendanceError } = await supabase
         .from("attendance")
         .insert({
           meeting_id: meetingId,
           member_id: userMember.id,
-          status: latenessMinutes > 0 ? 'late' : 'present',
+          status: latenessMinutes > toleranceMinutes ? 'late' : 'present',
           check_in_time: checkInTime.toISOString(),
           lateness_minutes: latenessMinutes,
           fine_amount: fineAmount,
-        });
+        })
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (attendanceError) throw attendanceError;
+
+      // If there's a fine, record it in the member's wallet
+      if (fineAmount > 0) {
+        // Get or create wallet
+        const { data: wallet, error: walletError } = await supabase
+          .from("member_wallets")
+          .select("id")
+          .eq("member_id", userMember.id)
+          .eq("family_id", family.id)
+          .maybeSingle();
+
+        if (walletError) throw walletError;
+
+        const walletId = wallet?.id;
+        if (walletId) {
+          // Record fine as negative transaction
+          const { error: transactionError } = await supabase
+            .from("wallet_transactions")
+            .insert({
+              wallet_id: walletId,
+              amount: -fineAmount,
+              transaction_type: "fine",
+              description: `Lateness fine: ${latenessMinutes} minutes late`,
+              reference_id: attendanceRecord.id,
+              reference_type: "attendance",
+            });
+
+          if (transactionError) throw transactionError;
+        }
+      }
 
       setHasCheckedIn(true);
       await loadAttendance();
 
       toast({
         title: "Success",
-        description: latenessMinutes > 0 
+        description: latenessMinutes > toleranceMinutes
           ? `Checked in (${latenessMinutes} min late). Fine: ${fineAmount} FCFA`
           : "Checked in successfully!",
       });

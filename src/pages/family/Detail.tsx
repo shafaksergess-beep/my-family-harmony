@@ -124,6 +124,13 @@ const FamilyDetail = () => {
       color: "text-purple-600",
     },
     {
+      title: "Meeting Settings",
+      description: "Configure meeting schedules and fine policies",
+      icon: Settings,
+      path: `/family/${familySlug}/meeting-settings`,
+      color: "text-gray-600",
+    },
+    {
       title: "Members",
       description: "View and manage family members",
       icon: Users,
