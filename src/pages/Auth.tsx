@@ -7,7 +7,8 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Home, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { loginSchema, signupSchema } from "@/lib/validation";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -22,12 +23,19 @@ const Auth = () => {
   // Login form state
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [loginErrors, setLoginErrors] = useState<{ email?: string; password?: string }>({});
 
   // Signup form state
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupFullName, setSignupFullName] = useState("");
   const [signupPhone, setSignupPhone] = useState("");
+  const [signupErrors, setSignupErrors] = useState<{
+    email?: string;
+    password?: string;
+    fullName?: string;
+    phone?: string;
+  }>({});
 
   useEffect(() => {
     // Check if user is already logged in
@@ -53,12 +61,30 @@ const Auth = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoginErrors({});
+    
+    // Validate input
+    const result = loginSchema.safeParse({
+      email: loginEmail,
+      password: loginPassword,
+    });
+
+    if (!result.success) {
+      const errors: { email?: string; password?: string } = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0] === "email") errors.email = err.message;
+        if (err.path[0] === "password") errors.password = err.message;
+      });
+      setLoginErrors(errors);
+      return;
+    }
+
     setLoading(true);
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email: loginEmail,
-        password: loginPassword,
+        email: result.data.email,
+        password: result.data.password,
       });
 
       if (error) throw error;
@@ -80,17 +106,44 @@ const Auth = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSignupErrors({});
+    
+    // Validate input
+    const result = signupSchema.safeParse({
+      email: signupEmail,
+      password: signupPassword,
+      fullName: signupFullName,
+      phone: signupPhone || undefined,
+    });
+
+    if (!result.success) {
+      const errors: {
+        email?: string;
+        password?: string;
+        fullName?: string;
+        phone?: string;
+      } = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0] === "email") errors.email = err.message;
+        if (err.path[0] === "password") errors.password = err.message;
+        if (err.path[0] === "fullName") errors.fullName = err.message;
+        if (err.path[0] === "phone") errors.phone = err.message;
+      });
+      setSignupErrors(errors);
+      return;
+    }
+
     setLoading(true);
 
     try {
       const { error } = await supabase.auth.signUp({
-        email: signupEmail,
-        password: signupPassword,
+        email: result.data.email,
+        password: result.data.password,
         options: {
           emailRedirectTo: `${window.location.origin}/dashboard`,
           data: {
-            full_name: signupFullName,
-            phone: signupPhone,
+            full_name: result.data.fullName,
+            phone: result.data.phone,
           },
         },
       });
@@ -103,7 +156,7 @@ const Auth = () => {
       });
 
       // Switch to login tab
-      setLoginEmail(signupEmail);
+      setLoginEmail(result.data.email);
     } catch (error: any) {
       toast({
         title: "Signup failed",
@@ -156,9 +209,15 @@ const Auth = () => {
                     type="email"
                     placeholder="your.email@example.com"
                     value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
-                    required
+                    onChange={(e) => {
+                      setLoginEmail(e.target.value);
+                      setLoginErrors({ ...loginErrors, email: undefined });
+                    }}
+                    className={loginErrors.email ? "border-red-500" : ""}
                   />
+                  {loginErrors.email && (
+                    <p className="text-sm text-red-500">{loginErrors.email}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -168,9 +227,15 @@ const Auth = () => {
                     type="password"
                     placeholder="••••••••"
                     value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    required
+                    onChange={(e) => {
+                      setLoginPassword(e.target.value);
+                      setLoginErrors({ ...loginErrors, password: undefined });
+                    }}
+                    className={loginErrors.password ? "border-red-500" : ""}
                   />
+                  {loginErrors.password && (
+                    <p className="text-sm text-red-500">{loginErrors.password}</p>
+                  )}
                 </div>
 
                 <Button
@@ -199,9 +264,15 @@ const Auth = () => {
                     type="text"
                     placeholder="John Doe"
                     value={signupFullName}
-                    onChange={(e) => setSignupFullName(e.target.value)}
-                    required
+                    onChange={(e) => {
+                      setSignupFullName(e.target.value);
+                      setSignupErrors({ ...signupErrors, fullName: undefined });
+                    }}
+                    className={signupErrors.fullName ? "border-red-500" : ""}
                   />
+                  {signupErrors.fullName && (
+                    <p className="text-sm text-red-500">{signupErrors.fullName}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -211,9 +282,15 @@ const Auth = () => {
                     type="email"
                     placeholder="your.email@example.com"
                     value={signupEmail}
-                    onChange={(e) => setSignupEmail(e.target.value)}
-                    required
+                    onChange={(e) => {
+                      setSignupEmail(e.target.value);
+                      setSignupErrors({ ...signupErrors, email: undefined });
+                    }}
+                    className={signupErrors.email ? "border-red-500" : ""}
                   />
+                  {signupErrors.email && (
+                    <p className="text-sm text-red-500">{signupErrors.email}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -223,8 +300,15 @@ const Auth = () => {
                     type="tel"
                     placeholder="+237 6XX XXX XXX"
                     value={signupPhone}
-                    onChange={(e) => setSignupPhone(e.target.value)}
+                    onChange={(e) => {
+                      setSignupPhone(e.target.value);
+                      setSignupErrors({ ...signupErrors, phone: undefined });
+                    }}
+                    className={signupErrors.phone ? "border-red-500" : ""}
                   />
+                  {signupErrors.phone && (
+                    <p className="text-sm text-red-500">{signupErrors.phone}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -234,10 +318,19 @@ const Auth = () => {
                     type="password"
                     placeholder="••••••••"
                     value={signupPassword}
-                    onChange={(e) => setSignupPassword(e.target.value)}
-                    required
+                    onChange={(e) => {
+                      setSignupPassword(e.target.value);
+                      setSignupErrors({ ...signupErrors, password: undefined });
+                    }}
+                    className={signupErrors.password ? "border-red-500" : ""}
                     minLength={6}
                   />
+                  {signupErrors.password && (
+                    <p className="text-sm text-red-500">{signupErrors.password}</p>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Must contain uppercase, lowercase, and number
+                  </p>
                 </div>
 
                 <Button
