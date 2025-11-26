@@ -128,6 +128,59 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        {/* Member Quick Stats */}
+        {userFamilies.length > 0 && !isSuperAdmin && (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded">
+                  <Users className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Families</p>
+                  <p className="text-2xl font-bold">{userFamilies.length}</p>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded">
+                  <Activity className="w-5 h-5 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Active</p>
+                  <p className="text-2xl font-bold">{userFamilies.filter(f => f.user_role !== 'guest').length}</p>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded">
+                  <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Leadership</p>
+                  <p className="text-2xl font-bold">
+                    {userFamilies.filter(f => ['family_head', 'treasurer', 'loan_committee'].includes(f.user_role)).length}
+                  </p>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-amber-100 dark:bg-amber-900/20 rounded">
+                  <Building2 className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Member</p>
+                  <p className="text-2xl font-bold">
+                    {userFamilies.filter(f => f.user_role === 'member').length}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
         {/* Super Admin Section */}
         {isSuperAdmin && (
           <Card className="p-6 mb-8 border-secondary/30 bg-gradient-to-r from-secondary/5 to-secondary/10">

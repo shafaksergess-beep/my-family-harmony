@@ -51,6 +51,7 @@ import ContributionAnalytics from "./pages/family/ContributionAnalytics";
 import ReminderSettings from "./pages/family/ReminderSettings";
 import FinancialForecasting from "./pages/family/FinancialForecasting";
 import PaymentPlans from "./pages/family/PaymentPlans";
+import FamilyEmailReports from "./pages/family/EmailReports";
 import FamilyReports from "./pages/family/Reports";
 import NotFound from "./pages/NotFound";
 
@@ -111,6 +112,7 @@ const App = () => (
           <Route path="/family/:familySlug/reminder-settings" element={<ReminderSettings />} />
           <Route path="/family/:familySlug/forecasting" element={<FinancialForecasting />} />
           <Route path="/family/:familySlug/payment-plans" element={<PaymentPlans />} />
+          <Route path="/family/:familySlug/email-reports" element={<FamilyEmailReports />} />
           <Route path="/accept-invitation" element={<AcceptInvitation />} />
           <Route path="/install" element={<Install />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
