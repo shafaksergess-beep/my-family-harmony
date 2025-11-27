@@ -176,6 +176,33 @@ export default function FamilyAssistance() {
     if (!family) return;
     setValidationErrors({});
     
+    // Sickness frequency validation: only once per year
+    if (formData.event_type === 'sickness') {
+      const currentYear = new Date().getFullYear();
+      const { data: existingSickness, error: checkError } = await supabase
+        .from("assistance_events")
+        .select("id")
+        .eq("family_id", family.id)
+        .eq("member_id", formData.member_id)
+        .eq("event_type", "sickness")
+        .gte("event_date", `${currentYear}-01-01`)
+        .lte("event_date", `${currentYear}-12-31`);
+
+      if (checkError) {
+        toast({ title: "Error", description: checkError.message, variant: "destructive" });
+        return;
+      }
+
+      if (existingSickness && existingSickness.length > 0) {
+        toast({ 
+          title: "Limit Exceeded", 
+          description: "Member can only receive sickness assistance once per year",
+          variant: "destructive" 
+        });
+        return;
+      }
+    }
+    
     // Map event types to validation schema format
     const eventTypeMap: Record<string, string> = {
       birth: "birth",
@@ -576,34 +603,68 @@ export default function FamilyAssistance() {
                     </td>
                   </tr>
                 ) : (
-                  events.map((event) => (
-                    <tr key={event.id} className="border-b hover:bg-muted/50">
-                      <td className="p-4">{new Date(event.event_date).toLocaleDateString()}</td>
-                      <td className="p-4">{event.family_members.profiles.full_name}</td>
-                      <td className="p-4">
-                        {EVENT_TYPES[event.event_type as keyof typeof EVENT_TYPES]?.label || event.event_type}
-                      </td>
-                      <td className="p-4 text-right font-mono">{parseFloat(event.amount.toString()).toLocaleString()} FCFA</td>
-                      <td className="p-4 text-center">
-                        {event.is_paid ? (
-                          <Badge variant="default">Paid</Badge>
-                        ) : (
-                          <Badge variant="secondary">Pending</Badge>
-                        )}
-                      </td>
-                       <td className="p-4 text-center">
-                        {!event.is_paid && canManageFinances && (
-                          <Button
-                            size="sm"
-                            onClick={() => handleMarkPaid(event.id)}
-                          >
-                            <CheckCircle2 className="h-4 w-4 mr-1" />
-                            Mark Paid
-                          </Button>
-                        )}
-                      </td>
-                    </tr>
-                  ))
+                  events.map((event) => {
+                    const isDeathEvent = event.event_type.includes('death');
+                    const wreathAmount = isDeathEvent ? 50000 : 0;
+                    const beneficiaryAmount = isDeathEvent ? event.amount - wreathAmount : event.amount;
+                    
+                    const isBirthEvent = event.event_type === 'birth';
+                    const birthDate = isBirthEvent ? new Date(event.event_date) : null;
+                    const visitDeadline = birthDate ? new Date(birthDate.setMonth(birthDate.getMonth() + 6)) : null;
+                    const daysUntilDeadline = visitDeadline ? Math.ceil((visitDeadline.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : null;
+                    
+                    return (
+                      <tr key={event.id} className="border-b hover:bg-muted/50">
+                        <td className="p-4">
+                          {new Date(event.event_date).toLocaleDateString()}
+                          {isBirthEvent && visitDeadline && (
+                            <div className="text-xs text-muted-foreground mt-1">
+                              Visit by: {visitDeadline.toLocaleDateString()}
+                              {daysUntilDeadline !== null && (
+                                <Badge 
+                                  variant={daysUntilDeadline < 0 ? "destructive" : daysUntilDeadline < 30 ? "default" : "secondary"}
+                                  className="ml-2"
+                                >
+                                  {daysUntilDeadline < 0 ? "Overdue" : `${daysUntilDeadline}d left`}
+                                </Badge>
+                              )}
+                            </div>
+                          )}
+                        </td>
+                        <td className="p-4">{event.family_members.profiles.full_name}</td>
+                        <td className="p-4">
+                          {EVENT_TYPES[event.event_type as keyof typeof EVENT_TYPES]?.label || event.event_type}
+                        </td>
+                        <td className="p-4 text-right font-mono">
+                          {parseFloat(event.amount.toString()).toLocaleString()} FCFA
+                          {isDeathEvent && (
+                            <div className="text-xs text-muted-foreground mt-1">
+                              Wreath: {wreathAmount.toLocaleString()} FCFA<br/>
+                              Beneficiary: {beneficiaryAmount.toLocaleString()} FCFA
+                            </div>
+                          )}
+                        </td>
+                        <td className="p-4 text-center">
+                          {event.is_paid ? (
+                            <Badge variant="default">Paid</Badge>
+                          ) : (
+                            <Badge variant="secondary">Pending</Badge>
+                          )}
+                        </td>
+                        <td className="p-4 text-center">
+                          {!event.is_paid && canManageFinances && (
+                            <Button
+                              size="sm"
+                              onClick={() => handleMarkPaid(event.id)}
+                            >
+                              <CheckCircle2 className="h-4 w-4 mr-1" />
+                              Mark Paid
+                            </Button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
