@@ -92,12 +92,16 @@ export const useFamilyAuth = (familySlug?: string) => {
 
   // Permission helpers
   const isFamilyHead = userRole === "family_head";
+  const isFamilyAdmin = userRole === "family_admin";
   const isTreasurer = userRole === "treasurer";
   const isLoanCommittee = userRole === "loan_committee";
+  const isSecretary = userRole === "secretary";
   
-  const canManageFinances = isFamilyHead || isTreasurer;
-  const canManageLoans = isFamilyHead || isLoanCommittee;
-  const canManageMembers = isFamilyHead;
+  const canManageFinances = isFamilyHead || isFamilyAdmin || isTreasurer;
+  const canManageLoans = isFamilyHead || isFamilyAdmin || isLoanCommittee;
+  const canManageMembers = isFamilyHead || isFamilyAdmin;
+  const canManageReports = isFamilyHead || isFamilyAdmin || isSecretary;
+  const canManageMinutes = isFamilyHead || isFamilyAdmin || isSecretary;
 
   return {
     family,
@@ -107,7 +111,11 @@ export const useFamilyAuth = (familySlug?: string) => {
     canManageFinances,
     canManageLoans,
     canManageMembers,
+    canManageReports,
+    canManageMinutes,
     isFamilyHead,
+    isFamilyAdmin,
     isTreasurer,
+    isSecretary,
   };
 };
