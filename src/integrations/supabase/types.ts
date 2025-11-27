@@ -2233,6 +2233,19 @@ export type Database = {
       }
     }
     Functions: {
+      check_is_family_admin: {
+        Args: { _family_id: string; _user_id: string }
+        Returns: boolean
+      }
+      check_is_family_head: {
+        Args: { _family_id: string; _user_id: string }
+        Returns: boolean
+      }
+      check_is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      check_user_belongs_to_family: {
+        Args: { _family_id: string; _user_id: string }
+        Returns: boolean
+      }
       get_user_families: {
         Args: { check_user_id: string }
         Returns: {
