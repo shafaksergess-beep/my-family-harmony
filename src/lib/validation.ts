@@ -168,7 +168,7 @@ export const meetingSchema = z.object({
 // Assistance event schema
 export const assistanceEventSchema = z.object({
   memberId: z.string().uuid({ message: "Invalid member ID" }),
-  eventType: z.enum(["birth", "death", "sickness", "external_support"], {
+  eventType: z.enum(["birth", "death", "sickness", "external_support", "joyful_event"], {
     errorMap: () => ({ message: "Invalid event type" }),
   }),
   eventDate: z.string().min(1, { message: "Event date is required" }),
