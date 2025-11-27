@@ -1598,6 +1598,62 @@ export type Database = {
           },
         ]
       }
+      notification_preferences: {
+        Row: {
+          assistance_notifications: boolean
+          created_at: string | null
+          digest_frequency: string
+          email_enabled: boolean
+          family_id: string | null
+          id: string
+          loan_updates: boolean
+          meeting_reminders: boolean
+          payment_reminders: boolean
+          push_enabled: boolean
+          sms_enabled: boolean
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          assistance_notifications?: boolean
+          created_at?: string | null
+          digest_frequency?: string
+          email_enabled?: boolean
+          family_id?: string | null
+          id?: string
+          loan_updates?: boolean
+          meeting_reminders?: boolean
+          payment_reminders?: boolean
+          push_enabled?: boolean
+          sms_enabled?: boolean
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          assistance_notifications?: boolean
+          created_at?: string | null
+          digest_frequency?: string
+          email_enabled?: boolean
+          family_id?: string | null
+          id?: string
+          loan_updates?: boolean
+          meeting_reminders?: boolean
+          payment_reminders?: boolean
+          push_enabled?: boolean
+          sms_enabled?: boolean
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_preferences_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_plans: {
         Row: {
           amount_paid: number
