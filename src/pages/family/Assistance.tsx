@@ -27,6 +27,8 @@ interface AssistanceEvent {
   notes: string | null;
   beneficiary_name: string | null;
   hospitalization_days: number | null;
+  visit_completed: boolean;
+  visit_completed_at: string | null;
   family_members: {
     id: string;
     profiles: {
