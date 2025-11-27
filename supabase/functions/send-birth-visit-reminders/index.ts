@@ -21,7 +21,7 @@ interface BirthEvent {
   family_members: {
     id: string;
     user_id: string;
-  };
+  }[];
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -79,7 +79,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const reminders: Array<{ email: string; name: string; deadline: string; daysLeft: number }> = [];
 
-    for (const event of (birthEvents as BirthEvent[]) || []) {
+    for (const event of (birthEvents || []) as BirthEvent[]) {
       const birthDate = new Date(event.event_date);
       const visitDeadline = new Date(birthDate);
       visitDeadline.setMonth(visitDeadline.getMonth() + 6);
@@ -88,15 +88,18 @@ const handler = async (req: Request): Promise<Response> => {
 
       // Send reminders for upcoming or overdue deadlines
       if (daysUntilDeadline <= 30 && daysUntilDeadline >= -7) {
+        const member = event.family_members[0];
+        if (!member) continue;
+
         // Fetch user profile for notification
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("full_name, email, phone")
-          .eq("id", event.family_members.user_id)
+          .eq("id", member.user_id)
           .single();
 
         if (profileError || !profile) {
-          console.error(`Error fetching profile for user ${event.family_members.user_id}:`, profileError);
+          console.error(`Error fetching profile for user ${member.user_id}:`, profileError);
           continue;
         }
 
