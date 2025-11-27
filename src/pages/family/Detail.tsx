@@ -159,6 +159,20 @@ const FamilyDetail = () => {
       color: "text-purple-600",
     },
     {
+      title: "Loan Analytics",
+      description: "Repayment rates and interest revenue tracking",
+      icon: TrendingUp,
+      path: `/family/${familySlug}/loan-analytics`,
+      color: "text-blue-600",
+    },
+    {
+      title: "Loan History",
+      description: "Complete loan transaction history and balances",
+      icon: FileText,
+      path: `/family/${familySlug}/loan-history`,
+      color: "text-slate-600",
+    },
+    {
       title: "Savings",
       description: "Track individual member savings",
       icon: PiggyBank,
