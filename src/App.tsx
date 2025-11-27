@@ -3,80 +3,88 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
-import AdminDashboard from "./pages/admin/Dashboard";
-import AdminFamilies from "./pages/admin/Families";
-import FamilyMembers from "./pages/admin/FamilyMembers";
-import AdminMemberDetail from "./pages/admin/MemberDetail";
-import MemberLeaderboard from "./pages/admin/MemberLeaderboard";
-import Permissions from "./pages/admin/Permissions";
-import ActivityLogs from "./pages/admin/ActivityLogs";
-import EmailReports from "./pages/admin/EmailReports";
-import ExportScheduler from "./pages/admin/ExportScheduler";
-import FamilyDetail from "./pages/family/Detail";
-import FamilyAnalytics from "./pages/family/Analytics";
-import FinancialAnalytics from "./pages/family/FinancialAnalytics";
-import Notifications from "./pages/family/Notifications";
-import AuditTrail from "./pages/family/AuditTrail";
-import MemberDetail from "./pages/family/MemberDetail";
-import PDFReports from "./pages/family/PDFReports";
-import MeetingCheckIn from "./pages/family/MeetingCheckIn";
-import FamilyMeetings from "./pages/family/Meetings";
-import FamilyContributions from "./pages/family/Contributions";
-import ContributionSettings from "./pages/family/ContributionSettings";
-import FinancialSettings from "./pages/family/FinancialSettings";
-import FamilyLoans from "./pages/family/Loans";
-import LoanCommitteeDashboard from "./pages/family/LoanCommitteeDashboard";
-import FamilyAttendance from "./pages/family/Attendance";
-import FamilySavings from "./pages/family/Savings";
-import FamilyNjangi from "./pages/family/Njangi";
-import FamilyAssistance from "./pages/family/Assistance";
-import FamilyShares from "./pages/family/Shares";
-import MemberProfile from "./pages/family/MemberProfile";
-import Members from "./pages/family/Members";
-import EmailSettings from "./pages/family/EmailSettings";
-import GlobalAnalytics from "./pages/admin/GlobalAnalytics";
-import Users from "./pages/admin/Users";
-import UserDetail from "./pages/admin/UserDetail";
-import RolePermissions from "./pages/admin/RolePermissions";
-import UserActivity from "./pages/admin/UserActivity";
-import DigestSettings from "./pages/admin/DigestSettings";
-import CustomizeDashboard from "./pages/admin/CustomizeDashboard";
-import AuditTrailEnhanced from "./pages/family/AuditTrailEnhanced";
 import Install from "./pages/Install";
-import Invitations from "./pages/family/Invitations";
-import Payments from "./pages/family/Payments";
 import AcceptInvitation from "./pages/AcceptInvitation";
-import MeetingReminders from "./pages/family/MeetingReminders";
-import PaymentIntegration from "./pages/family/PaymentIntegration";
-import ContributionAnalytics from "./pages/family/ContributionAnalytics";
-import ReminderSettings from "./pages/family/ReminderSettings";
-import FinancialForecasting from "./pages/family/FinancialForecasting";
-import PaymentPlans from "./pages/family/PaymentPlans";
-import FamilyEmailReports from "./pages/family/EmailReports";
-import FamilyReports from "./pages/family/Reports";
-import FamilyExportScheduler from "./pages/family/ExportScheduler";
-import BudgetPlanning from "./pages/family/BudgetPlanning";
-import Balloting from "./pages/family/Balloting";
-import AttendanceAnalytics from "./pages/family/AttendanceAnalytics";
-import MeetingDetail from "./pages/family/MeetingDetail";
-import MeetingTemplates from "./pages/family/MeetingTemplates";
-import MeetingSettings from "./pages/family/MeetingSettings";
-import MeetingAnalyticsDashboard from "./pages/family/MeetingAnalyticsDashboard";
 import NotFound from "./pages/NotFound";
-import LoanAnalytics from "./pages/family/LoanAnalytics";
-import LoanHistory from "./pages/family/LoanHistory";
-import FamilyContributionSettings from "./pages/family/ContributionSettings";
-import FamilyPaymentIntegration from "./pages/family/PaymentIntegration";
-import FamilyFinancialSettings from "./pages/family/FinancialSettings";
-import FamilyAssistanceAnalytics from "./pages/family/AssistanceAnalytics";
-import FamilyAssistanceReports from "./pages/family/AssistanceReports";
-import ModuleManagement from "./pages/admin/ModuleManagement";
+
+// Lazy load admin pages
+const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminFamilies = lazy(() => import("./pages/admin/Families"));
+const FamilyMembers = lazy(() => import("./pages/admin/FamilyMembers"));
+const AdminMemberDetail = lazy(() => import("./pages/admin/MemberDetail"));
+const MemberLeaderboard = lazy(() => import("./pages/admin/MemberLeaderboard"));
+const Permissions = lazy(() => import("./pages/admin/Permissions"));
+const ActivityLogs = lazy(() => import("./pages/admin/ActivityLogs"));
+const EmailReports = lazy(() => import("./pages/admin/EmailReports"));
+const ExportScheduler = lazy(() => import("./pages/admin/ExportScheduler"));
+const GlobalAnalytics = lazy(() => import("./pages/admin/GlobalAnalytics"));
+const Users = lazy(() => import("./pages/admin/Users"));
+const UserDetail = lazy(() => import("./pages/admin/UserDetail"));
+const RolePermissions = lazy(() => import("./pages/admin/RolePermissions"));
+const UserActivity = lazy(() => import("./pages/admin/UserActivity"));
+const DigestSettings = lazy(() => import("./pages/admin/DigestSettings"));
+const CustomizeDashboard = lazy(() => import("./pages/admin/CustomizeDashboard"));
+const ModuleManagement = lazy(() => import("./pages/admin/ModuleManagement"));
+
+// Lazy load family pages
+const FamilyDetail = lazy(() => import("./pages/family/Detail"));
+const FamilyAnalytics = lazy(() => import("./pages/family/Analytics"));
+const FinancialAnalytics = lazy(() => import("./pages/family/FinancialAnalytics"));
+const Notifications = lazy(() => import("./pages/family/Notifications"));
+const AuditTrail = lazy(() => import("./pages/family/AuditTrail"));
+const MemberDetail = lazy(() => import("./pages/family/MemberDetail"));
+const PDFReports = lazy(() => import("./pages/family/PDFReports"));
+const MeetingCheckIn = lazy(() => import("./pages/family/MeetingCheckIn"));
+const FamilyMeetings = lazy(() => import("./pages/family/Meetings"));
+const FamilyContributions = lazy(() => import("./pages/family/Contributions"));
+const ContributionSettings = lazy(() => import("./pages/family/ContributionSettings"));
+const FinancialSettings = lazy(() => import("./pages/family/FinancialSettings"));
+const FamilyLoans = lazy(() => import("./pages/family/Loans"));
+const LoanCommitteeDashboard = lazy(() => import("./pages/family/LoanCommitteeDashboard"));
+const FamilyAttendance = lazy(() => import("./pages/family/Attendance"));
+const FamilySavings = lazy(() => import("./pages/family/Savings"));
+const FamilyNjangi = lazy(() => import("./pages/family/Njangi"));
+const FamilyAssistance = lazy(() => import("./pages/family/Assistance"));
+const FamilyShares = lazy(() => import("./pages/family/Shares"));
+const MemberProfile = lazy(() => import("./pages/family/MemberProfile"));
+const Members = lazy(() => import("./pages/family/Members"));
+const EmailSettings = lazy(() => import("./pages/family/EmailSettings"));
+const AuditTrailEnhanced = lazy(() => import("./pages/family/AuditTrailEnhanced"));
+const Invitations = lazy(() => import("./pages/family/Invitations"));
+const Payments = lazy(() => import("./pages/family/Payments"));
+const MeetingReminders = lazy(() => import("./pages/family/MeetingReminders"));
+const PaymentIntegration = lazy(() => import("./pages/family/PaymentIntegration"));
+const ContributionAnalytics = lazy(() => import("./pages/family/ContributionAnalytics"));
+const ReminderSettings = lazy(() => import("./pages/family/ReminderSettings"));
+const FinancialForecasting = lazy(() => import("./pages/family/FinancialForecasting"));
+const PaymentPlans = lazy(() => import("./pages/family/PaymentPlans"));
+const FamilyEmailReports = lazy(() => import("./pages/family/EmailReports"));
+const FamilyReports = lazy(() => import("./pages/family/Reports"));
+const FamilyExportScheduler = lazy(() => import("./pages/family/ExportScheduler"));
+const BudgetPlanning = lazy(() => import("./pages/family/BudgetPlanning"));
+const Balloting = lazy(() => import("./pages/family/Balloting"));
+const AttendanceAnalytics = lazy(() => import("./pages/family/AttendanceAnalytics"));
+const MeetingDetail = lazy(() => import("./pages/family/MeetingDetail"));
+const MeetingTemplates = lazy(() => import("./pages/family/MeetingTemplates"));
+const MeetingSettings = lazy(() => import("./pages/family/MeetingSettings"));
+const MeetingAnalyticsDashboard = lazy(() => import("./pages/family/MeetingAnalyticsDashboard"));
+const LoanAnalytics = lazy(() => import("./pages/family/LoanAnalytics"));
+const LoanHistory = lazy(() => import("./pages/family/LoanHistory"));
+const FamilyAssistanceAnalytics = lazy(() => import("./pages/family/AssistanceAnalytics"));
+const FamilyAssistanceReports = lazy(() => import("./pages/family/AssistanceReports"));
 
 const queryClient = new QueryClient();
+
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="text-lg">Loading...</div>
+  </div>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -84,14 +92,15 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/install" element={<Install />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/profile" element={<Profile />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/families" element={<AdminFamilies />} />
+        <Suspense fallback={<LoadingFallback />}>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/install" element={<Install />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/families" element={<AdminFamilies />} />
           <Route path="/admin/families/:familyId/members" element={<FamilyMembers />} />
           <Route path="/admin/families/:familyId/members/:memberId" element={<AdminMemberDetail />} />
           <Route path="/admin/leaderboard" element={<MemberLeaderboard />} />
@@ -157,6 +166,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </Suspense>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
