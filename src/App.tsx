@@ -69,6 +69,11 @@ import MeetingAnalyticsDashboard from "./pages/family/MeetingAnalyticsDashboard"
 import NotFound from "./pages/NotFound";
 import LoanAnalytics from "./pages/family/LoanAnalytics";
 import LoanHistory from "./pages/family/LoanHistory";
+import FamilyContributionSettings from "./pages/family/ContributionSettings";
+import FamilyPaymentIntegration from "./pages/family/PaymentIntegration";
+import FamilyFinancialSettings from "./pages/family/FinancialSettings";
+import FamilyAssistanceAnalytics from "./pages/family/AssistanceAnalytics";
+import ModuleManagement from "./pages/admin/ModuleManagement";
 
 const queryClient = new QueryClient();
 
@@ -98,6 +103,7 @@ const App = () => (
         <Route path="/admin/users/:userId" element={<UserDetail />} />
         <Route path="/admin/digest-settings" element={<DigestSettings />} />
         <Route path="/admin/customize-dashboard" element={<CustomizeDashboard />} />
+        <Route path="/admin/modules" element={<ModuleManagement />} />
         <Route path="/admin/role-permissions" element={<RolePermissions />} />
         <Route path="/admin/user-activity" element={<UserActivity />} />
           <Route path="/family/:familySlug" element={<FamilyDetail />} />
@@ -143,6 +149,7 @@ const App = () => (
           <Route path="/family/:familySlug/email-reports" element={<FamilyEmailReports />} />
           <Route path="/family/:familySlug/export-scheduler" element={<FamilyExportScheduler />} />
           <Route path="/family/:familySlug/budget" element={<BudgetPlanning />} />
+          <Route path="/family/:familySlug/assistance-analytics" element={<FamilyAssistanceAnalytics />} />
           <Route path="/accept-invitation" element={<AcceptInvitation />} />
           <Route path="/install" element={<Install />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

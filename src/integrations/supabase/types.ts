@@ -160,6 +160,8 @@ export type Database = {
           notes: string | null
           payment_date: string | null
           updated_at: string | null
+          visit_completed: boolean | null
+          visit_completed_at: string | null
         }
         Insert: {
           amount?: number
@@ -176,6 +178,8 @@ export type Database = {
           notes?: string | null
           payment_date?: string | null
           updated_at?: string | null
+          visit_completed?: boolean | null
+          visit_completed_at?: string | null
         }
         Update: {
           amount?: number
@@ -192,6 +196,8 @@ export type Database = {
           notes?: string | null
           payment_date?: string | null
           updated_at?: string | null
+          visit_completed?: boolean | null
+          visit_completed_at?: string | null
         }
         Relationships: [
           {
@@ -771,6 +777,61 @@ export type Database = {
           },
         ]
       }
+      family_module_settings: {
+        Row: {
+          created_at: string | null
+          custom_category_id: string | null
+          custom_order_index: number | null
+          family_id: string
+          id: string
+          is_enabled: boolean | null
+          module_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          custom_category_id?: string | null
+          custom_order_index?: number | null
+          family_id: string
+          id?: string
+          is_enabled?: boolean | null
+          module_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          custom_category_id?: string | null
+          custom_order_index?: number | null
+          family_id?: string
+          id?: string
+          is_enabled?: boolean | null
+          module_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_module_settings_custom_category_id_fkey"
+            columns: ["custom_category_id"]
+            isOneToOne: false
+            referencedRelation: "module_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_module_settings_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_module_settings_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invitations: {
         Row: {
           accepted_at: string | null
@@ -1172,6 +1233,98 @@ export type Database = {
             columns: ["member_id"]
             isOneToOne: false
             referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      module_categories: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          order_index: number
+          slug: string
+          updated_at: string | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          order_index?: number
+          slug: string
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          order_index?: number
+          slug?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      modules: {
+        Row: {
+          category_id: string | null
+          color: string | null
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          order_index: number
+          required_roles: string[] | null
+          route_path: string
+          slug: string
+          updated_at: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          order_index?: number
+          required_roles?: string[] | null
+          route_path: string
+          slug: string
+          updated_at?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          order_index?: number
+          required_roles?: string[] | null
+          route_path?: string
+          slug?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "modules_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "module_categories"
             referencedColumns: ["id"]
           },
         ]
