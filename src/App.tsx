@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -77,6 +78,8 @@ const LoanAnalytics = lazy(() => import("./pages/family/LoanAnalytics"));
 const LoanHistory = lazy(() => import("./pages/family/LoanHistory"));
 const FamilyAssistanceAnalytics = lazy(() => import("./pages/family/AssistanceAnalytics"));
 const FamilyAssistanceReports = lazy(() => import("./pages/family/AssistanceReports"));
+const BackupRestore = lazy(() => import("./pages/family/BackupRestore"));
+const NotificationSettings = lazy(() => import("./pages/family/NotificationSettings"));
 
 const queryClient = new QueryClient();
 
@@ -87,13 +90,14 @@ const LoadingFallback = () => (
 );
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Suspense fallback={<LoadingFallback />}>
-          <Routes>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/install" element={<Install />} />
@@ -161,15 +165,18 @@ const App = () => (
           <Route path="/family/:familySlug/budget" element={<BudgetPlanning />} />
           <Route path="/family/:familySlug/assistance-analytics" element={<FamilyAssistanceAnalytics />} />
           <Route path="/family/:familySlug/assistance-reports" element={<FamilyAssistanceReports />} />
+          <Route path="/family/:familySlug/backup-restore" element={<BackupRestore />} />
+          <Route path="/family/:familySlug/notification-settings" element={<NotificationSettings />} />
           <Route path="/accept-invitation" element={<AcceptInvitation />} />
           <Route path="/install" element={<Install />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
-        </Routes>
-        </Suspense>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+          </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;
