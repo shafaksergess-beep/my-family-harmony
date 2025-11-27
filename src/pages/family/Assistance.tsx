@@ -50,6 +50,8 @@ const EVENT_TYPES = {
   external_wonya: { label: "External Wonya Kotto", amount: 150000, description: "Up to 150,000 FCFA" },
   external_other: { label: "External Other", amount: 100000, description: "Up to 100,000 FCFA" },
   sickness: { label: "Sickness (5+ days)", amount: 50000, description: "50,000 FCFA" },
+  wedding: { label: "Wedding", amount: 100000, description: "100,000 FCFA" },
+  ceremony_invitation: { label: "Other Ceremony", amount: 2500, description: "2,500 FCFA per member" },
 };
 
 export default function FamilyAssistance() {
@@ -160,11 +162,12 @@ export default function FamilyAssistance() {
 
   const handleEventTypeChange = (eventType: string) => {
     const eventConfig = EVENT_TYPES[eventType as keyof typeof EVENT_TYPES];
+    const requiresPerMemberContribution = ['birth', 'ceremony_invitation'].includes(eventType);
     setFormData({
       ...formData,
       event_type: eventType,
       amount: eventConfig.amount.toString(),
-      contribution_per_member: eventType === 'birth' ? eventConfig.amount.toString() : "",
+      contribution_per_member: requiresPerMemberContribution ? eventConfig.amount.toString() : "",
     });
   };
 
@@ -182,6 +185,8 @@ export default function FamilyAssistance() {
       external_wonya: "external_support",
       external_other: "external_support",
       sickness: "sickness",
+      wedding: "joyful_event",
+      ceremony_invitation: "joyful_event",
     };
     
     // Validate input
