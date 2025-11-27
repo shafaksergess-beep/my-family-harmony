@@ -67,6 +67,8 @@ import MeetingTemplates from "./pages/family/MeetingTemplates";
 import MeetingSettings from "./pages/family/MeetingSettings";
 import MeetingAnalyticsDashboard from "./pages/family/MeetingAnalyticsDashboard";
 import NotFound from "./pages/NotFound";
+import LoanAnalytics from "./pages/family/LoanAnalytics";
+import LoanHistory from "./pages/family/LoanHistory";
 
 const queryClient = new QueryClient();
 
@@ -116,6 +118,8 @@ const App = () => (
           <Route path="/family/:familySlug/financial-settings" element={<FinancialSettings />} />
           <Route path="/family/:familySlug/loans" element={<FamilyLoans />} />
           <Route path="/family/:familySlug/loan-committee" element={<LoanCommitteeDashboard />} />
+          <Route path="/family/:familySlug/loan-analytics" element={<LoanAnalytics />} />
+          <Route path="/family/:familySlug/loan-history" element={<LoanHistory />} />
           <Route path="/family/:familySlug/attendance" element={<FamilyAttendance />} />
           <Route path="/family/:familySlug/savings" element={<FamilySavings />} />
           <Route path="/family/:familySlug/njangi" element={<FamilyNjangi />} />
