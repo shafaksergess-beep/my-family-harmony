@@ -73,6 +73,7 @@ import FamilyContributionSettings from "./pages/family/ContributionSettings";
 import FamilyPaymentIntegration from "./pages/family/PaymentIntegration";
 import FamilyFinancialSettings from "./pages/family/FinancialSettings";
 import FamilyAssistanceAnalytics from "./pages/family/AssistanceAnalytics";
+import FamilyAssistanceReports from "./pages/family/AssistanceReports";
 import ModuleManagement from "./pages/admin/ModuleManagement";
 
 const queryClient = new QueryClient();
@@ -150,6 +151,7 @@ const App = () => (
           <Route path="/family/:familySlug/export-scheduler" element={<FamilyExportScheduler />} />
           <Route path="/family/:familySlug/budget" element={<BudgetPlanning />} />
           <Route path="/family/:familySlug/assistance-analytics" element={<FamilyAssistanceAnalytics />} />
+          <Route path="/family/:familySlug/assistance-reports" element={<FamilyAssistanceReports />} />
           <Route path="/accept-invitation" element={<AcceptInvitation />} />
           <Route path="/install" element={<Install />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

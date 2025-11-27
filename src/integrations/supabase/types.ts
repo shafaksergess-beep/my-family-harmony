@@ -650,9 +650,14 @@ export type Database = {
       }
       families: {
         Row: {
+          birth_assistance_amount: number | null
+          ceremony_invitation_amount: number | null
+          child_death_amount: number | null
           contribution_scope: string | null
           created_at: string | null
           description: string | null
+          external_other_amount: number | null
+          external_wonya_amount: number | null
           fine_after_30min: number | null
           fine_after_60min: number | null
           heritage_info: string | null
@@ -665,19 +670,28 @@ export type Database = {
           meeting_day: string | null
           meeting_frequency: string | null
           meeting_time: string | null
+          member_death_amount: number | null
           min_loan_amount: number | null
           min_savings_amount: number | null
           name: string
           njangi_amount: number | null
           primary_language: string | null
           share_value: number | null
+          sickness_assistance_amount: number | null
           slug: string
+          spouse_death_amount: number | null
           updated_at: string | null
+          wedding_assistance_amount: number | null
         }
         Insert: {
+          birth_assistance_amount?: number | null
+          ceremony_invitation_amount?: number | null
+          child_death_amount?: number | null
           contribution_scope?: string | null
           created_at?: string | null
           description?: string | null
+          external_other_amount?: number | null
+          external_wonya_amount?: number | null
           fine_after_30min?: number | null
           fine_after_60min?: number | null
           heritage_info?: string | null
@@ -690,19 +704,28 @@ export type Database = {
           meeting_day?: string | null
           meeting_frequency?: string | null
           meeting_time?: string | null
+          member_death_amount?: number | null
           min_loan_amount?: number | null
           min_savings_amount?: number | null
           name: string
           njangi_amount?: number | null
           primary_language?: string | null
           share_value?: number | null
+          sickness_assistance_amount?: number | null
           slug: string
+          spouse_death_amount?: number | null
           updated_at?: string | null
+          wedding_assistance_amount?: number | null
         }
         Update: {
+          birth_assistance_amount?: number | null
+          ceremony_invitation_amount?: number | null
+          child_death_amount?: number | null
           contribution_scope?: string | null
           created_at?: string | null
           description?: string | null
+          external_other_amount?: number | null
+          external_wonya_amount?: number | null
           fine_after_30min?: number | null
           fine_after_60min?: number | null
           heritage_info?: string | null
@@ -715,14 +738,18 @@ export type Database = {
           meeting_day?: string | null
           meeting_frequency?: string | null
           meeting_time?: string | null
+          member_death_amount?: number | null
           min_loan_amount?: number | null
           min_savings_amount?: number | null
           name?: string
           njangi_amount?: number | null
           primary_language?: string | null
           share_value?: number | null
+          sickness_assistance_amount?: number | null
           slug?: string
+          spouse_death_amount?: number | null
           updated_at?: string | null
+          wedding_assistance_amount?: number | null
         }
         Relationships: []
       }
