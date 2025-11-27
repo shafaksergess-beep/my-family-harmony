@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { LoanDeductionDialog } from "@/components/LoanDeductionDialog";
 
 interface NjangiCycle {
   id: string;
@@ -64,6 +65,8 @@ export default function FamilyNjangi() {
     amount_per_person: "25000",
     notes: "",
   });
+  const [selectedParticipantForPayout, setSelectedParticipantForPayout] = useState<string | null>(null);
+  const [isLoanDeductionDialogOpen, setIsLoanDeductionDialogOpen] = useState(false);
 
   useEffect(() => {
     if (family?.id) {
@@ -203,21 +206,90 @@ export default function FamilyNjangi() {
     }
   };
 
-  const handleMarkPaid = async (participantId: string) => {
+  const handleMarkPaid = (participantId: string, memberId: string) => {
+    setSelectedParticipantForPayout(participantId);
+    setIsLoanDeductionDialogOpen(true);
+  };
+
+  const confirmPayout = async (deductionAmount: number, remainingPayout: number) => {
+    if (!selectedParticipantForPayout || !selectedCycle) return;
+
     try {
-      const { error } = await supabase
+      const participant = participants.find(p => p.id === selectedParticipantForPayout);
+      if (!participant) return;
+
+      // Mark payout as paid with actual amount after deduction
+      const { error: payoutError } = await supabase
         .from("njangi_participants")
         .update({
           is_paid: true,
           payout_date: new Date().toISOString().split('T')[0],
-          amount_received: selectedCycle?.amount_per_person,
+          amount_received: Math.max(0, remainingPayout),
+          notes: deductionAmount > 0 
+            ? `${deductionAmount.toLocaleString()} FCFA deducted for loan repayment. Original amount: ${selectedCycle.amount_per_person.toLocaleString()} FCFA`
+            : null,
         })
-        .eq("id", participantId);
+        .eq("id", selectedParticipantForPayout);
 
-      if (error) throw error;
+      if (payoutError) throw payoutError;
 
-      toast({ title: "Success", description: "Payout marked as paid" });
+      // If there was a deduction, apply it to the member's loans
+      if (deductionAmount > 0) {
+        const { data: loans, error: loansError } = await supabase
+          .from("loans")
+          .select("*")
+          .eq("member_id", participant.family_members.id)
+          .in("status", ["approved", "disbursed"])
+          .order("created_at", { ascending: true });
+
+        if (loansError) throw loansError;
+
+        let remainingDeduction = deductionAmount;
+        for (const loan of loans || []) {
+          if (remainingDeduction <= 0) break;
+
+          const totalInterest = (loan.amount * loan.interest_rate * loan.term_months) / 100;
+          const totalOwed = loan.amount + totalInterest;
+          const totalPaid = (loan.amount_paid || 0) + (loan.interest_paid || 0);
+          const outstanding = totalOwed - totalPaid;
+
+          const paymentAmount = Math.min(remainingDeduction, outstanding);
+          
+          // Apply payment (prioritize interest first, then principal)
+          const interestRemaining = totalInterest - (loan.interest_paid || 0);
+          const interestPayment = Math.min(paymentAmount, interestRemaining);
+          const principalPayment = paymentAmount - interestPayment;
+
+          const newInterestPaid = (loan.interest_paid || 0) + interestPayment;
+          const newPrincipalPaid = (loan.amount_paid || 0) + principalPayment;
+          const newTotalPaid = newPrincipalPaid + newInterestPaid;
+          const isFullyPaid = newTotalPaid >= totalOwed;
+
+          const { error: loanUpdateError } = await supabase
+            .from("loans")
+            .update({
+              amount_paid: newPrincipalPaid,
+              interest_paid: newInterestPaid,
+              status: isFullyPaid ? "repaid" : loan.status,
+              notes: `${loan.notes || ""}\n\nAuto-deduction from Njangi payout: ${paymentAmount.toLocaleString()} FCFA (${interestPayment.toLocaleString()} interest + ${principalPayment.toLocaleString()} principal)`,
+            })
+            .eq("id", loan.id);
+
+          if (loanUpdateError) throw loanUpdateError;
+
+          remainingDeduction -= paymentAmount;
+        }
+      }
+
+      toast({ 
+        title: "Success", 
+        description: deductionAmount > 0 
+          ? `Payout processed: ${remainingPayout.toLocaleString()} FCFA paid, ${deductionAmount.toLocaleString()} FCFA applied to loans`
+          : "Payout marked as paid"
+      });
+      
       if (selectedCycle) loadParticipants(selectedCycle.id);
+      setSelectedParticipantForPayout(null);
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     }
@@ -393,7 +465,7 @@ export default function FamilyNjangi() {
                             {!participant.is_paid && canManageFinances && (
                               <Button
                                 size="sm"
-                                onClick={() => handleMarkPaid(participant.id)}
+                                onClick={() => handleMarkPaid(participant.id, participant.family_members.id)}
                               >
                                 <CheckCircle2 className="h-4 w-4 mr-1" />
                                 Mark Paid
@@ -408,6 +480,17 @@ export default function FamilyNjangi() {
               </div>
             </Card>
           </>
+        )}
+
+        {selectedParticipantForPayout && (
+          <LoanDeductionDialog
+            open={isLoanDeductionDialogOpen}
+            onOpenChange={setIsLoanDeductionDialogOpen}
+            memberId={participants.find(p => p.id === selectedParticipantForPayout)?.family_members.id || ""}
+            payoutAmount={selectedCycle?.amount_per_person || 0}
+            payoutType="njangi"
+            onConfirm={confirmPayout}
+          />
         )}
       </div>
     </div>

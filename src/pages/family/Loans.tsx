@@ -1,21 +1,21 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { useFamilyAuth } from "@/hooks/useFamilyAuth";
+import { ArrowLeft, Plus, CheckCircle2, XCircle, DollarSign, AlertTriangle, TrendingUp, Clock } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { useFamilyAuth } from "@/hooks/useFamilyAuth";
-import { ArrowLeft, Plus, DollarSign, TrendingUp, Clock, Download, Loader2 } from "lucide-react";
-import { format } from "date-fns";
-import { exportToCSV } from "@/lib/export";
-import { loanSchema, type LoanInput } from "@/lib/validation";
+import { Badge } from "@/components/ui/badge";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LoanPaymentForm } from "@/components/LoanPaymentForm";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { format } from "date-fns";
 
 interface Loan {
   id: string;
@@ -115,6 +115,7 @@ export default function Loans() {
   };
 
   const handleRequestLoan = async () => {
+    if (!family) return;
     setValidationErrors({});
     
     // Check for ongoing loans
@@ -155,7 +156,7 @@ export default function Loans() {
     }
 
     try {
-      const { error } = await supabase.from("loans").insert({
+      const { data: newLoanData, error } = await supabase.from("loans").insert({
         family_id: family!.id,
         member_id: newLoan.member_id,
         amount: parseFloat(newLoan.amount),
@@ -164,9 +165,40 @@ export default function Loans() {
         interest_rate: family?.loan_interest_rate || 2.5,
         notes: newLoan.notes || null,
         status: "pending",
-      });
+      }).select().single();
 
       if (error) throw error;
+
+      // Get member name for notification
+      const { data: memberData } = await supabase
+        .from("family_members")
+        .select("user_id")
+        .eq("id", newLoan.member_id)
+        .single();
+
+      if (memberData) {
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", memberData.user_id)
+          .single();
+
+        // Send notification to loan committee and family head
+        try {
+          await supabase.functions.invoke('send-loan-notification', {
+            body: {
+              loanId: newLoanData.id,
+              familyId: family.id,
+              memberName: profileData?.full_name || 'Unknown Member',
+              amount: parseFloat(newLoan.amount),
+              purpose: newLoan.purpose,
+            }
+          });
+        } catch (notifError) {
+          console.error('Failed to send notification:', notifError);
+          // Don't fail the loan creation if notification fails
+        }
+      }
 
       toast({
         title: "Loan request submitted",
@@ -260,6 +292,19 @@ export default function Loans() {
     const totalOwed = principal + interest;
     const totalPaid = (loan.amount_paid || 0) + (loan.interest_paid || 0);
     return { totalOwed, totalPaid, remaining: totalOwed - totalPaid };
+  };
+
+  const getDeadlineStatus = (loan: Loan) => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const deadline = new Date(currentYear, 10, 30); // November 30 of current year
+    const daysUntilDeadline = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (loan.status === 'repaid') return null;
+    if (daysUntilDeadline < 0) return { type: 'overdue', message: 'Overdue - must be cleared by November' };
+    if (daysUntilDeadline < 30) return { type: 'urgent', message: `${daysUntilDeadline} days until deadline` };
+    if (daysUntilDeadline < 60) return { type: 'warning', message: `${daysUntilDeadline} days until deadline` };
+    return null;
   };
 
   const totalLoansOut = loans.filter((l) => l.status === "disbursed").reduce((sum, l) => sum + l.amount, 0);
@@ -407,42 +452,50 @@ export default function Loans() {
         </Dialog>
       </div>
 
+      <Alert variant="default" className="border-orange-500">
+        <AlertTriangle className="h-4 w-4 text-orange-500" />
+        <AlertDescription>
+          <strong>Loan Deadline: November 30, {new Date().getFullYear()}</strong>
+          <p className="mt-1 text-sm">
+            All loans and interest must be cleared by November of the current year. Unpaid loans may be recovered from Njangi, assistance, or other entitlements.
+          </p>
+        </AlertDescription>
+      </Alert>
+
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Loans</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalLoansOut.toLocaleString()} FCFA</div>
-            <p className="text-xs text-muted-foreground">{loans.filter((l) => l.status === "disbursed").length} loans</p>
-          </CardContent>
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">Active Loans</div>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <div className="text-2xl font-bold mt-2">{totalLoansOut.toLocaleString()} FCFA</div>
+            <p className="text-xs text-muted-foreground mt-1">{loans.filter((l) => l.status === "disbursed").length} loans</p>
+          </div>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Expected Interest</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalInterestExpected.toLocaleString()} FCFA</div>
-          </CardContent>
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">Expected Interest</div>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <div className="text-2xl font-bold mt-2">{totalInterestExpected.toLocaleString()} FCFA</div>
+          </div>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Requests</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{loans.filter((l) => l.status === "pending").length}</div>
-          </CardContent>
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">Pending Requests</div>
+              <Clock className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <div className="text-2xl font-bold mt-2">{loans.filter((l) => l.status === "pending").length}</div>
+          </div>
         </Card>
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Loan Records</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <div className="p-6 space-y-6">
+          <h2 className="text-xl font-semibold">Loan Records</h2>
           <div className="space-y-4">
             {loans.map((loan) => {
               const { totalOwed, totalPaid, remaining } = calculateTotalOwed(loan);
@@ -469,6 +522,14 @@ export default function Loans() {
                     >
                       {loan.status}
                     </Badge>
+                    {getDeadlineStatus(loan) && (
+                      <Badge 
+                        variant={getDeadlineStatus(loan)!.type === 'overdue' ? "destructive" : "secondary"}
+                        className="text-xs"
+                      >
+                        {getDeadlineStatus(loan)!.message}
+                      </Badge>
+                    )}
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
@@ -534,7 +595,7 @@ export default function Loans() {
               );
             })}
           </div>
-        </CardContent>
+        </div>
       </Card>
     </div>
   );

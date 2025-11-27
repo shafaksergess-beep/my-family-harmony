@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { assistanceEventSchema, type AssistanceEventInput } from "@/lib/validation";
+import { LoanDeductionDialog } from "@/components/LoanDeductionDialog";
 
 interface AssistanceEvent {
   id: string;
@@ -71,6 +72,8 @@ export default function FamilyAssistance() {
     notes: "",
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [selectedEventForPayout, setSelectedEventForPayout] = useState<string | null>(null);
+  const [isLoanDeductionDialogOpen, setIsLoanDeductionDialogOpen] = useState(false);
 
   useEffect(() => {
     if (family?.id) {
@@ -241,20 +244,89 @@ export default function FamilyAssistance() {
     }
   };
 
-  const handleMarkPaid = async (eventId: string) => {
+  const handleMarkPaid = (eventId: string) => {
+    setSelectedEventForPayout(eventId);
+    setIsLoanDeductionDialogOpen(true);
+  };
+
+  const confirmPayout = async (deductionAmount: number, remainingPayout: number) => {
+    if (!selectedEventForPayout) return;
+
     try {
-      const { error } = await supabase
+      const event = events.find(e => e.id === selectedEventForPayout);
+      if (!event) return;
+
+      // Mark event as paid with actual amount after deduction
+      const { error: payoutError } = await supabase
         .from("assistance_events")
         .update({
           is_paid: true,
           payment_date: new Date().toISOString(),
+          notes: deductionAmount > 0 
+            ? `${deductionAmount.toLocaleString()} FCFA deducted for loan repayment. Original amount: ${event.amount.toLocaleString()} FCFA. Net paid: ${Math.max(0, remainingPayout).toLocaleString()} FCFA`
+            : event.notes,
         })
-        .eq("id", eventId);
+        .eq("id", selectedEventForPayout);
 
-      if (error) throw error;
+      if (payoutError) throw payoutError;
 
-      toast({ title: "Success", description: "Event marked as paid" });
+      // If there was a deduction, apply it to the member's loans
+      if (deductionAmount > 0) {
+        const { data: loans, error: loansError } = await supabase
+          .from("loans")
+          .select("*")
+          .eq("member_id", event.family_members.id)
+          .in("status", ["approved", "disbursed"])
+          .order("created_at", { ascending: true });
+
+        if (loansError) throw loansError;
+
+        let remainingDeduction = deductionAmount;
+        for (const loan of loans || []) {
+          if (remainingDeduction <= 0) break;
+
+          const totalInterest = (loan.amount * loan.interest_rate * loan.term_months) / 100;
+          const totalOwed = loan.amount + totalInterest;
+          const totalPaid = (loan.amount_paid || 0) + (loan.interest_paid || 0);
+          const outstanding = totalOwed - totalPaid;
+
+          const paymentAmount = Math.min(remainingDeduction, outstanding);
+          
+          // Apply payment (prioritize interest first, then principal)
+          const interestRemaining = totalInterest - (loan.interest_paid || 0);
+          const interestPayment = Math.min(paymentAmount, interestRemaining);
+          const principalPayment = paymentAmount - interestPayment;
+
+          const newInterestPaid = (loan.interest_paid || 0) + interestPayment;
+          const newPrincipalPaid = (loan.amount_paid || 0) + principalPayment;
+          const newTotalPaid = newPrincipalPaid + newInterestPaid;
+          const isFullyPaid = newTotalPaid >= totalOwed;
+
+          const { error: loanUpdateError } = await supabase
+            .from("loans")
+            .update({
+              amount_paid: newPrincipalPaid,
+              interest_paid: newInterestPaid,
+              status: isFullyPaid ? "repaid" : loan.status,
+              notes: `${loan.notes || ""}\n\nAuto-deduction from assistance payment: ${paymentAmount.toLocaleString()} FCFA (${interestPayment.toLocaleString()} interest + ${principalPayment.toLocaleString()} principal)`,
+            })
+            .eq("id", loan.id);
+
+          if (loanUpdateError) throw loanUpdateError;
+
+          remainingDeduction -= paymentAmount;
+        }
+      }
+
+      toast({ 
+        title: "Success", 
+        description: deductionAmount > 0 
+          ? `Payment processed: ${Math.max(0, remainingPayout).toLocaleString()} FCFA paid, ${deductionAmount.toLocaleString()} FCFA applied to loans`
+          : "Event marked as paid"
+      });
+      
       loadData();
+      setSelectedEventForPayout(null);
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     }
@@ -514,7 +586,7 @@ export default function FamilyAssistance() {
                           <Badge variant="secondary">Pending</Badge>
                         )}
                       </td>
-                      <td className="p-4 text-center">
+                       <td className="p-4 text-center">
                         {!event.is_paid && canManageFinances && (
                           <Button
                             size="sm"
@@ -532,7 +604,19 @@ export default function FamilyAssistance() {
             </table>
           </div>
         </Card>
+
+        {selectedEventForPayout && (
+          <LoanDeductionDialog
+            open={isLoanDeductionDialogOpen}
+            onOpenChange={setIsLoanDeductionDialogOpen}
+            memberId={events.find(e => e.id === selectedEventForPayout)?.family_members.id || ""}
+            payoutAmount={events.find(e => e.id === selectedEventForPayout)?.amount || 0}
+            payoutType="assistance"
+            onConfirm={confirmPayout}
+          />
+        )}
       </div>
     </div>
   );
 }
+
