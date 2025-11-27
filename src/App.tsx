@@ -31,6 +31,7 @@ const UserActivity = lazy(() => import("./pages/admin/UserActivity"));
 const DigestSettings = lazy(() => import("./pages/admin/DigestSettings"));
 const CustomizeDashboard = lazy(() => import("./pages/admin/CustomizeDashboard"));
 const ModuleManagement = lazy(() => import("./pages/admin/ModuleManagement"));
+const RoleManagement = lazy(() => import("./pages/admin/RoleManagement"));
 
 // Lazy load family pages
 const FamilyDetail = lazy(() => import("./pages/family/Detail"));
@@ -120,6 +121,10 @@ const App = () => (
         <Route path="/admin/modules" element={<ModuleManagement />} />
         <Route path="/admin/role-permissions" element={<RolePermissions />} />
         <Route path="/admin/user-activity" element={<UserActivity />} />
+          
+          {/* Family Role Management */}
+          <Route path="/family/:familySlug/role-management" element={<RoleManagement />} />
+          
           <Route path="/family/:familySlug" element={<FamilyDetail />} />
           <Route path="/family/:familySlug/audit-trail-enhanced" element={<AuditTrailEnhanced />} />
           <Route path="/family/:familySlug/analytics" element={<FamilyAnalytics />} />

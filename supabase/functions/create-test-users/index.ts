@@ -10,7 +10,7 @@ interface TestUser {
   email: string;
   password: string;
   fullName: string;
-  role: 'super_admin' | 'family_head' | 'treasurer' | 'loan_committee' | 'member' | 'guest';
+  role: 'super_admin' | 'family_head' | 'family_admin' | 'secretary' | 'treasurer' | 'loan_committee' | 'member' | 'guest';
 }
 
 const TEST_USERS: TestUser[] = [
@@ -25,6 +25,18 @@ const TEST_USERS: TestUser[] = [
     password: "TestPass123!",
     fullName: "Family Head User",
     role: "family_head",
+  },
+  {
+    email: "familyadmin@test.com",
+    password: "TestPass123!",
+    fullName: "Family Admin User",
+    role: "family_admin",
+  },
+  {
+    email: "secretary@test.com",
+    password: "TestPass123!",
+    fullName: "Secretary User",
+    role: "secretary",
   },
   {
     email: "treasurer@test.com",
