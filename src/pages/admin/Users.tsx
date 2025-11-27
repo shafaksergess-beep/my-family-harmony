@@ -53,6 +53,9 @@ export default function Users() {
     failed: number;
     errors: string[];
   } | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string>("");
+  const [userRole, setUserRole] = useState<"super_admin" | "family_head" | "family_admin" | null>(null);
+  const [managedFamilies, setManagedFamilies] = useState<string[]>([]);
   
   // New user form state
   const [newUser, setNewUser] = useState({
@@ -65,37 +68,72 @@ export default function Users() {
   });
 
   useEffect(() => {
-    checkSuperAdmin();
-    fetchUsers();
-    fetchFamilies();
+    checkAccess();
   }, []);
 
-  const checkSuperAdmin = async () => {
+  useEffect(() => {
+    if (userRole) {
+      fetchFamilies();
+      fetchUsers();
+    }
+  }, [userRole, managedFamilies]);
+
+  const checkAccess = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
       navigate("/auth");
       return;
     }
 
+    setCurrentUserId(session.user.id);
+
+    // Check if super admin
     const { data: isSuperAdmin } = await supabase
       .rpc("is_super_admin", { check_user_id: session.user.id });
 
-    if (!isSuperAdmin) {
-      toast({
-        title: "Access Denied",
-        description: "You must be a super admin to access this page",
-        variant: "destructive",
-      });
-      navigate("/dashboard");
+    if (isSuperAdmin) {
+      setUserRole("super_admin");
+      return;
     }
+
+    // Check if family head or family admin
+    const { data: familyMemberships } = await supabase
+      .from("family_members")
+      .select("family_id, role")
+      .eq("user_id", session.user.id)
+      .in("role", ["family_head", "family_admin"]);
+
+    if (familyMemberships && familyMemberships.length > 0) {
+      const familyIds = familyMemberships.map(m => m.family_id);
+      setManagedFamilies(familyIds);
+      
+      // Set role to the highest privilege
+      const hasHead = familyMemberships.some(m => m.role === "family_head");
+      setUserRole(hasHead ? "family_head" : "family_admin");
+      return;
+    }
+
+    // No admin permissions
+    toast({
+      title: "Access Denied",
+      description: "You must be a super admin, family head, or family admin to access this page",
+      variant: "destructive",
+    });
+    navigate("/dashboard");
   };
 
   const fetchFamilies = async () => {
-    const { data, error } = await supabase
+    let query = supabase
       .from("families")
       .select("*")
-      .eq("is_active", true)
-      .order("name");
+      .eq("is_active", true);
+
+    // If not super admin, only show managed families
+    if (userRole !== "super_admin" && managedFamilies.length > 0) {
+      query = query.in("id", managedFamilies);
+    }
+
+    const { data, error } = await query.order("name");
 
     if (error) {
       console.error("Error fetching families:", error);
@@ -107,16 +145,8 @@ export default function Users() {
 
   const fetchUsers = async () => {
     try {
-      // Fetch all profiles
-      const { data: profiles, error: profilesError } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("full_name");
-
-      if (profilesError) throw profilesError;
-
-      // Fetch family memberships for all users
-      const { data: memberships, error: membershipsError } = await supabase
+      // Fetch family memberships - filtered by managed families if not super admin
+      let membershipsQuery = supabase
         .from("family_members")
         .select(`
           user_id,
@@ -128,7 +158,25 @@ export default function Users() {
           )
         `);
 
+      if (userRole !== "super_admin" && managedFamilies.length > 0) {
+        membershipsQuery = membershipsQuery.in("family_id", managedFamilies);
+      }
+
+      const { data: memberships, error: membershipsError } = await membershipsQuery;
+
       if (membershipsError) throw membershipsError;
+
+      // Get unique user IDs from memberships
+      const userIds = [...new Set(memberships?.map(m => m.user_id) || [])];
+
+      // Fetch profiles for these users
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("*")
+        .in("id", userIds)
+        .order("full_name");
+
+      if (profilesError) throw profilesError;
 
       // Fetch super admins
       const { data: superAdmins, error: superAdminsError } = await supabase
@@ -170,6 +218,26 @@ export default function Users() {
       toast({
         title: "Validation Error",
         description: "Email, password, and full name are required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Family heads and admins must assign to a family
+    if (userRole !== "super_admin" && !newUser.family_id) {
+      toast({
+        title: "Validation Error",
+        description: "You must assign the user to a family",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate family access
+    if (newUser.family_id && userRole !== "super_admin" && !managedFamilies.includes(newUser.family_id)) {
+      toast({
+        title: "Access Denied",
+        description: "You can only create users for families you manage",
         variant: "destructive",
       });
       return;
@@ -261,6 +329,16 @@ export default function Users() {
             }
           }
 
+          // Validate family access for non-super admins
+          if (familyId && userRole !== "super_admin" && !managedFamilies.includes(familyId)) {
+            throw new Error(`You don't have permission to add users to "${family_name}"`);
+          }
+
+          // Family heads and admins must assign to a family
+          if (userRole !== "super_admin" && !familyId) {
+            throw new Error("Family assignment is required");
+          }
+
           // Create user
           const { data: authData, error: authError } = await supabase.auth.signUp({
             email,
@@ -346,7 +424,11 @@ export default function Users() {
             </Button>
             <div>
               <h1 className="text-3xl font-bold">{t('common.userManagement')}</h1>
-              <p className="text-muted-foreground">Manage all users across the system</p>
+              <p className="text-muted-foreground">
+                {userRole === "super_admin" 
+                  ? "Manage all users across the system"
+                  : "Manage users in your families"}
+              </p>
             </div>
           </div>
 
@@ -470,7 +552,9 @@ export default function Users() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="family">Assign to Family (Optional)</Label>
+                  <Label htmlFor="family">
+                    Assign to Family {userRole !== "super_admin" ? "*" : "(Optional)"}
+                  </Label>
                   <Select
                     value={newUser.family_id}
                     onValueChange={(value) => setNewUser({ ...newUser, family_id: value })}
@@ -479,7 +563,7 @@ export default function Users() {
                       <SelectValue placeholder="Select a family" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">No Family</SelectItem>
+                      {userRole === "super_admin" && <SelectItem value="">No Family</SelectItem>}
                       {families.map((family) => (
                         <SelectItem key={family.id} value={family.id}>
                           {family.name}
