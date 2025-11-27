@@ -916,6 +916,147 @@ export type Database = {
           },
         ]
       }
+      loan_payments: {
+        Row: {
+          amount_paid: number
+          created_at: string
+          created_by: string | null
+          family_id: string
+          id: string
+          interest_paid: number
+          loan_id: string
+          member_id: string
+          notes: string | null
+          payment_date: string
+          payment_method: string | null
+          principal_paid: number
+        }
+        Insert: {
+          amount_paid: number
+          created_at?: string
+          created_by?: string | null
+          family_id: string
+          id?: string
+          interest_paid?: number
+          loan_id: string
+          member_id: string
+          notes?: string | null
+          payment_date?: string
+          payment_method?: string | null
+          principal_paid?: number
+        }
+        Update: {
+          amount_paid?: number
+          created_at?: string
+          created_by?: string | null
+          family_id?: string
+          id?: string
+          interest_paid?: number
+          loan_id?: string
+          member_id?: string
+          notes?: string | null
+          payment_date?: string
+          payment_method?: string | null
+          principal_paid?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loan_payments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loan_payments_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loan_payments_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "loans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loan_payments_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loan_surety_deductions: {
+        Row: {
+          amount_deducted: number
+          created_at: string
+          deduction_date: string
+          family_id: string
+          id: string
+          interest_applied: number
+          loan_id: string
+          member_id: string
+          notes: string | null
+          principal_applied: number
+          source_id: string | null
+          source_type: string
+        }
+        Insert: {
+          amount_deducted: number
+          created_at?: string
+          deduction_date?: string
+          family_id: string
+          id?: string
+          interest_applied?: number
+          loan_id: string
+          member_id: string
+          notes?: string | null
+          principal_applied?: number
+          source_id?: string | null
+          source_type: string
+        }
+        Update: {
+          amount_deducted?: number
+          created_at?: string
+          deduction_date?: string
+          family_id?: string
+          id?: string
+          interest_applied?: number
+          loan_id?: string
+          member_id?: string
+          notes?: string | null
+          principal_applied?: number
+          source_id?: string | null
+          source_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loan_surety_deductions_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loan_surety_deductions_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "loans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loan_surety_deductions_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       loans: {
         Row: {
           amount: number
