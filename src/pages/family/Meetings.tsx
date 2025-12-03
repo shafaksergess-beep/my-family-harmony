@@ -31,7 +31,7 @@ const FamilyMeetings = () => {
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { family, isFamilyHead, isLoading: authLoading } = useFamilyAuth(familySlug);
+  const { family, canScheduleMeetings, isLoading: authLoading } = useFamilyAuth(familySlug);
   const { isMobile } = usePlatform();
   const [loading, setLoading] = useState(true);
   const [meetings, setMeetings] = useState<Meeting[]>([]);
@@ -253,7 +253,7 @@ const FamilyMeetings = () => {
               </div>
             </div>
             
-            {isFamilyHead && (
+            {canScheduleMeetings && (
               <div className="flex gap-2">
                 <Dialog open={isBulkDialogOpen} onOpenChange={setIsBulkDialogOpen}>
                   <DialogTrigger asChild>
@@ -473,7 +473,7 @@ const FamilyMeetings = () => {
             <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
             <h3 className="text-xl font-semibold mb-2 text-foreground">No meetings scheduled</h3>
             <p className="text-muted-foreground mb-6">Create your first meeting to get started</p>
-            {isFamilyHead && (
+            {canScheduleMeetings && (
               <Button onClick={() => setIsDialogOpen(true)}>
                 <Plus className="w-4 h-4 mr-2" />
                 Create Meeting
