@@ -102,6 +102,7 @@ export const useFamilyAuth = (familySlug?: string) => {
   const canManageMembers = isFamilyHead || isFamilyAdmin;
   const canManageReports = isFamilyHead || isFamilyAdmin || isSecretary;
   const canManageMinutes = isFamilyHead || isFamilyAdmin || isSecretary;
+  const canScheduleMeetings = isFamilyHead || isFamilyAdmin || isTreasurer || isSecretary;
 
   return {
     family,
@@ -113,6 +114,7 @@ export const useFamilyAuth = (familySlug?: string) => {
     canManageMembers,
     canManageReports,
     canManageMinutes,
+    canScheduleMeetings,
     isFamilyHead,
     isFamilyAdmin,
     isTreasurer,
