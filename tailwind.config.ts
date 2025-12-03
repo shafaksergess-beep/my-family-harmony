@@ -135,6 +135,23 @@ export default {
             opacity: "1",
           },
         },
+        "scan-line": {
+          "0%": { 
+            top: "15%",
+            opacity: "1",
+          },
+          "50%": { 
+            top: "85%",
+            opacity: "1",
+          },
+          "51%": { 
+            opacity: "0",
+          },
+          "100%": { 
+            top: "15%",
+            opacity: "0",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -146,6 +163,7 @@ export default {
         "glow-pulse": "glow-pulse 2.5s ease-in-out infinite",
         "fade-in-up": "fade-in-up 0.8s ease-out forwards",
         "bounce-dot": "bounce-dot 1.2s ease-in-out infinite",
+        "scan-line": "scan-line 2s ease-in-out infinite",
       },
     },
   },

@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
+import { usePlatform } from "@/hooks/usePlatform";
 import { Loader2, ArrowLeft, Plus, Calendar, MapPin, Clock, QrCode, CalendarRange } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { meetingSchema, type MeetingInput } from "@/lib/validation";
 import { MeetingsCalendar } from "@/components/MeetingsCalendar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MobileMeetings } from "@/components/mobile";
 
 interface Meeting {
   id: string;
@@ -30,6 +32,7 @@ const FamilyMeetings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { family, isFamilyHead, isLoading: authLoading } = useFamilyAuth(familySlug);
+  const { isMobile } = usePlatform();
   const [loading, setLoading] = useState(true);
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -227,6 +230,11 @@ const FamilyMeetings = () => {
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
+  }
+
+  // Use mobile-optimized view on mobile devices
+  if (isMobile) {
+    return <MobileMeetings />;
   }
 
   return (
