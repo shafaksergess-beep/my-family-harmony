@@ -9,8 +9,5 @@ verify_jwt = false
 [functions.check-late-payments]
 verify_jwt = false
 
-[functions.create-test-users]
-verify_jwt = false
-
 [functions.send-birth-visit-reminders]
 verify_jwt = false
