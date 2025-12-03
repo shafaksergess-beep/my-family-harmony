@@ -145,3 +145,12 @@ All colors MUST be HSL.
     font-weight: 700;
   }
 }
+
+@layer utilities {
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+}

@@ -1,11 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Users, Calendar, DollarSign, TrendingUp, Heart, Shield, Home, PiggyBank, FileText, Award } from "lucide-react";
+import SplashScreen from "@/components/SplashScreen";
+
 const Index = () => {
   const navigate = useNavigate();
+  const [showSplash, setShowSplash] = useState(true);
+
   useEffect(() => {
     // Check if user is already logged in
     const checkAuth = async () => {
@@ -20,6 +24,11 @@ const Index = () => {
     };
     checkAuth();
   }, [navigate]);
+
+  if (showSplash) {
+    return <SplashScreen onComplete={() => setShowSplash(false)} duration={3500} />;
+  }
+
   return <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary-hover to-secondary/20 text-primary-foreground">
