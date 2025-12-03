@@ -16,6 +16,8 @@ import { format } from "date-fns";
 import { exportToCSV } from "@/lib/export";
 import BulkPaymentMenu from "@/components/BulkPaymentMenu";
 import { contributionSchema, type ContributionInput } from "@/lib/validation";
+import { usePlatform } from "@/hooks/usePlatform";
+import { MobileContributions } from "@/components/mobile";
 
 interface Contribution {
   id: string;
@@ -46,6 +48,7 @@ export default function Contributions() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { family, canManageFinances, isLoading: authLoading } = useFamilyAuth(familySlug);
+  const { isMobile } = usePlatform();
   const [contributions, setContributions] = useState<Contribution[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
@@ -334,6 +337,11 @@ export default function Contributions() {
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
+  }
+
+  // Use mobile-optimized view on mobile devices
+  if (isMobile) {
+    return <MobileContributions />;
   }
 
   return (
