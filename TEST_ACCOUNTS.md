@@ -141,6 +141,25 @@ All accounts use the same password: **`TestPass123!`**
 
 ---
 
+## Sample Data Included
+
+The test family includes sample data for comprehensive testing:
+
+### Meetings (10 total)
+- **6 Past Meetings** (June - November 2025): Completed meetings with various hosts
+- **4 Upcoming Meetings** (December 2025 - February 2026): Scheduled future meetings
+
+### Contributions
+- Sample mandatory contributions for Family Head, Treasurer, and Regular Member
+- Mix of paid and pending contributions
+- Some with late payment scenarios
+
+### Loans
+- Active loan for Treasurer (200,000 FCFA for business capital)
+- Approved loan for Regular Member (100,000 FCFA for medical emergency)
+
+---
+
 ## Testing Scenarios
 
 ### 1. Authentication & Authorization
@@ -287,6 +306,8 @@ DELETE FROM families WHERE id = '00000000-0000-0000-0000-000000000001';
 - ✅ Password meets complexity requirements
 - ✅ Test family is created automatically
 - ✅ RLS policies are enforced
+- ✅ Sample meetings, contributions, and loans are pre-loaded
+- ⚠️ Family Admin and Secretary accounts must be created via edge function
 - ⚠️ These are **TEST ACCOUNTS** - delete before production deployment
 - ⚠️ Do not use these credentials in production
 
