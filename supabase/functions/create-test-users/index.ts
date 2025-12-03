@@ -72,7 +72,42 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // Create admin client with service role key
+    // SECURITY: Require authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error("No authorization header provided");
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - No authorization header' }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Create client with user's auth to verify their identity
+    const supabaseAuth = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      {
+        global: { headers: { Authorization: authHeader } },
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
+    );
+
+    // Verify the user is authenticated
+    const { data: { user }, error: userError } = await supabaseAuth.auth.getUser();
+    if (userError || !user) {
+      console.error("Failed to get user:", userError?.message);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - Invalid token' }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    console.log(`User ${user.id} attempting to create test users`);
+
+    // Create admin client to check super_admin status (bypasses RLS)
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -84,7 +119,22 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
 
-    console.log("Starting test user creation...");
+    // SECURITY: Verify the caller is a super admin
+    const { data: superAdminCheck, error: superAdminError } = await supabaseAdmin
+      .from("super_admins")
+      .select("id")
+      .eq("user_id", user.id)
+      .single();
+
+    if (superAdminError || !superAdminCheck) {
+      console.error(`User ${user.id} is not a super admin - access denied`);
+      return new Response(
+        JSON.stringify({ error: 'Forbidden - Only super admins can create test users' }),
+        { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    console.log(`Super admin ${user.id} authorized - starting test user creation...`);
 
     const results = [];
 
@@ -96,7 +146,7 @@ const handler = async (req: Request): Promise<Response> => {
         const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
           email: testUser.email,
           password: testUser.password,
-          email_confirm: true, // Auto-confirm email
+          email_confirm: true,
           user_metadata: {
             full_name: testUser.fullName,
           },
@@ -118,7 +168,6 @@ const handler = async (req: Request): Promise<Response> => {
 
             // Handle role assignment for existing user
             if (testUser.role === "super_admin") {
-              // Check if super admin entry exists
               const { data: existingSuperAdmin } = await supabaseAdmin
                 .from("super_admins")
                 .select("id")
@@ -131,7 +180,6 @@ const handler = async (req: Request): Promise<Response> => {
                   .insert({ user_id: existingUser.id });
               }
             } else {
-              // Check if family member exists
               const { data: existingMember } = await supabaseAdmin
                 .from("family_members")
                 .select("id")
@@ -148,7 +196,6 @@ const handler = async (req: Request): Promise<Response> => {
                     role: testUser.role,
                   });
               } else {
-                // Update role
                 await supabaseAdmin
                   .from("family_members")
                   .update({ role: testUser.role })
@@ -173,16 +220,14 @@ const handler = async (req: Request): Promise<Response> => {
 
         // Assign role
         if (testUser.role === "super_admin") {
-          // Add to super_admins table
-          const { error: superAdminError } = await supabaseAdmin
+          const { error: superAdminRoleError } = await supabaseAdmin
             .from("super_admins")
             .insert({ user_id: userId });
 
-          if (superAdminError) {
-            console.error(`Failed to assign super_admin role:`, superAdminError);
+          if (superAdminRoleError) {
+            console.error(`Failed to assign super_admin role:`, superAdminRoleError);
           }
         } else {
-          // Add to family with specific role
           const { error: memberError } = await supabaseAdmin
             .from("family_members")
             .insert({
@@ -204,12 +249,12 @@ const handler = async (req: Request): Promise<Response> => {
         });
 
         console.log(`Successfully created and assigned role for ${testUser.email}`);
-      } catch (userError: any) {
-        console.error(`Failed to create user ${testUser.email}:`, userError);
+      } catch (userCreateError: any) {
+        console.error(`Failed to create user ${testUser.email}:`, userCreateError);
         results.push({
           email: testUser.email,
           status: "error",
-          error: userError.message,
+          error: userCreateError.message,
         });
       }
     }
