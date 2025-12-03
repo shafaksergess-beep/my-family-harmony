@@ -15,27 +15,30 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "robots.txt", "apple-touch-icon.png"],
+      includeAssets: ["favicon.ico", "favicon.jpg", "robots.txt", "logo.jpg", "pwa-192x192.png", "pwa-512x512.png"],
       manifest: {
-        name: "Family Together - Wonya Kotto",
-        short_name: "Family Together",
-        description: "Complete family reunion management platform",
-        theme_color: "#667eea",
-        background_color: "#ffffff",
+        name: "Kinsroot - Rooted in Heritage",
+        short_name: "Kinsroot",
+        description: "Family reunion management platform - Rooted in Heritage, Built for Tomorrow",
+        theme_color: "#1a3d2e",
+        background_color: "#1a3d2e",
         display: "standalone",
         scope: "/",
         start_url: "/",
-        orientation: "portrait",
+        orientation: "portrait-primary",
+        categories: ["productivity", "finance", "social"],
         icons: [
+          {
+            src: "/logo.jpg",
+            sizes: "192x192",
+            type: "image/jpeg",
+            purpose: "any",
+          },
           {
             src: "/pwa-192x192.png",
             sizes: "192x192",
             type: "image/png",
-          },
-          {
-            src: "/pwa-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
+            purpose: "maskable",
           },
           {
             src: "/pwa-512x512.png",
@@ -44,10 +47,29 @@ export default defineConfig(({ mode }) => ({
             purpose: "any maskable",
           },
         ],
+        shortcuts: [
+          {
+            name: "Dashboard",
+            short_name: "Dashboard",
+            description: "View your family dashboard",
+            url: "/dashboard",
+            icons: [{ src: "/logo.jpg", sizes: "96x96" }],
+          },
+          {
+            name: "Profile",
+            short_name: "Profile",
+            description: "View your profile",
+            url: "/profile",
+            icons: [{ src: "/logo.jpg", sizes: "96x96" }],
+          },
+        ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2}"],
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
+        globPatterns: ["**/*.{js,css,html,ico,png,jpg,svg,woff,woff2}"],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
@@ -55,11 +77,33 @@ export default defineConfig(({ mode }) => ({
             options: {
               cacheName: "supabase-cache",
               expiration: {
-                maxEntries: 10,
+                maxEntries: 50,
                 maxAgeSeconds: 300,
               },
               cacheableResponse: {
                 statuses: [0, 200],
+              },
+            },
+          },
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "image-cache",
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
+            },
+          },
+          {
+            urlPattern: /\.(?:woff|woff2|ttf|eot)$/,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "font-cache",
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
               },
             },
           },
