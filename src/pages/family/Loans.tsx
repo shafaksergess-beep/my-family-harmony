@@ -16,6 +16,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { LoanPaymentForm } from "@/components/LoanPaymentForm";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { format } from "date-fns";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { MobileLoans } from "@/components/mobile";
 
 interface Loan {
   id: string;
@@ -312,8 +314,15 @@ export default function Loans() {
     .filter((l) => l.status === "disbursed")
     .reduce((sum, l) => sum + (l.amount * l.interest_rate * l.term_months) / 100, 0);
 
+  const isMobile = useIsMobile();
+
   if (loading) {
     return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
+
+  // Render mobile version on mobile devices
+  if (isMobile) {
+    return <MobileLoans />;
   }
 
   return (
