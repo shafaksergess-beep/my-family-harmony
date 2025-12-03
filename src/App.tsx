@@ -81,6 +81,7 @@ const FamilyAssistanceAnalytics = lazy(() => import("./pages/family/AssistanceAn
 const FamilyAssistanceReports = lazy(() => import("./pages/family/AssistanceReports"));
 const BackupRestore = lazy(() => import("./pages/family/BackupRestore"));
 const NotificationSettings = lazy(() => import("./pages/family/NotificationSettings"));
+const FamilyMore = lazy(() => import("./pages/family/More"));
 
 const queryClient = new QueryClient();
 
@@ -173,6 +174,7 @@ const App = () => (
           <Route path="/family/:familySlug/assistance-reports" element={<FamilyAssistanceReports />} />
           <Route path="/family/:familySlug/backup-restore" element={<BackupRestore />} />
           <Route path="/family/:familySlug/notification-settings" element={<NotificationSettings />} />
+          <Route path="/family/:familySlug/more" element={<FamilyMore />} />
           <Route path="/accept-invitation" element={<AcceptInvitation />} />
           <Route path="/install" element={<Install />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Smartphone, Download, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { haptics } from "@/lib/haptics";
 
 export default function Install() {
   const navigate = useNavigate();
@@ -33,25 +34,27 @@ export default function Install() {
   const handleInstall = async () => {
     if (!deferredPrompt) return;
 
+    await haptics.medium();
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
 
     if (outcome === "accepted") {
       setIsInstalled(true);
       setIsInstallable(false);
+      await haptics.success();
     }
 
     setDeferredPrompt(null);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center p-6 safe-area-inset">
       <Card className="max-w-2xl w-full">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
             <Smartphone className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-3xl">Install Family Together</CardTitle>
+          <CardTitle className="text-3xl">Install Kinsroot</CardTitle>
           <p className="text-muted-foreground mt-2">
             Get the full app experience with offline access and faster loading
           </p>
@@ -65,10 +68,10 @@ export default function Install() {
               <div>
                 <h3 className="text-xl font-semibold">App Installed!</h3>
                 <p className="text-muted-foreground">
-                  Family Together is now installed on your device
+                  Kinsroot is now installed on your device
                 </p>
               </div>
-              <Button onClick={() => navigate("/dashboard")} className="w-full">
+              <Button onClick={() => navigate("/dashboard")} className="w-full touch-target">
                 Go to Dashboard
               </Button>
             </div>
@@ -99,7 +102,7 @@ export default function Install() {
                 </ul>
               </div>
 
-              <Button onClick={handleInstall} size="lg" className="w-full">
+              <Button onClick={handleInstall} size="lg" className="w-full touch-target">
                 <Download className="mr-2 h-5 w-5" />
                 Install Now
               </Button>
@@ -107,7 +110,7 @@ export default function Install() {
               <Button
                 variant="outline"
                 onClick={() => navigate("/dashboard")}
-                className="w-full"
+                className="w-full touch-target"
               >
                 Continue in Browser
               </Button>
@@ -139,7 +142,7 @@ export default function Install() {
               <Button
                 variant="outline"
                 onClick={() => navigate("/dashboard")}
-                className="w-full"
+                className="w-full touch-target"
               >
                 Continue in Browser
               </Button>
