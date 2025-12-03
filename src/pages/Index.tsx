@@ -14,9 +14,7 @@ const Index = () => {
     // Check if user is already logged in
     const checkAuth = async () => {
       const {
-        data: {
-          session
-        }
+        data: { session },
       } = await supabase.auth.getSession();
       if (session) {
         navigate("/dashboard");
@@ -29,16 +27,21 @@ const Index = () => {
     return <SplashScreen onComplete={() => setShowSplash(false)} duration={3500} />;
   }
 
-  return <div className="min-h-screen bg-background">
+  return (
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary-hover to-secondary/20 text-primary-foreground">
         <div className="absolute inset-0 bg-[url('/lovable-uploads/pattern.svg')] opacity-10"></div>
         <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="max-w-4xl mx-auto text-center animate-fade-in">
             <div className="mb-8">
-              <img src="/logo.jpg" alt="Family Together Logo" className="w-32 h-32 mx-auto rounded-full object-cover shadow-2xl border-4 border-primary-foreground/20" />
+              <img
+                src="/logo.jpg"
+                alt="Family Together Logo"
+                className="w-32 h-32 mx-auto rounded-full object-cover shadow-2xl border-4 border-primary-foreground/20"
+              />
             </div>
-            
+
             <div className="mb-6 inline-flex items-center gap-3 bg-primary-foreground/10 backdrop-blur-sm px-6 py-3 rounded-full border border-primary-foreground/20">
               <Home className="w-5 h-5" />
               <span className="text-sm font-medium">Family Harmony Hub</span>
@@ -51,12 +54,23 @@ const Index = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Button size="lg" className="bg-secondary text-secondary-foreground hover:bg-secondary-hover shadow-lg hover:shadow-xl transition-all text-lg px-8 py-6" onClick={() => window.location.href = "/auth"}>
+              <Button
+                size="lg"
+                className="bg-secondary text-secondary-foreground hover:bg-secondary-hover shadow-lg hover:shadow-xl transition-all text-lg px-8 py-6"
+                onClick={() => (window.location.href = "/auth")}
+              >
                 Get Started
               </Button>
-              <Button size="lg" variant="outline" onClick={() => document.getElementById("features")?.scrollIntoView({
-              behavior: "smooth"
-            })} className="border-primary-foreground/30 text-primary-foreground text-lg px-8 py-6 bg-yellow-600 hover:bg-yellow-500">
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() =>
+                  document.getElementById("features")?.scrollIntoView({
+                    behavior: "smooth",
+                  })
+                }
+                className="border-primary-foreground/30 text-primary-foreground text-lg px-8 py-6 bg-yellow-600 hover:bg-yellow-500"
+              >
                 Learn More
               </Button>
             </div>
@@ -75,7 +89,10 @@ const Index = () => {
         {/* Decorative bottom wave */}
         <div className="absolute bottom-0 left-0 right-0">
           <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0V120Z" fill="hsl(var(--background))" />
+            <path
+              d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0V120Z"
+              fill="hsl(var(--background))"
+            />
           </svg>
         </div>
       </section>
@@ -119,12 +136,42 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            <FeatureCard icon={<Calendar className="w-8 h-8" />} title="Meeting Management" description="Track attendance, hosting calendar, and automatically calculate lateness fines. Never miss a monthly gathering." color="primary" />
-            <FeatureCard icon={<DollarSign className="w-8 h-8" />} title="Financial Tracking" description="Monitor contributions, individual savings, and family coffers with real-time dashboards and reports." color="secondary" />
-            <FeatureCard icon={<TrendingUp className="w-8 h-8" />} title="Njangi (Rotating Savings)" description="Manage cycles, track participants, and automate payout schedules for your collective savings group." color="accent" />
-            <FeatureCard icon={<FileText className="w-8 h-8" />} title="Loan Management" description="Request, approve, and track loans with automatic interest calculations and payment schedules." color="primary" />
-            <FeatureCard icon={<Award className="w-8 h-8" />} title="Shares & Dividends" description="Purchase shares, track ownership, and receive annual dividends from family investments." color="secondary" />
-            <FeatureCard icon={<Heart className="w-8 h-8" />} title="Assistance Events" description="Coordinate support for births, deaths, sickness, and joyful occasions with automated contributions." color="accent" />
+            <FeatureCard
+              icon={<Calendar className="w-8 h-8" />}
+              title="Meeting Management"
+              description="Track attendance, hosting calendar, and automatically calculate lateness fines. Never miss a monthly gathering."
+              color="primary"
+            />
+            <FeatureCard
+              icon={<DollarSign className="w-8 h-8" />}
+              title="Financial Tracking"
+              description="Monitor contributions, individual savings, and family coffers with real-time dashboards and reports."
+              color="secondary"
+            />
+            <FeatureCard
+              icon={<TrendingUp className="w-8 h-8" />}
+              title="Njangi (Rotating Savings)"
+              description="Manage cycles, track participants, and automate payout schedules for your collective savings group."
+              color="accent"
+            />
+            <FeatureCard
+              icon={<FileText className="w-8 h-8" />}
+              title="Loan Management"
+              description="Request, approve, and track loans with automatic interest calculations and payment schedules."
+              color="primary"
+            />
+            <FeatureCard
+              icon={<Award className="w-8 h-8" />}
+              title="Shares & Dividends"
+              description="Purchase shares, track ownership, and receive annual dividends from family investments."
+              color="secondary"
+            />
+            <FeatureCard
+              icon={<Heart className="w-8 h-8" />}
+              title="Assistance Events"
+              description="Coordinate support for births, deaths, sickness, and joyful occasions with automated contributions."
+              color="accent"
+            />
           </div>
         </div>
       </section>
@@ -136,7 +183,7 @@ const Index = () => {
             <Shield className="w-16 h-16 mx-auto mb-6 text-primary" />
             <h2 className="text-4xl font-bold mb-6 text-foreground">Rooted in Heritage, Built for Tomorrow</h2>
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              The descendants of Wonya Kotto carry forward a legacy of unity, shared property, education, and Christian
+              The descendants of the family carry forward a legacy of unity, shared property, education, and Christian
               values. Our app honors these traditions while embracing modern tools to strengthen family bonds and secure
               our collective prosperity.
             </p>
@@ -165,7 +212,11 @@ const Index = () => {
           <p className="text-xl mb-8 text-primary-foreground/90 max-w-2xl mx-auto">
             Join us in building a prosperous future together
           </p>
-          <Button size="lg" className="bg-secondary text-secondary-foreground hover:bg-secondary-hover shadow-xl hover:shadow-2xl transition-all text-lg px-10 py-6 animate-glow" onClick={() => window.location.href = "/auth"}>
+          <Button
+            size="lg"
+            className="bg-secondary text-secondary-foreground hover:bg-secondary-hover shadow-xl hover:shadow-2xl transition-all text-lg px-10 py-6 animate-glow"
+            onClick={() => (window.location.href = "/auth")}
+          >
             Get Started Today
           </Button>
         </div>
@@ -180,7 +231,8 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
 interface FeatureCardProps {
   icon: React.ReactNode;
@@ -188,23 +240,22 @@ interface FeatureCardProps {
   description: string;
   color: "primary" | "secondary" | "accent";
 }
-const FeatureCard = ({
-  icon,
-  title,
-  description,
-  color
-}: FeatureCardProps) => {
+const FeatureCard = ({ icon, title, description, color }: FeatureCardProps) => {
   const colorClasses = {
     primary: "text-primary border-primary/20 hover:border-primary/40",
     secondary: "text-secondary border-secondary/20 hover:border-secondary/40",
-    accent: "text-accent border-accent/20 hover:border-accent/40"
+    accent: "text-accent border-accent/20 hover:border-accent/40",
   };
-  return <Card className={`p-8 transition-all hover:shadow-xl border-2 ${colorClasses[color]} group`}>
-      <div className={`mb-4 ${color === "primary" ? "text-primary" : color === "secondary" ? "text-secondary" : "text-accent"} group-hover:scale-110 transition-transform`}>
+  return (
+    <Card className={`p-8 transition-all hover:shadow-xl border-2 ${colorClasses[color]} group`}>
+      <div
+        className={`mb-4 ${color === "primary" ? "text-primary" : color === "secondary" ? "text-secondary" : "text-accent"} group-hover:scale-110 transition-transform`}
+      >
         {icon}
       </div>
       <h3 className="text-xl font-bold mb-3 text-foreground">{title}</h3>
       <p className="text-muted-foreground leading-relaxed">{description}</p>
-    </Card>;
+    </Card>
+  );
 };
 export default Index;
