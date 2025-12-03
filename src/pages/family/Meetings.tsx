@@ -68,7 +68,8 @@ const FamilyMeetings = () => {
         .from("meetings")
         .select("*")
         .eq("family_id", family.id)
-        .order("meeting_date", { ascending: false });
+        .order("meeting_date", { ascending: false })
+        .limit(50);
       
       setMeetings(meetingsData || []);
     } catch (error) {
@@ -82,6 +83,83 @@ const FamilyMeetings = () => {
       setLoading(false);
     }
   };
+
+  // Separate upcoming and past meetings
+  const today = new Date().toISOString().split('T')[0];
+  const upcomingMeetings = meetings.filter(m => m.meeting_date >= today);
+  const pastMeetings = meetings.filter(m => m.meeting_date < today).slice(0, 10);
+
+  // Meeting Card component
+  const MeetingCard = ({ meeting, isPast = false }: { meeting: Meeting; isPast?: boolean }) => (
+    <Card className={`hover:shadow-lg transition-all ${isPast ? 'opacity-80' : ''}`}>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-primary" />
+            {new Date(meeting.meeting_date).toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}
+          </CardTitle>
+          <span className={`px-3 py-1 rounded text-xs font-medium ${
+            meeting.is_completed 
+              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+              : isPast 
+                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                : 'bg-primary/10 text-primary'
+          }`}>
+            {meeting.is_completed ? 'Completed' : isPast ? 'Missed' : 'Upcoming'}
+          </span>
+        </div>
+        <CardDescription className="flex items-center gap-4 mt-2">
+          <span className="flex items-center gap-1">
+            <Clock className="w-4 h-4" />
+            {meeting.meeting_time}
+          </span>
+          {meeting.location && (
+            <span className="flex items-center gap-1">
+              <MapPin className="w-4 h-4" />
+              {meeting.location}
+            </span>
+          )}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="font-medium">Type:</span>
+            <span className="capitalize">{meeting.meeting_type}</span>
+          </div>
+          {meeting.host_house && (
+            <div className="flex items-center gap-2 text-sm">
+              <span className="font-medium">Host:</span>
+              <span>{meeting.host_house}</span>
+            </div>
+          )}
+          <div className="flex gap-2 mt-4">
+            <Button 
+              variant="outline" 
+              className="flex-1"
+              onClick={() => navigate(`/family/${familySlug}/meetings/${meeting.id}`)}
+            >
+              View Details
+            </Button>
+            {!isPast && !meeting.is_completed && (
+              <Button 
+                className="flex-1"
+                onClick={() => navigate(`/family/${familySlug}/meetings/${meeting.id}/checkin`)}
+              >
+                <QrCode className="w-4 h-4 mr-2" />
+                Check In
+              </Button>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -515,83 +593,53 @@ const FamilyMeetings = () => {
             )}
           </Card>
         ) : (
-          <Tabs defaultValue="calendar" className="space-y-6">
+          <Tabs defaultValue="upcoming" className="space-y-6">
             <TabsList>
+              <TabsTrigger value="upcoming">Upcoming ({upcomingMeetings.length})</TabsTrigger>
+              <TabsTrigger value="past">Past ({pastMeetings.length})</TabsTrigger>
               <TabsTrigger value="calendar">Calendar View</TabsTrigger>
-              <TabsTrigger value="list">List View</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="upcoming">
+              {upcomingMeetings.length === 0 ? (
+                <Card className="p-8 text-center">
+                  <Calendar className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
+                  <h3 className="text-lg font-semibold mb-2">No upcoming meetings</h3>
+                  <p className="text-muted-foreground mb-4">Schedule a meeting to get started</p>
+                  {canScheduleMeetings && (
+                    <Button onClick={() => setIsDialogOpen(true)}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Schedule Meeting
+                    </Button>
+                  )}
+                </Card>
+              ) : (
+                <div className="grid gap-4">
+                  {upcomingMeetings.map((meeting) => (
+                    <MeetingCard key={meeting.id} meeting={meeting} />
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="past">
+              {pastMeetings.length === 0 ? (
+                <Card className="p-8 text-center">
+                  <Calendar className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
+                  <h3 className="text-lg font-semibold mb-2">No past meetings</h3>
+                  <p className="text-muted-foreground">Past meetings will appear here</p>
+                </Card>
+              ) : (
+                <div className="grid gap-4">
+                  {pastMeetings.map((meeting) => (
+                    <MeetingCard key={meeting.id} meeting={meeting} isPast />
+                  ))}
+                </div>
+              )}
+            </TabsContent>
 
             <TabsContent value="calendar">
               <MeetingsCalendar meetings={meetings} />
-            </TabsContent>
-
-            <TabsContent value="list">
-              <div className="grid gap-4">
-                {meetings.map((meeting) => (
-              <Card key={meeting.id} className="hover:shadow-lg transition-all">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <Calendar className="w-5 h-5 text-primary" />
-                      {new Date(meeting.meeting_date).toLocaleDateString('en-US', { 
-                        weekday: 'long', 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      })}
-                    </CardTitle>
-                    <span className={`px-3 py-1 rounded text-xs font-medium ${meeting.is_completed ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                      {meeting.is_completed ? 'Completed' : 'Upcoming'}
-                    </span>
-                  </div>
-                  <CardDescription className="flex items-center gap-4 mt-2">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      {meeting.meeting_time}
-                    </span>
-                    {meeting.location && (
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        {meeting.location}
-                      </span>
-                    )}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="font-medium">Type:</span>
-                      <span className="capitalize">{meeting.meeting_type}</span>
-                    </div>
-                    {meeting.host_house && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <span className="font-medium">Host:</span>
-                        <span>{meeting.host_house}</span>
-                      </div>
-                    )}
-                    <div className="flex gap-2 mt-4">
-                      <Button 
-                        variant="outline" 
-                        className="flex-1"
-                        onClick={() => navigate(`/family/${familySlug}/meetings/${meeting.id}`)}
-                      >
-                        View Details
-                      </Button>
-                      {!meeting.is_completed && (
-                        <Button 
-                          className="flex-1"
-                          onClick={() => navigate(`/family/${familySlug}/meetings/${meeting.id}/checkin`)}
-                        >
-                          <QrCode className="w-4 h-4 mr-2" />
-                          Check In
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-                ))}
-              </div>
             </TabsContent>
           </Tabs>
         )}
