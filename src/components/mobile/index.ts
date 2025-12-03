@@ -13,4 +13,8 @@ export { MobileContributions } from './MobileContributions';
 export { MeetingCard } from './MeetingCard';
 export { MobileQRScanner } from './MobileQRScanner';
 export { MobileMeetings } from './MobileMeetings';
+export { LoanCalculator } from './LoanCalculator';
+export { LoanCard } from './LoanCard';
+export { RepaymentSchedule } from './RepaymentSchedule';
+export { MobileLoans } from './MobileLoans';
 
