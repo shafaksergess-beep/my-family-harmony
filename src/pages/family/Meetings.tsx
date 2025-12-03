@@ -113,7 +113,7 @@ const FamilyMeetings = () => {
     }
     
     try {
-      const { error } = await supabase
+      const { data: newMeeting, error } = await supabase
         .from("meetings")
         .insert({
           family_id: family.id,
@@ -123,13 +123,33 @@ const FamilyMeetings = () => {
           location: validationResult.data.location || null,
           host_house: validationResult.data.hostHouse || null,
           agenda: validationResult.data.agenda || null,
-        });
+        })
+        .select()
+        .single();
 
       if (error) throw error;
       
+      // Send notifications to all family members about the new meeting
+      if (newMeeting) {
+        try {
+          await supabase.functions.invoke('send-notification', {
+            body: {
+              familyId: family.id,
+              type: 'meeting_scheduled',
+              title: 'New Meeting Scheduled',
+              message: `A ${validationResult.data.meetingType} meeting has been scheduled for ${new Date(validationResult.data.meetingDate).toLocaleDateString()}`,
+              data: { meetingId: newMeeting.id }
+            }
+          });
+        } catch (notifError) {
+          console.error("Failed to send meeting notification:", notifError);
+          // Don't fail the whole operation if notification fails
+        }
+      }
+      
       toast({
         title: "Success",
-        description: "Meeting created successfully",
+        description: "Meeting created successfully. Notifications sent to family members.",
       });
 
       setIsDialogOpen(false);
@@ -199,10 +219,24 @@ const FamilyMeetings = () => {
         .insert(meetingsToCreate);
 
       if (error) throw error;
+
+      // Send notification about bulk scheduled meetings
+      try {
+        await supabase.functions.invoke('send-notification', {
+          body: {
+            familyId: family.id,
+            type: 'meeting_scheduled',
+            title: `${months} Meetings Scheduled`,
+            message: `${months} monthly meetings have been scheduled starting from ${new Date(bulkFormData.start_date).toLocaleDateString()}. Please check the calendar for details.`
+          }
+        });
+      } catch (notifError) {
+        console.error("Failed to send bulk meeting notification:", notifError);
+      }
       
       toast({
         title: "Success",
-        description: `${months} meetings scheduled successfully`,
+        description: `${months} meetings scheduled successfully. Notifications sent.`,
       });
 
       setIsBulkDialogOpen(false);

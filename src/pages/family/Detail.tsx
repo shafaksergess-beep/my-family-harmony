@@ -64,8 +64,10 @@ const FamilyDetail = () => {
   }, [family, userRole, userId]);
 
   useEffect(() => {
-    loadModulesAndCategories();
-  }, []);
+    if (userRole) {
+      loadModulesAndCategories();
+    }
+  }, [userRole]);
 
   const loadModulesAndCategories = async () => {
     try {
@@ -79,8 +81,20 @@ const FamilyDetail = () => {
       if (categoriesRes.error) throw categoriesRes.error;
       if (modulesRes.error) throw modulesRes.error;
 
+      // Filter modules based on user role
+      const allModules = modulesRes.data || [];
+      const filteredModules = allModules.filter((module) => {
+        const requiredRoles = module.required_roles as string[] | null;
+        // If no required roles, everyone can access
+        if (!requiredRoles || requiredRoles.length === 0) {
+          return true;
+        }
+        // Check if user has one of the required roles
+        return requiredRoles.includes(userRole);
+      });
+
       setCategories(categoriesRes.data || []);
-      setModules(modulesRes.data || []);
+      setModules(filteredModules);
     } catch (error) {
       console.error("Error loading modules:", error);
     } finally {
