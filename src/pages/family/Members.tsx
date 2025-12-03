@@ -13,6 +13,8 @@ import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { MobileMembers } from "@/components/mobile";
 
 interface Member {
   id: string;
@@ -34,6 +36,7 @@ const Members = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { canManageMembers } = useFamilyAuth(familySlug);
+  const isMobile = useIsMobile();
   const [loading, setLoading] = useState(true);
   const [members, setMembers] = useState<Member[]>([]);
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);
@@ -198,6 +201,11 @@ const Members = () => {
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
+  }
+
+  // Render mobile version
+  if (isMobile) {
+    return <MobileMembers />;
   }
 
   return (

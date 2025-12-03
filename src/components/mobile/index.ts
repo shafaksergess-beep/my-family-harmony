@@ -17,4 +17,7 @@ export { LoanCalculator } from './LoanCalculator';
 export { LoanCard } from './LoanCard';
 export { RepaymentSchedule } from './RepaymentSchedule';
 export { MobileLoans } from './MobileLoans';
+export { MemberCard } from './MemberCard';
+export { FamilyStatsCard } from './FamilyStatsCard';
+export { MobileMembers } from './MobileMembers';
 
