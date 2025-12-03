@@ -9,6 +9,9 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import * as LucideIcons from "lucide-react";
+import { usePlatform } from "@/hooks/usePlatform";
+import { MobileLayout } from "@/components/mobile/MobileLayout";
+import { haptics } from "@/lib/haptics";
 
 interface ModuleCategory {
   id: string;
@@ -37,6 +40,7 @@ const FamilyDetail = () => {
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { family, userRole, userId, isLoading } = useFamilyAuth(familySlug);
+  const { isMobile } = usePlatform();
   const [categories, setCategories] = useState<ModuleCategory[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [loadingModules, setLoadingModules] = useState(true);
@@ -98,6 +102,86 @@ const FamilyDetail = () => {
     );
   }
 
+  const handleModuleClick = async (path: string) => {
+    await haptics.light();
+    navigate(path);
+  };
+
+  // Mobile layout
+  if (isMobile) {
+    return (
+      <MobileLayout
+        title={family?.name || 'Family'}
+        familySlug={familySlug}
+        showSearch={true}
+      >
+        <div className="p-4 space-y-6">
+          {family && <FinancialWidget familyId={family.id} />}
+          
+          <Tabs defaultValue={categories[0]?.slug || "meetings"} className="space-y-4">
+            <div className="overflow-x-auto pb-2 -mx-4 px-4 hide-scrollbar">
+              <TabsList className="inline-flex w-auto gap-1 bg-muted/50 p-1">
+                {categories.map((category) => {
+                  const Icon = getIconComponent(category.icon);
+                  return (
+                    <TabsTrigger 
+                      key={category.id} 
+                      value={category.slug}
+                      className="whitespace-nowrap px-3 py-2 data-[state=active]:bg-card"
+                    >
+                      <Icon className="w-4 h-4 mr-1.5" />
+                      <span className="text-xs">{category.name}</span>
+                    </TabsTrigger>
+                  );
+                })}
+              </TabsList>
+            </div>
+
+            {categories.map((category) => {
+              const categoryModules = modules.filter(m => m.category_id === category.id);
+              
+              return (
+                <TabsContent key={category.id} value={category.slug} className="space-y-3 mt-0">
+                  {categoryModules.map((module) => {
+                    const Icon = getIconComponent(module.icon);
+                    const path = module.route_path.replace(':familySlug', familySlug || '');
+                    return (
+                      <Card 
+                        key={module.id} 
+                        className="p-4 active:bg-muted/50 transition-colors cursor-pointer"
+                        onClick={() => handleModuleClick(path)}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className={`p-3 rounded-xl bg-primary/10`}>
+                            <Icon className="w-5 h-5 text-primary" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-sm">{module.name}</h3>
+                            <p className="text-xs text-muted-foreground truncate">
+                              {module.description}
+                            </p>
+                          </div>
+                          <LucideIcons.ChevronRight className="w-5 h-5 text-muted-foreground" />
+                        </div>
+                      </Card>
+                    );
+                  })}
+                  {categoryModules.length === 0 && (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <LucideIcons.Circle className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p className="text-sm">No modules in this category</p>
+                    </div>
+                  )}
+                </TabsContent>
+              );
+            })}
+          </Tabs>
+        </div>
+      </MobileLayout>
+    );
+  }
+
+  // Desktop layout
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">

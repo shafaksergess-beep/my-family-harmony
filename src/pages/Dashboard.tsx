@@ -6,6 +6,8 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, LogOut, Plus, Users, Building2, Shield, FileText, User as UserIcon, Activity } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { usePlatform } from "@/hooks/usePlatform";
+import { MobileDashboard } from "@/components/mobile/MobileDashboard";
 
 interface UserFamily {
   family_id: string;
@@ -17,6 +19,7 @@ interface UserFamily {
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isMobile } = usePlatform();
   const [loading, setLoading] = useState(true);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [userFamilies, setUserFamilies] = useState<UserFamily[]>([]);
@@ -95,6 +98,11 @@ const Dashboard = () => {
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
+  }
+
+  // Show mobile dashboard on mobile devices (for non-super-admins)
+  if (isMobile && !isSuperAdmin) {
+    return <MobileDashboard />;
   }
 
   return (
