@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { haptics } from '@/lib/haptics';
+import { SyncStatusIndicator } from './SyncStatusIndicator';
 
 interface MobileHeaderProps {
   title?: string;
@@ -98,6 +99,8 @@ export function MobileHeader({
 
         {/* Right: Actions */}
         <div className="flex items-center gap-1">
+          <SyncStatusIndicator />
+          
           {showSearch && (
             <Button
               variant="ghost"

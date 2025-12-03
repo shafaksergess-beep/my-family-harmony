@@ -20,4 +20,5 @@ export { MobileLoans } from './MobileLoans';
 export { MemberCard } from './MemberCard';
 export { FamilyStatsCard } from './FamilyStatsCard';
 export { MobileMembers } from './MobileMembers';
+export { SyncStatusIndicator } from './SyncStatusIndicator';
 
