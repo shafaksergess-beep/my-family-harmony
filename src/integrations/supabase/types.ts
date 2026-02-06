@@ -2304,47 +2304,7 @@ export type Database = {
       }
     }
     Views: {
-      activity_logs_safe: {
-        Row: {
-          action_type: string | null
-          created_at: string | null
-          details: Json | null
-          entity_id: string | null
-          entity_type: string | null
-          family_id: string | null
-          id: string | null
-          user_id: string | null
-        }
-        Insert: {
-          action_type?: string | null
-          created_at?: string | null
-          details?: Json | null
-          entity_id?: string | null
-          entity_type?: string | null
-          family_id?: string | null
-          id?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          action_type?: string | null
-          created_at?: string | null
-          details?: Json | null
-          entity_id?: string | null
-          entity_type?: string | null
-          family_id?: string | null
-          id?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "activity_logs_family_id_fkey"
-            columns: ["family_id"]
-            isOneToOne: false
-            referencedRelation: "families"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       check_is_family_admin: {
@@ -2361,6 +2321,21 @@ export type Database = {
         Returns: boolean
       }
       generate_reference_code: { Args: never; Returns: string }
+      get_activity_logs_safe: {
+        Args: { p_family_id?: string; p_limit?: number }
+        Returns: {
+          action_type: string
+          created_at: string
+          details: Json
+          entity_id: string
+          entity_type: string
+          family_id: string
+          id: string
+          ip_address: string
+          user_agent: string
+          user_id: string
+        }[]
+      }
       get_user_email: { Args: { check_user_id: string }; Returns: string }
       get_user_families: {
         Args: { check_user_id: string }
