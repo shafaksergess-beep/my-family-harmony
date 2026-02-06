@@ -2,11 +2,10 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { JoinRequestCard } from "./JoinRequestCard";
-import { Loader2, UserPlus, Clock, CheckCircle, XCircle, Bell } from "lucide-react";
+import { JoinRequestCardEnhanced } from "./JoinRequestCardEnhanced";
+import { Loader2, UserPlus, Clock, CheckCircle, XCircle, Bell, HelpCircle } from "lucide-react";
 
 interface JoinRequest {
   id: string;
@@ -161,10 +160,11 @@ export const PendingJoinRequests = ({ familyId, familySlug }: PendingJoinRequest
 
   const filteredRequests = requests.filter(r => {
     if (filter === "all") return true;
+    if (filter === "pending") return r.status === "pending" || r.status === "info_requested";
     return r.status === filter;
   });
 
-  const pendingCount = requests.filter(r => r.status === "pending").length;
+  const pendingCount = requests.filter(r => r.status === "pending" || r.status === "info_requested").length;
 
   if (loading) {
     return (
@@ -202,10 +202,14 @@ export const PendingJoinRequests = ({ familyId, familySlug }: PendingJoinRequest
       </CardHeader>
       <CardContent>
         <Tabs value={filter} onValueChange={setFilter} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-4">
+          <TabsList className="grid w-full grid-cols-4 mb-4">
             <TabsTrigger value="pending" className="gap-1">
               <Clock className="w-3 h-3" />
               Pending
+            </TabsTrigger>
+            <TabsTrigger value="info_requested" className="gap-1">
+              <HelpCircle className="w-3 h-3" />
+              Info
             </TabsTrigger>
             <TabsTrigger value="approved" className="gap-1">
               <CheckCircle className="w-3 h-3" />
@@ -221,15 +225,17 @@ export const PendingJoinRequests = ({ familyId, familySlug }: PendingJoinRequest
             {filteredRequests.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <UserPlus className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p>No {filter === "all" ? "" : filter} requests</p>
+                <p>No {filter === "all" ? "" : filter === "info_requested" ? "info requested" : filter} requests</p>
               </div>
             ) : (
               filteredRequests.map((request) => (
-                <JoinRequestCard
+                <JoinRequestCardEnhanced
                   key={request.id}
                   request={request}
+                  familyId={familyId}
                   onApprove={handleApprove}
                   onReject={handleReject}
+                  onRefresh={loadRequests}
                 />
               ))
             )}
