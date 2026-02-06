@@ -1,9 +1,10 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Clock, AlertTriangle, CreditCard } from "lucide-react";
+import { CheckCircle, Clock, AlertTriangle, CreditCard, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { haptics } from "@/lib/haptics";
+import { ContributionReceiptButton } from "@/components/contributions/ContributionReceiptButton";
 
 interface ContributionCardProps {
   contribution: {
@@ -20,9 +21,10 @@ interface ContributionCardProps {
   onPay?: (id: string) => void;
   onMarkPaid?: (id: string) => void;
   canManage?: boolean;
+  familyName?: string;
 }
 
-export function ContributionCard({ contribution, onPay, onMarkPaid, canManage }: ContributionCardProps) {
+export function ContributionCard({ contribution, onPay, onMarkPaid, canManage, familyName = 'Family' }: ContributionCardProps) {
   const getStatusConfig = (status: string) => {
     switch (status) {
       case "paid":
@@ -159,10 +161,20 @@ export function ContributionCard({ contribution, onPay, onMarkPaid, canManage }:
                   </div>
                 )}
 
-                {contribution.status === "paid" && contribution.payment_date && (
-                  <span className="text-xs text-muted-foreground">
-                    {format(new Date(contribution.payment_date), "MMM d")}
-                  </span>
+                {contribution.status === "paid" && (
+                  <div className="flex items-center gap-1">
+                    <ContributionReceiptButton
+                      contribution={contribution}
+                      familyName={familyName}
+                      size="icon"
+                      variant="ghost"
+                    />
+                    {contribution.payment_date && (
+                      <span className="text-xs text-muted-foreground">
+                        {format(new Date(contribution.payment_date), "MMM d")}
+                      </span>
+                    )}
+                  </div>
                 )}
               </div>
             </div>

@@ -11,7 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
-import { ArrowLeft, Plus, DollarSign, TrendingUp, Download, Loader2 } from "lucide-react";
+import { ArrowLeft, Plus, DollarSign, TrendingUp, Download, Loader2, FileText } from "lucide-react";
+import { ContributionReceiptButton } from "@/components/contributions/ContributionReceiptButton";
 import { format } from "date-fns";
 import { exportToCSV } from "@/lib/export";
 import BulkPaymentMenu from "@/components/BulkPaymentMenu";
@@ -543,15 +544,26 @@ export default function Contributions() {
                         <p className="text-sm text-red-600">+{contribution.late_fine} fine</p>
                       )}
                     </div>
-                    {contribution.status === "pending" && canManageFinances ? (
-                      <Button size="sm" onClick={() => handleMarkAsPaid(contribution.id)}>
-                        Mark Paid
-                      </Button>
-                    ) : (
-                      <Badge variant={contribution.status === "paid" ? "default" : "secondary"}>
-                        {contribution.status}
-                      </Badge>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {contribution.status === "paid" && (
+                        <ContributionReceiptButton
+                          contribution={{
+                            ...contribution,
+                            member_name: contribution.family_members?.profiles?.full_name,
+                          }}
+                          familyName={family?.name || 'Family'}
+                        />
+                      )}
+                      {contribution.status === "pending" && canManageFinances ? (
+                        <Button size="sm" onClick={() => handleMarkAsPaid(contribution.id)}>
+                          Mark Paid
+                        </Button>
+                      ) : (
+                        <Badge variant={contribution.status === "paid" ? "default" : "secondary"}>
+                          {contribution.status}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}

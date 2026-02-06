@@ -1,12 +1,6 @@
 // Sync queue for offline mutations with conflict resolution
 
-import { createClient } from '@supabase/supabase-js';
-
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-
-// Use untyped client for dynamic table operations
-const untypedSupabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+import { supabase } from '@/integrations/supabase/client';
 
 export interface SyncOperation {
   id?: number;
@@ -178,8 +172,8 @@ class SyncQueue {
 
     switch (type) {
       case 'INSERT': {
-        const { error } = await untypedSupabase
-          .from(table)
+        const { error } = await supabase
+          .from(table as any)
           .insert(data);
         if (error) throw error;
         break;
@@ -188,9 +182,9 @@ class SyncQueue {
         if (!primaryKey || !data[primaryKey]) {
           throw new Error('Primary key required for UPDATE');
         }
-        const { error } = await untypedSupabase
-          .from(table)
-          .update(data)
+        const { error } = await supabase
+          .from(table as any)
+          .update(data as any)
           .eq(primaryKey, data[primaryKey] as string);
         if (error) throw error;
         break;
@@ -199,8 +193,8 @@ class SyncQueue {
         if (!primaryKey || !data[primaryKey]) {
           throw new Error('Primary key required for DELETE');
         }
-        const { error } = await untypedSupabase
-          .from(table)
+        const { error } = await supabase
+          .from(table as any)
           .delete()
           .eq(primaryKey, data[primaryKey] as string);
         if (error) throw error;

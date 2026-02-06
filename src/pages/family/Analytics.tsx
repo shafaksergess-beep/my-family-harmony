@@ -7,6 +7,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { Loader2, ArrowLeft, TrendingUp, Users, DollarSign, PiggyBank, CreditCard, AlertCircle } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { SavingsGrowthChart } from "@/components/analytics/SavingsGrowthChart";
+import { LoanRepaymentChart } from "@/components/analytics/LoanRepaymentChart";
+import { ContributionTrendsChart } from "@/components/analytics/ContributionTrendsChart";
 
 interface KPIData {
   totalMembers: number;
@@ -202,6 +205,16 @@ const FamilyAnalytics = () => {
           ))}
         </div>
 
+        {/* Visual Analytics Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <SavingsGrowthChart familyId={family?.id || ''} />
+          <LoanRepaymentChart familyId={family?.id || ''} />
+        </div>
+
+        <div className="mb-8">
+          <ContributionTrendsChart familyId={family?.id || ''} />
+        </div>
+
         <Card>
           <CardHeader>
             <CardTitle>Meeting Statistics</CardTitle>
@@ -212,9 +225,6 @@ const FamilyAnalytics = () => {
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Completed Meetings:</span>
                 <span className="text-2xl font-bold text-primary">{kpis.completedMeetings}</span>
-              </div>
-              <div className="text-sm text-muted-foreground">
-                More detailed meeting analytics coming soon
               </div>
             </div>
           </CardContent>

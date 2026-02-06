@@ -10,6 +10,7 @@ import {
   SkeletonCard, 
   OfflineIndicator 
 } from "@/components/mobile";
+import { ContributionReceiptButton } from "@/components/contributions/ContributionReceiptButton";
 import { MobileMoneyPayment } from "./MobileMoneyPayment";
 import { ReceiptScanner } from "./ReceiptScanner";
 import { ContributionCard } from "./ContributionCard";
@@ -300,6 +301,7 @@ export function MobileContributions() {
                     onPay={() => handlePayContribution(contribution)}
                     canManage={canManageFinances}
                     onMarkPaid={() => handleMarkAsPaid(contribution.id)}
+                    familyName={family?.name}
                   />
                 ))
               )}
@@ -321,6 +323,7 @@ export function MobileContributions() {
                       contribution={contribution}
                       canManage={canManageFinances}
                       onMarkPaid={() => handleMarkAsPaid(contribution.id)}
+                      familyName={family?.name}
                     />
                   ))
                 )}
