@@ -9,6 +9,7 @@ import { Loader2, ArrowLeft, Users, Building2, Activity, TrendingUp, Shield, Fil
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Badge } from "@/components/ui/badge";
 import ActivityWidget from "@/components/ActivityWidget";
+import { AdminNotificationsList } from "@/components/admin/AdminNotificationsList";
 import { LineChart, Line, BarChart, Bar, PieChart as RechartsPie, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
@@ -353,8 +354,11 @@ const AdminDashboard = () => {
           </Card>
         </div>
 
-        {/* Charts */}
+        {/* Notifications and Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Admin Notifications */}
+          <AdminNotificationsList />
+          
           {/* Activity Widget */}
           <ActivityWidget limit={15} />
           

@@ -8,6 +8,7 @@ import { Loader2, LogOut, Plus, Users, Building2, Shield, FileText, User as User
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { usePlatform } from "@/hooks/usePlatform";
 import { MobileDashboard } from "@/components/mobile/MobileDashboard";
+import { JoinFamilyCard } from "@/components/dashboard/JoinFamilyCard";
 
 interface UserFamily {
   family_id: string;
@@ -260,22 +261,26 @@ const Dashboard = () => {
           </div>
 
           {userFamilies.length === 0 ? (
-            <Card className="p-12 text-center">
-              <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-xl font-semibold mb-2 text-foreground">
-                No families yet
-              </h3>
-              <p className="text-muted-foreground mb-6">
-                You haven't been added to any family yet.
-                {isSuperAdmin && " As a super admin, you can create a new family."}
-              </p>
-              {isSuperAdmin && (
-                <Button onClick={() => navigate("/admin/families")}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Family
-                </Button>
-              )}
-            </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="p-12 text-center">
+                <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-xl font-semibold mb-2 text-foreground">
+                  No families yet
+                </h3>
+                <p className="text-muted-foreground mb-6">
+                  You haven't been added to any family yet.
+                  {isSuperAdmin && " As a super admin, you can create a new family."}
+                </p>
+                {isSuperAdmin && (
+                  <Button onClick={() => navigate("/admin/families")}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Family
+                  </Button>
+                )}
+              </Card>
+              {/* Join Family Card */}
+              {!isSuperAdmin && <JoinFamilyCard />}
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {userFamilies.map((family) => (
@@ -301,6 +306,8 @@ const Dashboard = () => {
                   </Button>
                 </Card>
               ))}
+              {/* Join Family Card - also show when user has families */}
+              {!isSuperAdmin && <JoinFamilyCard />}
             </div>
           )}
         </div>
