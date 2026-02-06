@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.send-birth-visit-reminders]
 verify_jwt = false
+
+[functions.send-event-reminders]
+verify_jwt = false

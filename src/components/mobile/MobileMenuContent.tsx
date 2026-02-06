@@ -12,6 +12,8 @@ import {
   LogOut,
   User,
   ChevronRight,
+  MessageCircle,
+  CalendarDays,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptics } from '@/lib/haptics';
@@ -65,6 +67,13 @@ export function MobileMenuContent({
         { label: 'Savings', icon: PiggyBank, path: familySlug ? `/family/${familySlug}/savings` : '/dashboard' },
         { label: 'Loans', icon: HandCoins, path: familySlug ? `/family/${familySlug}/loans` : '/dashboard' },
         { label: 'Njangi', icon: HeartHandshake, path: familySlug ? `/family/${familySlug}/njangi` : '/dashboard' },
+      ],
+    },
+    {
+      title: 'Community',
+      items: [
+        { label: 'Chat', icon: MessageCircle, path: familySlug ? `/family/${familySlug}/chat` : '/dashboard' },
+        { label: 'Calendar', icon: CalendarDays, path: familySlug ? `/family/${familySlug}/calendar` : '/dashboard' },
       ],
     },
     {
