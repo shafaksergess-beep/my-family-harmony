@@ -18,10 +18,18 @@ interface JoinRequest {
   status: string;
   reference_code_used?: string;
   created_at: string;
+  reviewed_at?: string;
+  reviewed_by?: string;
+  welcome_message?: string;
+  rejection_reason?: string;
   user_id?: string;
   profiles?: {
     avatar_url?: string;
     full_name: string;
+  };
+  reviewer?: {
+    full_name: string;
+    avatar_url?: string;
   };
 }
 
@@ -222,18 +230,37 @@ export const JoinRequestCardEnhanced = ({
                 </div>
               )}
 
-              {/* Show status for non-pending */}
+              {/* Show status for non-pending with reviewer info */}
               {request.status === "approved" && (
-                <Badge className="bg-green-600/90">
-                  <Check className="w-3 h-3 mr-1" />
-                  Approved
-                </Badge>
+                <div className="space-y-1">
+                  <Badge className="bg-primary">
+                    <Check className="w-3 h-3 mr-1" />
+                    Approved
+                  </Badge>
+                  {request.reviewer && request.reviewed_at && (
+                    <p className="text-xs text-muted-foreground">
+                      by {request.reviewer.full_name} on {new Date(request.reviewed_at).toLocaleDateString()}
+                    </p>
+                  )}
+                  {request.welcome_message && (
+                    <p className="text-xs text-muted-foreground italic">
+                      "{request.welcome_message}"
+                    </p>
+                  )}
+                </div>
               )}
               {request.status === "rejected" && (
-                <Badge variant="destructive">
-                  <X className="w-3 h-3 mr-1" />
-                  Declined
-                </Badge>
+                <div className="space-y-1">
+                  <Badge variant="destructive">
+                    <X className="w-3 h-3 mr-1" />
+                    Declined
+                  </Badge>
+                  {request.reviewer && request.reviewed_at && (
+                    <p className="text-xs text-muted-foreground">
+                      by {request.reviewer.full_name} on {new Date(request.reviewed_at).toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
               )}
             </div>
           </div>
