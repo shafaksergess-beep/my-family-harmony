@@ -16,10 +16,18 @@ interface JoinRequest {
   status: string;
   reference_code_used?: string;
   created_at: string;
+  reviewed_at?: string;
+  reviewed_by?: string;
+  welcome_message?: string;
+  rejection_reason?: string;
   user_id?: string;
   profiles?: {
     avatar_url?: string;
     full_name: string;
+  };
+  reviewer?: {
+    full_name: string;
+    avatar_url?: string;
   };
 }
 
@@ -48,22 +56,36 @@ export const PendingJoinRequests = ({ familyId, familySlug }: PendingJoinRequest
 
       if (error) throw error;
       
-      // Fetch profiles separately for requests with user_id
+      // Fetch profiles separately for requests with user_id and/or reviewed_by
       const requestsWithProfiles = await Promise.all(
         (data || []).map(async (request) => {
+          const result: JoinRequest = { ...request };
+          
+          // Fetch requester profile
           if (request.user_id) {
             const { data: profile } = await supabase
               .from("profiles")
               .select("avatar_url, full_name")
               .eq("id", request.user_id)
               .single();
-            return { ...request, profiles: profile || undefined };
+            result.profiles = profile || undefined;
           }
-          return request;
+          
+          // Fetch reviewer profile
+          if (request.reviewed_by) {
+            const { data: reviewerProfile } = await supabase
+              .from("profiles")
+              .select("avatar_url, full_name")
+              .eq("id", request.reviewed_by)
+              .single();
+            result.reviewer = reviewerProfile || undefined;
+          }
+          
+          return result;
         })
       );
       
-      setRequests(requestsWithProfiles as JoinRequest[]);
+      setRequests(requestsWithProfiles);
     } catch (error) {
       console.error("Error loading join requests:", error);
     } finally {

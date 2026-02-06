@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Users, CheckCircle, AlertCircle, ArrowRight, Sparkles, Shield, Calendar, Wallet } from "lucide-react";
+import { Loader2, Users, CheckCircle, AlertCircle, ArrowRight, Sparkles, Shield, Calendar, Wallet, Eye, Edit, Lock } from "lucide-react";
+import { PermissionExplanation } from "@/components/invitations/PermissionExplanation";
 
 interface FamilyInfo {
   id: string;
@@ -326,30 +327,71 @@ const JoinFamily = () => {
               </CardContent>
             </Card>
 
-            {/* What joining means */}
+            {/* What joining means - Expanded with permissions */}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Sparkles className="w-4 h-4" />
-                  What you'll get access to
+                  <Shield className="w-4 h-4" />
+                  What you'll get as a member
                 </CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-2 gap-3">
-                <div className="flex items-center gap-2 text-sm">
-                  <Calendar className="w-4 h-4 text-primary" />
-                  <span>Family meetings</span>
+              <CardContent className="space-y-4">
+                {/* View permissions */}
+                <div>
+                  <div className="flex items-center gap-2 text-sm font-medium mb-2">
+                    <Eye className="w-4 h-4 text-primary" />
+                    What you can view
+                  </div>
+                  <div className="grid grid-cols-1 gap-1.5 ml-6">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <CheckCircle className="w-3 h-3 text-primary shrink-0" />
+                      <span>Family meetings & schedules</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <CheckCircle className="w-3 h-3 text-primary shrink-0" />
+                      <span>Member directory & contacts</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <CheckCircle className="w-3 h-3 text-primary shrink-0" />
+                      <span>Your own contributions & history</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Wallet className="w-4 h-4 text-primary" />
-                  <span>Contributions</span>
+
+                {/* Edit permissions */}
+                <div>
+                  <div className="flex items-center gap-2 text-sm font-medium mb-2">
+                    <Edit className="w-4 h-4 text-primary" />
+                    What you can edit
+                  </div>
+                  <div className="grid grid-cols-1 gap-1.5 ml-6">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <CheckCircle className="w-3 h-3 text-primary shrink-0" />
+                      <span>Your personal profile</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <CheckCircle className="w-3 h-3 text-primary shrink-0" />
+                      <span>Your meeting attendance</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Users className="w-4 h-4 text-primary" />
-                  <span>Member directory</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Shield className="w-4 h-4 text-primary" />
-                  <span>Family events</span>
+
+                {/* Visibility */}
+                <div>
+                  <div className="flex items-center gap-2 text-sm font-medium mb-2">
+                    <Lock className="w-4 h-4 text-primary" />
+                    Who can see your profile
+                  </div>
+                  <div className="grid grid-cols-1 gap-1.5 ml-6">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Users className="w-3 h-3 shrink-0" />
+                      <span>All family members can see your name & contact</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Shield className="w-3 h-3 shrink-0" />
+                      <span>Admins can view your financial records</span>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>

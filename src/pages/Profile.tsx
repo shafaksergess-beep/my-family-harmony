@@ -3,13 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, User, Save } from "lucide-react";
+import { Loader2, ArrowLeft, User, Save, Users, Hash, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { JoinFamilyOptions } from "@/components/invitations/JoinFamilyOptions";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -25,6 +26,8 @@ const Profile = () => {
     preferred_language: "en",
     is_working: false,
   });
+  const [showJoinFamily, setShowJoinFamily] = useState(false);
+  const [userFamilies, setUserFamilies] = useState<any[]>([]);
 
   useEffect(() => {
     loadProfile();
@@ -39,26 +42,41 @@ const Profile = () => {
         return;
       }
 
-      const { data: profileData, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", session.user.id)
-        .single();
+      // Load profile and families in parallel
+      const [profileResult, familiesResult] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single(),
+        supabase
+          .from("family_members")
+          .select(`
+            id,
+            role,
+            families:family_id (id, name, slug, logo_url)
+          `)
+          .eq("user_id", session.user.id),
+      ]);
 
-      if (error) throw error;
+      if (profileResult.error) throw profileResult.error;
 
-      setProfile(profileData);
+      setProfile(profileResult.data);
       setFormData({
-        full_name: profileData.full_name || "",
-        email: profileData.email || "",
-        phone: profileData.phone || "",
-        preferred_language: profileData.preferred_language || "en",
-        is_working: profileData.is_working || false,
+        full_name: profileResult.data.full_name || "",
+        email: profileResult.data.email || "",
+        phone: profileResult.data.phone || "",
+        preferred_language: profileResult.data.preferred_language || "en",
+        is_working: profileResult.data.is_working || false,
       });
 
+      if (familiesResult.data) {
+        setUserFamilies(familiesResult.data);
+      }
+
       // Set language from profile
-      if (profileData.preferred_language) {
-        i18n.changeLanguage(profileData.preferred_language);
+      if (profileResult.data.preferred_language) {
+        i18n.changeLanguage(profileResult.data.preferred_language);
       }
     } catch (error: any) {
       console.error("Error loading profile:", error);
@@ -150,7 +168,63 @@ const Profile = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-2xl">
+      <main className="container mx-auto px-4 py-8 max-w-2xl space-y-6">
+        {/* Join Family Card */}
+        <Card className="border-dashed border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Family Memberships
+            </CardTitle>
+            <CardDescription>
+              {userFamilies.length > 0 
+                ? `You're a member of ${userFamilies.length} family group${userFamilies.length > 1 ? "s" : ""}`
+                : "Join a family to access shared resources"
+              }
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {/* Current families */}
+            {userFamilies.length > 0 && (
+              <div className="space-y-2">
+                {userFamilies.map((membership: any) => (
+                  <div
+                    key={membership.id}
+                    className="flex items-center gap-3 p-2 rounded-lg bg-background/80 cursor-pointer hover:bg-background transition-colors"
+                    onClick={() => navigate(`/family/${membership.families.slug}`)}
+                  >
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      {membership.families.logo_url ? (
+                        <img src={membership.families.logo_url} alt="" className="w-full h-full rounded-full object-cover" />
+                      ) : (
+                        <Users className="w-4 h-4 text-primary" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{membership.families.name}</p>
+                      <p className="text-xs text-muted-foreground capitalize">
+                        {membership.role?.replace("_", " ")}
+                      </p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Join family button */}
+            <Button 
+              variant="outline" 
+              className="w-full gap-2"
+              onClick={() => setShowJoinFamily(true)}
+            >
+              <Hash className="w-4 h-4" />
+              Join a Family
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Personal Information Card */}
         <Card>
           <CardHeader>
             <CardTitle>Personal Information</CardTitle>
@@ -242,6 +316,9 @@ const Profile = () => {
           </CardContent>
         </Card>
       </main>
+
+      {/* Join Family Dialog */}
+      <JoinFamilyOptions open={showJoinFamily} onOpenChange={setShowJoinFamily} />
     </div>
   );
 };
