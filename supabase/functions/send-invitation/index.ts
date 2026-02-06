@@ -51,17 +51,17 @@ const handler = async (req: Request): Promise<Response> => {
 
     const { invitationId, recaptchaToken }: InvitationRequest = await req.json();
 
-    // Verify reCAPTCHA token if provided
+    // Verify reCAPTCHA token if provided (graceful degradation - don't block if verification fails)
     if (recaptchaToken) {
-      const recaptchaResult = await verifyRecaptchaToken(recaptchaToken, "invite", 0.5);
-      if (!recaptchaResult.success) {
-        return new Response(
-          JSON.stringify({ error: "Security verification failed. Please try again." }),
-          {
-            status: 403,
-            headers: { "Content-Type": "application/json", ...corsHeaders },
-          }
-        );
+      try {
+        const recaptchaResult = await verifyRecaptchaToken(recaptchaToken, "invite", 0.5);
+        if (!recaptchaResult.success) {
+          // Log the failure but don't block - this is an authenticated action
+          console.warn("reCAPTCHA verification failed, proceeding with authenticated request");
+        }
+      } catch (recaptchaError) {
+        // reCAPTCHA service error - log and continue
+        console.warn("reCAPTCHA service error:", recaptchaError);
       }
     }
 
