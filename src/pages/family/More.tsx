@@ -15,12 +15,14 @@ import {
   CalendarDays,
   Users,
   Heart,
+  UserPlus,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptics } from '@/lib/haptics';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { MobileLayout } from '@/components/mobile/MobileLayout';
+import { useFamilyAuth } from '@/hooks/useFamilyAuth';
 
 interface MenuItem {
   label: string;
@@ -37,6 +39,9 @@ interface MenuSection {
 export default function More() {
   const { familySlug } = useParams();
   const navigate = useNavigate();
+  const { isFamilyHead, isFamilyAdmin } = useFamilyAuth(familySlug);
+
+  const canManageFamily = isFamilyHead || isFamilyAdmin;
 
   const menuSections: MenuSection[] = [
     {
@@ -63,14 +68,15 @@ export default function More() {
         { label: 'Export Data', description: 'Download your data', icon: Download, path: `/family/${familySlug}/export-scheduler` },
       ],
     },
-    {
+    // Settings section only visible to family head and family admin
+    ...(canManageFamily ? [{
       title: 'Settings',
       items: [
         { label: 'Notifications', description: 'Manage alerts & reminders', icon: Bell, path: `/family/${familySlug}/notifications` },
         { label: 'Notification Settings', description: 'Customize preferences', icon: Settings, path: `/family/${familySlug}/notification-settings` },
-        { label: 'Invitations', description: 'Invite family members', icon: Users, path: `/family/${familySlug}/invitations` },
+        { label: 'Invitations & Requests', description: 'Manage invites & join requests', icon: UserPlus, path: `/family/${familySlug}/invitations` },
       ],
-    },
+    }] : []),
   ];
 
   const handleNavigate = async (path: string) => {
