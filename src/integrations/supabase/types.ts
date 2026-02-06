@@ -688,6 +688,7 @@ export type Database = {
           child_death_amount: number | null
           contribution_scope: string | null
           created_at: string | null
+          deactivated_at: string | null
           description: string | null
           external_other_amount: number | null
           external_wonya_amount: number | null
@@ -722,6 +723,7 @@ export type Database = {
           child_death_amount?: number | null
           contribution_scope?: string | null
           created_at?: string | null
+          deactivated_at?: string | null
           description?: string | null
           external_other_amount?: number | null
           external_wonya_amount?: number | null
@@ -756,6 +758,7 @@ export type Database = {
           child_death_amount?: number | null
           contribution_scope?: string | null
           created_at?: string | null
+          deactivated_at?: string | null
           description?: string | null
           external_other_amount?: number | null
           external_wonya_amount?: number | null

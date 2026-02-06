@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, ArrowLeft, Building2, Users, Edit, Trash2, Shield, FileText, Download } from "lucide-react";
+import { Loader2, Plus, ArrowLeft, Building2, Users, Edit, Trash2, Shield, FileText, Download, RotateCcw, AlertTriangle } from "lucide-react";
 import { logAdminActivity } from "@/lib/adminLogger";
 import { exportToCSV, formatFamiliesForExport } from "@/lib/export";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { cn } from "@/lib/utils";
 
 interface Family {
   id: string;
@@ -21,6 +22,7 @@ interface Family {
   description: string | null;
   is_active: boolean;
   created_at: string;
+  deactivated_at: string | null;
 }
 
 const AdminFamilies = () => {
@@ -167,8 +169,8 @@ const AdminFamilies = () => {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = async (familyId: string) => {
-    if (!confirm(t("admin.deleteConfirm"))) {
+  const handleDeactivate = async (familyId: string) => {
+    if (!confirm(t("admin.deactivateConfirm") || "Are you sure you want to deactivate this family? It can be reactivated within 100 days.")) {
       return;
     }
 
@@ -177,33 +179,86 @@ const AdminFamilies = () => {
       
       const { error } = await supabase
         .from("families")
-        .delete()
+        .update({ 
+          is_active: false, 
+          deactivated_at: new Date().toISOString() 
+        })
         .eq("id", familyId);
 
       if (error) throw error;
       
       // Log activity
       await logAdminActivity({
-        action_type: 'delete',
+        action_type: 'update',
         entity_type: 'family',
         entity_id: familyId,
-        details: { name: family?.name },
+        details: { name: family?.name, action: 'deactivated' },
         sendNotification: true
       });
       
       toast({
         title: t("common.success"),
-        description: t("admin.familyDeleted"),
+        description: t("admin.familyDeactivated") || "Family deactivated successfully. It can be reactivated within 100 days.",
       });
       loadFamilies();
     } catch (error: any) {
-      console.error("Error deleting family:", error);
+      console.error("Error deactivating family:", error);
       toast({
         title: t("common.error"),
-        description: error.message || t("admin.deleteFailed"),
+        description: error.message || t("admin.deactivateFailed") || "Failed to deactivate family",
         variant: "destructive",
       });
     }
+  };
+
+  const handleReactivate = async (familyId: string) => {
+    if (!confirm(t("admin.reactivateConfirm") || "Are you sure you want to reactivate this family?")) {
+      return;
+    }
+
+    try {
+      const family = families.find(f => f.id === familyId);
+      
+      const { error } = await supabase
+        .from("families")
+        .update({ 
+          is_active: true, 
+          deactivated_at: null 
+        })
+        .eq("id", familyId);
+
+      if (error) throw error;
+      
+      // Log activity
+      await logAdminActivity({
+        action_type: 'update',
+        entity_type: 'family',
+        entity_id: familyId,
+        details: { name: family?.name, action: 'reactivated' },
+        sendNotification: true
+      });
+      
+      toast({
+        title: t("common.success"),
+        description: t("admin.familyReactivated") || "Family reactivated successfully.",
+      });
+      loadFamilies();
+    } catch (error: any) {
+      console.error("Error reactivating family:", error);
+      toast({
+        title: t("common.error"),
+        description: error.message || t("admin.reactivateFailed") || "Failed to reactivate family",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getDaysRemaining = (deactivatedAt: string | null): number => {
+    if (!deactivatedAt) return 0;
+    const deactivatedDate = new Date(deactivatedAt);
+    const now = new Date();
+    const diffTime = (deactivatedDate.getTime() + 100 * 24 * 60 * 60 * 1000) - now.getTime();
+    return Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
   };
 
   const handleExport = () => {
@@ -343,17 +398,33 @@ const AdminFamilies = () => {
             {families.map((family) => (
               <Card key={family.id} className="hover:shadow-lg transition-all">
                 <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <Building2 className="w-10 h-10 text-primary" />
+                    <div className="flex items-start justify-between">
+                    <Building2 className={cn("w-10 h-10", family.is_active ? "text-primary" : "text-muted-foreground")} />
                     <div className="flex gap-2">
-                      <Button size="icon" variant="ghost" onClick={() => handleEdit(family)}>
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button size="icon" variant="ghost" onClick={() => handleDelete(family.id)}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      {family.is_active ? (
+                        <>
+                          <Button size="icon" variant="ghost" onClick={() => handleEdit(family)}>
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button size="icon" variant="ghost" onClick={() => handleDeactivate(family.id)}>
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </>
+                      ) : (
+                        <Button size="icon" variant="ghost" onClick={() => handleReactivate(family.id)}>
+                          <RotateCcw className="w-4 h-4 text-primary" />
+                        </Button>
+                      )}
                     </div>
                   </div>
+                  {!family.is_active && family.deactivated_at && (
+                    <div className="flex items-center gap-2 mt-2 p-2 bg-destructive/10 rounded-md">
+                      <AlertTriangle className="w-4 h-4 text-destructive" />
+                      <span className="text-xs text-destructive font-medium">
+                        Deactivated - {getDaysRemaining(family.deactivated_at)} days to reactivate
+                      </span>
+                    </div>
+                  )}
                   <CardTitle>{family.name}</CardTitle>
                   <CardDescription>{family.description || t("admin.noDescription")}</CardDescription>
                 </CardHeader>
@@ -365,27 +436,34 @@ const AdminFamilies = () => {
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <span className="font-medium">{t("admin.status")}:</span>
-                      <span className={`px-2 py-1 rounded text-xs ${family.is_active ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                        {family.is_active ? t("admin.active") : t("admin.inactive")}
+                      <span className={cn(
+                        "px-2 py-1 rounded text-xs",
+                        family.is_active 
+                          ? 'bg-primary/10 text-primary' 
+                          : 'bg-destructive/10 text-destructive'
+                      )}>
+                        {family.is_active ? t("admin.active") : t("admin.inactive") || "Deactivated"}
                       </span>
                     </div>
                   </div>
-                  <div className="flex gap-2 mt-4">
-                    <Button 
-                      className="flex-1" 
-                      variant="outline"
-                      onClick={() => navigate(`/admin/families/${family.id}/members`)}
-                    >
-                      <Users className="w-4 h-4 mr-2" />
-                      {t("admin.members")}
-                    </Button>
-                    <Button 
-                      className="flex-1" 
-                      onClick={() => navigate(`/family/${family.slug}/analytics`)}
-                    >
-                      {t("admin.analytics")}
-                    </Button>
-                  </div>
+                  {family.is_active && (
+                    <div className="flex gap-2 mt-4">
+                      <Button 
+                        className="flex-1" 
+                        variant="outline"
+                        onClick={() => navigate(`/admin/families/${family.id}/members`)}
+                      >
+                        <Users className="w-4 h-4 mr-2" />
+                        {t("admin.members")}
+                      </Button>
+                      <Button 
+                        className="flex-1" 
+                        onClick={() => navigate(`/family/${family.slug}/analytics`)}
+                      >
+                        {t("admin.analytics")}
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
