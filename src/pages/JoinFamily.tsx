@@ -80,24 +80,21 @@ const JoinFamily = () => {
 
   const checkClipboard = async () => {
     try {
-      const text = await navigator.clipboard.readText();
-      // Check if clipboard contains a valid-looking code (8 alphanumeric chars)
-      if (/^[A-Z0-9]{8}$/i.test(text.trim()) && !referenceCode) {
-        toast({
-          title: "Code detected",
-          description: `Found "${text.trim()}" in clipboard. Use this code?`,
-          action: (
-            <Button size="sm" onClick={() => {
-              setReferenceCode(text.trim().toUpperCase());
-              validateCode(text.trim().toUpperCase());
-            }}>
-              Use Code
-            </Button>
-          ),
-        });
+      // Only check clipboard if we have focus and permission
+      if (document.hasFocus()) {
+        const text = await navigator.clipboard.readText();
+        // Check if clipboard contains a valid-looking code (8 alphanumeric chars)
+        if (/^[A-Z0-9]{8}$/i.test(text.trim()) && !referenceCode) {
+          setReferenceCode(text.trim().toUpperCase());
+          toast({
+            title: "Invitation code detected",
+            description: `Found "${text.trim().toUpperCase()}" in clipboard. Validating...`,
+          });
+          validateCode(text.trim().toUpperCase());
+        }
       }
     } catch {
-      // Clipboard access denied - ignore
+      // Clipboard access denied - ignore silently
     }
   };
 
@@ -292,11 +289,14 @@ const JoinFamily = () => {
                 Continue
               </Button>
 
-              <div className="text-center pt-4 border-t">
-                <p className="text-sm text-muted-foreground mb-2">Don't have a code?</p>
+              <div className="text-center pt-4 border-t space-y-3">
+                <p className="text-sm text-muted-foreground">Don't have a code?</p>
                 <Button variant="link" onClick={() => navigate("/dashboard")}>
                   Go to Dashboard
                 </Button>
+                <p className="text-xs text-muted-foreground">
+                  Using a code will send a join request to the family administrator for approval.
+                </p>
               </div>
             </CardContent>
           </Card>

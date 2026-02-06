@@ -4,13 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Users, Ticket, ArrowRight } from "lucide-react";
 import { loginSchema, signupSchema } from "@/lib/validation";
 import { checkRateLimit, recordAttempt, resetRateLimit } from "@/lib/rateLimit";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
+
+interface PendingInvitation {
+  familyName: string;
+  inviterName?: string;
+  role: string;
+}
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -22,6 +29,9 @@ const Auth = () => {
 
   // Get redirect URL from query params
   const redirectUrl = searchParams.get("redirect") || "/dashboard";
+  
+  // Pending invitation context
+  const [pendingInvitation, setPendingInvitation] = useState<PendingInvitation | null>(null);
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState("");
@@ -52,6 +62,9 @@ const Auth = () => {
 
     checkAuth();
 
+    // Check for pending invitation context
+    checkPendingInvitation();
+
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) {
@@ -61,6 +74,37 @@ const Auth = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate, redirectUrl]);
+
+  const checkPendingInvitation = async () => {
+    // Check if redirect contains invitation token
+    if (redirectUrl.includes("accept-invitation") && redirectUrl.includes("token=")) {
+      const tokenMatch = redirectUrl.match(/token=([^&]+)/);
+      if (tokenMatch) {
+        try {
+          const { data } = await supabase
+            .from("invitations")
+            .select(`
+              role,
+              families:family_id (name),
+              profiles:invited_by (full_name)
+            `)
+            .eq("token", tokenMatch[1])
+            .eq("status", "pending")
+            .single();
+
+          if (data) {
+            setPendingInvitation({
+              familyName: (data.families as any)?.name || "the family",
+              inviterName: (data.profiles as any)?.full_name,
+              role: data.role,
+            });
+          }
+        } catch (error) {
+          // Invitation lookup failed - continue without context
+        }
+      }
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -239,6 +283,29 @@ const Auth = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        {/* Pending Invitation Banner */}
+        {pendingInvitation && (
+          <Card className="mb-4 p-4 bg-primary/5 border-primary/20">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <Users className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium">
+                  {pendingInvitation.inviterName 
+                    ? `${pendingInvitation.inviterName} invited you to join`
+                    : "You've been invited to join"
+                  }
+                </p>
+                <p className="text-sm text-primary font-semibold">{pendingInvitation.familyName}</p>
+              </div>
+              <Badge variant="secondary">
+                {pendingInvitation.role.replace("_", " ")}
+              </Badge>
+            </div>
+          </Card>
+        )}
+
         <div className="text-center mb-8">
           <div className="mb-4">
             <img 
@@ -249,7 +316,10 @@ const Auth = () => {
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-2">Family Together</h1>
           <p className="text-muted-foreground">
-            Manage your family reunion with ease
+            {pendingInvitation 
+              ? "Sign in or create an account to accept your invitation"
+              : "Manage your family reunion with ease"
+            }
           </p>
         </div>
 
@@ -410,6 +480,19 @@ const Auth = () => {
               </form>
             </TabsContent>
           </Tabs>
+          
+          {/* Have a code section */}
+          <div className="mt-6 pt-6 border-t">
+            <Button
+              variant="outline"
+              onClick={() => navigate("/join")}
+              className="w-full"
+            >
+              <Ticket className="w-4 h-4 mr-2" />
+              Have an invitation code?
+              <ArrowRight className="w-4 h-4 ml-auto" />
+            </Button>
+          </div>
         </Card>
 
         <div className="text-center mt-6">
