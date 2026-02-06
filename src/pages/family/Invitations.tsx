@@ -9,11 +9,12 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, Mail, Check, X, Clock, Share2, Link2, QrCode, UserPlus, Copy } from "lucide-react";
+import { Loader2, ArrowLeft, Mail, Check, X, Clock, Share2, Link2, QrCode, UserPlus, Copy, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { ShareInvitationSheet } from "@/components/invitations/ShareInvitationSheet";
 import { PendingJoinRequests } from "@/components/invitations/PendingJoinRequests";
+import { ContactsPicker } from "@/components/invitations/ContactsPicker";
 
 interface Invitation {
   id: string;
@@ -275,10 +276,14 @@ const Invitations = () => {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="email" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsList className="grid w-full grid-cols-3 mb-4">
                   <TabsTrigger value="email" className="gap-1">
                     <Mail className="w-3 h-3" />
                     Email
+                  </TabsTrigger>
+                  <TabsTrigger value="contacts" className="gap-1">
+                    <Users className="w-3 h-3" />
+                    Contacts
                   </TabsTrigger>
                   <TabsTrigger value="link" className="gap-1">
                     <Link2 className="w-3 h-3" />
@@ -345,6 +350,37 @@ const Invitations = () => {
                     {sending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Mail className="w-4 h-4 mr-2" />}
                     Send Email Invitation
                   </Button>
+                </TabsContent>
+
+                <TabsContent value="contacts" className="space-y-4">
+                  <div className="text-center py-4">
+                    <Users className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Import contacts from your phone to quickly invite family members
+                    </p>
+                    <ContactsPicker
+                      disabled={sending}
+                      onSelectContacts={async (contacts) => {
+                        for (const contact of contacts) {
+                          if (contact.email) {
+                            await handleCreateInvitation({
+                              email: contact.email,
+                              role: formData.role,
+                              expirationDays: parseInt(formData.expirationDays),
+                              type: "email",
+                            });
+                          }
+                        }
+                        toast({
+                          title: "Invitations Sent",
+                          description: `Sent ${contacts.filter(c => c.email).length} email invitations`,
+                        });
+                      }}
+                    />
+                  </div>
+                  <div className="text-xs text-muted-foreground text-center">
+                    Only contacts with email addresses will receive invitations
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="link" className="space-y-4">
