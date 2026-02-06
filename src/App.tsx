@@ -85,6 +85,8 @@ const FamilyAssistanceReports = lazy(() => import("./pages/family/AssistanceRepo
 const BackupRestore = lazy(() => import("./pages/family/BackupRestore"));
 const NotificationSettings = lazy(() => import("./pages/family/NotificationSettings"));
 const FamilyMore = lazy(() => import("./pages/family/More"));
+const FamilyChat = lazy(() => import("./pages/family/Chat"));
+const FamilyCalendar = lazy(() => import("./pages/family/Calendar"));
 
 const queryClient = new QueryClient();
 
@@ -191,6 +193,8 @@ const App = () => (
           <Route path="/family/:familySlug/backup-restore" element={<FamilyModule><BackupRestore /></FamilyModule>} />
           <Route path="/family/:familySlug/notification-settings" element={<FamilyModule><NotificationSettings /></FamilyModule>} />
           <Route path="/family/:familySlug/more" element={<FamilyModule><FamilyMore /></FamilyModule>} />
+          <Route path="/family/:familySlug/chat" element={<FamilyModule><FamilyChat /></FamilyModule>} />
+          <Route path="/family/:familySlug/calendar" element={<FamilyModule><FamilyCalendar /></FamilyModule>} />
           <Route path="/accept-invitation" element={<AcceptInvitation />} />
           <Route path="/join" element={<JoinFamily />} />
           <Route path="/join/:familySlug" element={<JoinFamily />} />

@@ -388,6 +388,67 @@ export type Database = {
           },
         ]
       }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          edited_at: string | null
+          family_id: string
+          id: string
+          is_edited: boolean | null
+          meeting_id: string | null
+          message_type: string
+          sender_id: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          edited_at?: string | null
+          family_id: string
+          id?: string
+          is_edited?: boolean | null
+          meeting_id?: string | null
+          message_type?: string
+          sender_id: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          edited_at?: string | null
+          family_id?: string
+          id?: string
+          is_edited?: boolean | null
+          meeting_id?: string | null
+          message_type?: string
+          sender_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_messages_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contributions: {
         Row: {
           amount: number
@@ -554,6 +615,48 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "dividends_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_reminders: {
+        Row: {
+          days_before: number
+          event_id: string
+          family_id: string
+          id: string
+          reminder_type: string
+          sent_at: string
+        }
+        Insert: {
+          days_before: number
+          event_id: string
+          family_id: string
+          id?: string
+          reminder_type?: string
+          sent_at?: string
+        }
+        Update: {
+          days_before?: number
+          event_id?: string
+          family_id?: string
+          id?: string
+          reminder_type?: string
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_reminders_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "family_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_reminders_family_id_fkey"
             columns: ["family_id"]
             isOneToOne: false
             referencedRelation: "families"
@@ -788,6 +891,82 @@ export type Database = {
           wedding_assistance_amount?: number | null
         }
         Relationships: []
+      }
+      family_events: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          event_date: string
+          event_time: string | null
+          event_type: string
+          family_id: string
+          id: string
+          is_active: boolean | null
+          is_recurring: boolean | null
+          member_id: string | null
+          recurrence_pattern: string | null
+          reminder_days: number[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          event_date: string
+          event_time?: string | null
+          event_type: string
+          family_id: string
+          id?: string
+          is_active?: boolean | null
+          is_recurring?: boolean | null
+          member_id?: string | null
+          recurrence_pattern?: string | null
+          reminder_days?: number[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          event_date?: string
+          event_time?: string | null
+          event_type?: string
+          family_id?: string
+          id?: string
+          is_active?: boolean | null
+          is_recurring?: boolean | null
+          member_id?: string | null
+          recurrence_pattern?: string | null
+          reminder_days?: number[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_events_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_events_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_events_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       family_members: {
         Row: {
