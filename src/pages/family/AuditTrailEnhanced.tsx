@@ -81,19 +81,17 @@ export default function AuditTrailEnhanced() {
 
   const fetchAuditLogs = async () => {
     try {
-      // Use activity_logs_safe view to exclude sensitive tracking data (IP, user agent)
-      // Only super admins should query activity_logs table directly
+      // Use the secure RPC function that masks IP/user agent for non-super-admins
       const { data, error } = await supabase
-        .from("activity_logs_safe")
-        .select(`*`)
-        .eq("family_id", family.id)
-        .order("created_at", { ascending: false })
-        .limit(200);
+        .rpc('get_activity_logs_safe', {
+          p_family_id: family.id,
+          p_limit: 200
+        });
 
       if (error) throw error;
 
       // Fetch user profiles
-      const userIds = [...new Set(data?.map(d => d.user_id).filter(Boolean))] as string[];
+      const userIds = [...new Set(data?.map((d: any) => d.user_id).filter(Boolean))] as string[];
       const profilesData = userIds.length > 0
         ? await supabase.from("profiles").select("id, full_name, email").in("id", userIds)
         : { data: [] };
@@ -101,7 +99,7 @@ export default function AuditTrailEnhanced() {
       const profilesMap = new Map<string, any>();
       profilesData.data?.forEach(p => profilesMap.set(p.id, p));
 
-      const enrichedData = data?.map(log => ({
+      const enrichedData = data?.map((log: any) => ({
         ...log,
         profiles: log.user_id ? profilesMap.get(log.user_id) : null,
       })) || [];
