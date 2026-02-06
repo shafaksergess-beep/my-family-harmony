@@ -59,6 +59,7 @@ const Members = lazy(() => import("./pages/family/Members"));
 const EmailSettings = lazy(() => import("./pages/family/EmailSettings"));
 const AuditTrailEnhanced = lazy(() => import("./pages/family/AuditTrailEnhanced"));
 const Invitations = lazy(() => import("./pages/family/Invitations"));
+const JoinFamily = lazy(() => import("./pages/JoinFamily"));
 const Payments = lazy(() => import("./pages/family/Payments"));
 const MeetingReminders = lazy(() => import("./pages/family/MeetingReminders"));
 const PaymentIntegration = lazy(() => import("./pages/family/PaymentIntegration"));
@@ -178,6 +179,8 @@ const App = () => (
           <Route path="/family/:familySlug/notification-settings" element={<NotificationSettings />} />
           <Route path="/family/:familySlug/more" element={<FamilyMore />} />
           <Route path="/accept-invitation" element={<AcceptInvitation />} />
+          <Route path="/join" element={<JoinFamily />} />
+          <Route path="/join/:familySlug" element={<JoinFamily />} />
           <Route path="/install" element={<Install />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

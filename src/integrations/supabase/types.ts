@@ -102,6 +102,39 @@ export type Database = {
           },
         ]
       }
+      admin_notifications: {
+        Row: {
+          created_at: string
+          data: Json | null
+          id: string
+          is_read: boolean
+          message: string
+          notification_type: string
+          read_at: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          is_read?: boolean
+          message: string
+          notification_type: string
+          read_at?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          is_read?: boolean
+          message?: string
+          notification_type?: string
+          read_at?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       agenda_item_votes: {
         Row: {
           agenda_item_id: string
@@ -867,7 +900,9 @@ export type Database = {
           expires_at: string
           family_id: string
           id: string
+          invitation_type: string
           invited_by: string
+          reference_code: string | null
           role: Database["public"]["Enums"]["user_role"]
           status: string
           token: string
@@ -880,7 +915,9 @@ export type Database = {
           expires_at: string
           family_id: string
           id?: string
+          invitation_type?: string
           invited_by: string
+          reference_code?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           status?: string
           token: string
@@ -893,7 +930,9 @@ export type Database = {
           expires_at?: string
           family_id?: string
           id?: string
+          invitation_type?: string
           invited_by?: string
+          reference_code?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           status?: string
           token?: string
@@ -912,6 +951,78 @@ export type Database = {
             columns: ["invited_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      join_requests: {
+        Row: {
+          created_at: string
+          email: string | null
+          family_id: string
+          full_name: string
+          id: string
+          invitation_id: string | null
+          message: string | null
+          phone: string | null
+          reference_code_used: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+          welcome_message: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          family_id: string
+          full_name: string
+          id?: string
+          invitation_id?: string | null
+          message?: string | null
+          phone?: string | null
+          reference_code_used?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          welcome_message?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          family_id?: string
+          full_name?: string
+          id?: string
+          invitation_id?: string | null
+          message?: string | null
+          phone?: string | null
+          reference_code_used?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          welcome_message?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "join_requests_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "join_requests_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "invitations"
             referencedColumns: ["id"]
           },
         ]
@@ -2246,6 +2357,7 @@ export type Database = {
         Args: { _family_id: string; _user_id: string }
         Returns: boolean
       }
+      generate_reference_code: { Args: never; Returns: string }
       get_user_families: {
         Args: { check_user_id: string }
         Returns: {
