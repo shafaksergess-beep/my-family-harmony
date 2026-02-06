@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { useParams, useNavigate } from "react-router-dom";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, UserPlus } from "lucide-react";
 import FinancialWidget from "@/components/FinancialWidget";
 import { notificationManager } from "@/lib/notifications";
 import { useEffect, useState } from "react";
@@ -39,11 +39,13 @@ interface Module {
 const FamilyDetail = () => {
   const { familySlug } = useParams();
   const navigate = useNavigate();
-  const { family, userRole, userId, isLoading } = useFamilyAuth(familySlug);
+  const { family, userRole, userId, isLoading, isFamilyHead, isFamilyAdmin } = useFamilyAuth(familySlug);
   const { isMobile } = usePlatform();
   const [categories, setCategories] = useState<ModuleCategory[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [loadingModules, setLoadingModules] = useState(true);
+  
+  const canManageInvitations = isFamilyHead || isFamilyAdmin;
 
   useEffect(() => {
     const requestNotificationPermission = async () => {
@@ -130,6 +132,18 @@ const FamilyDetail = () => {
         showSearch={true}
       >
         <div className="p-4 space-y-6">
+          {/* Invite Members Button for Family Heads/Admins */}
+          {canManageInvitations && (
+            <Button 
+              onClick={() => navigate(`/family/${familySlug}/invitations`)}
+              className="w-full"
+              size="lg"
+            >
+              <UserPlus className="w-5 h-5 mr-2" />
+              Invite Members
+            </Button>
+          )}
+          
           {family && <FinancialWidget familyId={family.id} />}
           
           <Tabs defaultValue={categories[0]?.slug || "meetings"} className="space-y-4">
@@ -200,18 +214,26 @@ const FamilyDetail = () => {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={() => navigate("/dashboard")}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">{family?.name}</h1>
-              <p className="text-sm text-muted-foreground">
-                {family?.description || "Family management dashboard"}
-                {userRole && ` • Your role: ${userRole.replace("_", " ").toUpperCase()}`}
-              </p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" onClick={() => navigate("/dashboard")}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Dashboard
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">{family?.name}</h1>
+                <p className="text-sm text-muted-foreground">
+                  {family?.description || "Family management dashboard"}
+                  {userRole && ` • Your role: ${userRole.replace("_", " ").toUpperCase()}`}
+                </p>
+              </div>
             </div>
+            {canManageInvitations && (
+              <Button onClick={() => navigate(`/family/${familySlug}/invitations`)}>
+                <UserPlus className="w-4 h-4 mr-2" />
+                Invite Members
+              </Button>
+            )}
           </div>
         </div>
       </header>
