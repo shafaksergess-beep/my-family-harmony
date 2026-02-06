@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { MedianProvider } from "@/contexts/MedianContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -94,9 +95,10 @@ const LoadingFallback = () => (
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
+      <MedianProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
         <BrowserRouter>
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
@@ -182,7 +184,8 @@ const App = () => (
           </Routes>
           </Suspense>
         </BrowserRouter>
-      </TooltipProvider>
+        </TooltipProvider>
+      </MedianProvider>
     </QueryClientProvider>
   </ErrorBoundary>
 );
