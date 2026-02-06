@@ -3,8 +3,9 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, ReactNode } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ModuleErrorBoundary } from "@/components/ModuleErrorBoundary";
 import { MedianProvider } from "@/contexts/MedianContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -93,6 +94,19 @@ const LoadingFallback = () => (
   </div>
 );
 
+// Wrapper components for module error boundaries
+const AdminModule = ({ children }: { children: ReactNode }) => (
+  <ModuleErrorBoundary moduleName="admin" fallbackPath="/dashboard">
+    {children}
+  </ModuleErrorBoundary>
+);
+
+const FamilyModule = ({ children }: { children: ReactNode }) => (
+  <ModuleErrorBoundary moduleName="family" fallbackPath="/dashboard">
+    {children}
+  </ModuleErrorBoundary>
+);
+
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
@@ -105,79 +119,78 @@ const App = () => (
             <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin" element={<AdminModule><AdminDashboard /></AdminModule>} />
             <Route path="/install" element={<Install />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/families" element={<AdminFamilies />} />
-          <Route path="/admin/families/:familyId/members" element={<FamilyMembers />} />
-          <Route path="/admin/families/:familyId/members/:memberId" element={<AdminMemberDetail />} />
-          <Route path="/admin/leaderboard" element={<MemberLeaderboard />} />
-        <Route path="/admin/permissions" element={<Permissions />} />
-        <Route path="/admin/activity-logs" element={<ActivityLogs />} />
-        <Route path="/admin/email-reports" element={<EmailReports />} />
-        <Route path="/admin/export-scheduler" element={<ExportScheduler />} />
-        <Route path="/admin/global-analytics" element={<GlobalAnalytics />} />
-        <Route path="/admin/users" element={<Users />} />
-        <Route path="/admin/users/:userId" element={<UserDetail />} />
-        <Route path="/admin/digest-settings" element={<DigestSettings />} />
-        <Route path="/admin/customize-dashboard" element={<CustomizeDashboard />} />
-        <Route path="/admin/modules" element={<ModuleManagement />} />
-        <Route path="/admin/role-permissions" element={<RolePermissions />} />
-        <Route path="/admin/user-activity" element={<UserActivity />} />
+            <Route path="/admin/dashboard" element={<AdminModule><AdminDashboard /></AdminModule>} />
+            <Route path="/admin/families" element={<AdminModule><AdminFamilies /></AdminModule>} />
+          <Route path="/admin/families/:familyId/members" element={<AdminModule><FamilyMembers /></AdminModule>} />
+          <Route path="/admin/families/:familyId/members/:memberId" element={<AdminModule><AdminMemberDetail /></AdminModule>} />
+          <Route path="/admin/leaderboard" element={<AdminModule><MemberLeaderboard /></AdminModule>} />
+        <Route path="/admin/permissions" element={<AdminModule><Permissions /></AdminModule>} />
+        <Route path="/admin/activity-logs" element={<AdminModule><ActivityLogs /></AdminModule>} />
+        <Route path="/admin/email-reports" element={<AdminModule><EmailReports /></AdminModule>} />
+        <Route path="/admin/export-scheduler" element={<AdminModule><ExportScheduler /></AdminModule>} />
+        <Route path="/admin/global-analytics" element={<AdminModule><GlobalAnalytics /></AdminModule>} />
+        <Route path="/admin/users" element={<AdminModule><Users /></AdminModule>} />
+        <Route path="/admin/users/:userId" element={<AdminModule><UserDetail /></AdminModule>} />
+        <Route path="/admin/digest-settings" element={<AdminModule><DigestSettings /></AdminModule>} />
+        <Route path="/admin/customize-dashboard" element={<AdminModule><CustomizeDashboard /></AdminModule>} />
+        <Route path="/admin/modules" element={<AdminModule><ModuleManagement /></AdminModule>} />
+        <Route path="/admin/role-permissions" element={<AdminModule><RolePermissions /></AdminModule>} />
+        <Route path="/admin/user-activity" element={<AdminModule><UserActivity /></AdminModule>} />
           
           {/* Family Role Management */}
-          <Route path="/family/:familySlug/role-management" element={<RoleManagement />} />
+          <Route path="/family/:familySlug/role-management" element={<FamilyModule><RoleManagement /></FamilyModule>} />
           
-          <Route path="/family/:familySlug" element={<FamilyDetail />} />
-          <Route path="/family/:familySlug/audit-trail-enhanced" element={<AuditTrailEnhanced />} />
-          <Route path="/family/:familySlug/analytics" element={<FamilyAnalytics />} />
-          <Route path="/family/:familySlug/financial-analytics" element={<FinancialAnalytics />} />
-          <Route path="/family/:familySlug/notifications" element={<Notifications />} />
-          <Route path="/family/:familySlug/audit-trail" element={<AuditTrail />} />
-          <Route path="/family/:familySlug/members" element={<Members />} />
-          <Route path="/family/:familySlug/members/:memberId" element={<MemberProfile />} />
-          <Route path="/family/:familySlug/email-settings" element={<EmailSettings />} />
-          <Route path="/family/:familySlug/pdf-reports" element={<PDFReports />} />
-          <Route path="/family/:familySlug/meetings/:meetingId" element={<MeetingDetail />} />
-          <Route path="/family/:familySlug/meetings/:meetingId/checkin" element={<MeetingCheckIn />} />
-          <Route path="/family/:familySlug/meetings" element={<FamilyMeetings />} />
-          <Route path="/family/:familySlug/contributions" element={<FamilyContributions />} />
-          <Route path="/family/:familySlug/contribution-settings" element={<ContributionSettings />} />
-          <Route path="/family/:familySlug/financial-settings" element={<FinancialSettings />} />
-          <Route path="/family/:familySlug/loans" element={<FamilyLoans />} />
-          <Route path="/family/:familySlug/loan-committee" element={<LoanCommitteeDashboard />} />
-          <Route path="/family/:familySlug/loan-analytics" element={<LoanAnalytics />} />
-          <Route path="/family/:familySlug/loan-history" element={<LoanHistory />} />
-          <Route path="/family/:familySlug/attendance" element={<FamilyAttendance />} />
-          <Route path="/family/:familySlug/savings" element={<FamilySavings />} />
-          <Route path="/family/:familySlug/njangi" element={<FamilyNjangi />} />
-          <Route path="/family/:familySlug/assistance" element={<FamilyAssistance />} />
-          <Route path="/family/:familySlug/shares" element={<FamilyShares />} />
-          <Route path="/family/:familySlug/balloting" element={<Balloting />} />
-          <Route path="/family/:familySlug/attendance-analytics" element={<AttendanceAnalytics />} />
-          <Route path="/family/:familySlug/meeting-analytics" element={<MeetingAnalyticsDashboard />} />
-          <Route path="/family/:familySlug/meeting-templates" element={<MeetingTemplates />} />
-          <Route path="/family/:familySlug/meeting-settings" element={<MeetingSettings />} />
-          <Route path="/family/:familySlug/members/:memberId" element={<MemberProfile />} />
-          <Route path="/family/:familySlug/reports" element={<FamilyReports />} />
-          <Route path="/family/:familySlug/invitations" element={<Invitations />} />
-          <Route path="/family/:familySlug/payments" element={<Payments />} />
-          <Route path="/family/:familySlug/payment-integration" element={<PaymentIntegration />} />
-          <Route path="/family/:familySlug/meeting-reminders" element={<MeetingReminders />} />
-          <Route path="/family/:familySlug/contribution-analytics" element={<ContributionAnalytics />} />
-          <Route path="/family/:familySlug/reminder-settings" element={<ReminderSettings />} />
-          <Route path="/family/:familySlug/forecasting" element={<FinancialForecasting />} />
-          <Route path="/family/:familySlug/payment-plans" element={<PaymentPlans />} />
-          <Route path="/family/:familySlug/email-reports" element={<FamilyEmailReports />} />
-          <Route path="/family/:familySlug/export-scheduler" element={<FamilyExportScheduler />} />
-          <Route path="/family/:familySlug/budget" element={<BudgetPlanning />} />
-          <Route path="/family/:familySlug/assistance-analytics" element={<FamilyAssistanceAnalytics />} />
-          <Route path="/family/:familySlug/assistance-reports" element={<FamilyAssistanceReports />} />
-          <Route path="/family/:familySlug/backup-restore" element={<BackupRestore />} />
-          <Route path="/family/:familySlug/notification-settings" element={<NotificationSettings />} />
-          <Route path="/family/:familySlug/more" element={<FamilyMore />} />
+          <Route path="/family/:familySlug" element={<FamilyModule><FamilyDetail /></FamilyModule>} />
+          <Route path="/family/:familySlug/audit-trail-enhanced" element={<FamilyModule><AuditTrailEnhanced /></FamilyModule>} />
+          <Route path="/family/:familySlug/analytics" element={<FamilyModule><FamilyAnalytics /></FamilyModule>} />
+          <Route path="/family/:familySlug/financial-analytics" element={<FamilyModule><FinancialAnalytics /></FamilyModule>} />
+          <Route path="/family/:familySlug/notifications" element={<FamilyModule><Notifications /></FamilyModule>} />
+          <Route path="/family/:familySlug/audit-trail" element={<FamilyModule><AuditTrail /></FamilyModule>} />
+          <Route path="/family/:familySlug/members" element={<FamilyModule><Members /></FamilyModule>} />
+          <Route path="/family/:familySlug/members/:memberId" element={<FamilyModule><MemberProfile /></FamilyModule>} />
+          <Route path="/family/:familySlug/email-settings" element={<FamilyModule><EmailSettings /></FamilyModule>} />
+          <Route path="/family/:familySlug/pdf-reports" element={<FamilyModule><PDFReports /></FamilyModule>} />
+          <Route path="/family/:familySlug/meetings/:meetingId" element={<FamilyModule><MeetingDetail /></FamilyModule>} />
+          <Route path="/family/:familySlug/meetings/:meetingId/checkin" element={<FamilyModule><MeetingCheckIn /></FamilyModule>} />
+          <Route path="/family/:familySlug/meetings" element={<FamilyModule><FamilyMeetings /></FamilyModule>} />
+          <Route path="/family/:familySlug/contributions" element={<FamilyModule><FamilyContributions /></FamilyModule>} />
+          <Route path="/family/:familySlug/contribution-settings" element={<FamilyModule><ContributionSettings /></FamilyModule>} />
+          <Route path="/family/:familySlug/financial-settings" element={<FamilyModule><FinancialSettings /></FamilyModule>} />
+          <Route path="/family/:familySlug/loans" element={<FamilyModule><FamilyLoans /></FamilyModule>} />
+          <Route path="/family/:familySlug/loan-committee" element={<FamilyModule><LoanCommitteeDashboard /></FamilyModule>} />
+          <Route path="/family/:familySlug/loan-analytics" element={<FamilyModule><LoanAnalytics /></FamilyModule>} />
+          <Route path="/family/:familySlug/loan-history" element={<FamilyModule><LoanHistory /></FamilyModule>} />
+          <Route path="/family/:familySlug/attendance" element={<FamilyModule><FamilyAttendance /></FamilyModule>} />
+          <Route path="/family/:familySlug/savings" element={<FamilyModule><FamilySavings /></FamilyModule>} />
+          <Route path="/family/:familySlug/njangi" element={<FamilyModule><FamilyNjangi /></FamilyModule>} />
+          <Route path="/family/:familySlug/assistance" element={<FamilyModule><FamilyAssistance /></FamilyModule>} />
+          <Route path="/family/:familySlug/shares" element={<FamilyModule><FamilyShares /></FamilyModule>} />
+          <Route path="/family/:familySlug/balloting" element={<FamilyModule><Balloting /></FamilyModule>} />
+          <Route path="/family/:familySlug/attendance-analytics" element={<FamilyModule><AttendanceAnalytics /></FamilyModule>} />
+          <Route path="/family/:familySlug/meeting-analytics" element={<FamilyModule><MeetingAnalyticsDashboard /></FamilyModule>} />
+          <Route path="/family/:familySlug/meeting-templates" element={<FamilyModule><MeetingTemplates /></FamilyModule>} />
+          <Route path="/family/:familySlug/meeting-settings" element={<FamilyModule><MeetingSettings /></FamilyModule>} />
+          <Route path="/family/:familySlug/reports" element={<FamilyModule><FamilyReports /></FamilyModule>} />
+          <Route path="/family/:familySlug/invitations" element={<FamilyModule><Invitations /></FamilyModule>} />
+          <Route path="/family/:familySlug/payments" element={<FamilyModule><Payments /></FamilyModule>} />
+          <Route path="/family/:familySlug/payment-integration" element={<FamilyModule><PaymentIntegration /></FamilyModule>} />
+          <Route path="/family/:familySlug/meeting-reminders" element={<FamilyModule><MeetingReminders /></FamilyModule>} />
+          <Route path="/family/:familySlug/contribution-analytics" element={<FamilyModule><ContributionAnalytics /></FamilyModule>} />
+          <Route path="/family/:familySlug/reminder-settings" element={<FamilyModule><ReminderSettings /></FamilyModule>} />
+          <Route path="/family/:familySlug/forecasting" element={<FamilyModule><FinancialForecasting /></FamilyModule>} />
+          <Route path="/family/:familySlug/payment-plans" element={<FamilyModule><PaymentPlans /></FamilyModule>} />
+          <Route path="/family/:familySlug/email-reports" element={<FamilyModule><FamilyEmailReports /></FamilyModule>} />
+          <Route path="/family/:familySlug/export-scheduler" element={<FamilyModule><FamilyExportScheduler /></FamilyModule>} />
+          <Route path="/family/:familySlug/budget" element={<FamilyModule><BudgetPlanning /></FamilyModule>} />
+          <Route path="/family/:familySlug/assistance-analytics" element={<FamilyModule><FamilyAssistanceAnalytics /></FamilyModule>} />
+          <Route path="/family/:familySlug/assistance-reports" element={<FamilyModule><FamilyAssistanceReports /></FamilyModule>} />
+          <Route path="/family/:familySlug/backup-restore" element={<FamilyModule><BackupRestore /></FamilyModule>} />
+          <Route path="/family/:familySlug/notification-settings" element={<FamilyModule><NotificationSettings /></FamilyModule>} />
+          <Route path="/family/:familySlug/more" element={<FamilyModule><FamilyMore /></FamilyModule>} />
           <Route path="/accept-invitation" element={<AcceptInvitation />} />
           <Route path="/join" element={<JoinFamily />} />
           <Route path="/join/:familySlug" element={<JoinFamily />} />
