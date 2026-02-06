@@ -263,7 +263,7 @@ const JoinFamily = () => {
                   }`}
                 />
                 {codeError && (
-                  <p className="text-sm text-red-500 mt-1 flex items-center gap-1">
+                  <p className="text-sm text-destructive mt-1 flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
                     {codeError}
                   </p>
@@ -452,7 +452,7 @@ const JoinFamily = () => {
         {step === "success" && (
           <Card className="text-center">
             <CardContent className="p-8">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/10 flex items-center justify-center">
                 <CheckCircle className="w-8 h-8 text-green-600" />
               </div>
               <h2 className="text-xl font-bold mb-2">Request Sent!</h2>

@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, ArrowLeft, Mail, Check, X, Clock, Share2, Link2, QrCode, UserPlus, Copy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
-import { InvitationShareDialog } from "@/components/invitations/InvitationShareDialog";
+import { ShareInvitationSheet } from "@/components/invitations/ShareInvitationSheet";
 import { PendingJoinRequests } from "@/components/invitations/PendingJoinRequests";
 
 interface Invitation {
@@ -480,11 +480,13 @@ const Invitations = () => {
 
       {/* Share Dialog */}
       {selectedInvitation && family && (
-        <InvitationShareDialog
+        <ShareInvitationSheet
           open={shareDialogOpen}
           onOpenChange={setShareDialogOpen}
           familyName={family.name}
           familySlug={familySlug || ""}
+          familyLogo={family.logo_url}
+          familyDescription={family.description}
           inviteLink={getInviteLink(selectedInvitation)}
           referenceCode={selectedInvitation.reference_code || ""}
           expiresAt={selectedInvitation.expires_at}
