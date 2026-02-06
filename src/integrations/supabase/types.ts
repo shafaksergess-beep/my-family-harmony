@@ -2361,6 +2361,7 @@ export type Database = {
         Returns: boolean
       }
       generate_reference_code: { Args: never; Returns: string }
+      get_user_email: { Args: { check_user_id: string }; Returns: string }
       get_user_families: {
         Args: { check_user_id: string }
         Returns: {
