@@ -1656,6 +1656,48 @@ export type Database = {
           },
         ]
       }
+      member_roles: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          created_at: string
+          id: string
+          member_id: string
+          role: Database["public"]["Enums"]["user_role"]
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          member_id: string
+          role: Database["public"]["Enums"]["user_role"]
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          member_id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_roles_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_roles_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       member_wallets: {
         Row: {
           balance: number
@@ -2515,6 +2557,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_member_roles: {
+        Args: { check_family_id: string; check_user_id: string }
+        Returns: Database["public"]["Enums"]["user_role"][]
+      }
       get_user_email: { Args: { check_user_id: string }; Returns: string }
       get_user_families: {
         Args: { check_user_id: string }
@@ -2524,6 +2570,14 @@ export type Database = {
           family_slug: string
           user_role: Database["public"]["Enums"]["user_role"]
         }[]
+      }
+      has_any_role: {
+        Args: {
+          check_family_id: string
+          check_roles: Database["public"]["Enums"]["user_role"][]
+          check_user_id: string
+        }
+        Returns: boolean
       }
       has_family_role: {
         Args: {

@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export interface FamilyAuthData {
   family: any;
-  userRole: string;
+  userRoles: string[];
   userId: string;
   isLoading: boolean;
   canManageFinances: boolean;
@@ -20,8 +20,9 @@ export const useFamilyAuth = (familySlug?: string) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [family, setFamily] = useState<any>(null);
-  const [userRole, setUserRole] = useState<string>("");
+  const [userRoles, setUserRoles] = useState<string[]>([]);
   const [userId, setUserId] = useState<string>("");
+  const [memberId, setMemberId] = useState<string>("");
 
   useEffect(() => {
     checkAuth();
@@ -57,10 +58,10 @@ export const useFamilyAuth = (familySlug?: string) => {
         
         setFamily(familyData);
 
-        // Get user's role in this family
+        // Get user's membership in this family
         const { data: memberData } = await supabase
           .from("family_members")
-          .select("role")
+          .select("id, role")
           .eq("family_id", familyData.id)
           .eq("user_id", session.user.id)
           .single();
@@ -75,7 +76,16 @@ export const useFamilyAuth = (familySlug?: string) => {
           return;
         }
 
-        setUserRole(memberData.role);
+        setMemberId(memberData.id);
+
+        // Get all roles for this member from member_roles table
+        const { data: rolesData } = await supabase
+          .from("member_roles")
+          .select("role")
+          .eq("member_id", memberData.id);
+
+        const roles = rolesData?.map(r => r.role) || [memberData.role];
+        setUserRoles(roles);
       }
     } catch (error) {
       console.error("Auth check error:", error);
@@ -90,25 +100,33 @@ export const useFamilyAuth = (familySlug?: string) => {
     }
   };
 
-  // Permission helpers
-  const isFamilyHead = userRole === "family_head";
-  const isFamilyAdmin = userRole === "family_admin";
-  const isTreasurer = userRole === "treasurer";
-  const isLoanCommittee = userRole === "loan_committee";
-  const isSecretary = userRole === "secretary";
+  // Helper to check if user has a specific role
+  const hasRole = (role: string) => userRoles.includes(role);
+  const hasAnyRole = (roles: string[]) => roles.some(r => userRoles.includes(r));
+
+  // Permission helpers (now check against array of roles)
+  const isFamilyHead = hasRole("family_head");
+  const isFamilyAdmin = hasRole("family_admin");
+  const isTreasurer = hasRole("treasurer");
+  const isLoanCommittee = hasRole("loan_committee");
+  const isSecretary = hasRole("secretary");
   
-  const canManageFinances = isFamilyHead || isFamilyAdmin || isTreasurer;
-  const canManageLoans = isFamilyHead || isFamilyAdmin || isLoanCommittee;
-  const canManageMembers = isFamilyHead || isFamilyAdmin;
-  const canManageReports = isFamilyHead || isFamilyAdmin || isSecretary;
-  const canManageMinutes = isFamilyHead || isFamilyAdmin || isSecretary;
-  const canScheduleMeetings = isFamilyHead || isFamilyAdmin || isTreasurer || isSecretary;
+  const canManageFinances = hasAnyRole(["family_head", "family_admin", "treasurer"]);
+  const canManageLoans = hasAnyRole(["family_head", "family_admin", "loan_committee"]);
+  const canManageMembers = hasAnyRole(["family_head", "family_admin"]);
+  const canManageReports = hasAnyRole(["family_head", "family_admin", "secretary"]);
+  const canManageMinutes = hasAnyRole(["family_head", "family_admin", "secretary"]);
+  const canScheduleMeetings = hasAnyRole(["family_head", "family_admin", "treasurer", "secretary"]);
 
   return {
     family,
-    userRole,
+    userRoles,
+    userRole: userRoles[0] || "", // Backward compatibility - primary role
     userId,
+    memberId,
     isLoading: loading,
+    hasRole,
+    hasAnyRole,
     canManageFinances,
     canManageLoans,
     canManageMembers,
@@ -119,5 +137,6 @@ export const useFamilyAuth = (familySlug?: string) => {
     isFamilyAdmin,
     isTreasurer,
     isSecretary,
+    isLoanCommittee,
   };
 };
