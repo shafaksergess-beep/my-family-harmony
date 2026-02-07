@@ -433,7 +433,9 @@ const FamilyMembers = () => {
                         <SelectContent>
                           <SelectItem value="member">{t("roles.member")}</SelectItem>
                           <SelectItem value="family_head">{t("roles.family_head")}</SelectItem>
+                          <SelectItem value="family_admin">{t("roles.family_admin")}</SelectItem>
                           <SelectItem value="treasurer">{t("roles.treasurer")}</SelectItem>
+                          <SelectItem value="secretary">{t("roles.secretary")}</SelectItem>
                           <SelectItem value="loan_committee">{t("roles.loan_committee")}</SelectItem>
                           <SelectItem value="guest">{t("roles.guest")}</SelectItem>
                         </SelectContent>
@@ -483,7 +485,9 @@ const FamilyMembers = () => {
               <SelectContent>
                 <SelectItem value="all">All Roles</SelectItem>
                 <SelectItem value="family_head">Family Head</SelectItem>
+                <SelectItem value="family_admin">Family Admin</SelectItem>
                 <SelectItem value="treasurer">Treasurer</SelectItem>
+                <SelectItem value="secretary">Secretary</SelectItem>
                 <SelectItem value="loan_committee">Loan Committee</SelectItem>
                 <SelectItem value="member">Member</SelectItem>
                 <SelectItem value="guest">Guest</SelectItem>
@@ -632,7 +636,9 @@ const FamilyMembers = () => {
                         <SelectContent>
                           <SelectItem value="member">Member</SelectItem>
                           <SelectItem value="family_head">Family Head</SelectItem>
+                          <SelectItem value="family_admin">Family Admin</SelectItem>
                           <SelectItem value="treasurer">Treasurer</SelectItem>
+                          <SelectItem value="secretary">Secretary</SelectItem>
                           <SelectItem value="loan_committee">Loan Committee</SelectItem>
                           <SelectItem value="guest">Guest</SelectItem>
                         </SelectContent>

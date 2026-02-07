@@ -98,7 +98,9 @@
   "roles": {
     "member": "Member",
     "family_head": "Family Head",
+    "family_admin": "Family Admin",
     "treasurer": "Treasurer",
+    "secretary": "Secretary",
     "loan_committee": "Loan Committee",
     "guest": "Guest",
     "canManageFinances": "Can manage finances",
