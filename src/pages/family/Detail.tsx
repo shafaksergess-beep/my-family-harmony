@@ -12,6 +12,7 @@ import * as LucideIcons from "lucide-react";
 import { usePlatform } from "@/hooks/usePlatform";
 import { MobileLayout } from "@/components/mobile/MobileLayout";
 import { haptics } from "@/lib/haptics";
+import { FamilyChatbot } from "@/components/chat/FamilyChatbot";
 
 interface ModuleCategory {
   id: string;
@@ -311,6 +312,7 @@ const FamilyDetail = () => {
           })}
         </Tabs>
       </main>
+      {family && <FamilyChatbot familyId={family.id} />}
     </div>
   );
 };
