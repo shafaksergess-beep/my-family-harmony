@@ -110,6 +110,7 @@ const Balloting = () => {
       }
 
       if (assignmentType === "hosting") await syncHostAssignments(assignments);
+      if (assignmentType === "njangi") await syncNjangiCycle(assignments);
       toast({ title: "Success", description: `${assignmentType === "hosting" ? "Hosting" : "Njangi"} schedule created` });
       setIsDialogOpen(false);
       loadData();
@@ -128,6 +129,7 @@ const Balloting = () => {
         .eq("id", record.id);
       if (error) throw error;
       if (type === "hosting") await syncHostAssignments(assignments);
+      if (type === "njangi") await syncNjangiCycle(assignments);
       toast({ title: "Success", description: "Schedule updated successfully" });
       loadData();
     } catch (error: any) {
@@ -145,6 +147,57 @@ const Balloting = () => {
       loadData();
     } catch (error: any) {
       toast({ title: "Error", description: error.message || "Failed to delete", variant: "destructive" });
+    }
+  };
+
+  const syncNjangiCycle = async (assignments: Assignment[]) => {
+    if (!family) return;
+    try {
+      const cycleName = `${selectedYear} Njangi`;
+      
+      // Check if a cycle already exists for this year
+      const { data: existingCycle } = await supabase
+        .from("njangi_cycles")
+        .select("id")
+        .eq("family_id", family.id)
+        .eq("name", cycleName)
+        .maybeSingle();
+
+      let cycleId: string;
+
+      if (existingCycle) {
+        cycleId = existingCycle.id;
+        // Delete existing participants to replace
+        await supabase.from("njangi_participants").delete().eq("cycle_id", cycleId);
+      } else {
+        const { data: newCycle, error: cycleError } = await supabase
+          .from("njangi_cycles")
+          .insert({
+            family_id: family.id,
+            name: cycleName,
+            start_date: `${selectedYear}-01-01`,
+            amount_per_person: family.njangi_amount || 25000,
+            status: "active",
+          })
+          .select("id")
+          .single();
+        if (cycleError) throw cycleError;
+        cycleId = newCycle.id;
+      }
+
+      // Insert participants from balloting assignments
+      const participantInserts = assignments.map((a, index) => ({
+        cycle_id: cycleId,
+        member_id: a.member_id,
+        payout_order: index + 1,
+      }));
+
+      const { error: participantsError } = await supabase
+        .from("njangi_participants")
+        .insert(participantInserts);
+      if (participantsError) throw participantsError;
+    } catch (error) {
+      console.error("Error syncing njangi cycle:", error);
     }
   };
 
