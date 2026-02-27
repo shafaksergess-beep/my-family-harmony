@@ -61,9 +61,8 @@ export const BallotingScheduleCard = ({
     const items = [...localAssignments];
     const [moved] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, moved);
-    // Re-assign months based on new position
-    const reindexed = items.map((item, idx) => ({ ...item, month: idx + 1 }));
-    setLocalAssignments(reindexed);
+    // Keep original month numbers, just reorder the list
+    setLocalAssignments(items);
     setHasChanges(true);
   };
 
@@ -82,15 +81,15 @@ export const BallotingScheduleCard = ({
   const handleDeleteMonth = (month: number) => {
     if (!localAssignments) return;
     const filtered = localAssignments.filter((a) => a.month !== month);
-    const reindexed = filtered.map((item, idx) => ({ ...item, month: idx + 1 }));
-    setLocalAssignments(reindexed);
+    setLocalAssignments(filtered);
     setHasChanges(true);
   };
 
   const handleAddMonth = () => {
     if (!localAssignments || members.length === 0) return;
-    const nextMonth = localAssignments.length + 1;
-    if (nextMonth > 12) return;
+    const usedMonths = localAssignments.map((a) => a.month);
+    const nextMonth = Array.from({ length: 12 }, (_, i) => i + 1).find((m) => !usedMonths.includes(m));
+    if (!nextMonth) return;
     const firstMember = members[0];
     setLocalAssignments([
       ...localAssignments,
