@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "Family Together",
+    "slug": "family-together",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#2E7D32"
+    },
+    "ios": {
+      "bundleIdentifier": "com.familytogether.app",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Camera access is needed for QR code check-in at meetings",
+        "NSFaceIDUsageDescription": "Use Face ID for secure and convenient login"
+      }
+    },
+    "android": {
+      "package": "com.familytogether.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#2E7D32"
+      },
+      "permissions": [
+        "CAMERA",
+        "USE_BIOMETRIC",
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE"
+      ]
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-local-authentication",
+      "expo-sqlite"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id"
+      }
+    }
+  }
+}

@@ -26,7 +26,53 @@ const handler = async (req: Request): Promise<Response> => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const payload: MobileMoneyPayload = await req.json();
+    const secret = Deno.env.get("MOBILE_MONEY_SECRET");
+    const signature = req.headers.get("x-provider-signature");
+
+    const bodyText = await req.text();
+    
+    // Signature verification (only if secret is configured)
+    if (secret) {
+      if (!signature) {
+        console.error("Missing signature header");
+        return new Response(JSON.stringify({ error: "Missing identity verification" }), {
+          status: 401,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        });
+      }
+
+      const encoder = new TextEncoder();
+      const key = await crypto.subtle.importKey(
+        "raw",
+        encoder.encode(secret),
+        { name: "HMAC", hash: "SHA-256" },
+        false,
+        ["verify"]
+      );
+
+      const signatureBytes = new Uint8Array(
+        signature.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16))
+      );
+
+      const isValid = await crypto.subtle.verify(
+        "HMAC",
+        key,
+        signatureBytes,
+        encoder.encode(bodyText)
+      );
+
+      if (!isValid) {
+        console.error("Invalid signature");
+        return new Response(JSON.stringify({ error: "Invalid identity verification" }), {
+          status: 401,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        });
+      }
+    } else {
+      console.warn("MOBILE_MONEY_SECRET not set, signature verification skipped in dev mode");
+    }
+
+    const payload: MobileMoneyPayload = JSON.parse(bodyText);
     console.log("Received mobile money webhook:", payload);
 
     // Validate payload

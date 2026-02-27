@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,11 +22,7 @@ export default function FinancialForecasting() {
   const [loading, setLoading] = useState(true);
   const [forecast, setForecast] = useState<ForecastData | null>(null);
 
-  useEffect(() => {
-    loadForecastData();
-  }, [familySlug]);
-
-  const loadForecastData = async () => {
+  const loadForecastData = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -124,7 +120,11 @@ export default function FinancialForecasting() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [familySlug]);
+
+  useEffect(() => {
+    loadForecastData();
+  }, [loadForecastData]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -132,6 +132,36 @@ export default function FinancialForecasting() {
       currency: "XAF",
       minimumFractionDigits: 0,
     }).format(amount);
+  };
+
+  const [generatingInsight, setGeneratingInsight] = useState(false);
+  const [aiInsight, setAiInsight] = useState<{ summary: string; risks: string; recommendations: string[] } | null>(null);
+
+  const generateAiInsight = async () => {
+    if (!forecast || !familySlug) return;
+    
+    setGeneratingInsight(true);
+    try {
+      const { data: family } = await supabase
+        .from("families")
+        .select("name")
+        .eq("slug", familySlug)
+        .single();
+
+      const { data, error } = await supabase.functions.invoke('financial-insight', {
+        body: { 
+          familyName: family?.name || "Family",
+          financialData: forecast 
+        },
+      });
+
+      if (error) throw error;
+      setAiInsight(data);
+    } catch (error) {
+      console.error("Error generating AI insight:", error);
+    } finally {
+      setGeneratingInsight(false);
+    }
   };
 
   if (loading) {
@@ -144,15 +174,56 @@ export default function FinancialForecasting() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center gap-4 mb-6">
-        <Button variant="outline" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">Financial Forecasting</h1>
-          <p className="text-muted-foreground">6-month financial projections based on historical trends</p>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Financial Forecasting</h1>
+            <p className="text-muted-foreground">6-month financial projections based on historical trends</p>
+          </div>
         </div>
+        <Button 
+          onClick={generateAiInsight} 
+          disabled={generatingInsight || !forecast}
+          className="gap-2"
+        >
+          {generatingInsight ? <Loader2 className="h-4 w-4 animate-spin" /> : <TrendingUp className="h-4 w-4" />}
+          AI Financial Insight
+        </Button>
       </div>
+
+      {/* AI Insight Section */}
+      {aiInsight && (
+        <Card className="border-primary/20 bg-primary/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-primary" />
+              AI Financial Analysis
+            </CardTitle>
+            <CardDescription>Intelligent observations based on your family's data</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <h4 className="font-semibold text-sm mb-1 uppercase tracking-wider text-primary/70">Summary</h4>
+              <p className="text-sm leading-relaxed">{aiInsight.summary}</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-sm mb-1 uppercase tracking-wider text-red-600/70">Potential Risks</h4>
+              <p className="text-sm leading-relaxed">{aiInsight.risks}</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-sm mb-2 uppercase tracking-wider text-green-600/70">Recommendations</h4>
+              <ul className="list-disc list-inside text-sm space-y-1">
+                {aiInsight.recommendations.map((rec, idx) => (
+                  <li key={idx} className="leading-relaxed">{rec}</li>
+                ))}
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* KPI Cards */}
       <div className="grid gap-4 md:grid-cols-3">

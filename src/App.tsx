@@ -7,13 +7,15 @@ import { lazy, Suspense, ReactNode } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ModuleErrorBoundary } from "@/components/ModuleErrorBoundary";
 import { MedianProvider } from "@/contexts/MedianContext";
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
-import Profile from "./pages/Profile";
-import Install from "./pages/Install";
-import AcceptInvitation from "./pages/AcceptInvitation";
-import NotFound from "./pages/NotFound";
+// Lazy load core pages
+const Index = lazy(() => import("./pages/Index"));
+const Auth = lazy(() => import("./pages/Auth"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Install = lazy(() => import("./pages/Install"));
+const AcceptInvitation = lazy(() => import("./pages/AcceptInvitation"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const JoinFamily = lazy(() => import("./pages/JoinFamily"));
 
 // Lazy load admin pages
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
@@ -60,7 +62,6 @@ const Members = lazy(() => import("./pages/family/Members"));
 const EmailSettings = lazy(() => import("./pages/family/EmailSettings"));
 const AuditTrailEnhanced = lazy(() => import("./pages/family/AuditTrailEnhanced"));
 const Invitations = lazy(() => import("./pages/family/Invitations"));
-const JoinFamily = lazy(() => import("./pages/JoinFamily"));
 const Payments = lazy(() => import("./pages/family/Payments"));
 const MeetingReminders = lazy(() => import("./pages/family/MeetingReminders"));
 const PaymentIntegration = lazy(() => import("./pages/family/PaymentIntegration"));

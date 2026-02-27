@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react';
-import { MessageCircle } from 'lucide-react';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { MessageCircle, Sparkles, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -34,6 +35,30 @@ export function FamilyChat({
     editMessage,
     deleteMessage,
   } = useFamilyChat({ familyId, memberId });
+
+  const [icebreakers, setIcebreakers] = useState<string[]>([]);
+  const [isFetchingIcebreakers, setIsFetchingIcebreakers] = useState(false);
+
+  const fetchIcebreakers = useCallback(async () => {
+    setIsFetchingIcebreakers(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('vibe-starter', {
+        body: { familyId },
+      });
+      if (error) throw error;
+      setIcebreakers(data.icebreakers || []);
+    } catch (error) {
+      console.error('Failed to fetch icebreakers:', error);
+    } finally {
+      setIsFetchingIcebreakers(false);
+    }
+  }, [familyId]);
+
+  useEffect(() => {
+    if (messages.length === 0 && !isLoading && icebreakers.length === 0) {
+      fetchIcebreakers();
+    }
+  }, [messages.length, isLoading, icebreakers.length, fetchIcebreakers]);
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -88,10 +113,44 @@ export function FamilyChat({
           className="h-[400px] px-4"
         >
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground py-12">
-              <MessageCircle className="h-12 w-12 mb-4 opacity-50" />
-              <p className="text-lg font-medium">No messages yet</p>
-              <p className="text-sm">Start the conversation with your family!</p>
+            <div className="flex flex-col items-center justify-center min-h-[400px] text-center p-6 bg-muted/20 rounded-lg">
+              <MessageCircle className="h-12 w-12 mb-4 text-primary opacity-50" />
+              <p className="text-lg font-semibold text-foreground">No messages yet</p>
+              <p className="text-sm text-muted-foreground mb-8">Start the conversation with your family!</p>
+              
+              <div className="w-full max-w-md space-y-4">
+                <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                  <Sparkles className="h-4 w-4" />
+                  <span>AI Vibe-Starters</span>
+                </div>
+                
+                {isFetchingIcebreakers ? (
+                  <div className="flex items-center justify-center p-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  </div>
+                ) : icebreakers.length > 0 ? (
+                  <div className="grid gap-2">
+                    {icebreakers.map((icebreaker, idx) => (
+                      <button
+                        key={idx}
+                        className="text-left p-3 text-sm bg-card hover:bg-primary/5 border rounded-lg transition-colors border-border/50 hover:border-primary/20 shadow-sm"
+                        onClick={() => sendMessage(icebreaker)}
+                      >
+                        {icebreaker}
+                      </button>
+                    ))}
+                    <button 
+                      onClick={fetchIcebreakers}
+                      className="text-xs text-primary hover:underline pt-2 inline-flex items-center gap-1"
+                    >
+                      <Sparkles className="h-3 w-3" />
+                      Refresh suggestions
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">No suggestions available right now.</p>
+                )}
+              </div>
             </div>
           ) : (
             <div className="space-y-4 py-4">

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Camera, Upload, X, Check, Loader2, Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { haptics } from "@/lib/haptics";
+import imageCompression from 'browser-image-compression';
 
 interface ReceiptScannerProps {
   onReceiptCaptured: (imageData: string, file: File) => void;
@@ -111,14 +112,22 @@ export function ReceiptScanner({ onReceiptCaptured, onClose }: ReceiptScannerPro
       // Convert base64 to blob/file
       const response = await fetch(capturedImage);
       const blob = await response.blob();
-      const file = new File([blob], `receipt-${Date.now()}.jpg`, { type: "image/jpeg" });
+      
+      // Compression options
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true
+      };
 
-      // Call the callback with captured data
-      onReceiptCaptured(capturedImage, file);
+      const compressedFile = await imageCompression(blob as File, options);
+
+      // Call the callback with captured data and compressed file
+      onReceiptCaptured(capturedImage, compressedFile);
       
       toast({
         title: "Receipt Captured",
-        description: "Your payment receipt has been saved",
+        description: "Your payment receipt has been saved (compressed)",
       });
       haptics.success();
     } catch (error) {
