@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +11,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ArrowLeft, CheckCircle, Clock, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useCurrency } from "@/context/CurrencyContext";
+import { CurrencySelector } from "@/components/CurrencySelector";
 import {
   Dialog,
   DialogContent,
@@ -39,8 +42,9 @@ const Payments = () => {
   const navigate = useNavigate();
   const { family, canManageFinances, isLoading, userId } = useFamilyAuth(familySlug);
   const { toast } = useToast();
+  const { formatAmount } = useCurrency();
   const [payments, setPayments] = useState<PaymentTransaction[]>([]);
-  const [members, setMembers] = useState<any[]>([]);
+  const [members, setMembers] = useState<Array<Record<string, unknown>>>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -52,13 +56,8 @@ const Payments = () => {
     notes: "",
   });
 
-  useEffect(() => {
-    if (family) {
-      loadData();
-    }
-  }, [family]);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!family) return;
 
     try {
@@ -84,7 +83,7 @@ const Payments = () => {
         const enrichedPayments = paymentsData.map(payment => ({
           ...payment,
           family_members: membersMap.get(payment.member_id) || { profiles: { full_name: "Unknown" } }
-        })) as any;
+        })) as unknown as PaymentTransaction[];
 
         setPayments(enrichedPayments);
       } else {
@@ -109,7 +108,13 @@ const Payments = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [family, toast]);
+
+  useEffect(() => {
+    if (family) {
+      loadData();
+    }
+  }, [family, loadData]);
 
   const handleRecordPayment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,11 +150,12 @@ const Payments = () => {
       });
       setDialogOpen(false);
       loadData();
-    } catch (error: any) {
-      console.error("Error recording payment:", error);
+    } catch (error) {
+      const err = error as Error;
+      console.error("Error recording payment:", err);
       toast({
         title: "Error",
-        description: error.message || "Failed to record payment",
+        description: err.message || "Failed to record payment",
         variant: "destructive",
       });
     } finally {
@@ -208,11 +214,14 @@ const Payments = () => {
                 <p className="text-sm text-muted-foreground">Track and manage member payments</p>
               </div>
             </div>
-            {canManageFinances && (
-              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button>Record Payment</Button>
-                </DialogTrigger>
+            <div className="flex gap-2 items-center">
+              <LanguageSwitcher />
+              <CurrencySelector />
+              {canManageFinances && (
+                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button>Record Payment</Button>
+                  </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Record Payment</DialogTitle>
@@ -231,15 +240,15 @@ const Payments = () => {
                         </SelectTrigger>
                         <SelectContent>
                           {members.map((member) => (
-                            <SelectItem key={member.id} value={member.id}>
-                              {member.profiles?.full_name}
+                            <SelectItem key={String(member.id)} value={String(member.id)}>
+                              {(member.profiles as { full_name: string })?.full_name}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="amount">Amount (FCFA)</Label>
+                      <Label htmlFor="amount">Amount</Label>
                       <Input
                         id="amount"
                         type="number"
@@ -296,6 +305,7 @@ const Payments = () => {
                 </DialogContent>
               </Dialog>
             )}
+            </div>
           </div>
         </div>
       </header>
@@ -324,7 +334,7 @@ const Payments = () => {
                     <div className="flex-1">
                       <p className="font-medium">{payment.family_members?.profiles?.full_name}</p>
                       <p className="text-sm text-muted-foreground">
-                        Amount: {payment.amount.toLocaleString()} FCFA
+                        Amount: {formatAmount(payment.amount)}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         Method: {payment.payment_method.replace("_", " ").toUpperCase()}

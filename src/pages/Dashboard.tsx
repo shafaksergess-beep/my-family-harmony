@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, LogOut, Plus, Users, Building2, Shield, FileText, User as UserIcon, Activity } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { CurrencySelector } from "@/components/CurrencySelector";
 import { usePlatform } from "@/hooks/usePlatform";
 import { MobileDashboard } from "@/components/mobile/MobileDashboard";
 import { JoinFamilyCard } from "@/components/dashboard/JoinFamilyCard";
@@ -148,6 +149,7 @@ const Dashboard = () => {
                 Profile
               </Button>
               <LanguageSwitcher />
+              <CurrencySelector />
               <Button variant="ghost" onClick={handleLogout}>
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout

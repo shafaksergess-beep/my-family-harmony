@@ -20,7 +20,18 @@ interface NotificationRequest {
   eventDetails?: string;
   actionUrl?: string;
   message?: string;
-  type?: 'family_created' | 'member_added' | 'role_changed' | 'meeting_scheduled' | 'general';
+  type?: 
+    | 'family_created' 
+    | 'member_added' 
+    | 'role_changed' 
+    | 'meeting_scheduled' 
+    | 'loan_requested'
+    | 'loan_approved'
+    | 'loan_rejected'
+    | 'loan_repaid'
+    | 'payment_received'
+    | 'chat_message'
+    | 'general';
   // For meeting_scheduled type
   familyId?: string;
   title?: string;
@@ -87,7 +98,18 @@ const handler = async (req: Request): Promise<Response> => {
         throw new Error("Failed to fetch family members");
       }
 
-      const notifications = members.map(async (m: any) => {
+      // Determine who to notify based on type
+      let recipients = members;
+      const typeStr = type as string;
+      if (typeStr === 'loan_requested') {
+        recipients = members.filter((m: any) => ['family_head', 'loan_committee'].includes(m.role));
+      } else if (typeStr === 'chat_message') {
+        // Chat message usually passed senderId in data
+        const senderId = data?.senderId;
+        recipients = members.filter((m: any) => m.user_id !== senderId);
+      }
+
+      const notifications = recipients.map(async (m: any) => {
         const results = [];
         const userName = m.profiles?.full_name || "Family Member";
 
@@ -97,13 +119,13 @@ const handler = async (req: Request): Promise<Response> => {
             await resend.emails.send({
               from: "Family Together <onboarding@resend.dev>",
               to: [m.profiles.email],
-              subject: title || "New Meeting Scheduled",
+              subject: title || "Family Activity Update",
               html: `
                 <div style="font-family: sans-serif; padding: 20px;">
-                  <h1>New Meeting Scheduled</h1>
+                  <h1>${title || "Family Activity Update"}</h1>
                   <p>Hello ${userName},</p>
-                  <p>${message || `A new meeting has been scheduled for ${family.name}.`}</p>
-                  <p>Please check the app for details.</p>
+                  <p>${message || "There is a new update in your family app."}</p>
+                  ${actionUrl ? `<p><a href="${actionUrl}">View Details</a></p>` : ""}
                 </div>
               `,
             });
@@ -121,8 +143,8 @@ const handler = async (req: Request): Promise<Response> => {
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 to: m.profiles.push_token,
-                title: title || "New Meeting Scheduled",
-                body: message || `A new meeting has been scheduled for ${family.name}.`,
+                title: title || "Family Activity Update",
+                body: message || "There is a new update in your family app.",
                 data: data || {},
               }),
             });
@@ -141,13 +163,12 @@ const handler = async (req: Request): Promise<Response> => {
           try {
             const auth = btoa(`${twilioSid}:${twilioToken}`);
             const formData = new URLSearchParams();
-            // Use whatsapp: prefix if using Twilio WhatsApp API
             const to = m.profiles.phone.startsWith("whatsapp:") ? m.profiles.phone : `whatsapp:${m.profiles.phone}`;
             const from = twilioFrom.startsWith("whatsapp:") ? twilioFrom : `whatsapp:${twilioFrom}`;
             
             formData.append("To", to);
             formData.append("From", from);
-            formData.append("Body", message || `A new meeting has been scheduled for ${family.name}. Please check the app.`);
+            formData.append("Body", `${title ? `*${title}*\n` : ""}${message || "Family Activity Update"}\nCheck the app for details.`);
 
             const twilioResponse = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`, {
               method: "POST",
@@ -167,7 +188,7 @@ const handler = async (req: Request): Promise<Response> => {
       });
 
       const processedResults = await Promise.all(notifications);
-      console.log(`Notifications processed for ${processedResults.length} members`);
+      console.log(`Notifications processed for ${processedResults.length} recipients`);
 
       return new Response(
         JSON.stringify({ success: true, processed: processedResults.length }),

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { Loader2, ArrowLeft, TrendingUp, TrendingDown } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { useCurrency } from "@/context/CurrencyContext";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
@@ -21,6 +22,7 @@ const FamilyReports = () => {
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { family, isLoading: authLoading } = useFamilyAuth(familySlug);
+  const { formatAmount } = useCurrency();
   const [loading, setLoading] = useState(true);
   const [reportData, setReportData] = useState<ReportData>({
     contributionsTrend: [],
@@ -30,13 +32,45 @@ const FamilyReports = () => {
     loansByStatus: [],
   });
 
-  useEffect(() => {
-    if (family) {
-      loadReportData();
-    }
-  }, [family]);
 
-  const loadReportData = async () => {
+  const processMonthlyData = useCallback((data: Array<Record<string, unknown>>, dateField: string, amountField: string, includeCount = false) => {
+    const monthlyData: { [key: string]: { amount: number; count?: number } } = {};
+    
+    data.forEach((item) => {
+      const dateStr = item[dateField] as Extract<Record<string, unknown>[string], string | number | Date>;
+      const date = new Date(dateStr);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+      
+      if (!monthlyData[monthKey]) {
+        monthlyData[monthKey] = { amount: 0 };
+        if (includeCount) monthlyData[monthKey].count = 0;
+      }
+      
+      monthlyData[monthKey].amount += (item[amountField] as number) || 0;
+      if (includeCount) monthlyData[monthKey].count! += 1;
+    });
+
+    return Object.entries(monthlyData)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .slice(-12)
+      .map(([month, data]) => ({
+        month: new Date(month + "-01").toLocaleDateString("en-US", { month: "short", year: "numeric" }),
+        ...data,
+      }));
+  }, []);
+
+  const processGroupData = useCallback((data: Array<Record<string, unknown>>, groupField: string, amountField: string) => {
+    const grouped: { [key: string]: number } = {};
+    
+    data.forEach((item) => {
+      const key = item[groupField] as string;
+      grouped[key] = (grouped[key] || 0) + ((item[amountField] as number) || 0);
+    });
+
+    return Object.entries(grouped).map(([type, amount]) => ({ type, amount }));
+  }, []);
+
+  const loadReportData = useCallback(async () => {
     try {
       // Get contributions data
       const { data: contributions } = await supabase
@@ -69,7 +103,7 @@ const FamilyReports = () => {
       const contributionsByType = processGroupData(contributions || [], "type", "amount");
 
       // Process loans by status
-      const loansByStatus = (loans || []).reduce((acc: any[], loan) => {
+      const loansByStatus = (loans || []).reduce((acc: Array<{ status: string; count: number; amount: number }>, loan) => {
         const existing = acc.find((item) => item.status === loan.status);
         if (existing) {
           existing.count += 1;
@@ -92,43 +126,14 @@ const FamilyReports = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [family, processMonthlyData, processGroupData]);
 
-  const processMonthlyData = (data: any[], dateField: string, amountField: string, includeCount = false) => {
-    const monthlyData: { [key: string]: { amount: number; count?: number } } = {};
-    
-    data.forEach((item) => {
-      const date = new Date(item[dateField]);
-      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-      
-      if (!monthlyData[monthKey]) {
-        monthlyData[monthKey] = { amount: 0 };
-        if (includeCount) monthlyData[monthKey].count = 0;
-      }
-      
-      monthlyData[monthKey].amount += item[amountField];
-      if (includeCount) monthlyData[monthKey].count! += 1;
-    });
+  useEffect(() => {
+    if (family) {
+      loadReportData();
+    }
+  }, [family, loadReportData]);
 
-    return Object.entries(monthlyData)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .slice(-12)
-      .map(([month, data]) => ({
-        month: new Date(month + "-01").toLocaleDateString("en-US", { month: "short", year: "numeric" }),
-        ...data,
-      }));
-  };
-
-  const processGroupData = (data: any[], groupField: string, amountField: string) => {
-    const grouped: { [key: string]: number } = {};
-    
-    data.forEach((item) => {
-      const key = item[groupField];
-      grouped[key] = (grouped[key] || 0) + item[amountField];
-    });
-
-    return Object.entries(grouped).map(([type, amount]) => ({ type, amount }));
-  };
 
   if (authLoading || loading) {
     return (
@@ -170,9 +175,9 @@ const FamilyReports = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis />
-                <Tooltip formatter={(value) => `${value.toLocaleString()} FCFA`} />
+                <Tooltip formatter={(value: number) => formatAmount(value)} />
                 <Legend />
-                <Line type="monotone" dataKey="amount" stroke="#8884d8" name="Amount (FCFA)" />
+                <Line type="monotone" dataKey="amount" stroke="#8884d8" name="Amount" />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -193,13 +198,13 @@ const FamilyReports = () => {
                   cx="50%"
                   cy="50%"
                   outerRadius={100}
-                  label={(entry) => `${entry.type}: ${entry.amount.toLocaleString()} FCFA`}
+                  label={(entry) => `${entry.type}: ${formatAmount(entry.amount)}`}
                 >
                   {reportData.contributionsByType.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value) => `${value.toLocaleString()} FCFA`} />
+                <Tooltip formatter={(value: number) => formatAmount(value)} />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
@@ -220,9 +225,9 @@ const FamilyReports = () => {
                 <XAxis dataKey="month" />
                 <YAxis yAxisId="left" />
                 <YAxis yAxisId="right" orientation="right" />
-                <Tooltip />
+                <Tooltip formatter={(value: number, name: string) => name === "amount" ? formatAmount(value) : value} />
                 <Legend />
-                <Bar yAxisId="left" dataKey="amount" fill="#8884d8" name="Amount (FCFA)" />
+                <Bar yAxisId="left" dataKey="amount" fill="#8884d8" name="Amount" />
                 <Bar yAxisId="right" dataKey="count" fill="#82ca9d" name="Number of Loans" />
               </BarChart>
             </ResponsiveContainer>
@@ -240,10 +245,10 @@ const FamilyReports = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="status" />
                 <YAxis />
-                <Tooltip />
+                <Tooltip formatter={(value: number, name: string) => name === "amount" ? formatAmount(value) : value} />
                 <Legend />
                 <Bar dataKey="count" fill="#8884d8" name="Count" />
-                <Bar dataKey="amount" fill="#82ca9d" name="Amount (FCFA)" />
+                <Bar dataKey="amount" fill="#82ca9d" name="Amount" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -260,9 +265,9 @@ const FamilyReports = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis />
-                <Tooltip formatter={(value) => `${value.toLocaleString()} FCFA`} />
+                <Tooltip formatter={(value: number) => formatAmount(value)} />
                 <Legend />
-                <Line type="monotone" dataKey="amount" stroke="#82ca9d" name="Savings (FCFA)" />
+                <Line type="monotone" dataKey="amount" stroke="#82ca9d" name="Savings Amount" />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { ArrowLeft, Plus, DollarSign, TrendingUp, Download, Loader2, FileText } from "lucide-react";
+import { useCurrency } from "@/context/CurrencyContext";
+import { CurrencySelector } from "@/components/CurrencySelector";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ContributionReceiptButton } from "@/components/contributions/ContributionReceiptButton";
 import { format } from "date-fns";
 import { exportToCSV } from "@/lib/export";
@@ -49,6 +52,7 @@ export default function Contributions() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { family, canManageFinances, isLoading: authLoading } = useFamilyAuth(familySlug);
+  const { formatAmount } = useCurrency();
   const { isMobile } = usePlatform();
   const [contributions, setContributions] = useState<Contribution[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
@@ -66,15 +70,7 @@ export default function Contributions() {
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    if (family) {
-      fetchFamilySettings();
-      fetchContributions();
-      fetchMembers();
-    }
-  }, [family]);
-
-  const fetchFamilySettings = async () => {
+  const fetchFamilySettings = useCallback(async () => {
     if (!family) return;
     
     try {
@@ -104,9 +100,9 @@ export default function Contributions() {
     } catch (error) {
       console.error("Error fetching family settings:", error);
     }
-  };
+  }, [family]);
 
-  const fetchContributions = async () => {
+  const fetchContributions = useCallback(async () => {
     if (!family) return;
     
     try {
@@ -148,19 +144,20 @@ export default function Contributions() {
         }
       })) || [];
 
-      setContributions(enrichedContributions as any);
-    } catch (error: any) {
+      setContributions((enrichedContributions as unknown as Contribution[]) || []);
+    } catch (error) {
+      const err = error as Error;
       toast({
         variant: "destructive",
         title: "Error fetching contributions",
-        description: error.message,
+        description: err.message,
       });
     } finally {
       setLoading(false);
     }
-  };
+  }, [family, toast]);
 
-  const fetchMembers = async () => {
+  const fetchMembers = useCallback(async () => {
     if (!family) return;
     
     try {
@@ -188,21 +185,30 @@ export default function Contributions() {
         profiles: userIdToProfile.get(member.user_id) || { full_name: "Unknown" }
       })) || [];
 
-      setMembers(enrichedMembers as any);
-    } catch (error: any) {
+      setMembers((enrichedMembers as unknown as Member[]) || []);
+    } catch (error) {
+      const err = error as Error;
       toast({
         variant: "destructive",
         title: "Error fetching members",
-        description: error.message,
+        description: err.message,
       });
     }
-  };
+  }, [family, toast]);
+
+  useEffect(() => {
+    if (family) {
+      fetchFamilySettings();
+      fetchContributions();
+      fetchMembers();
+    }
+  }, [family, fetchFamilySettings, fetchContributions, fetchMembers]);
 
   const handleAddContribution = async () => {
     setValidationErrors({});
     
     // Validate input
-    const validationData: any = {
+    const validationData: Record<string, unknown> = {
       amount: parseFloat(newContribution.amount),
       contributionDate: newContribution.contribution_date,
       type: newContribution.type,
@@ -241,22 +247,16 @@ export default function Contributions() {
     }
 
     try {
-      const contributionData: any = {
+      const contributionData = {
         family_id: family.id,
         amount: validationResult.data.amount,
         contribution_date: validationResult.data.contributionDate,
         type: validationResult.data.type,
         notes: validationResult.data.notes || null,
         status: "pending",
+        house_id: contributionScope === "house" ? newContribution.house_id : null,
+        member_id: contributionScope === "house" ? null : validationResult.data.memberId,
       };
-
-      if (contributionScope === "house") {
-        contributionData.house_id = newContribution.house_id;
-        contributionData.member_id = null;
-      } else {
-        contributionData.member_id = validationResult.data.memberId;
-        contributionData.house_id = null;
-      }
 
       const { error } = await supabase.from("contributions").insert(contributionData);
 
@@ -278,11 +278,12 @@ export default function Contributions() {
       });
       setValidationErrors({});
       fetchContributions();
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as Error;
       toast({
         variant: "destructive",
         title: "Error adding contribution",
-        description: error.message,
+        description: err.message,
       });
     }
   };
@@ -305,11 +306,12 @@ export default function Contributions() {
       });
 
       fetchContributions();
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as Error;
       toast({
         variant: "destructive",
         title: "Error updating contribution",
-        description: error.message,
+        description: err.message,
       });
     }
   };
@@ -360,9 +362,14 @@ export default function Contributions() {
                 <p className="text-sm text-muted-foreground">Track monthly contributions and payments</p>
               </div>
             </div>
-            <div className="flex gap-2">
-              {canManageFinances && (
-                <BulkPaymentMenu
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher />
+              <CurrencySelector />
+            </div>
+          </div>
+          <div className="flex items-center justify-end gap-2 mt-4 border-t pt-4 border-border">
+            {canManageFinances && (
+              <BulkPaymentMenu
                   members={members}
                   familyId={family?.id || ''}
                   contributionDate={format(new Date(), "yyyy-MM-dd")}
@@ -410,7 +417,7 @@ export default function Contributions() {
                         )}
                       </div>
                       <div>
-                        <Label>Amount (FCFA)</Label>
+                        <Label>Amount</Label>
                         <Input
                           type="number"
                           min="0"
@@ -487,7 +494,6 @@ export default function Contributions() {
                 </Dialog>
               )}
             </div>
-          </div>
         </div>
       </header>
 
@@ -499,7 +505,7 @@ export default function Contributions() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalContributions.toLocaleString()} FCFA</div>
+              <div className="text-2xl font-bold">{formatAmount(totalContributions)}</div>
             </CardContent>
           </Card>
           <Card>
@@ -508,7 +514,7 @@ export default function Contributions() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{paidContributions.toLocaleString()} FCFA</div>
+              <div className="text-2xl font-bold text-green-600">{formatAmount(paidContributions)}</div>
             </CardContent>
           </Card>
           <Card>
@@ -517,7 +523,7 @@ export default function Contributions() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-orange-600">{pendingContributions.toLocaleString()} FCFA</div>
+              <div className="text-2xl font-bold text-orange-600">{formatAmount(pendingContributions)}</div>
             </CardContent>
           </Card>
         </div>
@@ -539,7 +545,7 @@ export default function Contributions() {
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <p className="font-bold">{contribution.amount.toLocaleString()} FCFA</p>
+                      <p className="font-bold">{formatAmount(contribution.amount)}</p>
                       {contribution.late_fine && contribution.late_fine > 0 && (
                         <p className="text-sm text-red-600">+{contribution.late_fine} fine</p>
                       )}

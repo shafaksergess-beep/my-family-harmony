@@ -111,13 +111,16 @@ const FamilyModule = ({ children }: { children: ReactNode }) => (
   </ModuleErrorBoundary>
 );
 
+import { CurrencyProvider } from "@/context/CurrencyContext";
+
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
       <MedianProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
+        <CurrencyProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
         <BrowserRouter>
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
@@ -208,9 +211,10 @@ const App = () => (
           </Suspense>
         </BrowserRouter>
         </TooltipProvider>
-      </MedianProvider>
-    </QueryClientProvider>
-  </ErrorBoundary>
+      </CurrencyProvider>
+    </MedianProvider>
+  </QueryClientProvider>
+</ErrorBoundary>
 );
 
 export default App;

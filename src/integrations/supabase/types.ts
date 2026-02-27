@@ -2220,6 +2220,7 @@ export type Database = {
           id: string
           is_working: boolean | null
           phone: string | null
+          push_token: string | null
           preferred_language: string | null
           updated_at: string | null
         }
@@ -2231,6 +2232,7 @@ export type Database = {
           id: string
           is_working?: boolean | null
           phone?: string | null
+          push_token?: string | null
           preferred_language?: string | null
           updated_at?: string | null
         }
@@ -2242,6 +2244,7 @@ export type Database = {
           id?: string
           is_working?: boolean | null
           phone?: string | null
+          push_token?: string | null
           preferred_language?: string | null
           updated_at?: string | null
         }
@@ -2346,6 +2349,7 @@ export type Database = {
           member_id: string
           notes: string | null
           purchase_date: string
+          share_count: number | null
           share_number: string
           share_value: number
           updated_at: string | null
@@ -2358,6 +2362,7 @@ export type Database = {
           member_id: string
           notes?: string | null
           purchase_date: string
+          share_count?: number | null
           share_number: string
           share_value?: number
           updated_at?: string | null
@@ -2370,6 +2375,7 @@ export type Database = {
           member_id?: string
           notes?: string | null
           purchase_date?: string
+          share_count?: number | null
           share_number?: string
           share_value?: number
           updated_at?: string | null

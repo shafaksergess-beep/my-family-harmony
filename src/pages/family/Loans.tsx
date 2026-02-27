@@ -12,6 +12,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useCurrency } from "@/context/CurrencyContext";
+import { CurrencySelector } from "@/components/CurrencySelector";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LoanPaymentForm } from "@/components/LoanPaymentForm";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -52,6 +54,7 @@ export default function Loans() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { family, canManageLoans, isLoading: authLoading } = useFamilyAuth(familySlug);
+  const { formatAmount } = useCurrency();
   const [loans, setLoans] = useState<Loan[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,6 +73,7 @@ export default function Loans() {
       fetchLoans();
       fetchMembers();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [family?.id]);
 
   const fetchLoans = async () => {
@@ -86,12 +90,13 @@ export default function Loans() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setLoans(data as any || []);
-    } catch (error: any) {
+      setLoans((data as unknown as Loan[]) || []);
+    } catch (error) {
+      const err = error as Error;
       toast({
         variant: "destructive",
         title: "Error fetching loans",
-        description: error.message,
+        description: err.message,
       });
     } finally {
       setLoading(false);
@@ -106,12 +111,13 @@ export default function Loans() {
         .eq("family_id", family!.id);
 
       if (error) throw error;
-      setMembers(data as any || []);
-    } catch (error: any) {
+      setMembers((data as unknown as Member[]) || []);
+    } catch (error) {
+      const err = error as Error;
       toast({
         variant: "destructive",
         title: "Error fetching members",
-        description: error.message,
+        description: err.message,
       });
     }
   };
@@ -187,13 +193,13 @@ export default function Loans() {
 
         // Send notification to loan committee and family head
         try {
-          await supabase.functions.invoke('send-loan-notification', {
+          await supabase.functions.invoke('send-notification', {
             body: {
-              loanId: newLoanData.id,
               familyId: family.id,
-              memberName: profileData?.full_name || 'Unknown Member',
-              amount: parseFloat(newLoan.amount),
-              purpose: newLoan.purpose,
+              type: 'loan_requested',
+              title: 'New Loan Request',
+              message: `${profileData?.full_name || 'A member'} requested a loan of ${formatAmount(parseFloat(newLoan.amount))}. Purpose: ${newLoan.purpose}`,
+              actionUrl: `/family/${familySlug}/loans`
             }
           });
         } catch (notifError) {
@@ -217,11 +223,12 @@ export default function Loans() {
       });
       setValidationErrors({});
       fetchLoans();
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as Error;
       toast({
         variant: "destructive",
         title: "Error requesting loan",
-        description: error.message,
+        description: err.message,
       });
     }
   };
@@ -248,11 +255,12 @@ export default function Loans() {
       });
 
       fetchLoans();
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as Error;
       toast({
         variant: "destructive",
         title: "Error approving loan",
-        description: error.message,
+        description: err.message,
       });
     }
   };
@@ -279,11 +287,12 @@ export default function Loans() {
       });
 
       fetchLoans();
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as Error;
       toast({
         variant: "destructive",
         title: "Error disbursing loan",
-        description: error.message,
+        description: err.message,
       });
     }
   };

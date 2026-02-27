@@ -13,6 +13,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useCurrency } from "@/context/CurrencyContext";
+import { CurrencySelector } from "@/components/CurrencySelector";
 import { LoanDeductionDialog } from "@/components/LoanDeductionDialog";
 
 interface NjangiCycle {
@@ -52,6 +54,7 @@ export default function FamilyNjangi() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { family, canManageFinances, isLoading: authLoading } = useFamilyAuth(familySlug);
+  const { formatAmount } = useCurrency();
   const [loading, setLoading] = useState(true);
   const [cycles, setCycles] = useState<NjangiCycle[]>([]);
   const [selectedCycle, setSelectedCycle] = useState<NjangiCycle | null>(null);
@@ -72,12 +75,14 @@ export default function FamilyNjangi() {
     if (family?.id) {
       loadData();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [family?.id]);
 
   useEffect(() => {
     if (selectedCycle) {
       loadParticipants(selectedCycle.id);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCycle]);
 
   const loadData = async () => {
@@ -122,9 +127,10 @@ export default function FamilyNjangi() {
         profiles: userIdToProfile.get(member.user_id) || { full_name: "Unknown" }
       })) || [];
 
-      setMembers(enrichedMembers as any);
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      setMembers((enrichedMembers as unknown as FamilyMember[]) || []);
+    } catch (error) {
+      const err = error as Error;
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -171,9 +177,10 @@ export default function FamilyNjangi() {
         }
       })) || [];
 
-      setParticipants(enrichedParticipants as any);
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      setParticipants((enrichedParticipants as unknown as NjangiParticipant[]) || []);
+    } catch (error) {
+      const err = error as Error;
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     }
   };
 
@@ -201,8 +208,9 @@ export default function FamilyNjangi() {
         notes: "",
       });
       loadData();
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } catch (error) {
+      const err = error as Error;
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     }
   };
 
@@ -226,7 +234,7 @@ export default function FamilyNjangi() {
           payout_date: new Date().toISOString().split('T')[0],
           amount_received: Math.max(0, remainingPayout),
           notes: deductionAmount > 0 
-            ? `${deductionAmount.toLocaleString()} FCFA deducted for loan repayment. Original amount: ${selectedCycle.amount_per_person.toLocaleString()} FCFA`
+            ? `${formatAmount(deductionAmount)} deducted for loan repayment. Original amount: ${formatAmount(selectedCycle.amount_per_person)}`
             : null,
         })
         .eq("id", selectedParticipantForPayout);
@@ -271,7 +279,7 @@ export default function FamilyNjangi() {
               amount_paid: newPrincipalPaid,
               interest_paid: newInterestPaid,
               status: isFullyPaid ? "repaid" : loan.status,
-              notes: `${loan.notes || ""}\n\nAuto-deduction from Njangi payout: ${paymentAmount.toLocaleString()} FCFA (${interestPayment.toLocaleString()} interest + ${principalPayment.toLocaleString()} principal)`,
+              notes: `${loan.notes || ""}\n\nAuto-deduction from Njangi payout: ${formatAmount(paymentAmount)} (${formatAmount(interestPayment)} interest + ${formatAmount(principalPayment)} principal)`,
             })
             .eq("id", loan.id);
 
@@ -284,14 +292,15 @@ export default function FamilyNjangi() {
       toast({ 
         title: "Success", 
         description: deductionAmount > 0 
-          ? `Payout processed: ${remainingPayout.toLocaleString()} FCFA paid, ${deductionAmount.toLocaleString()} FCFA applied to loans`
+          ? `Payout processed: ${formatAmount(remainingPayout)} paid, ${formatAmount(deductionAmount)} applied to loans`
           : "Payout marked as paid"
       });
       
       if (selectedCycle) loadParticipants(selectedCycle.id);
       setSelectedParticipantForPayout(null);
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } catch (error) {
+      const err = error as Error;
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     }
   };
 
@@ -309,7 +318,10 @@ export default function FamilyNjangi() {
             </Button>
             <h1 className="text-3xl font-bold">Njangi (Rotating Savings)</h1>
           </div>
-          <LanguageSwitcher />
+          <div className="flex gap-2 items-center">
+            <LanguageSwitcher />
+            <CurrencySelector />
+          </div>
         </div>
 
         <div className="flex justify-between items-center">
@@ -359,7 +371,7 @@ export default function FamilyNjangi() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="amount">Amount Per Person (FCFA)</Label>
+                    <Label htmlFor="amount">Amount Per Person</Label>
                     <Input
                       id="amount"
                       type="number"
@@ -395,7 +407,7 @@ export default function FamilyNjangi() {
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">Amount Per Person</div>
-                  <div className="text-xl font-bold">{parseFloat(selectedCycle.amount_per_person.toString()).toLocaleString()} FCFA</div>
+                  <div className="text-xl font-bold">{formatAmount(selectedCycle.amount_per_person)}</div>
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">Participants</div>
@@ -443,10 +455,10 @@ export default function FamilyNjangi() {
                           <td className="p-4 font-mono">#{participant.payout_order}</td>
                           <td className="p-4">{participant.family_members.profiles.full_name}</td>
                           <td className="p-4 text-right font-mono">
-                            {participant.amount_received 
-                              ? parseFloat(participant.amount_received.toString()).toLocaleString() 
-                              : parseFloat(selectedCycle.amount_per_person.toString()).toLocaleString()
-                            } FCFA
+                            {formatAmount(participant.amount_received 
+                              ? participant.amount_received
+                              : selectedCycle.amount_per_person
+                            )}
                           </td>
                           <td className="p-4">
                             {participant.payout_date 

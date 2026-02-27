@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useCurrency } from "@/context/CurrencyContext";
+import { CurrencySelector } from "@/components/CurrencySelector";
 
 interface Saving {
   id: string;
@@ -40,6 +42,7 @@ export default function FamilySavings() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { family, canManageFinances, isLoading: authLoading } = useFamilyAuth(familySlug);
+  const { formatAmount } = useCurrency();
   const [loading, setLoading] = useState(true);
   const [savings, setSavings] = useState<Saving[]>([]);
   const [members, setMembers] = useState<FamilyMember[]>([]);
@@ -51,13 +54,7 @@ export default function FamilySavings() {
     notes: "",
   });
 
-  useEffect(() => {
-    if (family?.id) {
-      loadData();
-    }
-  }, [family?.id]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!family) return;
     
     try {
@@ -102,7 +99,7 @@ export default function FamilySavings() {
         }
       })) || [];
 
-      setSavings(enrichedSavings as any);
+      setSavings((enrichedSavings as unknown as Saving[]) || []);
 
       // Fetch all members for dropdown
       const { data: allMembersData, error: allMembersError } = await supabase
@@ -126,13 +123,20 @@ export default function FamilySavings() {
         profiles: allUserIdToProfile.get(member.user_id) || { full_name: "Unknown" }
       })) || [];
 
-      setMembers(allEnrichedMembers as any);
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      setMembers((allEnrichedMembers as unknown as FamilyMember[]) || []);
+    } catch (error) {
+      const err = error as Error;
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
-  };
+  }, [family, toast]);
+
+  useEffect(() => {
+    if (family?.id) {
+      loadData();
+    }
+  }, [family?.id, loadData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -159,8 +163,9 @@ export default function FamilySavings() {
         notes: "",
       });
       loadData();
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } catch (error) {
+      const err = error as Error;
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     }
   };
 
@@ -206,7 +211,7 @@ export default function FamilySavings() {
                 Recommended Monthly Savings (Optional)
               </p>
               <p className="text-2xl font-bold text-primary">
-                {(family?.min_savings_amount || 5000).toLocaleString()} FCFA
+                {formatAmount(family?.min_savings_amount || 5000)}
               </p>
             </div>
             <DollarSign className="h-8 w-8 text-primary opacity-50" />
@@ -216,19 +221,25 @@ export default function FamilySavings() {
           </p>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="p-6">
-            <div className="text-sm text-muted-foreground">Total Savings</div>
-            <div className="text-2xl font-bold">{stats.totalSavings.toLocaleString()} FCFA</div>
-          </Card>
-          <Card className="p-6">
-            <div className="text-sm text-muted-foreground">Active Savers</div>
-            <div className="text-2xl font-bold">{stats.uniqueMembers}</div>
-          </Card>
-          <Card className="p-6">
-            <div className="text-sm text-muted-foreground">This Month</div>
-            <div className="text-2xl font-bold">{stats.thisMonthTotal.toLocaleString()} FCFA</div>
-          </Card>
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <CurrencySelector />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+            <Card className="p-6">
+              <div className="text-sm text-muted-foreground">Total Savings</div>
+              <div className="text-2xl font-bold">{formatAmount(stats.totalSavings)}</div>
+            </Card>
+            <Card className="p-6">
+              <div className="text-sm text-muted-foreground">Active Savers</div>
+              <div className="text-2xl font-bold">{stats.uniqueMembers}</div>
+            </Card>
+            <Card className="p-6">
+              <div className="text-sm text-muted-foreground">This Month</div>
+              <div className="text-2xl font-bold">{formatAmount(stats.thisMonthTotal)}</div>
+            </Card>
+          </div>
         </div>
 
         <div className="flex justify-between items-center">
@@ -335,7 +346,7 @@ export default function FamilySavings() {
                     <tr key={saving.id} className="border-b hover:bg-muted/50">
                       <td className="p-4">{saving.family_members.profiles.full_name}</td>
                       <td className="p-4">{new Date(saving.month).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}</td>
-                      <td className="p-4 text-right font-mono">{parseFloat(saving.amount.toString()).toLocaleString()} FCFA</td>
+                      <td className="p-4 text-right font-mono">{formatAmount(parseFloat(saving.amount.toString()))}</td>
                       <td className="p-4 text-muted-foreground">{saving.notes || '-'}</td>
                     </tr>
                   ))

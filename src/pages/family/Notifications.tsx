@@ -29,7 +29,7 @@ const Notifications = () => {
   const { toast } = useToast();
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
-  const [family, setFamily] = useState<any>(null);
+  const [family, setFamily] = useState<Record<string, unknown> | null>(null);
   const [userRole, setUserRole] = useState<string>('member');
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [settings, setSettings] = useState({
@@ -43,6 +43,7 @@ const Notifications = () => {
   useEffect(() => {
     loadData();
     setupRealtimeSubscription();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [familySlug]);
 
   const setupRealtimeSubscription = () => {
@@ -261,7 +262,7 @@ const Notifications = () => {
                     <Badge variant="destructive">{unreadCount}</Badge>
                   )}
                 </h1>
-                <p className="text-sm text-muted-foreground">{family?.name} - Role: {userRole}</p>
+                <p className="text-sm text-muted-foreground">{family?.name as string} - Role: {userRole}</p>
               </div>
             </div>
             <LanguageSwitcher />

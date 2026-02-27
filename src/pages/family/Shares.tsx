@@ -14,15 +14,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-
+import { useCurrency } from "@/context/CurrencyContext";
+import { CurrencySelector } from "@/components/CurrencySelector";
 interface Share {
   id: string;
   share_number: string;
   purchase_date: string;
   share_value: number;
-  share_count: number;
+  share_count: number | null;
   is_active: boolean;
   notes: string | null;
+  member_id: string;
   family_members: {
     profiles: { full_name: string };
   };
@@ -50,6 +52,7 @@ export default function FamilyShares() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { family, canManageFinances, isLoading: authLoading } = useFamilyAuth(familySlug);
+  const { formatAmount } = useCurrency();
   const [loading, setLoading] = useState(true);
   const [shares, setShares] = useState<Share[]>([]);
   const [dividends, setDividends] = useState<Dividend[]>([]);
@@ -77,6 +80,7 @@ export default function FamilyShares() {
     if (family?.id) {
       loadData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [family?.id]);
 
   const loadData = async () => {
@@ -93,6 +97,7 @@ export default function FamilyShares() {
         .order("purchase_date", { ascending: false });
 
       if (sharesError) throw sharesError;
+      setShares(sharesData as unknown as Share[]);
 
       // Fetch family members
       const memberIds = [...new Set(sharesData?.map(s => s.member_id) || [])];
@@ -157,9 +162,10 @@ export default function FamilyShares() {
         profiles: allUserIdToProfile.get(member.user_id) || { full_name: "Unknown" }
       })) || [];
 
-      setMembers(allEnrichedMembers as any);
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      setMembers(allEnrichedMembers as FamilyMember[]);
+    } catch (error) {
+      const err = error as Error;
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -201,8 +207,9 @@ export default function FamilyShares() {
         notes: "",
       });
       loadData();
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } catch (error) {
+      const err = error as Error;
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     }
   };
 
@@ -214,8 +221,9 @@ export default function FamilyShares() {
       if (error) throw error;
       toast({ title: "Success", description: "Share record deleted" });
       loadData();
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } catch (error) {
+      const err = error as Error;
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     }
   };
 
@@ -251,8 +259,9 @@ export default function FamilyShares() {
         notes: "",
       });
       loadData();
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } catch (error) {
+      const err = error as Error;
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     }
   };
 
@@ -295,15 +304,19 @@ export default function FamilyShares() {
           </Card>
           <Card className="p-6">
             <div className="text-sm text-muted-foreground">Total Share Value</div>
-            <div className="text-2xl font-bold">{stats.totalValue.toLocaleString()} FCFA</div>
+            <div className="text-2xl font-bold">{formatAmount(stats.totalValue)}</div>
           </Card>
           <Card className="p-6">
             <div className="text-sm text-muted-foreground">Dividends Paid</div>
-            <div className="text-2xl font-bold">{stats.totalDividends.toLocaleString()} FCFA</div>
+            <div className="text-2xl font-bold">{formatAmount(stats.totalDividends)}</div>
           </Card>
         </div>
 
         <Tabs defaultValue="shares" className="w-full">
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <CurrencySelector />
+          </div>
           <TabsList>
             <TabsTrigger value="shares">Shares</TabsTrigger>
             <TabsTrigger value="dividends">Dividends</TabsTrigger>
@@ -448,7 +461,7 @@ export default function FamilyShares() {
                             {parseFloat(share.share_value.toString()).toLocaleString()}
                           </td>
                           <td className="p-4 text-right font-bold font-mono text-primary">
-                            {(parseFloat(share.share_value.toString()) * (share.share_count || 1)).toLocaleString()} FCFA
+                            {formatAmount(parseFloat(share.share_value.toString()) * (share.share_count || 1))}
                           </td>
                           <td className="p-4 text-center">
                             {share.is_active ? (
@@ -555,7 +568,7 @@ export default function FamilyShares() {
                         required
                       />
                       <p className="text-sm text-muted-foreground mt-1">
-                        {stats.totalShares} active shares × {dividendFormData.amount_per_share || 0} FCFA = {(stats.totalShares * parseFloat(dividendFormData.amount_per_share || "0")).toLocaleString()} FCFA total
+                        {stats.totalShares} active shares × {dividendFormData.amount_per_share || 0} FCFA = {formatAmount(stats.totalShares * parseFloat(dividendFormData.amount_per_share || "0"))} total
                       </p>
                     </div>
                     <div>
@@ -608,11 +621,11 @@ export default function FamilyShares() {
                             {dividend.period_year} {dividend.period_quarter && `Q${dividend.period_quarter}`}
                           </td>
                           <td className="p-4 text-right font-mono">
-                            {parseFloat(dividend.amount_per_share.toString()).toLocaleString()} FCFA
+                            {formatAmount(parseFloat(dividend.amount_per_share.toString()))}
                           </td>
                           <td className="p-4 text-right">{dividend.total_shares}</td>
                           <td className="p-4 text-right font-mono">
-                            {parseFloat(dividend.total_amount.toString()).toLocaleString()} FCFA
+                            {formatAmount(parseFloat(dividend.total_amount.toString()))}
                           </td>
                           <td className="p-4 text-center">
                             {dividend.is_paid ? (
@@ -655,7 +668,7 @@ export default function FamilyShares() {
                           <td className="p-4">{memberName}</td>
                           <td className="p-4 text-right font-mono">{shareCount}</td>
                           <td className="p-4 text-right font-mono">
-                            {memberTotalValue.toLocaleString()} FCFA
+                            {formatAmount(memberTotalValue)}
                           </td>
                         </tr>
                       );

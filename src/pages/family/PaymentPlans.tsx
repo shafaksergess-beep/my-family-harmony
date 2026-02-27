@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -53,11 +53,7 @@ export default function PaymentPlans() {
     notes: "",
   });
 
-  useEffect(() => {
-    loadData();
-  }, [familySlug]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -84,7 +80,7 @@ export default function PaymentPlans() {
 
       // Get member names separately
       if (plansData && plansData.length > 0) {
-        const userIds = plansData.map((p: any) => p.family_members.user_id);
+        const userIds = plansData.map((p: Record<string, unknown>) => (p.family_members as { user_id: string }).user_id);
         const { data: profilesData } = await supabase
           .from("profiles")
           .select("id, full_name")
@@ -92,14 +88,14 @@ export default function PaymentPlans() {
 
         const profilesMap = new Map(profilesData?.map(p => [p.id, p]) || []);
         
-        const enrichedPlans = plansData.map((plan: any) => ({
+        const enrichedPlans = plansData.map((plan: Record<string, unknown>) => ({
           ...plan,
           family_members: {
-            profiles: profilesMap.get(plan.family_members.user_id) || { full_name: "Unknown" }
+            profiles: profilesMap.get((plan.family_members as { user_id: string }).user_id) || { full_name: "Unknown" }
           }
         }));
         
-        setPlans(enrichedPlans as any);
+        setPlans(enrichedPlans as unknown as PaymentPlan[]);
       } else {
         setPlans([]);
       }
@@ -124,7 +120,7 @@ export default function PaymentPlans() {
           profiles: profilesMap.get(member.user_id) || { full_name: "Unknown" }
         }));
         
-        setMembers(enrichedMembers as any);
+        setMembers(enrichedMembers as unknown as Member[]);
       } else {
         setMembers([]);
       }
@@ -134,7 +130,11 @@ export default function PaymentPlans() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [familySlug]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleCreatePlan = async (e: React.FormEvent) => {
     e.preventDefault();

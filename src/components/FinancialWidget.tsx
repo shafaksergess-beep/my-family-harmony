@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp, TrendingDown, DollarSign, Wallet, CreditCard, PiggyBank } from "lucide-react";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface FinancialSummary {
   totalContributions: number;
@@ -117,13 +118,7 @@ const FinancialWidget = ({ familyId, className = "" }: FinancialWidgetProps) => 
     }
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "XAF",
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
+  const { formatAmount } = useCurrency();
 
   if (loading) {
     return (
@@ -202,7 +197,7 @@ const FinancialWidget = ({ familyId, className = "" }: FinancialWidgetProps) => 
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">{metric.label}</p>
-                    <p className="text-2xl font-bold">{formatCurrency(metric.value)}</p>
+                    <p className="text-2xl font-bold">{formatAmount(metric.value)}</p>
                   </div>
                   <div className={`p-2 rounded-lg ${metric.bgColor}`}>
                     <Icon className={`h-5 w-5 ${metric.color}`} />

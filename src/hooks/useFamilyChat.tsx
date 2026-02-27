@@ -165,6 +165,20 @@ export function useFamilyChat({ familyId, memberId }: UseFamilyChatOptions) {
         });
 
         if (error) throw error;
+
+        // Trigger notification
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase.functions.invoke('send-notification', {
+            body: {
+              familyId,
+              type: 'chat_message',
+              title: 'New Family Message',
+              message: content.trim().substring(0, 100) + (content.length > 100 ? '...' : ''),
+              data: { senderId: user.id }
+            }
+          });
+        }
       } catch (error) {
         console.error('Error sending message:', error);
         toast({

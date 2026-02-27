@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,14 +17,10 @@ const PDFReports = () => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
-  const [family, setFamily] = useState<any>(null);
+  const [family, setFamily] = useState<Record<string, unknown> | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string>(new Date().toISOString().slice(0, 7));
 
-  useEffect(() => {
-    loadData();
-  }, [familySlug]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
@@ -54,7 +50,11 @@ const PDFReports = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [familySlug, navigate, toast]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleGenerateReport = async () => {
     setGenerating(true);
@@ -71,7 +71,7 @@ const PDFReports = () => {
             profiles!inner (full_name)
           )
         `)
-        .eq("family_id", family.id)
+        .eq("family_id", family?.id as string)
         .gte("contribution_date", `${selectedMonth}-01`)
         .lt("contribution_date", `${year}-${String(parseInt(month) + 1).padStart(2, '0')}-01`);
 
@@ -84,7 +84,7 @@ const PDFReports = () => {
             profiles!inner (full_name)
           )
         `)
-        .eq("family_id", family.id);
+        .eq("family_id", family?.id as string);
 
       // Fetch savings for the month
       const { data: savings } = await supabase
@@ -95,7 +95,7 @@ const PDFReports = () => {
             profiles!inner (full_name)
           )
         `)
-        .eq("family_id", family.id)
+        .eq("family_id", family?.id as string)
         .eq("month", `${selectedMonth}-01`);
 
       const totalContributions = contributions?.reduce((sum, c) => sum + parseFloat(c.amount.toString()), 0) || 0;
@@ -108,7 +108,7 @@ const PDFReports = () => {
       }, 0) || 0;
 
       const reportData = {
-        familyName: family.name,
+        familyName: family?.name as string,
         month: monthName,
         year: parseInt(year),
         totalContributions,
@@ -202,7 +202,7 @@ const PDFReports = () => {
                   <FileText className="w-6 h-6" />
                   PDF Reports
                 </h1>
-                <p className="text-sm text-muted-foreground">{family?.name}</p>
+                <p className="text-sm text-muted-foreground">{family?.name as string}</p>
               </div>
             </div>
             <LanguageSwitcher />
