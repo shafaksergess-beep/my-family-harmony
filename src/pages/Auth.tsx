@@ -33,6 +33,12 @@ const Auth = () => {
   // Pending invitation context
   const [pendingInvitation, setPendingInvitation] = useState<PendingInvitation | null>(null);
 
+  // Forgot password state
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
+
   // Login form state
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -412,6 +418,21 @@ const Auth = () => {
                     "Login"
                   )}
                 </Button>
+
+                <div className="text-center">
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="text-sm text-muted-foreground hover:text-primary p-0 h-auto"
+                    onClick={() => {
+                      setShowForgotPassword(true);
+                      setForgotEmail(loginEmail);
+                      setForgotSent(false);
+                    }}
+                  >
+                    Forgot your password?
+                  </Button>
+                </div>
               </form>
             </TabsContent>
 
@@ -542,7 +563,7 @@ const Auth = () => {
                     <p className="text-sm text-destructive">{signupErrors.confirmPassword}</p>
                   )}
                   {signupConfirmPassword && signupPassword === signupConfirmPassword && (
-                    <p className="text-xs text-green-600 dark:text-green-400">✓ Passwords match</p>
+                    <p className="text-xs text-primary">✓ Passwords match</p>
                   )}
                 </div>
 
@@ -577,6 +598,76 @@ const Auth = () => {
             </Button>
           </div>
         </Card>
+
+        {/* Forgot Password Dialog */}
+        {showForgotPassword && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowForgotPassword(false)}>
+            <Card className="p-6 max-w-md w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
+              {forgotSent ? (
+                <div className="text-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                    <Users className="w-6 h-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground">Check your email</h3>
+                  <p className="text-sm text-muted-foreground">
+                    If an account exists with that email, we've sent a password reset link. Please check your inbox and spam folder.
+                  </p>
+                  <Button variant="outline" className="w-full" onClick={() => setShowForgotPassword(false)}>
+                    Back to Login
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground">Reset Password</h3>
+                    <p className="text-sm text-muted-foreground">Enter your email and we'll send you a reset link.</p>
+                  </div>
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      if (!forgotEmail.trim()) return;
+                      setForgotLoading(true);
+                      try {
+                        const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail.trim(), {
+                          redirectTo: `${window.location.origin}/reset-password`,
+                        });
+                        if (error) throw error;
+                        setForgotSent(true);
+                      } catch (error: any) {
+                        // Always show success to prevent email enumeration
+                        setForgotSent(true);
+                      } finally {
+                        setForgotLoading(false);
+                      }
+                    }}
+                    className="space-y-4"
+                  >
+                    <div className="space-y-2">
+                      <Label htmlFor="forgot-email">Email Address</Label>
+                      <Input
+                        id="forgot-email"
+                        type="email"
+                        placeholder="your.email@example.com"
+                        value={forgotEmail}
+                        onChange={(e) => setForgotEmail(e.target.value)}
+                        autoFocus
+                        required
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button type="button" variant="outline" className="flex-1" onClick={() => setShowForgotPassword(false)}>
+                        Cancel
+                      </Button>
+                      <Button type="submit" className="flex-1" disabled={forgotLoading}>
+                        {forgotLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send Reset Link"}
+                      </Button>
+                    </div>
+                  </form>
+                </div>
+              )}
+            </Card>
+          </div>
+        )}
 
         <div className="text-center mt-6">
           <Button
