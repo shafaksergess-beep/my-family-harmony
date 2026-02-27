@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.send-event-reminders]
 verify_jwt = false
+
+[functions.family-chatbot]
+verify_jwt = false
