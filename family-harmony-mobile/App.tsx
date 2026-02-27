@@ -9,6 +9,7 @@ import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import GlobalErrorBoundary from './src/components/common/GlobalErrorBoundary';
 import { registerForPushNotificationsAsync } from './src/services/notifications';
 import * as Notifications from 'expo-notifications';
+import { supabase } from './src/lib/supabase';
 
 // Create a client
 const queryClient = new QueryClient();
@@ -35,17 +36,24 @@ function AppContent() {
 
   useEffect(() => {
     initDatabase();
-    registerForPushNotificationsAsync().then(token => {
-      // Logic to save token to user profile can go here later
-      console.log('Push token:', token);
-    });
+    if (user) {
+      registerForPushNotificationsAsync().then(async (token) => {
+        if (token) {
+          await supabase
+            .from('profiles')
+            .update({ push_token: token })
+            .eq('id', user.id);
+          console.log('Push token saved:', token);
+        }
+      });
+    }
 
-    const subscription = Notifications.addNotificationReceivedListener((notification: any) => {
+    const subscription = Notifications.addNotificationReceivedListener((notification) => {
       console.log('Notification received:', notification);
     });
 
     return () => subscription.remove();
-  }, []);
+  }, [user]);
 
   if (loading) {
     return (

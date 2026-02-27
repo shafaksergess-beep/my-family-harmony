@@ -79,7 +79,7 @@ const handler = async (req: Request): Promise<Response> => {
       // Fetch all family members with their profiles
       const { data: members, error: membersError } = await supabaseClient
         .from("family_members")
-        .select("*, profiles:user_id(email, full_name)")
+        .select("*, profiles:user_id(email, full_name, push_token, phone)")
         .eq("family_id", familyId);
 
       if (membersError) {
@@ -87,75 +87,90 @@ const handler = async (req: Request): Promise<Response> => {
         throw new Error("Failed to fetch family members");
       }
 
-      // Filter members with valid emails
-      const emailRecipients = members
-        .filter((m: any) => m.profiles?.email)
-        .map((m: any) => ({
-          email: m.profiles.email,
-          name: m.profiles.full_name || "Family Member"
-        }));
+      const notifications = members.map(async (m: any) => {
+        const results = [];
+        const userName = m.profiles?.full_name || "Family Member";
 
-      if (emailRecipients.length === 0) {
-        console.log("No email recipients found for meeting notification");
-        return new Response(JSON.stringify({ success: true, sent: 0 }), {
-          status: 200,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        });
-      }
-
-      // Send emails to all members
-      const emailPromises = emailRecipients.map((recipient: any) =>
-        resend.emails.send({
-          from: "Family Together <onboarding@resend.dev>",
-          to: [recipient.email],
-          subject: title || "New Meeting Scheduled",
-          html: `
-            <!DOCTYPE html>
-            <html>
-              <head>
-                <meta charset="utf-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              </head>
-              <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-                  <img src="https://31382291-0546-4a70-a015-b86eb65a55a3.lovableproject.com/logo.jpg" alt="Family Together" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 16px; border: 3px solid rgba(255,255,255,0.3);" />
-                  <h1 style="margin: 0;">New Meeting Scheduled</h1>
-                  <p style="margin: 10px 0 0 0; opacity: 0.9;">${family.name}</p>
+        // 1. Send Email
+        if (m.profiles?.email) {
+          try {
+            await resend.emails.send({
+              from: "Family Together <onboarding@resend.dev>",
+              to: [m.profiles.email],
+              subject: title || "New Meeting Scheduled",
+              html: `
+                <div style="font-family: sans-serif; padding: 20px;">
+                  <h1>New Meeting Scheduled</h1>
+                  <p>Hello ${userName},</p>
+                  <p>${message || `A new meeting has been scheduled for ${family.name}.`}</p>
+                  <p>Please check the app for details.</p>
                 </div>
-                
-                <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
-                  <p>Hello ${recipient.name},</p>
-                  
-                  <div style="display: inline-block; background: #667eea; color: white; padding: 5px 15px; border-radius: 20px; font-size: 14px; margin-bottom: 15px;">
-                    Meeting Notification
-                  </div>
-                  
-                  <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea;">
-                    <p style="margin: 0;">${message || "A new meeting has been scheduled for your family."}</p>
-                  </div>
-                  
-                  <p style="color: #666; font-size: 14px; margin-top: 20px;">
-                    Please check the app for full meeting details and add it to your calendar.
-                  </p>
-                </div>
-                
-                <div style="text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
-                  <p>© ${new Date().getFullYear()} Family Together. All rights reserved.</p>
-                </div>
-              </body>
-            </html>
-          `,
-        })
-      );
+              `,
+            });
+            results.push("email_sent");
+          } catch (e) {
+            console.error(`Failed to send email to ${m.profiles.email}:`, e);
+          }
+        }
 
-      const results = await Promise.allSettled(emailPromises);
-      const successCount = results.filter((r) => r.status === "fulfilled").length;
-      const failureCount = results.filter((r) => r.status === "rejected").length;
+        // 2. Send Push Notification (Expo)
+        if (m.profiles?.push_token) {
+          try {
+            const expoResponse = await fetch("https://exp.host/--/api/v2/push/send", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                to: m.profiles.push_token,
+                title: title || "New Meeting Scheduled",
+                body: message || `A new meeting has been scheduled for ${family.name}.`,
+                data: data || {},
+              }),
+            });
+            if (expoResponse.ok) results.push("push_sent");
+          } catch (e) {
+            console.error(`Failed to send push to ${userName}:`, e);
+          }
+        }
 
-      console.log(`Meeting notifications sent: ${successCount} successful, ${failureCount} failed`);
+        // 3. Send WhatsApp (Twilio)
+        const twilioSid = Deno.env.get("TWILIO_ACCOUNT_SID");
+        const twilioToken = Deno.env.get("TWILIO_AUTH_TOKEN");
+        const twilioFrom = Deno.env.get("TWILIO_WHATSAPP_NUMBER") || Deno.env.get("TWILIO_PHONE_NUMBER");
+
+        if (m.profiles?.phone && twilioSid && twilioToken && twilioFrom) {
+          try {
+            const auth = btoa(`${twilioSid}:${twilioToken}`);
+            const formData = new URLSearchParams();
+            // Use whatsapp: prefix if using Twilio WhatsApp API
+            const to = m.profiles.phone.startsWith("whatsapp:") ? m.profiles.phone : `whatsapp:${m.profiles.phone}`;
+            const from = twilioFrom.startsWith("whatsapp:") ? twilioFrom : `whatsapp:${twilioFrom}`;
+            
+            formData.append("To", to);
+            formData.append("From", from);
+            formData.append("Body", message || `A new meeting has been scheduled for ${family.name}. Please check the app.`);
+
+            const twilioResponse = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`, {
+              method: "POST",
+              headers: {
+                "Authorization": `Basic ${auth}`,
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body: formData.toString(),
+            });
+            if (twilioResponse.ok) results.push("whatsapp_sent");
+          } catch (e) {
+            console.error(`Failed to send WhatsApp to ${m.profiles.phone}:`, e);
+          }
+        }
+
+        return { memberId: m.id, results };
+      });
+
+      const processedResults = await Promise.all(notifications);
+      console.log(`Notifications processed for ${processedResults.length} members`);
 
       return new Response(
-        JSON.stringify({ success: true, sent: successCount, failed: failureCount }),
+        JSON.stringify({ success: true, processed: processedResults.length }),
         {
           status: 200,
           headers: { "Content-Type": "application/json", ...corsHeaders },
