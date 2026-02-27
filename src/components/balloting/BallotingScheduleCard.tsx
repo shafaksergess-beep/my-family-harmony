@@ -51,9 +51,13 @@ export const BallotingScheduleCard = ({
   const [localAssignments, setLocalAssignments] = useState<Assignment[] | null>(assignments);
   const [hasChanges, setHasChanges] = useState(false);
 
-  // Sync when parent data changes
-  if (assignments !== null && localAssignments === null) {
+  // Sync when parent data changes (e.g. after save or reload)
+  const assignmentsKey = JSON.stringify(assignments);
+  const [lastSyncedKey, setLastSyncedKey] = useState(assignmentsKey);
+  if (assignmentsKey !== lastSyncedKey) {
     setLocalAssignments(assignments);
+    setLastSyncedKey(assignmentsKey);
+    setHasChanges(false);
   }
 
   const handleDragEnd = (result: DropResult) => {
