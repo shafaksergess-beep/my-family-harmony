@@ -185,12 +185,19 @@ const Balloting = () => {
         cycleId = newCycle.id;
       }
 
-      // Insert participants from balloting assignments
-      const participantInserts = assignments.map((a, index) => ({
-        cycle_id: cycleId,
-        member_id: a.member_id,
-        payout_order: index + 1,
-      }));
+      // Deduplicate members - each member appears once, with their first assignment's order
+      const seen = new Set<string>();
+      const participantInserts: { cycle_id: string; member_id: string; payout_order: number }[] = [];
+      for (const a of assignments) {
+        if (!seen.has(a.member_id)) {
+          seen.add(a.member_id);
+          participantInserts.push({
+            cycle_id: cycleId,
+            member_id: a.member_id,
+            payout_order: participantInserts.length + 1,
+          });
+        }
+      }
 
       const { error: participantsError } = await supabase
         .from("njangi_participants")
