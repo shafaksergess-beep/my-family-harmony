@@ -10,6 +10,7 @@ import {
   Loader2, CheckCircle, XCircle, Users, Calendar, Wallet, 
   Shield, Heart, ArrowRight, Sparkles, PartyPopper, UserCheck 
 } from "lucide-react";
+import { FamilyJoinOnboarding } from "@/components/onboarding/FamilyJoinOnboarding";
 
 interface InvitationData {
   id: string;
@@ -50,6 +51,7 @@ const AcceptInvitation = () => {
   const [step, setStep] = useState<"preview" | "joining" | "welcome">("preview");
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [user, setUser] = useState<any>(null);
+  const [showJoinOnboarding, setShowJoinOnboarding] = useState(false);
 
   useEffect(() => {
     loadInvitation();
@@ -184,6 +186,7 @@ const AcceptInvitation = () => {
 
       setFamilyMembers(members as FamilyMember[] || []);
       setStep("welcome");
+      setShowJoinOnboarding(true);
 
       toast({
         title: "Welcome to the family! 🎉",
@@ -374,6 +377,14 @@ const AcceptInvitation = () => {
             </CardContent>
           </Card>
         </div>
+
+        <FamilyJoinOnboarding
+          open={showJoinOnboarding}
+          onComplete={() => setShowJoinOnboarding(false)}
+          familyName={invitation.families.name}
+          role={invitation.role}
+          userName={user?.user_metadata?.full_name}
+        />
       </div>
     );
   }
