@@ -20,49 +20,75 @@ interface NotificationRequest {
   eventDetails?: string;
   actionUrl?: string;
   message?: string;
-  type?: 
-    | 'family_created' 
-    | 'member_added' 
-    | 'role_changed' 
-    | 'meeting_scheduled' 
-    | 'loan_requested'
-    | 'loan_approved'
-    | 'loan_rejected'
-    | 'loan_repaid'
-    | 'payment_received'
-    | 'chat_message'
-    | 'general';
-  // For meeting_scheduled type
+  type?: 'family_created' | 'member_added' | 'role_changed' | 'meeting_scheduled' | 'general';
   familyId?: string;
   title?: string;
   data?: Record<string, any>;
 }
 
+async function sendWhatsAppMessage(to: string, message: string): Promise<boolean> {
+  const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
+  const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
+  const twilioPhone = Deno.env.get("TWILIO_PHONE_NUMBER");
+
+  if (!accountSid || !authToken || !twilioPhone) {
+    console.log("Twilio credentials not configured, skipping WhatsApp");
+    return false;
+  }
+
+  try {
+    const auth = btoa(`${accountSid}:${authToken}`);
+    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+
+    // Format phone for WhatsApp
+    const whatsappTo = to.startsWith("+") ? `whatsapp:${to}` : `whatsapp:+${to}`;
+    const whatsappFrom = `whatsapp:${twilioPhone}`;
+
+    const formData = new URLSearchParams();
+    formData.append("To", whatsappTo);
+    formData.append("From", whatsappFrom);
+    formData.append("Body", message);
+
+    const response = await fetch(twilioUrl, {
+      method: "POST",
+      headers: {
+        "Authorization": `Basic ${auth}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: formData.toString(),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("WhatsApp send error:", errorData);
+      return false;
+    }
+
+    console.log("WhatsApp message sent to:", to);
+    return true;
+  } catch (error) {
+    console.error("WhatsApp send failed:", error);
+    return false;
+  }
+}
+
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Rate limiting check
     const ipAddress = getIpAddress(req);
     const rateLimitCheck = checkRateLimit(ipAddress);
     
     if (rateLimitCheck.isBlocked) {
       const minutesBlocked = Math.ceil((rateLimitCheck.blockedUntil! - Date.now()) / 60000);
       return new Response(
-        JSON.stringify({ 
-          error: `Too many requests. Please try again in ${minutesBlocked} minute(s).` 
-        }),
-        {
-          status: 429,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
+        JSON.stringify({ error: `Too many requests. Please try again in ${minutesBlocked} minute(s).` }),
+        { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    // Record the request for rate limiting
     recordRequest(ipAddress);
     
     const requestData: NotificationRequest = await req.json();
@@ -75,7 +101,6 @@ const handler = async (req: Request): Promise<Response> => {
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       );
 
-      // Fetch family details
       const { data: family, error: familyError } = await supabaseClient
         .from("families")
         .select("name")
@@ -87,10 +112,10 @@ const handler = async (req: Request): Promise<Response> => {
         throw new Error("Failed to fetch family details");
       }
 
-      // Fetch all family members with their profiles
+      // Fetch all family members with their profiles (including phone)
       const { data: members, error: membersError } = await supabaseClient
         .from("family_members")
-        .select("*, profiles:user_id(email, full_name, push_token, phone)")
+        .select("*, profiles:user_id(email, full_name, phone)")
         .eq("family_id", familyId);
 
       if (membersError) {
@@ -98,242 +123,114 @@ const handler = async (req: Request): Promise<Response> => {
         throw new Error("Failed to fetch family members");
       }
 
-      // Determine who to notify based on type
-      let recipients = members;
-      const typeStr = type as string;
-      if (typeStr === 'loan_requested') {
-        recipients = members.filter((m: any) => ['family_head', 'loan_committee'].includes(m.role));
-      } else if (typeStr === 'chat_message') {
-        // Chat message usually passed senderId in data
-        const senderId = data?.senderId;
-        recipients = members.filter((m: any) => m.user_id !== senderId);
-      }
+      const emailRecipients = members
+        .filter((m: any) => m.profiles?.email)
+        .map((m: any) => ({
+          email: m.profiles.email,
+          name: m.profiles.full_name || "Family Member",
+          phone: m.profiles.phone || null,
+        }));
 
-      const notifications = recipients.map(async (m: any) => {
-        const results = [];
-        const userName = m.profiles?.full_name || "Family Member";
-
-        // 1. Send Email
-        if (m.profiles?.email) {
-          try {
-            await resend.emails.send({
-              from: "Family Together <onboarding@resend.dev>",
-              to: [m.profiles.email],
-              subject: title || "Family Activity Update",
-              html: `
-                <div style="font-family: sans-serif; padding: 20px;">
-                  <h1>${title || "Family Activity Update"}</h1>
-                  <p>Hello ${userName},</p>
-                  <p>${message || "There is a new update in your family app."}</p>
-                  ${actionUrl ? `<p><a href="${actionUrl}">View Details</a></p>` : ""}
+      // Send emails
+      const emailPromises = emailRecipients.map((recipient: any) =>
+        resend.emails.send({
+          from: "Family Together <onboarding@resend.dev>",
+          to: [recipient.email],
+          subject: title || "New Meeting Scheduled",
+          html: `
+            <!DOCTYPE html>
+            <html>
+              <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+              <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
+                  <img src="https://31382291-0546-4a70-a015-b86eb65a55a3.lovableproject.com/logo.jpg" alt="Family Together" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 16px; border: 3px solid rgba(255,255,255,0.3);" />
+                  <h1 style="margin: 0;">New Meeting Scheduled</h1>
+                  <p style="margin: 10px 0 0 0; opacity: 0.9;">${family.name}</p>
                 </div>
-              `,
-            });
-            results.push("email_sent");
-          } catch (e) {
-            console.error(`Failed to send email to ${m.profiles.email}:`, e);
-          }
-        }
+                <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+                  <p>Hello ${recipient.name},</p>
+                  <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea;">
+                    <p style="margin: 0;">${message || "A new meeting has been scheduled for your family."}</p>
+                  </div>
+                  <p style="color: #666; font-size: 14px; margin-top: 20px;">Please check the app for full meeting details.</p>
+                </div>
+                <div style="text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+                  <p>© ${new Date().getFullYear()} Family Together. All rights reserved.</p>
+                </div>
+              </body>
+            </html>
+          `,
+        })
+      );
 
-        // 2. Send Push Notification (Expo)
-        if (m.profiles?.push_token) {
-          try {
-            const expoResponse = await fetch("https://exp.host/--/api/v2/push/send", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                to: m.profiles.push_token,
-                title: title || "Family Activity Update",
-                body: message || "There is a new update in your family app.",
-                data: data || {},
-              }),
-            });
-            if (expoResponse.ok) results.push("push_sent");
-          } catch (e) {
-            console.error(`Failed to send push to ${userName}:`, e);
-          }
-        }
+      // Send WhatsApp messages to members with phone numbers
+      const whatsappMessage = `📅 *${family.name} - New Meeting Scheduled*\n\n${message || "A new meeting has been scheduled."}\n\nPlease check the Family Together app for details.`;
+      
+      const whatsappPromises = emailRecipients
+        .filter((r: any) => r.phone)
+        .map((r: any) => sendWhatsAppMessage(r.phone, whatsappMessage));
 
-        // 3. Send WhatsApp (Twilio)
-        const twilioSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-        const twilioToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-        const twilioFrom = Deno.env.get("TWILIO_WHATSAPP_NUMBER") || Deno.env.get("TWILIO_PHONE_NUMBER");
+      const [emailResults, whatsappResults] = await Promise.all([
+        Promise.allSettled(emailPromises),
+        Promise.allSettled(whatsappPromises),
+      ]);
 
-        if (m.profiles?.phone && twilioSid && twilioToken && twilioFrom) {
-          try {
-            const auth = btoa(`${twilioSid}:${twilioToken}`);
-            const formData = new URLSearchParams();
-            const to = m.profiles.phone.startsWith("whatsapp:") ? m.profiles.phone : `whatsapp:${m.profiles.phone}`;
-            const from = twilioFrom.startsWith("whatsapp:") ? twilioFrom : `whatsapp:${twilioFrom}`;
-            
-            formData.append("To", to);
-            formData.append("From", from);
-            formData.append("Body", `${title ? `*${title}*\n` : ""}${message || "Family Activity Update"}\nCheck the app for details.`);
+      const emailSuccess = emailResults.filter((r) => r.status === "fulfilled").length;
+      const whatsappSuccess = whatsappResults.filter((r) => r.status === "fulfilled" && (r as any).value === true).length;
 
-            const twilioResponse = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`, {
-              method: "POST",
-              headers: {
-                "Authorization": `Basic ${auth}`,
-                "Content-Type": "application/x-www-form-urlencoded",
-              },
-              body: formData.toString(),
-            });
-            if (twilioResponse.ok) results.push("whatsapp_sent");
-          } catch (e) {
-            console.error(`Failed to send WhatsApp to ${m.profiles.phone}:`, e);
-          }
-        }
-
-        return { memberId: m.id, results };
-      });
-
-      const processedResults = await Promise.all(notifications);
-      console.log(`Notifications processed for ${processedResults.length} recipients`);
+      console.log(`Meeting notifications: ${emailSuccess} emails, ${whatsappSuccess} WhatsApp messages sent`);
 
       return new Response(
-        JSON.stringify({ success: true, processed: processedResults.length }),
-        {
-          status: 200,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
+        JSON.stringify({ success: true, emailsSent: emailSuccess, whatsappSent: whatsappSuccess }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
     // Original notification handling for direct email sending
-    const {
-      to,
-      subject,
-      userName,
-      familyName,
-      eventType,
-      eventDetails,
-      actionUrl,
-    } = requestData;
+    const { to, subject, userName, familyName, eventType, eventDetails, actionUrl } = requestData;
 
     if (!to || !subject) {
       return new Response(
         JSON.stringify({ error: "Missing required fields: to and subject" }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    console.log(`Sending notification to:`, to);
-
     const toArray = Array.isArray(to) ? to : [to];
 
-    // Use new format if provided
     const emailHtml = userName && familyName && eventType && eventDetails ? `
       <!DOCTYPE html>
       <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>${subject}</title>
-          <style>
-            body {
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-              line-height: 1.6;
-              color: #333;
-              max-width: 600px;
-              margin: 0 auto;
-              padding: 20px;
-            }
-            .header {
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-              padding: 30px;
-              border-radius: 10px 10px 0 0;
-              text-align: center;
-            }
-            .content {
-              background: #f9f9f9;
-              padding: 30px;
-              border-radius: 0 0 10px 10px;
-            }
-            .event-badge {
-              display: inline-block;
-              background: #667eea;
-              color: white;
-              padding: 5px 15px;
-              border-radius: 20px;
-              font-size: 14px;
-              margin-bottom: 15px;
-            }
-            .details {
-              background: white;
-              padding: 20px;
-              border-radius: 8px;
-              margin: 20px 0;
-              border-left: 4px solid #667eea;
-            }
-            .button {
-              display: inline-block;
-              background: #667eea;
-              color: white;
-              padding: 12px 30px;
-              border-radius: 6px;
-              text-decoration: none;
-              margin: 20px 0;
-            }
-            .footer {
-              text-align: center;
-              color: #666;
-              font-size: 12px;
-              margin-top: 30px;
-              padding-top: 20px;
-              border-top: 1px solid #ddd;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="header">
+        <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${subject}</title></head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
             <img src="https://31382291-0546-4a70-a015-b86eb65a55a3.lovableproject.com/logo.jpg" alt="Family Together" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 16px; border: 3px solid rgba(255,255,255,0.3);" />
             <h1 style="margin: 0;">Family Together</h1>
             <p style="margin: 10px 0 0 0; opacity: 0.9;">${familyName}</p>
           </div>
-          
-          <div class="content">
+          <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
             <p>Hello ${userName},</p>
-            
-            <div class="event-badge">${eventType}</div>
-            
-            <div class="details">
+            <div style="display: inline-block; background: #667eea; color: white; padding: 5px 15px; border-radius: 20px; font-size: 14px; margin-bottom: 15px;">${eventType}</div>
+            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea;">
               <p style="margin: 0;">${eventDetails}</p>
             </div>
-            
-            ${actionUrl ? `
-              <center>
-                <a href="${actionUrl}" class="button">View Details</a>
-              </center>
-            ` : ''}
-            
-            <p style="color: #666; font-size: 14px; margin-top: 20px;">
-              This is an automated notification from your Family Together app. 
-              You can manage your email preferences in the app settings.
-            </p>
+            ${actionUrl ? `<center><a href="${actionUrl}" style="display: inline-block; background: #667eea; color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; margin: 20px 0;">View Details</a></center>` : ''}
+            <p style="color: #666; font-size: 14px; margin-top: 20px;">This is an automated notification from Family Together.</p>
           </div>
-          
-          <div class="footer">
+          <div style="text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
             <p>© ${new Date().getFullYear()} Family Together. All rights reserved.</p>
           </div>
         </body>
       </html>
     ` : `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #333; border-bottom: 2px solid #4F46E5; padding-bottom: 10px;">
-            Family Together
-          </h1>
-          <div style="margin: 20px 0; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
-            ${message || 'Notification from Family Together'}
-          </div>
-          <p style="color: #666; font-size: 14px; margin-top: 30px;">
-            This is an automated notification from Family Together admin system.
-          </p>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h1 style="color: #333; border-bottom: 2px solid #4F46E5; padding-bottom: 10px;">Family Together</h1>
+        <div style="margin: 20px 0; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
+          ${message || 'Notification from Family Together'}
         </div>
-      `;
+        <p style="color: #666; font-size: 14px; margin-top: 30px;">This is an automated notification from Family Together admin system.</p>
+      </div>
+    `;
 
     const emailResponse = await resend.emails.send({
       from: "Family Together <onboarding@resend.dev>",
@@ -342,23 +239,15 @@ const handler = async (req: Request): Promise<Response> => {
       html: emailHtml,
     });
 
-    console.log("Email sent successfully:", emailResponse);
-
     return new Response(JSON.stringify({ success: true, data: emailResponse }), {
       status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
+      headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error: any) {
     console.error("Error sending notification:", error);
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
 };

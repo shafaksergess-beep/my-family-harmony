@@ -7,6 +7,7 @@ import { lazy, Suspense, ReactNode } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ModuleErrorBoundary } from "@/components/ModuleErrorBoundary";
 import { MedianProvider } from "@/contexts/MedianContext";
+import { CurrencyProvider } from "@/context/CurrencyContext";
 // Lazy load core pages
 const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
@@ -111,14 +112,12 @@ const FamilyModule = ({ children }: { children: ReactNode }) => (
   </ModuleErrorBoundary>
 );
 
-import { CurrencyProvider } from "@/context/CurrencyContext";
-
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
+      <CurrencyProvider>
       <MedianProvider>
-        <CurrencyProvider>
-          <TooltipProvider>
+        <TooltipProvider>
             <Toaster />
             <Sonner />
         <BrowserRouter>
@@ -211,10 +210,10 @@ const App = () => (
           </Suspense>
         </BrowserRouter>
         </TooltipProvider>
+      </MedianProvider>
       </CurrencyProvider>
-    </MedianProvider>
-  </QueryClientProvider>
-</ErrorBoundary>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;
