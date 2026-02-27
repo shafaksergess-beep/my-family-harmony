@@ -10,6 +10,7 @@ import { MedianProvider } from "@/contexts/MedianContext";
 // Lazy load core pages
 const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Install = lazy(() => import("./pages/Install"));
@@ -122,6 +123,7 @@ const App = () => (
             <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/admin" element={<AdminModule><AdminDashboard /></AdminModule>} />
             <Route path="/install" element={<Install />} />
             <Route path="/dashboard" element={<Dashboard />} />
