@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
-import { ArrowLeft, Plus, TrendingUp } from "lucide-react";
+import { ArrowLeft, Plus, TrendingUp, Pencil, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,14 +14,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { useCurrency } from "@/context/CurrencyContext";
 import { CurrencySelector } from "@/components/CurrencySelector";
+import { useCurrency } from "@/context/CurrencyContext";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+
 interface Share {
   id: string;
   share_number: string;
   purchase_date: string;
   share_value: number;
-  share_count: number | null;
+  share_count: number;
   is_active: boolean;
   notes: string | null;
   member_id: string;
@@ -59,13 +61,14 @@ export default function FamilyShares() {
   const [members, setMembers] = useState<FamilyMember[]>([]);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isDividendDialogOpen, setIsDividendDialogOpen] = useState(false);
+  const [editingShare, setEditingShare] = useState<Share | null>(null);
+  const [deletingShareId, setDeletingShareId] = useState<string | null>(null);
   const [shareFormData, setShareFormData] = useState({
-    id: "",
     member_id: "",
     share_number: "",
-    purchase_date: new Date().toISOString().split('T')[0],
-    share_value: family?.share_value?.toString() || "50000",
     share_count: "1",
+    purchase_date: new Date().toISOString().split('T')[0],
+    share_value: "50000",
     notes: "",
   });
   const [dividendFormData, setDividendFormData] = useState({
@@ -80,7 +83,6 @@ export default function FamilyShares() {
     if (family?.id) {
       loadData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [family?.id]);
 
   const loadData = async () => {
@@ -89,7 +91,6 @@ export default function FamilyShares() {
     try {
       setLoading(true);
 
-      // Fetch shares
       const { data: sharesData, error: sharesError } = await supabase
         .from("shares")
         .select("*")
@@ -97,39 +98,36 @@ export default function FamilyShares() {
         .order("purchase_date", { ascending: false });
 
       if (sharesError) throw sharesError;
-      setShares(sharesData as unknown as Share[]);
 
-      // Fetch family members
       const memberIds = [...new Set(sharesData?.map(s => s.member_id) || [])];
-      const { data: membersData, error: membersError } = await supabase
-        .from("family_members")
-        .select("id, user_id")
-        .in("id", memberIds);
+      
+      let enrichedShares: Share[] = [];
+      
+      if (memberIds.length > 0) {
+        const { data: membersData } = await supabase
+          .from("family_members")
+          .select("id, user_id")
+          .in("id", memberIds);
 
-      if (membersError) throw membersError;
+        const userIds = membersData?.map(m => m.user_id) || [];
+        const { data: profilesData } = await supabase
+          .from("profiles")
+          .select("id, full_name")
+          .in("id", userIds);
 
-      // Fetch profiles
-      const userIds = membersData?.map(m => m.user_id) || [];
-      const { data: profilesData, error: profilesError } = await supabase
-        .from("profiles")
-        .select("id, full_name")
-        .in("id", userIds);
+        const memberIdToUserId = new Map(membersData?.map(m => [m.id, m.user_id]) || []);
+        const userIdToProfile = new Map(profilesData?.map(p => [p.id, p]) || []);
 
-      if (profilesError) throw profilesError;
+        enrichedShares = sharesData?.map(share => ({
+          ...share,
+          share_count: share.share_count || 1,
+          family_members: {
+            profiles: userIdToProfile.get(memberIdToUserId.get(share.member_id)!) || { full_name: "Unknown" }
+          }
+        })) as Share[] || [];
+      }
 
-      // Merge data
-      const memberIdToUserId = new Map(membersData?.map(m => [m.id, m.user_id]) || []);
-      const userIdToProfile = new Map(profilesData?.map(p => [p.id, p]) || []);
-
-      const enrichedShares = sharesData?.map(share => ({
-        ...share,
-        family_members: {
-          id: share.member_id,
-          profiles: userIdToProfile.get(memberIdToUserId.get(share.member_id)!) || { full_name: "Unknown" }
-        }
-      })) || [];
-
-      setShares(enrichedShares as Share[]);
+      setShares(enrichedShares);
 
       const { data: dividendsData, error: dividendsError } = await supabase
         .from("dividends")
@@ -141,20 +139,16 @@ export default function FamilyShares() {
       setDividends(dividendsData);
 
       // Fetch all members for dropdown
-      const { data: allMembersData, error: allMembersError } = await supabase
+      const { data: allMembersData } = await supabase
         .from("family_members")
         .select("id, user_id")
         .eq("family_id", family.id);
 
-      if (allMembersError) throw allMembersError;
-
       const allUserIds = allMembersData?.map(m => m.user_id) || [];
-      const { data: allProfilesData, error: allProfilesError } = await supabase
+      const { data: allProfilesData } = await supabase
         .from("profiles")
         .select("id, full_name")
         .in("id", allUserIds);
-
-      if (allProfilesError) throw allProfilesError;
 
       const allUserIdToProfile = new Map(allProfilesData?.map(p => [p.id, p]) || []);
       const allEnrichedMembers = allMembersData?.map(member => ({
@@ -163,67 +157,84 @@ export default function FamilyShares() {
       })) || [];
 
       setMembers(allEnrichedMembers as FamilyMember[]);
-    } catch (error) {
-      const err = error as Error;
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCreateShare = async (e: React.FormEvent) => {
+  const openEditDialog = (share: Share) => {
+    setEditingShare(share);
+    setShareFormData({
+      member_id: share.member_id,
+      share_number: share.share_number,
+      share_count: (share.share_count || 1).toString(),
+      purchase_date: share.purchase_date,
+      share_value: share.share_value.toString(),
+      notes: share.notes || "",
+    });
+    setIsShareDialogOpen(true);
+  };
+
+  const resetShareForm = () => {
+    setEditingShare(null);
+    setShareFormData({
+      member_id: "",
+      share_number: "",
+      share_count: "1",
+      purchase_date: new Date().toISOString().split('T')[0],
+      share_value: "50000",
+      notes: "",
+    });
+  };
+
+  const handleCreateOrUpdateShare = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!family) return;
     
     try {
-      const data = {
+      const payload = {
         family_id: family.id,
         member_id: shareFormData.member_id,
         share_number: shareFormData.share_number,
+        share_count: parseInt(shareFormData.share_count) || 1,
         purchase_date: shareFormData.purchase_date,
         share_value: parseFloat(shareFormData.share_value),
-        share_count: parseInt(shareFormData.share_count),
         notes: shareFormData.notes || null,
       };
 
-      if (shareFormData.id) {
-        const { error } = await supabase.from("shares").update(data).eq("id", shareFormData.id);
+      if (editingShare) {
+        const { error } = await supabase
+          .from("shares")
+          .update(payload)
+          .eq("id", editingShare.id);
         if (error) throw error;
         toast({ title: "Success", description: "Share updated successfully" });
       } else {
-        const { error } = await supabase.from("shares").insert(data);
+        const { error } = await supabase.from("shares").insert(payload);
         if (error) throw error;
         toast({ title: "Success", description: "Share issued successfully" });
       }
 
       setIsShareDialogOpen(false);
-      setShareFormData({
-        id: "",
-        member_id: "",
-        share_number: "",
-        purchase_date: new Date().toISOString().split('T')[0],
-        share_value: family?.share_value?.toString() || "50000",
-        share_count: "1",
-        notes: "",
-      });
+      resetShareForm();
       loadData();
-    } catch (error) {
-      const err = error as Error;
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     }
   };
 
-  const handleDeleteShare = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this share record?")) return;
-    
+  const handleDeleteShare = async () => {
+    if (!deletingShareId) return;
     try {
-      const { error } = await supabase.from("shares").delete().eq("id", id);
+      const { error } = await supabase.from("shares").delete().eq("id", deletingShareId);
       if (error) throw error;
-      toast({ title: "Success", description: "Share record deleted" });
+      toast({ title: "Success", description: "Share deleted successfully" });
+      setDeletingShareId(null);
       loadData();
-    } catch (error) {
-      const err = error as Error;
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     }
   };
 
@@ -232,16 +243,16 @@ export default function FamilyShares() {
     if (!family) return;
     
     try {
-      const activeShares = shares.filter(s => s.is_active).length;
+      const totalShareCount = shares.filter(s => s.is_active).reduce((sum, s) => sum + (s.share_count || 1), 0);
       const amountPerShare = parseFloat(dividendFormData.amount_per_share);
-      const totalAmount = activeShares * amountPerShare;
+      const totalAmount = totalShareCount * amountPerShare;
 
       const { error } = await supabase.from("dividends").insert({
         family_id: family.id,
         period_year: parseInt(dividendFormData.period_year),
         period_quarter: dividendFormData.period_quarter ? parseInt(dividendFormData.period_quarter) : null,
         amount_per_share: amountPerShare,
-        total_shares: activeShares,
+        total_shares: totalShareCount,
         total_amount: totalAmount,
         source_description: dividendFormData.source_description || null,
         notes: dividendFormData.notes || null,
@@ -259,26 +270,28 @@ export default function FamilyShares() {
         notes: "",
       });
       loadData();
-    } catch (error) {
-      const err = error as Error;
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     }
   };
 
   const calculateMemberStats = () => {
-    const memberShares = new Map<string, number>();
+    const memberStats = new Map<string, { count: number; value: number }>();
     shares.filter(s => s.is_active).forEach(share => {
       const memberName = share.family_members.profiles.full_name;
-      memberShares.set(memberName, (memberShares.get(memberName) || 0) + (share.share_count || 1));
+      const existing = memberStats.get(memberName) || { count: 0, value: 0 };
+      const sc = share.share_count || 1;
+      memberStats.set(memberName, {
+        count: existing.count + sc,
+        value: existing.value + sc * parseFloat(share.share_value.toString()),
+      });
     });
-    return memberShares;
+    return memberStats;
   };
 
-  const stats = {
-    totalShares: shares.filter(s => s.is_active).reduce((sum, s) => sum + (s.share_count || 1), 0),
-    totalValue: shares.filter(s => s.is_active).reduce((sum, s) => sum + (parseFloat(s.share_value.toString()) * (s.share_count || 1)), 0),
-    totalDividends: dividends.filter(d => d.is_paid).reduce((sum, d) => sum + parseFloat(d.total_amount.toString()), 0),
-  };
+  const totalShareCount = shares.filter(s => s.is_active).reduce((sum, s) => sum + (s.share_count || 1), 0);
+  const totalValue = shares.filter(s => s.is_active).reduce((sum, s) => sum + (s.share_count || 1) * parseFloat(s.share_value.toString()), 0);
+  const totalDividendsPaid = dividends.filter(d => d.is_paid).reduce((sum, d) => sum + parseFloat(d.total_amount.toString()), 0);
 
   if (authLoading || loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
@@ -294,29 +307,28 @@ export default function FamilyShares() {
             </Button>
             <h1 className="text-3xl font-bold">Shares & Dividends</h1>
           </div>
-          <LanguageSwitcher />
+          <div className="flex items-center gap-3">
+            <CurrencySelector />
+            <LanguageSwitcher />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="p-6">
             <div className="text-sm text-muted-foreground">Active Shares</div>
-            <div className="text-2xl font-bold">{stats.totalShares}</div>
+            <div className="text-2xl font-bold">{totalShareCount}</div>
           </Card>
           <Card className="p-6">
             <div className="text-sm text-muted-foreground">Total Share Value</div>
-            <div className="text-2xl font-bold">{formatAmount(stats.totalValue)}</div>
+            <div className="text-2xl font-bold">{formatAmount(totalValue)}</div>
           </Card>
           <Card className="p-6">
             <div className="text-sm text-muted-foreground">Dividends Paid</div>
-            <div className="text-2xl font-bold">{formatAmount(stats.totalDividends)}</div>
+            <div className="text-2xl font-bold">{formatAmount(totalDividendsPaid)}</div>
           </Card>
         </div>
 
         <Tabs defaultValue="shares" className="w-full">
-          <div className="flex items-center gap-2">
-            <LanguageSwitcher />
-            <CurrencySelector />
-          </div>
           <TabsList>
             <TabsTrigger value="shares">Shares</TabsTrigger>
             <TabsTrigger value="dividends">Dividends</TabsTrigger>
@@ -327,18 +339,18 @@ export default function FamilyShares() {
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Share Register</h2>
               {canManageFinances && (
-                <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
+                <Dialog open={isShareDialogOpen} onOpenChange={(open) => { setIsShareDialogOpen(open); if (!open) resetShareForm(); }}>
                   <DialogTrigger asChild>
                     <Button>
                       <Plus className="h-4 w-4 mr-2" />
                       Issue Share
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>{shareFormData.id ? "Edit Share" : "Issue New Share"}</DialogTitle>
-                    </DialogHeader>
-                  <form onSubmit={handleCreateShare} className="space-y-4">
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>{editingShare ? "Edit Share" : "Issue New Share"}</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleCreateOrUpdateShare} className="space-y-4">
                     <div>
                       <Label htmlFor="member">Member</Label>
                       <Select
@@ -368,6 +380,20 @@ export default function FamilyShares() {
                       />
                     </div>
                     <div>
+                      <Label htmlFor="share_count">Number of Shares</Label>
+                      <Input
+                        id="share_count"
+                        type="number"
+                        min="1"
+                        value={shareFormData.share_count}
+                        onChange={(e) => setShareFormData({ ...shareFormData, share_count: e.target.value })}
+                        required
+                      />
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Total: {formatAmount((parseInt(shareFormData.share_count) || 1) * (parseFloat(shareFormData.share_value) || 0))}
+                      </p>
+                    </div>
+                    <div>
                       <Label htmlFor="purchase_date">Purchase Date</Label>
                       <Input
                         id="purchase_date"
@@ -377,38 +403,17 @@ export default function FamilyShares() {
                         required
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="share_value">Value per Share (FCFA)</Label>
-                        <Input
-                          id="share_value"
-                          type="number"
-                          min="0"
-                          step="1000"
-                          value={shareFormData.share_value}
-                          onChange={(e) => setShareFormData({ ...shareFormData, share_value: e.target.value })}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="share_count">Number of Shares</Label>
-                        <Input
-                          id="share_count"
-                          type="number"
-                          min="1"
-                          value={shareFormData.share_count}
-                          onChange={(e) => setShareFormData({ ...shareFormData, share_count: e.target.value })}
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="bg-muted p-3 rounded-lg text-sm">
-                      <div className="flex justify-between">
-                        <span>Total Investment:</span>
-                        <span className="font-bold">
-                          {(parseFloat(shareFormData.share_value || "0") * parseInt(shareFormData.share_count || "0")).toLocaleString()} FCFA
-                        </span>
-                      </div>
+                    <div>
+                      <Label htmlFor="share_value">Share Value (per share)</Label>
+                      <Input
+                        id="share_value"
+                        type="number"
+                        min="0"
+                        step="1000"
+                        value={shareFormData.share_value}
+                        onChange={(e) => setShareFormData({ ...shareFormData, share_value: e.target.value })}
+                        required
+                      />
                     </div>
                     <div>
                       <Label htmlFor="notes">Notes (optional)</Label>
@@ -418,9 +423,7 @@ export default function FamilyShares() {
                         onChange={(e) => setShareFormData({ ...shareFormData, notes: e.target.value })}
                       />
                     </div>
-                    <Button type="submit" className="w-full">
-                      {shareFormData.id ? "Update Share" : "Issue Share"}
-                    </Button>
+                    <Button type="submit" className="w-full">{editingShare ? "Update Share" : "Issue Share"}</Button>
                   </form>
                 </DialogContent>
               </Dialog>
@@ -434,76 +437,55 @@ export default function FamilyShares() {
                     <tr className="border-b">
                       <th className="text-left p-4">Share #</th>
                       <th className="text-left p-4">Member</th>
-                      <th className="text-right p-4">Count</th>
-                      <th className="text-right p-4">Per Share</th>
-                      <th className="text-right p-4">Total</th>
+                      <th className="text-right p-4">Qty</th>
+                      <th className="text-left p-4">Purchase Date</th>
+                      <th className="text-right p-4">Unit Value</th>
+                      <th className="text-right p-4">Total Value</th>
                       <th className="text-center p-4">Status</th>
-                      {canManageFinances && <th className="text-right p-4">Actions</th>}
+                      {canManageFinances && <th className="text-center p-4">Actions</th>}
                     </tr>
                   </thead>
                   <tbody>
                     {shares.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="text-center p-8 text-muted-foreground">
+                        <td colSpan={canManageFinances ? 8 : 7} className="text-center p-8 text-muted-foreground">
                           No shares issued yet
                         </td>
                       </tr>
                     ) : (
-                      shares.map((share) => (
-                        <tr key={share.id} className="border-b hover:bg-muted/50">
-                          <td className="p-4 font-mono">{share.share_number}</td>
-                          <td className="p-4">
-                            <div>{share.family_members.profiles.full_name}</div>
-                            <div className="text-xs text-muted-foreground">{new Date(share.purchase_date).toLocaleDateString()}</div>
-                          </td>
-                          <td className="p-4 text-right font-mono">{share.share_count}</td>
-                          <td className="p-4 text-right font-mono">
-                            {parseFloat(share.share_value.toString()).toLocaleString()}
-                          </td>
-                          <td className="p-4 text-right font-bold font-mono text-primary">
-                            {formatAmount(parseFloat(share.share_value.toString()) * (share.share_count || 1))}
-                          </td>
-                          <td className="p-4 text-center">
-                            {share.is_active ? (
-                              <Badge variant="default">Active</Badge>
-                            ) : (
-                              <Badge variant="secondary">Inactive</Badge>
-                            )}
-                          </td>
-                          {canManageFinances && (
-                            <td className="p-4 text-right">
-                              <div className="flex justify-end gap-2">
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm"
-                                  onClick={() => {
-                                    setShareFormData({
-                                      id: share.id,
-                                      member_id: share.member_id,
-                                      share_number: share.share_number,
-                                      purchase_date: share.purchase_date,
-                                      share_value: share.share_value.toString(),
-                                      share_count: (share.share_count || 1).toString(),
-                                      notes: share.notes || "",
-                                    });
-                                    setIsShareDialogOpen(true);
-                                  }}
-                                >
-                                  Edit
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm"
-                                  className="text-destructive hover:text-destructive"
-                                  onClick={() => handleDeleteShare(share.id)}
-                                >
-                                  Delete
-                                </Button>
-                              </div>
+                      shares.map((share) => {
+                        const sc = share.share_count || 1;
+                        const unitVal = parseFloat(share.share_value.toString());
+                        return (
+                          <tr key={share.id} className="border-b hover:bg-muted/50">
+                            <td className="p-4 font-mono">{share.share_number}</td>
+                            <td className="p-4">{share.family_members.profiles.full_name}</td>
+                            <td className="p-4 text-right font-mono">{sc}</td>
+                            <td className="p-4">{new Date(share.purchase_date).toLocaleDateString()}</td>
+                            <td className="p-4 text-right font-mono">{formatAmount(unitVal)}</td>
+                            <td className="p-4 text-right font-mono font-semibold">{formatAmount(sc * unitVal)}</td>
+                            <td className="p-4 text-center">
+                              {share.is_active ? (
+                                <Badge variant="default">Active</Badge>
+                              ) : (
+                                <Badge variant="secondary">Inactive</Badge>
+                              )}
                             </td>
-                          )}
-                        </tr>
-                      ))
+                            {canManageFinances && (
+                              <td className="p-4 text-center">
+                                <div className="flex items-center justify-center gap-1">
+                                  <Button variant="ghost" size="icon" onClick={() => openEditDialog(share)}>
+                                    <Pencil className="h-4 w-4" />
+                                  </Button>
+                                  <Button variant="ghost" size="icon" className="text-destructive" onClick={() => setDeletingShareId(share.id)}>
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </td>
+                            )}
+                          </tr>
+                        );
+                      })
                     )}
                   </tbody>
                 </table>
@@ -557,7 +539,7 @@ export default function FamilyShares() {
                       </div>
                     </div>
                     <div>
-                      <Label htmlFor="amount_per_share">Amount Per Share (FCFA)</Label>
+                      <Label htmlFor="amount_per_share">Amount Per Share</Label>
                       <Input
                         id="amount_per_share"
                         type="number"
@@ -568,7 +550,7 @@ export default function FamilyShares() {
                         required
                       />
                       <p className="text-sm text-muted-foreground mt-1">
-                        {stats.totalShares} active shares × {dividendFormData.amount_per_share || 0} FCFA = {formatAmount(stats.totalShares * parseFloat(dividendFormData.amount_per_share || "0"))} total
+                        {totalShareCount} active shares × {formatAmount(parseFloat(dividendFormData.amount_per_share || "0"))} = {formatAmount(totalShareCount * parseFloat(dividendFormData.amount_per_share || "0"))} total
                       </p>
                     </div>
                     <div>
@@ -658,21 +640,15 @@ export default function FamilyShares() {
                     </tr>
                   </thead>
                   <tbody>
-                    {Array.from(calculateMemberStats()).map(([memberName, shareCount]) => {
-                      const memberTotalValue = shares
-                        .filter(s => s.is_active && s.family_members.profiles.full_name === memberName)
-                        .reduce((sum, s) => sum + (parseFloat(s.share_value.toString()) * (s.share_count || 1)), 0);
-                      
-                      return (
-                        <tr key={memberName} className="border-b hover:bg-muted/50">
-                          <td className="p-4">{memberName}</td>
-                          <td className="p-4 text-right font-mono">{shareCount}</td>
-                          <td className="p-4 text-right font-mono">
-                            {formatAmount(memberTotalValue)}
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    {Array.from(calculateMemberStats()).map(([memberName, stats]) => (
+                      <tr key={memberName} className="border-b hover:bg-muted/50">
+                        <td className="p-4">{memberName}</td>
+                        <td className="p-4 text-right font-mono">{stats.count}</td>
+                        <td className="p-4 text-right font-mono">
+                          {formatAmount(stats.value)}
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -680,6 +656,24 @@ export default function FamilyShares() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={!!deletingShareId} onOpenChange={(open) => !open && setDeletingShareId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Share</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this share? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteShare} className="bg-destructive text-destructive-foreground">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

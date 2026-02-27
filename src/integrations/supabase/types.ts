@@ -2220,8 +2220,8 @@ export type Database = {
           id: string
           is_working: boolean | null
           phone: string | null
-          push_token: string | null
           preferred_language: string | null
+          push_token: string | null
           updated_at: string | null
         }
         Insert: {
@@ -2232,8 +2232,8 @@ export type Database = {
           id: string
           is_working?: boolean | null
           phone?: string | null
-          push_token?: string | null
           preferred_language?: string | null
+          push_token?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -2244,8 +2244,8 @@ export type Database = {
           id?: string
           is_working?: boolean | null
           phone?: string | null
-          push_token?: string | null
           preferred_language?: string | null
+          push_token?: string | null
           updated_at?: string | null
         }
         Relationships: []
