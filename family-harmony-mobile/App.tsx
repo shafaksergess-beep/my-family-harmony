@@ -6,6 +6,9 @@ import { useAuth } from './src/hooks/useAuth';
 import LoginScreen from './src/components/auth/LoginScreen';
 import MainNavigator from './src/navigation/MainNavigator';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import GlobalErrorBoundary from './src/components/common/GlobalErrorBoundary';
+import { registerForPushNotificationsAsync } from './src/services/notifications';
+import * as Notifications from 'expo-notifications';
 
 // Create a client
 const queryClient = new QueryClient();
@@ -32,6 +35,16 @@ function AppContent() {
 
   useEffect(() => {
     initDatabase();
+    registerForPushNotificationsAsync().then(token => {
+      // Logic to save token to user profile can go here later
+      console.log('Push token:', token);
+    });
+
+    const subscription = Notifications.addNotificationReceivedListener((notification: any) => {
+      console.log('Notification received:', notification);
+    });
+
+    return () => subscription.remove();
   }, []);
 
   if (loading) {
@@ -56,9 +69,11 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <PaperProvider theme={theme}>
-        <FamilyProvider>
-          <AppContent />
-        </FamilyProvider>
+        <GlobalErrorBoundary>
+          <FamilyProvider>
+            <AppContent />
+          </FamilyProvider>
+        </GlobalErrorBoundary>
       </PaperProvider>
     </QueryClientProvider>
   );
