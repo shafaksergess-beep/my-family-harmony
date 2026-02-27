@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Users, Ticket, ArrowRight } from "lucide-react";
+import { Loader2, Users, Ticket, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { loginSchema, signupSchema } from "@/lib/validation";
 import { checkRateLimit, recordAttempt, resetRateLimit } from "@/lib/rateLimit";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
@@ -36,16 +36,21 @@ const Auth = () => {
   // Login form state
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [loginErrors, setLoginErrors] = useState<{ email?: string; password?: string }>({});
 
   // Signup form state
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
+  const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
+  const [showSignupConfirmPassword, setShowSignupConfirmPassword] = useState(false);
   const [signupFullName, setSignupFullName] = useState("");
   const [signupPhone, setSignupPhone] = useState("");
   const [signupErrors, setSignupErrors] = useState<{
     email?: string;
     password?: string;
+    confirmPassword?: string;
     fullName?: string;
     phone?: string;
   }>({});
@@ -186,6 +191,12 @@ const Auth = () => {
     e.preventDefault();
     setSignupErrors({});
     
+    // Check confirm password match first
+    if (signupPassword !== signupConfirmPassword) {
+      setSignupErrors({ confirmPassword: "Passwords do not match" });
+      return;
+    }
+    
     // Validate input
     const result = signupSchema.safeParse({
       email: signupEmail,
@@ -254,9 +265,12 @@ const Auth = () => {
       // Reset rate limit on successful signup
       resetRateLimit(result.data.email);
 
+      // Mark as first-time user for onboarding
+      localStorage.setItem("family-together-first-login", "true");
+
       toast({
         title: "Account created!",
-        description: "Welcome to Family Together. You can now log in.",
+        description: "Welcome to Family Together. Please check your email to verify your account.",
       });
 
       // Switch to login tab
@@ -343,28 +357,44 @@ const Auth = () => {
                       setLoginEmail(e.target.value);
                       setLoginErrors({ ...loginErrors, email: undefined });
                     }}
-                    className={loginErrors.email ? "border-red-500" : ""}
+                    className={loginErrors.email ? "border-destructive" : ""}
                   />
                   {loginErrors.email && (
-                    <p className="text-sm text-red-500">{loginErrors.email}</p>
+                    <p className="text-sm text-destructive">{loginErrors.email}</p>
                   )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="login-password">Password</Label>
-                  <Input
-                    id="login-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={loginPassword}
-                    onChange={(e) => {
-                      setLoginPassword(e.target.value);
-                      setLoginErrors({ ...loginErrors, password: undefined });
-                    }}
-                    className={loginErrors.password ? "border-red-500" : ""}
-                  />
+                  <div className="relative">
+                    <Input
+                      id="login-password"
+                      type={showLoginPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={loginPassword}
+                      onChange={(e) => {
+                        setLoginPassword(e.target.value);
+                        setLoginErrors({ ...loginErrors, password: undefined });
+                      }}
+                      className={`pr-10 ${loginErrors.password ? "border-destructive" : ""}`}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                      onClick={() => setShowLoginPassword(!showLoginPassword)}
+                      tabIndex={-1}
+                    >
+                      {showLoginPassword ? (
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </Button>
+                  </div>
                   {loginErrors.password && (
-                    <p className="text-sm text-red-500">{loginErrors.password}</p>
+                    <p className="text-sm text-destructive">{loginErrors.password}</p>
                   )}
                 </div>
 
@@ -398,10 +428,10 @@ const Auth = () => {
                       setSignupFullName(e.target.value);
                       setSignupErrors({ ...signupErrors, fullName: undefined });
                     }}
-                    className={signupErrors.fullName ? "border-red-500" : ""}
+                    className={signupErrors.fullName ? "border-destructive" : ""}
                   />
                   {signupErrors.fullName && (
-                    <p className="text-sm text-red-500">{signupErrors.fullName}</p>
+                    <p className="text-sm text-destructive">{signupErrors.fullName}</p>
                   )}
                 </div>
 
@@ -416,10 +446,10 @@ const Auth = () => {
                       setSignupEmail(e.target.value);
                       setSignupErrors({ ...signupErrors, email: undefined });
                     }}
-                    className={signupErrors.email ? "border-red-500" : ""}
+                    className={signupErrors.email ? "border-destructive" : ""}
                   />
                   {signupErrors.email && (
-                    <p className="text-sm text-red-500">{signupErrors.email}</p>
+                    <p className="text-sm text-destructive">{signupErrors.email}</p>
                   )}
                 </div>
 
@@ -434,33 +464,86 @@ const Auth = () => {
                       setSignupPhone(e.target.value);
                       setSignupErrors({ ...signupErrors, phone: undefined });
                     }}
-                    className={signupErrors.phone ? "border-red-500" : ""}
+                    className={signupErrors.phone ? "border-destructive" : ""}
                   />
                   {signupErrors.phone && (
-                    <p className="text-sm text-red-500">{signupErrors.phone}</p>
+                    <p className="text-sm text-destructive">{signupErrors.phone}</p>
                   )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">Password</Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={signupPassword}
-                    onChange={(e) => {
-                      setSignupPassword(e.target.value);
-                      setSignupErrors({ ...signupErrors, password: undefined });
-                    }}
-                    className={signupErrors.password ? "border-red-500" : ""}
-                    minLength={6}
-                  />
+                  <div className="relative">
+                    <Input
+                      id="signup-password"
+                      type={showSignupPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={signupPassword}
+                      onChange={(e) => {
+                        setSignupPassword(e.target.value);
+                        setSignupErrors({ ...signupErrors, password: undefined });
+                      }}
+                      className={`pr-10 ${signupErrors.password ? "border-destructive" : ""}`}
+                      minLength={6}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                      onClick={() => setShowSignupPassword(!showSignupPassword)}
+                      tabIndex={-1}
+                    >
+                      {showSignupPassword ? (
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </Button>
+                  </div>
                   {signupErrors.password && (
-                    <p className="text-sm text-red-500">{signupErrors.password}</p>
+                    <p className="text-sm text-destructive">{signupErrors.password}</p>
                   )}
                   <p className="text-xs text-muted-foreground">
                     Must contain uppercase, lowercase, and number
                   </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="signup-confirm-password">Confirm Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="signup-confirm-password"
+                      type={showSignupConfirmPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={signupConfirmPassword}
+                      onChange={(e) => {
+                        setSignupConfirmPassword(e.target.value);
+                        setSignupErrors({ ...signupErrors, confirmPassword: undefined });
+                      }}
+                      className={`pr-10 ${signupErrors.confirmPassword ? "border-destructive" : ""}`}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                      onClick={() => setShowSignupConfirmPassword(!showSignupConfirmPassword)}
+                      tabIndex={-1}
+                    >
+                      {showSignupConfirmPassword ? (
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </Button>
+                  </div>
+                  {signupErrors.confirmPassword && (
+                    <p className="text-sm text-destructive">{signupErrors.confirmPassword}</p>
+                  )}
+                  {signupConfirmPassword && signupPassword === signupConfirmPassword && (
+                    <p className="text-xs text-green-600 dark:text-green-400">✓ Passwords match</p>
+                  )}
                 </div>
 
                 <Button

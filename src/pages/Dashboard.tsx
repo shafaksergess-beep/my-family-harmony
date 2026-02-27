@@ -9,6 +9,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { usePlatform } from "@/hooks/usePlatform";
 import { MobileDashboard } from "@/components/mobile/MobileDashboard";
 import { JoinFamilyCard } from "@/components/dashboard/JoinFamilyCard";
+import { NewUserOnboarding } from "@/components/onboarding/NewUserOnboarding";
 
 interface UserFamily {
   family_id: string;
@@ -25,6 +26,7 @@ const Dashboard = () => {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [userFamilies, setUserFamilies] = useState<UserFamily[]>([]);
   const [profile, setProfile] = useState<any>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -76,6 +78,12 @@ const Dashboard = () => {
       } else {
         setUserFamilies(familiesData || []);
       }
+      // Check for first-time user onboarding
+      const isFirstLogin = localStorage.getItem("family-together-first-login");
+      if (isFirstLogin) {
+        setShowOnboarding(true);
+        localStorage.removeItem("family-together-first-login");
+      }
     } catch (error) {
       console.error("Auth check error:", error);
       navigate("/auth");
@@ -107,6 +115,12 @@ const Dashboard = () => {
   }
 
   return (
+    <>
+    <NewUserOnboarding
+      open={showOnboarding}
+      onComplete={() => setShowOnboarding(false)}
+      userName={profile?.full_name}
+    />
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border bg-card">
@@ -313,6 +327,7 @@ const Dashboard = () => {
         </div>
       </main>
     </div>
+    </>
   );
 };
 
