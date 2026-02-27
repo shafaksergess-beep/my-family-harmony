@@ -153,11 +153,36 @@ export function NotificationPreferences() {
                 Receive push notifications in your browser
               </p>
             </div>
-            <Switch
-              id="push"
-              checked={settings.push_enabled}
-              onCheckedChange={() => handleToggle('push_enabled')}
-            />
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={async () => {
+                  if ('Notification' in window) {
+                    const permission = await Notification.requestPermission();
+                    if (permission === 'granted') {
+                      new Notification('Kinsroot', {
+                        body: 'This is a test notification!',
+                        icon: '/logo.jpg'
+                      });
+                      if ('setAppBadge' in navigator) {
+                        navigator.setAppBadge(1).catch(console.error);
+                      }
+                      toast.success('Test notification sent!');
+                    } else {
+                      toast.error('Notification permission denied');
+                    }
+                  }
+                }}
+              >
+                Test
+              </Button>
+              <Switch
+                id="push"
+                checked={settings.push_enabled}
+                onCheckedChange={() => handleToggle('push_enabled')}
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -220,7 +245,7 @@ export function NotificationPreferences() {
             <Label htmlFor="digest">Digest Frequency</Label>
             <Select
               value={settings.digest_frequency}
-              onValueChange={(value: any) =>
+              onValueChange={(value: 'daily' | 'weekly' | 'monthly' | 'never') =>
                 setSettings((prev) => ({ ...prev, digest_frequency: value }))
               }
             >

@@ -57,16 +57,58 @@ USING (
   )
 );
 
--- 5. CHAT MESSAGES (assuming table exists)
-ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+-- 5. CHAT MESSAGES
+ALTER TABLE chat_messages ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can only see messages in their family threads"
-ON messages
+ON chat_messages
 FOR ALL
 USING (
   EXISTS (
     SELECT 1 FROM family_members
-    WHERE family_members.family_id = messages.family_id
+    WHERE family_members.family_id = chat_messages.family_id
+    AND family_members.user_id = auth.uid()
+  )
+);
+
+-- 6. LOANS
+ALTER TABLE loans ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can see loans for their families"
+ON loans
+FOR SELECT
+USING (
+  EXISTS (
+    SELECT 1 FROM family_members
+    WHERE family_members.family_id = loans.family_id
+    AND family_members.user_id = auth.uid()
+  )
+);
+
+-- 7. SAVINGS
+ALTER TABLE savings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can see savings for their families"
+ON savings
+FOR SELECT
+USING (
+  EXISTS (
+    SELECT 1 FROM family_members
+    WHERE family_members.family_id = savings.family_id
+    AND family_members.user_id = auth.uid()
+  )
+);
+
+-- 8. MEMBER WALLETS
+ALTER TABLE member_wallets ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can see wallets for their families"
+ON member_wallets
+FOR SELECT
+USING (
+  EXISTS (
+    SELECT 1 FROM family_members
+    WHERE family_members.family_id = member_wallets.family_id
     AND family_members.user_id = auth.uid()
   )
 );
