@@ -14,6 +14,7 @@ import { NewUserOnboarding } from "@/components/onboarding/NewUserOnboarding";
 import { NotificationsFeed } from "@/components/dashboard/NotificationsFeed";
 import { PendingActionsWidget } from "@/components/dashboard/PendingActionsWidget";
 import { FinancialOverviewWidget } from "@/components/dashboard/FinancialOverviewWidget";
+import { FamilyChatbot } from "@/components/chat/FamilyChatbot";
 
 interface UserFamily {
   family_id: string;
@@ -344,6 +345,19 @@ const Dashboard = () => {
           </div>
         )}
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-border bg-card mt-12">
+        <div className="container mx-auto px-4 py-4 text-center text-sm text-muted-foreground">
+          Developed by{' '}
+          <a href="mailto:softserge.dev@gmail.com" className="text-primary hover:underline font-medium">
+            Softserge
+          </a>
+          . © {new Date().getFullYear()} All rights reserved.
+        </div>
+      </footer>
+
+      {userId && <FamilyChatbot />}
     </div>
     </>
   );

@@ -13,7 +13,7 @@ interface Message {
 }
 
 interface FamilyChatbotProps {
-  familyId: string;
+  familyId?: string;
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/family-chatbot`;
@@ -65,7 +65,7 @@ export function FamilyChatbot({ familyId }: FamilyChatbotProps) {
         },
         body: JSON.stringify({
           messages: [...messages, userMsg],
-          familyId,
+          familyId: familyId || '__all__',
         }),
       });
 

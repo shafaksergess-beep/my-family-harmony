@@ -65,7 +65,6 @@ export default function FamilyShares() {
   const [deletingShareId, setDeletingShareId] = useState<string | null>(null);
   const [shareFormData, setShareFormData] = useState({
     member_id: "",
-    share_number: "",
     share_count: "1",
     purchase_date: new Date().toISOString().split('T')[0],
     share_value: "50000",
@@ -168,7 +167,6 @@ export default function FamilyShares() {
     setEditingShare(share);
     setShareFormData({
       member_id: share.member_id,
-      share_number: share.share_number,
       share_count: (share.share_count || 1).toString(),
       purchase_date: share.purchase_date,
       share_value: share.share_value.toString(),
@@ -181,7 +179,6 @@ export default function FamilyShares() {
     setEditingShare(null);
     setShareFormData({
       member_id: "",
-      share_number: "",
       share_count: "1",
       purchase_date: new Date().toISOString().split('T')[0],
       share_value: "50000",
@@ -194,15 +191,18 @@ export default function FamilyShares() {
     if (!family) return;
     
     try {
-      const payload = {
+      const payload: any = {
         family_id: family.id,
         member_id: shareFormData.member_id,
-        share_number: shareFormData.share_number,
         share_count: parseInt(shareFormData.share_count) || 1,
         purchase_date: shareFormData.purchase_date,
         share_value: parseFloat(shareFormData.share_value),
         notes: shareFormData.notes || null,
       };
+      // Only include share_number for updates (auto-generated on insert)
+      if (editingShare) {
+        payload.share_number = editingShare.share_number;
+      }
 
       if (editingShare) {
         const { error } = await supabase
@@ -369,16 +369,17 @@ export default function FamilyShares() {
                         </SelectContent>
                       </Select>
                     </div>
+                    {editingShare && (
                     <div>
-                      <Label htmlFor="share_number">Share Number</Label>
+                      <Label>Share Number</Label>
                       <Input
-                        id="share_number"
-                        value={shareFormData.share_number}
-                        onChange={(e) => setShareFormData({ ...shareFormData, share_number: e.target.value })}
-                        placeholder="e.g., SH-001"
-                        required
+                        value={editingShare.share_number}
+                        disabled
+                        className="bg-muted"
                       />
+                      <p className="text-xs text-muted-foreground mt-1">Auto-generated</p>
                     </div>
+                    )}
                     <div>
                       <Label htmlFor="share_count">Number of Shares</Label>
                       <Input

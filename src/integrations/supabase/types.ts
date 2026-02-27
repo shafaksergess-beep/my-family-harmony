@@ -2363,7 +2363,7 @@ export type Database = {
           notes?: string | null
           purchase_date: string
           share_count?: number | null
-          share_number: string
+          share_number?: string
           share_value?: number
           updated_at?: string | null
         }
