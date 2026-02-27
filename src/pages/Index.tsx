@@ -20,30 +20,18 @@ const Index = () => {
     };
     checkAuth();
 
-    // Fetch real platform stats
+    // Fetch real platform stats via secure RPC function
     const fetchStats = async () => {
-      const [membersRes, familiesRes, meetingsRes] = await Promise.all([
-        supabase.from("family_members").select("user_id", { count: "exact", head: true }),
-        supabase.from("families").select("mandatory_contribution, loan_interest_rate").eq("is_active", true),
-        supabase.from("meetings").select("id", { count: "exact", head: true })
-          .gte("meeting_date", `${new Date().getFullYear()}-01-01`)
-          .lte("meeting_date", new Date().toISOString().split("T")[0]),
-      ]);
-
-      const families = familiesRes.data || [];
-      const avgContribution = families.length
-        ? families.reduce((sum, f) => sum + (f.mandatory_contribution || 0), 0) / families.length
-        : 0;
-      const avgInterest = families.length
-        ? families.reduce((sum, f) => sum + (f.loan_interest_rate || 0), 0) / families.length
-        : 0;
-
-      setStats({
-        activeMembers: membersRes.count || 0,
-        avgContribution,
-        avgInterestRate: avgInterest,
-        meetingsPerYear: meetingsRes.count || 0,
-      });
+      const { data } = await supabase.rpc("get_platform_stats");
+      if (data && typeof data === 'object' && !Array.isArray(data)) {
+        const d = data as Record<string, number>;
+        setStats({
+          activeMembers: d.active_members || 0,
+          avgContribution: d.avg_contribution || 0,
+          avgInterestRate: d.avg_interest_rate || 0,
+          meetingsPerYear: d.meetings_this_year || 0,
+        });
+      }
     };
     fetchStats();
   }, [navigate]);
