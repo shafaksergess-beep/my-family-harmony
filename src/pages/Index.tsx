@@ -9,18 +9,43 @@ import SplashScreen from "@/components/SplashScreen";
 const Index = () => {
   const navigate = useNavigate();
   const [showSplash, setShowSplash] = useState(true);
+  const [stats, setStats] = useState({ activeMembers: 0, avgContribution: 0, avgInterestRate: 0, meetingsPerYear: 0 });
 
   useEffect(() => {
-    // Check if user is already logged in
     const checkAuth = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         navigate("/dashboard");
       }
     };
     checkAuth();
+
+    // Fetch real platform stats
+    const fetchStats = async () => {
+      const [membersRes, familiesRes, meetingsRes] = await Promise.all([
+        supabase.from("family_members").select("user_id", { count: "exact", head: true }),
+        supabase.from("families").select("mandatory_contribution, loan_interest_rate").eq("is_active", true),
+        supabase.from("meetings").select("id", { count: "exact", head: true })
+          .gte("meeting_date", `${new Date().getFullYear()}-01-01`)
+          .lte("meeting_date", new Date().toISOString().split("T")[0]),
+      ]);
+
+      const families = familiesRes.data || [];
+      const avgContribution = families.length
+        ? families.reduce((sum, f) => sum + (f.mandatory_contribution || 0), 0) / families.length
+        : 0;
+      const avgInterest = families.length
+        ? families.reduce((sum, f) => sum + (f.loan_interest_rate || 0), 0) / families.length
+        : 0;
+
+      setStats({
+        activeMembers: membersRes.count || 0,
+        avgContribution,
+        avgInterestRate: avgInterest,
+        meetingsPerYear: meetingsRes.count || 0,
+      });
+    };
+    fetchStats();
   }, [navigate]);
 
   if (showSplash) {
@@ -103,22 +128,22 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
             <Card className="p-6 text-center border-primary/10 hover:border-primary/30 transition-all hover:shadow-lg">
               <Users className="w-10 h-10 mx-auto mb-3 text-primary" />
-              <div className="text-3xl font-bold text-primary mb-1">50+</div>
+              <div className="text-3xl font-bold text-primary mb-1">{stats.activeMembers}+</div>
               <div className="text-sm text-muted-foreground">Active Members</div>
             </Card>
             <Card className="p-6 text-center border-secondary/10 hover:border-secondary/30 transition-all hover:shadow-lg">
               <DollarSign className="w-10 h-10 mx-auto mb-3 text-secondary" />
-              <div className="text-3xl font-bold text-secondary mb-1">25K</div>
+              <div className="text-3xl font-bold text-secondary mb-1">{stats.avgContribution >= 1000 ? `${Math.round(stats.avgContribution / 1000)}K` : stats.avgContribution}</div>
               <div className="text-sm text-muted-foreground">Monthly Contribution</div>
             </Card>
             <Card className="p-6 text-center border-accent/10 hover:border-accent/30 transition-all hover:shadow-lg">
               <PiggyBank className="w-10 h-10 mx-auto mb-3 text-accent" />
-              <div className="text-3xl font-bold text-accent mb-1">2.5%</div>
-              <div className="text-sm text-muted-foreground">Loan Interest</div>
+              <div className="text-3xl font-bold text-accent mb-1">{stats.avgInterestRate.toFixed(1)}%</div>
+              <div className="text-sm text-muted-foreground">Avg Loan Interest</div>
             </Card>
             <Card className="p-6 text-center border-primary/10 hover:border-primary/30 transition-all hover:shadow-lg">
               <Calendar className="w-10 h-10 mx-auto mb-3 text-primary" />
-              <div className="text-3xl font-bold text-foreground mb-1">12</div>
+              <div className="text-3xl font-bold text-foreground mb-1">{stats.meetingsPerYear}</div>
               <div className="text-sm text-muted-foreground">Meetings/Year</div>
             </Card>
           </div>
