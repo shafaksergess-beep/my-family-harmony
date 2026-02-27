@@ -11,6 +11,9 @@ import { usePlatform } from "@/hooks/usePlatform";
 import { MobileDashboard } from "@/components/mobile/MobileDashboard";
 import { JoinFamilyCard } from "@/components/dashboard/JoinFamilyCard";
 import { NewUserOnboarding } from "@/components/onboarding/NewUserOnboarding";
+import { NotificationsFeed } from "@/components/dashboard/NotificationsFeed";
+import { PendingActionsWidget } from "@/components/dashboard/PendingActionsWidget";
+import { FinancialOverviewWidget } from "@/components/dashboard/FinancialOverviewWidget";
 
 interface UserFamily {
   family_id: string;
@@ -27,6 +30,7 @@ const Dashboard = () => {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [userFamilies, setUserFamilies] = useState<UserFamily[]>([]);
   const [profile, setProfile] = useState<any>(null);
+  const [userId, setUserId] = useState<string>("");
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
@@ -59,6 +63,7 @@ const Dashboard = () => {
         .single();
 
       setProfile(profileData);
+      setUserId(session.user.id);
 
       // Check if super admin
       const { data: superAdminData } = await supabase
@@ -327,6 +332,17 @@ const Dashboard = () => {
             </div>
           )}
         </div>
+
+        {/* Member Dashboard Widgets */}
+        {!isSuperAdmin && userFamilies.length > 0 && userId && (
+          <div className="mt-8 space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <PendingActionsWidget userId={userId} families={userFamilies} />
+              <NotificationsFeed userId={userId} familyIds={userFamilies.map(f => f.family_id)} />
+            </div>
+            <FinancialOverviewWidget userId={userId} families={userFamilies} />
+          </div>
+        )}
       </main>
     </div>
     </>
