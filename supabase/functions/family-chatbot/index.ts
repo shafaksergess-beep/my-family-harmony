@@ -43,15 +43,18 @@ serve(async (req) => {
     const lovableKey = Deno.env.get("LOVABLE_API_KEY");
     if (!lovableKey) throw new Error("LOVABLE_API_KEY not configured");
 
-    // Auth user
-    const userClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
+    // Auth user using getClaims
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers: { Authorization: authHeader } },
     });
-    const { data: { user }, error: authErr } = await userClient.auth.getUser();
-    if (authErr || !user) throw new Error("Unauthorized");
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: authErr } = await userClient.auth.getClaims(token);
+    if (authErr || !claimsData?.claims?.sub) throw new Error("Unauthorized");
+    const userId = claimsData.claims.sub as string;
 
     // Rate limit per user
-    const rl = checkRate(user.id);
+    const rl = checkRate(userId);
     if (rl.blocked) {
       return new Response(JSON.stringify({ error: "Too many requests. Please wait a minute." }), {
         status: 429,
@@ -70,7 +73,7 @@ serve(async (req) => {
       .from("family_members")
       .select("id, role, house_name, profiles(full_name)")
       .eq("family_id", familyId)
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .single();
 
     if (!membership) throw new Error("Not a member of this family");
