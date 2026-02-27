@@ -2295,35 +2295,54 @@ export type Database = {
       savings: {
         Row: {
           amount: number
+          approved_at: string | null
+          approved_by: string | null
           created_at: string | null
           family_id: string
           id: string
           member_id: string
           month: string
           notes: string | null
+          rejection_reason: string | null
+          status: string
           updated_at: string | null
         }
         Insert: {
           amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string | null
           family_id: string
           id?: string
           member_id: string
           month: string
           notes?: string | null
+          rejection_reason?: string | null
+          status?: string
           updated_at?: string | null
         }
         Update: {
           amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string | null
           family_id?: string
           id?: string
           member_id?: string
           month?: string
           notes?: string | null
+          rejection_reason?: string | null
+          status?: string
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "savings_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "savings_family_id_fkey"
             columns: ["family_id"]
@@ -2336,6 +2355,71 @@ export type Database = {
             columns: ["member_id"]
             isOneToOne: false
             referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      savings_notifications: {
+        Row: {
+          action_type: string
+          created_at: string
+          created_by: string | null
+          family_id: string
+          id: string
+          is_read: boolean
+          message: string
+          recipient_member_id: string
+          savings_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          created_by?: string | null
+          family_id: string
+          id?: string
+          is_read?: boolean
+          message: string
+          recipient_member_id: string
+          savings_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          created_by?: string | null
+          family_id?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          recipient_member_id?: string
+          savings_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "savings_notifications_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "savings_notifications_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "savings_notifications_recipient_member_id_fkey"
+            columns: ["recipient_member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "savings_notifications_savings_id_fkey"
+            columns: ["savings_id"]
+            isOneToOne: false
+            referencedRelation: "savings"
             referencedColumns: ["id"]
           },
         ]
