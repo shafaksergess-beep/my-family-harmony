@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
-import { ArrowLeft, Plus, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Plus, CheckCircle2, Trash2, UserPlus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -62,6 +62,7 @@ export default function FamilyNjangi() {
   const [members, setMembers] = useState<FamilyMember[]>([]);
   const [isCycleDialogOpen, setIsCycleDialogOpen] = useState(false);
   const [isParticipantDialogOpen, setIsParticipantDialogOpen] = useState(false);
+  const [selectedMemberToAdd, setSelectedMemberToAdd] = useState("");
   const [cycleFormData, setCycleFormData] = useState({
     name: "",
     start_date: new Date().toISOString().split('T')[0],
@@ -208,6 +209,43 @@ export default function FamilyNjangi() {
         notes: "",
       });
       loadData();
+    } catch (error) {
+      const err = error as Error;
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    }
+  };
+
+  const handleAddParticipant = async () => {
+    if (!selectedCycle || !selectedMemberToAdd) return;
+    try {
+      const nextOrder = participants.length > 0 
+        ? Math.max(...participants.map(p => p.payout_order)) + 1 
+        : 1;
+      
+      const { error } = await supabase.from("njangi_participants").insert({
+        cycle_id: selectedCycle.id,
+        member_id: selectedMemberToAdd,
+        payout_order: nextOrder,
+      });
+      if (error) throw error;
+      
+      toast({ title: "Success", description: "Participant added" });
+      setIsParticipantDialogOpen(false);
+      setSelectedMemberToAdd("");
+      loadParticipants(selectedCycle.id);
+    } catch (error) {
+      const err = error as Error;
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    }
+  };
+
+  const handleRemoveParticipant = async (participantId: string) => {
+    if (!selectedCycle) return;
+    try {
+      const { error } = await supabase.from("njangi_participants").delete().eq("id", participantId);
+      if (error) throw error;
+      toast({ title: "Success", description: "Participant removed" });
+      loadParticipants(selectedCycle.id);
     } catch (error) {
       const err = error as Error;
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -424,10 +462,39 @@ export default function FamilyNjangi() {
               <div className="p-4 border-b flex justify-between items-center">
                 <h2 className="text-xl font-semibold">Payout Order</h2>
                 {canManageFinances && (
-                  <Button variant="outline" size="sm">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Participant
-                  </Button>
+                  <Dialog open={isParticipantDialogOpen} onOpenChange={setIsParticipantDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Add Participant
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add Participant</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div>
+                          <Label>Select Member</Label>
+                          <Select value={selectedMemberToAdd} onValueChange={setSelectedMemberToAdd}>
+                            <SelectTrigger><SelectValue placeholder="Choose a member" /></SelectTrigger>
+                            <SelectContent>
+                              {members
+                                .filter(m => !participants.some(p => p.family_members.id === m.id))
+                                .map(m => (
+                                  <SelectItem key={m.id} value={m.id}>
+                                    {m.profiles.full_name}
+                                  </SelectItem>
+                                ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <Button onClick={handleAddParticipant} disabled={!selectedMemberToAdd} className="w-full">
+                          Add Participant
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 )}
               </div>
               <div className="overflow-x-auto">
@@ -474,15 +541,27 @@ export default function FamilyNjangi() {
                             )}
                           </td>
                           <td className="p-4 text-center">
-                            {!participant.is_paid && canManageFinances && (
-                              <Button
-                                size="sm"
-                                onClick={() => handleMarkPaid(participant.id, participant.family_members.id)}
-                              >
-                                <CheckCircle2 className="h-4 w-4 mr-1" />
-                                Mark Paid
-                              </Button>
-                            )}
+                            <div className="flex items-center justify-center gap-1">
+                              {!participant.is_paid && canManageFinances && (
+                                <>
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleMarkPaid(participant.id, participant.family_members.id)}
+                                  >
+                                    <CheckCircle2 className="h-4 w-4 mr-1" />
+                                    Mark Paid
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="text-destructive hover:text-destructive"
+                                    onClick={() => handleRemoveParticipant(participant.id)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))
