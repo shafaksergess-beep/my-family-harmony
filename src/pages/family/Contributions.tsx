@@ -59,6 +59,7 @@ export default function Contributions() {
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [contributionScope, setContributionScope] = useState<"member" | "house">("member");
+  const [dialogScope, setDialogScope] = useState<"member" | "house">("member");
   const [houses, setHouses] = useState<string[]>([]);
   const [newContribution, setNewContribution] = useState({
     member_id: "",
@@ -247,6 +248,18 @@ export default function Contributions() {
     }
 
     try {
+      // For house contributions, member_id is the payer/representative
+      if (dialogScope === "house" && !newContribution.member_id) {
+        setValidationErrors({ memberId: "Please select a payer/representative" });
+        toast({ title: "Validation Error", description: "Please select a payer for the house contribution", variant: "destructive" });
+        return;
+      }
+      if (dialogScope === "house" && !newContribution.house_id) {
+        setValidationErrors({ houseId: "House is required" });
+        toast({ title: "Validation Error", description: "Please select a house", variant: "destructive" });
+        return;
+      }
+
       const contributionData = {
         family_id: family.id,
         amount: validationResult.data.amount,
@@ -254,8 +267,8 @@ export default function Contributions() {
         type: validationResult.data.type,
         notes: validationResult.data.notes || null,
         status: "pending",
-        house_id: contributionScope === "house" ? newContribution.house_id : null,
-        member_id: contributionScope === "house" ? null : validationResult.data.memberId,
+        house_id: dialogScope === "house" ? newContribution.house_id : null,
+        member_id: dialogScope === "house" ? newContribution.member_id : validationResult.data.memberId,
       };
 
       const { error } = await supabase.from("contributions").insert(contributionData);
@@ -393,7 +406,47 @@ export default function Contributions() {
                     </DialogHeader>
                     <div className="space-y-4">
                       <div>
-                        <Label>Member</Label>
+                        <Label>Contribution For</Label>
+                        <Select value={dialogScope} onValueChange={(value) => setDialogScope(value as "member" | "house")}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="member">Individual Member</SelectItem>
+                            <SelectItem value="house">House</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {dialogScope === "house" && (
+                        <div>
+                          <Label>House</Label>
+                          <Select 
+                            value={newContribution.house_id} 
+                            onValueChange={(value) => {
+                              setNewContribution({ ...newContribution, house_id: value });
+                              setValidationErrors({ ...validationErrors, houseId: "" });
+                            }}
+                          >
+                            <SelectTrigger className={validationErrors.houseId ? "border-red-500" : ""}>
+                              <SelectValue placeholder="Select house" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {houses.map((house) => (
+                                <SelectItem key={house} value={house}>
+                                  {house}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          {validationErrors.houseId && (
+                            <p className="text-sm text-red-500 mt-1">{validationErrors.houseId}</p>
+                          )}
+                        </div>
+                      )}
+
+                      <div>
+                        <Label>{dialogScope === "house" ? "Payer / Representative" : "Member"}</Label>
                         <Select 
                           value={newContribution.member_id} 
                           onValueChange={(value) => {
@@ -402,7 +455,7 @@ export default function Contributions() {
                           }}
                         >
                           <SelectTrigger className={validationErrors.memberId ? "border-red-500" : ""}>
-                            <SelectValue placeholder="Select member" />
+                            <SelectValue placeholder={dialogScope === "house" ? "Select payer" : "Select member"} />
                           </SelectTrigger>
                           <SelectContent>
                             {members.map((member) => (
@@ -537,7 +590,12 @@ export default function Contributions() {
               {contributions.map((contribution) => (
                 <div key={contribution.id} className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="space-y-1">
-                    <p className="font-medium">{contribution.family_members?.profiles?.full_name || "Unknown"}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium">{contribution.family_members?.profiles?.full_name || "Unknown"}</p>
+                      {(contribution as any).house_id && (
+                        <Badge variant="outline" className="text-xs">House: {(contribution as any).house_id}</Badge>
+                      )}
+                    </div>
                     <p className="text-sm text-muted-foreground">
                       {format(new Date(contribution.contribution_date), "PPP")} • {contribution.type}
                     </p>
