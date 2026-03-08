@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Bell, Mail, MessageSquare, Loader2 } from 'lucide-react';
+import { useFamilyAuth } from '@/hooks/useFamilyAuth';
 import {
   Select,
   SelectContent,
@@ -28,6 +29,7 @@ interface NotificationSettings {
 
 export function NotificationPreferences() {
   const { familySlug } = useParams();
+  const { family, isLoading: authLoading } = useFamilyAuth(familySlug);
   const [settings, setSettings] = useState<NotificationSettings>({
     email_enabled: true,
     sms_enabled: false,
@@ -42,15 +44,47 @@ export function NotificationPreferences() {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    loadSettings();
-  }, [familySlug]);
+    if (!authLoading && family) {
+      loadSettings();
+    } else if (!authLoading && !familySlug) {
+      // If no familySlug, we're likely in a global settings context
+      loadSettings();
+    }
+  }, [family, authLoading, familySlug]);
 
   const loadSettings = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // TODO: Load from database when notification_preferences table is created
+      const query = supabase
+        .from('notification_preferences')
+        .select('*')
+        .eq('user_id', user.id);
+
+      if (family?.id) {
+        query.eq('family_id', family.id);
+      } else {
+        query.is('family_id', null);
+      }
+
+      const { data, error } = await query.maybeSingle();
+
+      if (error) throw error;
+
+      if (data) {
+        setSettings({
+          email_enabled: data.email_enabled,
+          sms_enabled: data.sms_enabled,
+          push_enabled: data.push_enabled,
+          meeting_reminders: data.meeting_reminders,
+          payment_reminders: data.payment_reminders,
+          loan_updates: data.loan_updates,
+          assistance_notifications: data.assistance_notifications,
+          digest_frequency: data.digest_frequency as any,
+        });
+      }
+
       setIsLoading(false);
     } catch (error) {
       console.error('Error loading notification settings:', error);
@@ -65,12 +99,15 @@ export function NotificationPreferences() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not found');
 
-      // TODO: Save to database when notification_preferences table is created
-      // await supabase.from('notification_preferences').upsert({
-      //   user_id: user.id,
-      //   family_slug: familySlug,
-      //   ...settings,
-      // });
+      const { error } = await supabase.from('notification_preferences').upsert({
+        user_id: user.id,
+        family_id: family?.id || null,
+        ...settings,
+      }, {
+        onConflict: 'user_id, family_id'
+      });
+
+      if (error) throw error;
 
       toast.success('Notification preferences saved successfully');
     } catch (error) {
@@ -88,7 +125,7 @@ export function NotificationPreferences() {
     }));
   };
 
-  if (isLoading) {
+  if (isLoading || authLoading) {
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
