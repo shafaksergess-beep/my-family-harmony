@@ -206,7 +206,7 @@ const JoinFamily = () => {
   };
 
   const handleJoinAsGuest = () => {
-    navigate(`/auth?redirect=/join/${familySlug || "family"}?code=${referenceCode}`);
+    navigate(`/auth?redirect=${encodeURIComponent(`/join/${familySlug || "family"}?code=${referenceCode}`)}`);
   };
 
   if (loading) {
