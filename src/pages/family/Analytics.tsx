@@ -13,6 +13,7 @@ import { SavingsGrowthChart } from "@/components/analytics/SavingsGrowthChart";
 import { LoanRepaymentChart } from "@/components/analytics/LoanRepaymentChart";
 import { ContributionTrendsChart } from "@/components/analytics/ContributionTrendsChart";
 import { Sparkles, Activity, ShieldCheck, Target } from "lucide-react";
+import SEO from "@/components/SEO";
 
 interface KPIData {
   totalMembers: number;
@@ -210,7 +211,9 @@ const FamilyAnalytics = () => {
   const glassCardStyle = "bg-white/40 dark:bg-black/20 backdrop-blur-xl border-white/20 dark:border-white/10 shadow-2xl hover:bg-white/50 dark:hover:bg-black/30 transition-all duration-300";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/50 to-background">
+    <>
+      <SEO title="Family Analytics" description="Insights and KPIs across contributions, savings, loans and meetings." />
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/50 to-background">
       <header className="sticky top-0 z-50 border-b border-white/20 bg-white/10 backdrop-blur-md">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -379,6 +382,7 @@ const FamilyAnalytics = () => {
         </Card>
       </main>
     </div>
+    </>
   );
 };
 

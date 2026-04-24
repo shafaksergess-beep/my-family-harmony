@@ -13,6 +13,8 @@ import { loginSchema, signupSchema } from "@/lib/validation";
 import { checkRateLimit, recordAttempt, resetRateLimit } from "@/lib/rateLimit";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import SEO from "@/components/SEO";
+import { Checkbox } from "@/components/ui/checkbox";
+import { PasswordStrength } from "@/components/PasswordStrength";
 
 interface PendingInvitation {
   familyName: string;
@@ -61,6 +63,8 @@ const Auth = () => {
     fullName?: string;
     phone?: string;
   }>({});
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
+  const [privacyError, setPrivacyError] = useState<string | null>(null);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -197,7 +201,13 @@ const Auth = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setSignupErrors({});
-    
+    setPrivacyError(null);
+
+    if (!acceptedPrivacy) {
+      setPrivacyError("Please accept the Privacy Policy and Terms to continue");
+      return;
+    }
+
     // Check confirm password match first
     if (signupPassword !== signupConfirmPassword) {
       setSignupErrors({ confirmPassword: "Passwords do not match" });
@@ -527,6 +537,7 @@ const Auth = () => {
                   {signupErrors.password && (
                     <p className="text-sm text-destructive">{signupErrors.password}</p>
                   )}
+                  <PasswordStrength password={signupPassword} />
                   <p className="text-xs text-muted-foreground">
                     Must contain uppercase, lowercase, and number
                   </p>
@@ -568,6 +579,28 @@ const Auth = () => {
                     <p className="text-xs text-primary">✓ Passwords match</p>
                   )}
                 </div>
+
+                <div className="flex items-start gap-2 pt-1">
+                  <Checkbox
+                    id="accept-privacy"
+                    checked={acceptedPrivacy}
+                    onCheckedChange={(v) => {
+                      setAcceptedPrivacy(v === true);
+                      if (v === true) setPrivacyError(null);
+                    }}
+                    aria-describedby={privacyError ? "privacy-error" : undefined}
+                  />
+                  <Label htmlFor="accept-privacy" className="text-sm font-normal leading-snug cursor-pointer">
+                    I agree to the{" "}
+                    <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">
+                      Privacy Policy
+                    </a>{" "}
+                    and Terms of Service.
+                  </Label>
+                </div>
+                {privacyError && (
+                  <p id="privacy-error" className="text-sm text-destructive">{privacyError}</p>
+                )}
 
                 <Button
                   type="submit"

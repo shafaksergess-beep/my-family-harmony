@@ -13,6 +13,7 @@ import { usePlatform } from "@/hooks/usePlatform";
 import { MobileLayout } from "@/components/mobile/MobileLayout";
 import { haptics } from "@/lib/haptics";
 import { FamilyChatbot } from "@/components/chat/FamilyChatbot";
+import SEO from "@/components/SEO";
 
 interface ModuleCategory {
   id: string;
@@ -212,7 +213,9 @@ const FamilyDetail = () => {
 
   // Desktop layout
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEO title="Family Workspace" description="Your family workspace — meetings, contributions, savings, loans and more." />
+      <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -314,6 +317,7 @@ const FamilyDetail = () => {
       </main>
       {family && <FamilyChatbot familyId={family.id} />}
     </div>
+    </>
   );
 };
 

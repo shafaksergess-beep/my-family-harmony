@@ -16,6 +16,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useCurrency } from "@/context/CurrencyContext";
 import { CurrencySelector } from "@/components/CurrencySelector";
 import { LoanDeductionDialog } from "@/components/LoanDeductionDialog";
+import SEO from "@/components/SEO";
 
 interface NjangiCycle {
   id: string;
@@ -347,7 +348,9 @@ export default function FamilyNjangi() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <>
+      <SEO title="Njangi Cycles" description="Manage Njangi rotating savings cycles, participants and payouts." />
+      <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -585,5 +588,6 @@ export default function FamilyNjangi() {
         )}
       </div>
     </div>
+    </>
   );
 }

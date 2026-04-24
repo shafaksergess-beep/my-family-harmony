@@ -25,6 +25,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from "@/components/ui/alert-dialog";
+import SEO from "@/components/SEO";
 
 interface Member {
   id: string;
@@ -299,7 +300,9 @@ const Members = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <>
+      <SEO title="Family Members" description="Manage family members, roles and permissions for your Kinsroot family." />
+      <div className="min-h-screen bg-background p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -603,6 +606,7 @@ const Members = () => {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+    </>
   );
 };
 

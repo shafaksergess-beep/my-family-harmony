@@ -20,6 +20,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { format } from "date-fns";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileLoans } from "@/components/mobile";
+import SEO from "@/components/SEO";
 
 interface Loan {
   id: string;
@@ -335,7 +336,9 @@ export default function Loans() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <>
+      <SEO title="Family Loans" description="Apply for, approve and track family loans with surety and repayment schedules." />
+      <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${family?.id}`)}>
@@ -616,5 +619,6 @@ export default function Loans() {
         </div>
       </Card>
     </div>
+    </>
   );
 }
