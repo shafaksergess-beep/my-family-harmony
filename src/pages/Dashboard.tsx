@@ -15,6 +15,7 @@ import { NotificationsFeed } from "@/components/dashboard/NotificationsFeed";
 import { PendingActionsWidget } from "@/components/dashboard/PendingActionsWidget";
 import { FinancialOverviewWidget } from "@/components/dashboard/FinancialOverviewWidget";
 import { FamilyChatbot } from "@/components/chat/FamilyChatbot";
+import SEO from "@/components/SEO";
 
 interface UserFamily {
   family_id: string;

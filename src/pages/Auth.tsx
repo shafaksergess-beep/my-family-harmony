@@ -12,6 +12,7 @@ import { Loader2, Users, Ticket, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { loginSchema, signupSchema } from "@/lib/validation";
 import { checkRateLimit, recordAttempt, resetRateLimit } from "@/lib/rateLimit";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
+import SEO from "@/components/SEO";
 
 interface PendingInvitation {
   familyName: string;

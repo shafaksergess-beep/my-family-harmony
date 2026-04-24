@@ -250,6 +250,7 @@ const Index = () => {
           </div>
         </div>
       </footer>
+      </main>
     </div>
   );
 };

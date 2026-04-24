@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { JoinFamilyOptions } from "@/components/invitations/JoinFamilyOptions";
+import SEO from "@/components/SEO";
 
 const Profile = () => {
   const navigate = useNavigate();
