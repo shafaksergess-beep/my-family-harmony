@@ -147,6 +147,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO title="My profile" description="Manage your Kinsroot profile, language and family memberships." />
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">

@@ -124,6 +124,7 @@ const Dashboard = () => {
 
   return (
     <>
+    <SEO title="My Family Tree" description="Your Kinsroot dashboard — view your families, contributions, meetings and recent activity at a glance." />
     <NewUserOnboarding
       open={showOnboarding}
       onComplete={() => setShowOnboarding(false)}
