@@ -22,10 +22,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileMembers } from "@/components/mobile";
 import {
-import SEO from "@/components/SEO";
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from "@/components/ui/alert-dialog";
+import SEO from "@/components/SEO";
 
 interface Member {
   id: string;
