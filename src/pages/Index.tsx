@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Users, Calendar, DollarSign, TrendingUp, Heart, Shield, Home, PiggyBank, FileText, Award } from "lucide-react";
 import SplashScreen from "@/components/SplashScreen";
+import SEO from "@/components/SEO";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -42,6 +43,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Kinsroot — Rooted in Heritage, Built for Tomorrow"
+        description="Kinsroot helps families run meetings, track contributions, manage savings, loans and njangi — all in one heritage-rooted platform."
+      />
+      <main id="main-content">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary-hover to-secondary/20 text-primary-foreground">
         <div className="absolute inset-0 bg-[url('/lovable-uploads/pattern.svg')] opacity-10"></div>
