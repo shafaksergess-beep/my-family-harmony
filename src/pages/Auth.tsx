@@ -12,6 +12,7 @@ import { Loader2, Users, Ticket, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { loginSchema, signupSchema } from "@/lib/validation";
 import { checkRateLimit, recordAttempt, resetRateLimit } from "@/lib/rateLimit";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
+import SEO from "@/components/SEO";
 
 interface PendingInvitation {
   familyName: string;
@@ -302,6 +303,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 flex items-center justify-center p-4">
+      <SEO title="Sign in" description="Sign in or create your Kinsroot account to manage your family's meetings, contributions and savings." />
       <div className="w-full max-w-md">
         {/* Pending Invitation Banner */}
         {pendingInvitation && (

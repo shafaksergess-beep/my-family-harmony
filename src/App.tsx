@@ -4,10 +4,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { lazy, Suspense, ReactNode } from "react";
+import { HelmetProvider } from "react-helmet-async";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ModuleErrorBoundary } from "@/components/ModuleErrorBoundary";
 import { MedianProvider } from "@/contexts/MedianContext";
 import { CurrencyProvider } from "@/context/CurrencyContext";
+import { PageLoadingSkeleton } from "@/components/PageLoadingSkeleton";
 // Lazy load core pages
 const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
@@ -93,11 +95,7 @@ const FamilyCalendar = lazy(() => import("./pages/family/Calendar"));
 
 const queryClient = new QueryClient();
 
-const LoadingFallback = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="text-lg">Loading...</div>
-  </div>
-);
+const LoadingFallback = () => <PageLoadingSkeleton />;
 
 // Wrapper components for module error boundaries
 const AdminModule = ({ children }: { children: ReactNode }) => (
@@ -114,6 +112,7 @@ const FamilyModule = ({ children }: { children: ReactNode }) => (
 
 const App = () => (
   <ErrorBoundary>
+    <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <CurrencyProvider>
       <MedianProvider>
@@ -213,6 +212,7 @@ const App = () => (
       </MedianProvider>
       </CurrencyProvider>
     </QueryClientProvider>
+    </HelmetProvider>
   </ErrorBoundary>
 );
 

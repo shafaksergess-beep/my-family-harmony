@@ -5,50 +5,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#1a3d2e" />
     <meta name="msapplication-TileColor" content="#1a3d2e" />
-    <link rel="icon" type="image/x-icon" href="/favicon.jpg">
-    <link rel="apple-touch-icon" href="/logo.jpg" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/logo.jpg" />
+
+    <!-- Baseline CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https: wss:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; frame-src 'self' https:;" />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.jpg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    
-    <title>Kinsroot - Rooted in Heritage, Built for Tomorrow</title>
-    <meta name="description" content="Kinsroot - Family meeting management platform. Rooted in Heritage, Built for Tomorrow. Digitizing unity and prosperity for families.">
+
+    <title>Kinsroot — Rooted in Heritage, Built for Tomorrow</title>
+    <meta name="description" content="Kinsroot is the all-in-one family management platform for meetings, contributions, savings, loans and heritage — rooted in tradition, built for tomorrow." />
+    <meta name="keywords" content="Kinsroot, family management, family meetings, contributions, savings, njangi, loans, heritage, family app" />
     <meta name="author" content="Kinsroot" />
     <meta name="application-name" content="Kinsroot" />
-    
-    <!-- iOS specific meta tags -->
+    <link rel="canonical" href="https://kinsroot.softgroupsolutions.com/" />
+
+    <!-- iOS / mobile web app -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Kinsroot" />
     <meta name="mobile-web-app-capable" content="yes" />
-    
-    <!-- Android specific -->
-    <meta name="format-detection" content="telephone=no" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    
-    <!-- Prevent automatic detection -->
     <meta name="format-detection" content="telephone=no, date=no, email=no, address=no" />
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
-    
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/80fa1dc8-46e4-43ef-9979-5242dea2632b?Expires=1772191340&amp;GoogleAccessId=go-api-on-aws%40gpt-engineer-390607.iam.gserviceaccount.com&amp;Signature=V8Z6aIQ%2BC9auuT8CT5sLCa%2FC5MM3BFIX04ClKnx99bT9h3l76hmJdnUDE4hPepo%2F2E4ryP2XnBC8qO5vhqNVsxC%2F%2FGdCAJvqQIbI9ClVdHU2IWtWUWk5gKHr14cVuaHdPon6bG%2BhH6vo%2FqcJRAZiQ1YQHD7uFgXU7aoChF%2B8fawGW84Ex7pKhnWOD7RUekOhZ%2BexyX2j7u8%2FNqlxx0D%2BN9SSL5i1FItloXQ2tKWq7yoCa3LG%2FpFyx7UVAEa0MKU90Zq04LXbjWcapyS%2BN8cOiHSNM5iEdIhZL4fX9Wdb9l6Eko1jFZXeEGBG8YiBHVP%2BZ3ynlduj36x6ryo4fuyzHQ%3D%3D">
+    <meta property="og:site_name" content="Kinsroot" />
+    <meta property="og:url" content="https://kinsroot.softgroupsolutions.com/" />
+    <meta property="og:title" content="Kinsroot — Rooted in Heritage, Built for Tomorrow" />
+    <meta property="og:description" content="The all-in-one family management platform for meetings, contributions, savings, loans and heritage." />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/80fa1dc8-46e4-43ef-9979-5242dea2632b?Expires=1772191340&amp;GoogleAccessId=go-api-on-aws%40gpt-engineer-390607.iam.gserviceaccount.com&amp;Signature=V8Z6aIQ%2BC9auuT8CT5sLCa%2FC5MM3BFIX04ClKnx99bT9h3l76hmJdnUDE4hPepo%2F2E4ryP2XnBC8qO5vhqNVsxC%2F%2FGdCAJvqQIbI9ClVdHU2IWtWUWk5gKHr14cVuaHdPon6bG%2BhH6vo%2FqcJRAZiQ1YQHD7uFgXU7aoChF%2B8fawGW84Ex7pKhnWOD7RUekOhZ%2BexyX2j7u8%2FNqlxx0D%2BN9SSL5i1FItloXQ2tKWq7yoCa3LG%2FpFyx7UVAEa0MKU90Zq04LXbjWcapyS%2BN8cOiHSNM5iEdIhZL4fX9Wdb9l6Eko1jFZXeEGBG8YiBHVP%2BZ3ynlduj36x6ryo4fuyzHQ%3D%3D" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Kinsroot — Rooted in Heritage, Built for Tomorrow" />
+
+    <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@Lovable" />
-    <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/80fa1dc8-46e4-43ef-9979-5242dea2632b?Expires=1772191340&amp;GoogleAccessId=go-api-on-aws%40gpt-engineer-390607.iam.gserviceaccount.com&amp;Signature=V8Z6aIQ%2BC9auuT8CT5sLCa%2FC5MM3BFIX04ClKnx99bT9h3l76hmJdnUDE4hPepo%2F2E4ryP2XnBC8qO5vhqNVsxC%2F%2FGdCAJvqQIbI9ClVdHU2IWtWUWk5gKHr14cVuaHdPon6bG%2BhH6vo%2FqcJRAZiQ1YQHD7uFgXU7aoChF%2B8fawGW84Ex7pKhnWOD7RUekOhZ%2BexyX2j7u8%2FNqlxx0D%2BN9SSL5i1FItloXQ2tKWq7yoCa3LG%2FpFyx7UVAEa0MKU90Zq04LXbjWcapyS%2BN8cOiHSNM5iEdIhZL4fX9Wdb9l6Eko1jFZXeEGBG8YiBHVP%2BZ3ynlduj36x6ryo4fuyzHQ%3D%3D">
-    
-    
-    
-    
-    <meta property="og:title" content="Kinsroot - Rooted in Heritage, Built for Tomorrow">
-  <meta name="twitter:title" content="Kinsroot - Rooted in Heritage, Built for Tomorrow">
-  <meta property="og:description" content="Kinsroot - Family meeting management platform. Rooted in Heritage, Built for Tomorrow. Digitizing unity and prosperity for families.">
-  <meta name="twitter:description" content="Kinsroot - Family meeting management platform. Rooted in Heritage, Built for Tomorrow. Digitizing unity and prosperity for families.">
-</head>
+    <meta name="twitter:site" content="@Kinsroot" />
+    <meta name="twitter:title" content="Kinsroot — Rooted in Heritage, Built for Tomorrow" />
+    <meta name="twitter:description" content="The all-in-one family management platform for meetings, contributions, savings, loans and heritage." />
+    <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/80fa1dc8-46e4-43ef-9979-5242dea2632b?Expires=1772191340&amp;GoogleAccessId=go-api-on-aws%40gpt-engineer-390607.iam.gserviceaccount.com&amp;Signature=V8Z6aIQ%2BC9auuT8CT5sLCa%2FC5MM3BFIX04ClKnx99bT9h3l76hmJdnUDE4hPepo%2F2E4ryP2XnBC8qO5vhqNVsxC%2F%2FGdCAJvqQIbI9ClVdHU2IWtWUWk5gKHr14cVuaHdPon6bG%2BhH6vo%2FqcJRAZiQ1YQHD7uFgXU7aoChF%2B8fawGW84Ex7pKhnWOD7RUekOhZ%2BexyX2j7u8%2FNqlxx0D%2BN9SSL5i1FItloXQ2tKWq7yoCa3LG%2FpFyx7UVAEa0MKU90Zq04LXbjWcapyS%2BN8cOiHSNM5iEdIhZL4fX9Wdb9l6Eko1jFZXeEGBG8YiBHVP%2BZ3ynlduj36x6ryo4fuyzHQ%3D%3D" />
+
+    <style>
+      /* Skip nav (visible only on focus) */
+      .skip-nav {
+        position: absolute;
+        left: -9999px;
+        top: 0;
+        z-index: 1000;
+        background: #1a3d2e;
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 0 0 8px 0;
+        font-family: Inter, system-ui, sans-serif;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      .skip-nav:focus {
+        left: 0;
+        outline: 3px solid #f5c542;
+      }
+
+      /* Inline boot skeleton — shown until React mounts */
+      #ks-boot {
+        position: fixed;
+        inset: 0;
+        background: #faf8f5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: Inter, system-ui, -apple-system, sans-serif;
+        z-index: 9999;
+      }
+      #ks-boot img {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 8px 24px rgba(26, 61, 46, 0.18);
+        margin-bottom: 18px;
+      }
+      #ks-boot .ks-name {
+        color: #1a3d2e;
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin-bottom: 14px;
+      }
+      #ks-boot .ks-bar {
+        position: relative;
+        width: 180px;
+        height: 4px;
+        background: rgba(26, 61, 46, 0.08);
+        border-radius: 999px;
+        overflow: hidden;
+      }
+      #ks-boot .ks-bar::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 40%;
+        background: linear-gradient(90deg, #1a3d2e, #f5c542);
+        border-radius: 999px;
+        animation: ks-load 1.2s ease-in-out infinite;
+      }
+      @keyframes ks-load {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(260%); }
+      }
+    </style>
+  </head>
 
   <body>
-    <div id="root"></div>
+    <a href="#main-content" class="skip-nav">Skip to main content</a>
+    <div id="root">
+      <div id="ks-boot" role="status" aria-label="Loading Kinsroot">
+        <img src="/logo.jpg" alt="" />
+        <div class="ks-name">Kinsroot</div>
+        <div class="ks-bar" aria-hidden="true"></div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

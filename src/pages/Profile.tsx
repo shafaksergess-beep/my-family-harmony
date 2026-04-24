@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { JoinFamilyOptions } from "@/components/invitations/JoinFamilyOptions";
+import SEO from "@/components/SEO";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -146,6 +147,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO title="My profile" description="Manage your Kinsroot profile, language and family memberships." />
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">

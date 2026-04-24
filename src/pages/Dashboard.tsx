@@ -15,6 +15,7 @@ import { NotificationsFeed } from "@/components/dashboard/NotificationsFeed";
 import { PendingActionsWidget } from "@/components/dashboard/PendingActionsWidget";
 import { FinancialOverviewWidget } from "@/components/dashboard/FinancialOverviewWidget";
 import { FamilyChatbot } from "@/components/chat/FamilyChatbot";
+import SEO from "@/components/SEO";
 
 interface UserFamily {
   family_id: string;
@@ -123,6 +124,7 @@ const Dashboard = () => {
 
   return (
     <>
+    <SEO title="My Family Tree" description="Your Kinsroot dashboard — view your families, contributions, meetings and recent activity at a glance." />
     <NewUserOnboarding
       open={showOnboarding}
       onComplete={() => setShowOnboarding(false)}
