@@ -22,6 +22,7 @@ import BulkPaymentMenu from "@/components/BulkPaymentMenu";
 import { contributionSchema, type ContributionInput } from "@/lib/validation";
 import { usePlatform } from "@/hooks/usePlatform";
 import { MobileContributions } from "@/components/mobile";
+import SEO from "@/components/SEO";
 
 interface Contribution {
   id: string;
@@ -361,7 +362,9 @@ export default function Contributions() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEO title="Contributions" description="Track member and house contributions, late fines and payment history." />
+      <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -636,5 +639,6 @@ export default function Contributions() {
         </Card>
       </main>
     </div>
+    </>
   );
 }

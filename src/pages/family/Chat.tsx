@@ -6,6 +6,7 @@ import { FamilyChat } from '@/components/chat';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIsMobile } from '@/hooks/use-mobile';
+import SEO from "@/components/SEO";
 
 export default function Chat() {
   const { familySlug } = useParams();
@@ -87,7 +88,9 @@ export default function Chat() {
   }
 
   return (
-    <div className="container max-w-4xl mx-auto py-6 px-4">
+    <>
+      <SEO title="Family Chat" description="Real-time conversations between family members on Kinsroot." />
+      <div className="container max-w-4xl mx-auto py-6 px-4">
       <div className="flex items-center gap-3 mb-6">
         <MessageCircle className="h-8 w-8 text-primary" />
         <div>
@@ -123,5 +126,6 @@ export default function Chat() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }

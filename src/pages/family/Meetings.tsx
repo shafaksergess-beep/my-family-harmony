@@ -16,6 +16,7 @@ import { meetingSchema, type MeetingInput } from "@/lib/validation";
 import { MeetingsCalendar } from "@/components/MeetingsCalendar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MobileMeetings } from "@/components/mobile";
+import SEO from "@/components/SEO";
 
 interface Meeting {
   id: string;
@@ -350,7 +351,9 @@ const FamilyMeetings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEO title="Family Meetings" description="Schedule, view and manage your family's meetings, agendas and minutes." />
+      <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -645,6 +648,7 @@ const FamilyMeetings = () => {
         )}
       </main>
     </div>
+    </>
   );
 };
 

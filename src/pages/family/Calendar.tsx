@@ -4,6 +4,7 @@ import { CalendarDays, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { FamilyCalendar } from '@/components/calendar';
 import { Card, CardContent } from '@/components/ui/card';
+import SEO from "@/components/SEO";
 
 export default function Calendar() {
   const { familySlug } = useParams();
@@ -96,7 +97,9 @@ export default function Calendar() {
   }
 
   return (
-    <div className="container max-w-6xl mx-auto py-6 px-4">
+    <>
+      <SEO title="Family Calendar" description="Birthdays, anniversaries, meetings and recurring events for your family." />
+      <div className="container max-w-6xl mx-auto py-6 px-4">
       <div className="flex items-center gap-3 mb-6">
         <CalendarDays className="h-8 w-8 text-primary" />
         <div>
@@ -114,5 +117,6 @@ export default function Calendar() {
         meetings={meetings}
       />
     </div>
+    </>
   );
 }

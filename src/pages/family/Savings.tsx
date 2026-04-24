@@ -16,6 +16,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useCurrency } from "@/context/CurrencyContext";
 import { CurrencySelector } from "@/components/CurrencySelector";
 import { Badge } from "@/components/ui/badge";
+import SEO from "@/components/SEO";
 
 interface Saving {
   id: string;
@@ -313,7 +314,9 @@ export default function FamilySavings() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <>
+      <SEO title="Family Savings" description="Record and review monthly savings with the family approval workflow." />
+      <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -497,5 +500,6 @@ export default function FamilySavings() {
         </Card>
       </div>
     </div>
+    </>
   );
 }
