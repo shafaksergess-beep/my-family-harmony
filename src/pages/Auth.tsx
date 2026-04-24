@@ -63,6 +63,8 @@ const Auth = () => {
     fullName?: string;
     phone?: string;
   }>({});
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
+  const [privacyError, setPrivacyError] = useState<string | null>(null);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -199,7 +201,13 @@ const Auth = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setSignupErrors({});
-    
+    setPrivacyError(null);
+
+    if (!acceptedPrivacy) {
+      setPrivacyError("Please accept the Privacy Policy and Terms to continue");
+      return;
+    }
+
     // Check confirm password match first
     if (signupPassword !== signupConfirmPassword) {
       setSignupErrors({ confirmPassword: "Passwords do not match" });
