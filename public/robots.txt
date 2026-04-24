@@ -1,3 +1,7 @@
 User-agent: *
 Allow: /
-Sitemap: https://family-together.app/sitemap.xml
+Disallow: /admin/
+Disallow: /api/
+Disallow: /accept-invitation
+Disallow: /reset-password
+Sitemap: https://kinsroot.softgroupsolutions.com/sitemap.xml
