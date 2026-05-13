@@ -14,6 +14,7 @@ import { MobileLayout } from "@/components/mobile/MobileLayout";
 import { haptics } from "@/lib/haptics";
 import { FamilyChatbot } from "@/components/chat/FamilyChatbot";
 import SEO from "@/components/SEO";
+import { FamilyHealthWidget } from "@/components/family/FamilyHealthWidget";
 
 interface ModuleCategory {
   id: string;
@@ -243,6 +244,9 @@ const FamilyDetail = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-6">
+        {family && canManageInvitations && (
+          <FamilyHealthWidget familyId={family.id} />
+        )}
         {family && <FinancialWidget familyId={family.id} />}
         
         <Tabs defaultValue={categories[0]?.slug || "meetings"} className="space-y-6">
