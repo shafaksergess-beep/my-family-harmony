@@ -11,14 +11,28 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const cronSecret = req.headers.get('authorization');
-    if (cronSecret !== `Bearer ${Deno.env.get('CRON_SECRET')}`) {
-      return new Response('Unauthorized', { status: 401 });
-    }
-
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const envSecret = Deno.env.get('CRON_SECRET') ?? '';
+    const authHeader = req.headers.get('authorization') ?? '';
+    const xHeader = req.headers.get('x-cron-secret') ?? '';
+    const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+    let authorized =
+      (envSecret && (authHeader === `Bearer ${envSecret}` || xHeader === envSecret));
+    if (!authorized) {
+      const candidate = xHeader || bearer;
+      if (candidate) {
+        try {
+          const { data } = await supabase.rpc('verify_cron_secret', { provided: candidate });
+          authorized = data === true;
+        } catch (e) { console.error('verify_cron_secret rpc failed', e); }
+      }
+    }
+    if (!authorized) {
+      return new Response('Unauthorized', { status: 401 });
+    }
 
     console.log('Starting loan payment reminder check...');
 

@@ -2751,6 +2751,7 @@ export type Database = {
         Args: { check_family_id: string; check_user_id: string }
         Returns: boolean
       }
+      verify_cron_secret: { Args: { provided: string }; Returns: boolean }
     }
     Enums: {
       user_role:

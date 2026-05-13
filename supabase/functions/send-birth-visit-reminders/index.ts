@@ -31,10 +31,17 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     // Verify CRON_SECRET for scheduled execution
-    const cronSecret = req.headers.get("cron-secret");
-    const expectedCronSecret = Deno.env.get("CRON_SECRET");
-    
-    if (cronSecret !== expectedCronSecret) {
+    const cronSecret = req.headers.get("cron-secret") || req.headers.get("x-cron-secret");
+    const envSecret = Deno.env.get("CRON_SECRET");
+    let authorized = !!cronSecret && cronSecret === envSecret;
+    if (!authorized && cronSecret) {
+      try {
+        const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+        const { data } = await sb.rpc('verify_cron_secret', { provided: cronSecret });
+        authorized = data === true;
+      } catch (e) { console.error('verify_cron_secret rpc failed', e); }
+    }
+    if (!authorized) {
       console.error("Unauthorized: Invalid or missing CRON_SECRET");
       return new Response(
         JSON.stringify({ error: "Unauthorized" }),

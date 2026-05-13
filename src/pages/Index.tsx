@@ -73,13 +73,15 @@ const Index = () => {
 
             <div className="mb-6 inline-flex items-center gap-3 bg-primary-foreground/10 backdrop-blur-sm px-6 py-3 rounded-full border border-primary-foreground/20">
               <Home className="w-5 h-5" />
-              <span className="text-sm font-medium">Family Harmony Hub</span>
+              <span className="text-sm font-medium">EN · FR · Bota Land · Works offline</span>
             </div>
 
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">Family Together</h1>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+              Run your family njangi, contributions and meetings — all in one place.
+            </h1>
 
             <p className="text-xl md:text-2xl mb-8 text-primary-foreground/90 max-w-2xl mx-auto">
-              Uniting heritage, managing prosperity, building our collective future
+              Kinsroot helps families schedule meetings, collect contributions, manage savings, loans and shares — even offline.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -315,9 +317,12 @@ const Index = () => {
       {/* Footer */}
       <footer className="bg-card border-t border-border py-12">
         <div className="container mx-auto px-4">
-          <div className="text-center text-muted-foreground">
-            <p className="mb-2">© 2025 Family Harmony</p>
-            <p className="text-sm">Powered by SoftSerge</p>
+          <div className="text-center text-muted-foreground space-y-1">
+            <p>Developed by Softserge.</p>
+            <p>Copyright 2026 All rights reserved.</p>
+            <p className="text-sm">
+              <a href="mailto:softserge.dev@gmail.com" className="hover:text-foreground transition-colors">softserge.dev@gmail.com</a>
+            </p>
           </div>
         </div>
       </footer>
