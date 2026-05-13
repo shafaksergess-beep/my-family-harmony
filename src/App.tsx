@@ -43,6 +43,7 @@ const CustomizeDashboard = lazy(() => import("./pages/admin/CustomizeDashboard")
 const ModuleManagement = lazy(() => import("./pages/admin/ModuleManagement"));
 const RoleManagement = lazy(() => import("./pages/admin/RoleManagement"));
 const AdminAnnouncements = lazy(() => import("./pages/admin/Announcements"));
+const SystemHealth = lazy(() => import("./pages/admin/SystemHealth"));
 const PendingApprovals = lazy(() => import("./pages/family/PendingApprovals"));
 
 // Lazy load family pages
