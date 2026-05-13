@@ -218,6 +218,54 @@ const Index = () => {
         </div>
       </section>
 
+      {/* How it works */}
+      <section className="py-20 bg-muted/20" aria-labelledby="how-it-works-heading">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 id="how-it-works-heading" className="text-4xl font-bold mb-4 text-foreground">How it works</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Get your family running on Kinsroot in three steps</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {[
+              { n: "1", title: "Create your family", body: "Set up your family space, invite members and assign roles in minutes." },
+              { n: "2", title: "Run your activities", body: "Schedule meetings, record contributions, manage loans and njangi cycles." },
+              { n: "3", title: "See the impact", body: "Track health, generate receipts and reports, and grow together year on year." },
+            ].map((s) => (
+              <Card key={s.n} className="p-8 text-center hover:shadow-lg transition-all border-primary/10">
+                <div className="mx-auto w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg mb-4">
+                  {s.n}
+                </div>
+                <h3 className="text-xl font-bold mb-2 text-foreground">{s.title}</h3>
+                <p className="text-muted-foreground">{s.body}</p>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-20" aria-labelledby="testimonials-heading">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 id="testimonials-heading" className="text-4xl font-bold mb-4 text-foreground">Loved by families</h2>
+            <p className="text-lg text-muted-foreground">Real stories from families using Kinsroot</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {[
+              { quote: "We used to argue over who paid what. Now everyone sees the same record — peace at last.", who: "Treasurer, Bota Land family" },
+              { quote: "Scheduling a year of meetings in one click changed our family rhythm completely.", who: "Family Head, Cameroon" },
+              { quote: "Our njangi cycle has never been smoother. Payouts and reminders just work.", who: "Member, diaspora chapter" },
+            ].map((t, i) => (
+              <Card key={i} className="p-6 border-secondary/20 hover:shadow-lg transition-all">
+                <div className="text-secondary text-3xl leading-none mb-2" aria-hidden="true">“</div>
+                <p className="text-foreground mb-4 leading-relaxed">{t.quote}</p>
+                <p className="text-sm text-muted-foreground font-medium">— {t.who}</p>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Cultural Heritage Section */}
       <section className="py-20 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5">
         <div className="container mx-auto px-4">
@@ -274,6 +322,7 @@ const Index = () => {
         </div>
       </footer>
       </main>
+      <InstallBanner />
     </div>
   );
 };
