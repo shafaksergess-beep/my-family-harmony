@@ -245,7 +245,18 @@ const FamilyDetail = () => {
 
       <main className="container mx-auto px-4 py-8 space-y-6">
         {family && canManageInvitations && (
-          <FamilyHealthWidget familyId={family.id} />
+          <>
+            <FamilyHealthWidget familyId={family.id} />
+            <div className="flex justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/family/${family.slug}/pending-approvals`)}
+              >
+                Pending approvals
+              </Button>
+            </div>
+          </>
         )}
         {family && <FinancialWidget familyId={family.id} />}
         
