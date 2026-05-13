@@ -652,6 +652,16 @@ const AdminDashboard = () => {
               <span>Announcements</span>
             </div>
           </Button>
+          <Button
+            variant="outline"
+            className="h-auto py-6"
+            onClick={() => navigate("/admin/system-health")}
+          >
+            <div className="flex flex-col items-center gap-2">
+              <HeartPulse className="w-8 h-8 text-green-500" />
+              <span>System Health</span>
+            </div>
+          </Button>
         </div>
       </main>
     </div>
