@@ -15,6 +15,7 @@ import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { ShareInvitationSheet } from "@/components/invitations/ShareInvitationSheet";
 import { PendingJoinRequests } from "@/components/invitations/PendingJoinRequests";
 import { ContactsPicker } from "@/components/invitations/ContactsPicker";
+import { BulkInviteForm } from "@/components/invitations/BulkInviteForm";
 
 interface Invitation {
   id: string;
@@ -276,10 +277,14 @@ const Invitations = () => {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="email" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 mb-4">
+                <TabsList className="grid w-full grid-cols-4 mb-4">
                   <TabsTrigger value="email" className="gap-1">
                     <Mail className="w-3 h-3" />
                     Email
+                  </TabsTrigger>
+                  <TabsTrigger value="bulk" className="gap-1">
+                    <Users className="w-3 h-3" />
+                    Bulk
                   </TabsTrigger>
                   <TabsTrigger value="contacts" className="gap-1">
                     <Users className="w-3 h-3" />
@@ -350,6 +355,17 @@ const Invitations = () => {
                     {sending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Mail className="w-4 h-4 mr-2" />}
                     Send Email Invitation
                   </Button>
+                </TabsContent>
+
+                <TabsContent value="bulk" className="space-y-4">
+                  {family && (
+                    <BulkInviteForm
+                      familyId={family.id}
+                      defaultRole={formData.role}
+                      expirationDays={parseInt(formData.expirationDays)}
+                      onSent={loadInvitations}
+                    />
+                  )}
                 </TabsContent>
 
                 <TabsContent value="contacts" className="space-y-4">
