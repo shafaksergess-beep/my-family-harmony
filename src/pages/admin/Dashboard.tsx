@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, Users, Building2, Activity, TrendingUp, Shield, FileText, BarChart3, PieChart, Mail, Download, Globe, Layout, Trophy } from "lucide-react";
+import { Loader2, ArrowLeft, Users, Building2, Activity, TrendingUp, Shield, FileText, BarChart3, PieChart, Mail, Download, Globe, Layout, Trophy, Megaphone, UserCheck } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Badge } from "@/components/ui/badge";
 import ActivityWidget from "@/components/ActivityWidget";
@@ -20,6 +20,7 @@ interface DashboardStats {
   totalAdmins: number;
   recentActivity: number;
   todayActivity: number;
+  dau7d: number;
 }
 
 interface ActivityData {
@@ -55,6 +56,7 @@ const AdminDashboard = () => {
     totalAdmins: 0,
     recentActivity: 0,
     todayActivity: 0,
+    dau7d: 0,
   });
   const [recentLogs, setRecentLogs] = useState<RecentLog[]>([]);
   const [activityData, setActivityData] = useState<ActivityData[]>([]);
@@ -200,6 +202,18 @@ const AdminDashboard = () => {
         setRecentLogs(logsWithProfiles);
       }
 
+      // DAU last 7 days from activity_logs
+      let dau7d = 0;
+      try {
+        const { data: au } = await supabase
+          .from("activity_logs")
+          .select("user_id")
+          .gte("created_at", sevenDaysAgo.toISOString());
+        dau7d = new Set((au || []).map((r: { user_id: string }) => r.user_id).filter(Boolean)).size;
+      } catch (e) {
+        console.warn("DAU lookup failed", e);
+      }
+
       setStats({
         totalFamilies,
         activeFamilies,
@@ -207,6 +221,7 @@ const AdminDashboard = () => {
         totalAdmins,
         recentActivity: recentActivityCount,
         todayActivity: todayActivityCount,
+        dau7d,
       });
     } catch (error: any) {
       console.error("Error loading stats:", error);
@@ -349,6 +364,19 @@ const AdminDashboard = () => {
               </div>
               <p className="text-xs text-muted-foreground">
                 Average family size
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Users (7d)</CardTitle>
+              <UserCheck className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.dau7d}</div>
+              <p className="text-xs text-muted-foreground">
+                Distinct users with activity
               </p>
             </CardContent>
           </Card>
@@ -612,6 +640,16 @@ const AdminDashboard = () => {
             <div className="flex flex-col items-center gap-2">
               <Download className="w-8 h-8" />
               <span>Export Scheduler</span>
+            </div>
+          </Button>
+          <Button
+            variant="outline"
+            className="h-auto py-6"
+            onClick={() => navigate("/admin/announcements")}
+          >
+            <div className="flex flex-col items-center gap-2">
+              <Megaphone className="w-8 h-8" />
+              <span>Announcements</span>
             </div>
           </Button>
         </div>
