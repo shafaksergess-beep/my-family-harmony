@@ -25,7 +25,8 @@ const handler = async (req: Request): Promise<Response> => {
   if (!authorized && cronSecret) {
     try {
       const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-      const { data } = await sb.rpc('verify_cron_secret', { provided: cronSecret });
+      const { data, error } = await sb.rpc('verify_cron_secret', { provided: cronSecret });
+      console.log('verify_cron_secret result', { data, error: error?.message });
       authorized = data === true;
     } catch (e) { console.error('verify_cron_secret rpc failed', e); }
   }
