@@ -1,16 +1,26 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Users, Calendar, DollarSign, TrendingUp, Heart, Shield, Home, PiggyBank, FileText, Award } from "lucide-react";
 import SplashScreen from "@/components/SplashScreen";
 import SEO from "@/components/SEO";
+import InstallBanner from "@/components/InstallBanner";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
   const [showSplash, setShowSplash] = useState(true);
+  const [lang, setLang] = useState(i18n.language || "en");
   const [stats, setStats] = useState({ activeMembers: 0, avgContribution: 0, avgInterestRate: 0, meetingsPerYear: 0 });
+
+  const switchLang = (code: string) => {
+    setLang(code);
+    i18n.changeLanguage(code);
+    try { localStorage.setItem("kinsroot-lang", code); } catch { /* ignore */ }
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -95,12 +105,25 @@ const Index = () => {
             </div>
 
             {/* Language Selector */}
-            <div className="flex items-center justify-center gap-4 text-sm">
-              <button className="px-4 py-2 rounded-lg bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-all border border-primary-foreground/20">
-                English
-              </button>
-              <button className="px-4 py-2 rounded-lg hover:bg-primary-foreground/10 transition-all">Français</button>
-              <button className="px-4 py-2 rounded-lg hover:bg-primary-foreground/10 transition-all">Bota</button>
+            <div className="flex items-center justify-center gap-2 text-sm" role="group" aria-label="Language">
+              {[
+                { code: "en", label: "English" },
+                { code: "fr", label: "Français" },
+                { code: "bota", label: "Bota" },
+              ].map((l) => (
+                <button
+                  key={l.code}
+                  onClick={() => switchLang(l.code)}
+                  className={`px-4 py-2 rounded-lg transition-all border ${
+                    lang === l.code
+                      ? "bg-primary-foreground/15 border-primary-foreground/30"
+                      : "border-transparent hover:bg-primary-foreground/10"
+                  }`}
+                  aria-pressed={lang === l.code}
+                >
+                  {l.label}
+                </button>
+              ))}
             </div>
           </div>
         </div>
