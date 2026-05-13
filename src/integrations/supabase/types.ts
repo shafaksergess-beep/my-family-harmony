@@ -2697,6 +2697,7 @@ export type Database = {
         Returns: Database["public"]["Enums"]["user_role"][]
       }
       get_platform_stats: { Args: never; Returns: Json }
+      get_system_health: { Args: never; Returns: Json }
       get_user_email: { Args: { check_user_id: string }; Returns: string }
       get_user_families: {
         Args: { check_user_id: string }
