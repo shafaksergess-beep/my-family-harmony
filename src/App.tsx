@@ -10,6 +10,7 @@ import { ModuleErrorBoundary } from "@/components/ModuleErrorBoundary";
 import { MedianProvider } from "@/contexts/MedianContext";
 import { CurrencyProvider } from "@/context/CurrencyContext";
 import { PageLoadingSkeleton } from "@/components/PageLoadingSkeleton";
+import { RoutePageViewTracker } from "@/components/RoutePageViewTracker";
 // Lazy load core pages
 const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
@@ -120,6 +121,7 @@ const App = () => (
             <Toaster />
             <Sonner />
         <BrowserRouter>
+          <RoutePageViewTracker />
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
             <Route path="/" element={<Index />} />
