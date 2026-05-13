@@ -364,23 +364,29 @@ export default function Contributions() {
     try {
       const { data: rows } = await supabase
         .from("family_members")
-        .select("user_id")
+        .select("user_id, profiles:user_id(email, full_name)")
         .in("id", unpaidMemberIds);
-      const userIds = (rows || []).map((r: { user_id: string }) => r.user_id).filter(Boolean);
+      const emails = (rows || [])
+        .map((r: { profiles: { email: string | null } | null }) => r.profiles?.email)
+        .filter((e): e is string => !!e);
+      if (emails.length === 0) {
+        toast({ title: "No member emails on file." });
+        return;
+      }
       const { error } = await supabase.functions.invoke("send-notification", {
         body: {
-          user_ids: userIds,
-          family_id: family.id,
-          title: `Contribution reminder — ${family.name}`,
-          body: "You have an unpaid contribution. Please settle it as soon as possible.",
-          type: "contribution_reminder",
-          link: `/family/${familySlug}/contributions`,
+          to: emails,
+          subject: `Contribution reminder — ${family.name}`,
+          message: "You have an unpaid contribution. Please settle it as soon as possible.",
+          familyName: family.name,
+          eventType: "contribution_reminder",
+          actionUrl: `${window.location.origin}/family/${familySlug}/contributions`,
         },
       });
       if (error) throw error;
       toast({
         title: "Reminders sent",
-        description: `Notified ${userIds.length} member(s).`,
+        description: `Notified ${emails.length} member(s).`,
       });
     } catch (e) {
       const err = e as Error;
