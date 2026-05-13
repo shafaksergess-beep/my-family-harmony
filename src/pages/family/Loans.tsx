@@ -21,6 +21,7 @@ import { format } from "date-fns";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileLoans } from "@/components/mobile";
 import SEO from "@/components/SEO";
+import { EmptyState } from "@/components/EmptyState";
 
 interface Loan {
   id: string;
@@ -517,6 +518,22 @@ export default function Loans() {
       <Card>
         <div className="p-6 space-y-6">
           <h2 className="text-xl font-semibold">Loan Records</h2>
+          {loans.length === 0 ? (
+            <EmptyState
+              icon={DollarSign}
+              title="No loans on record"
+              description="Members can request loans up to the family limit. Approved loans accrue interest monthly and must be cleared by November."
+              primary={{
+                label: "Request a loan",
+                onClick: () => setIsDialogOpen(true),
+                icon: <Plus className="w-4 h-4 mr-2" />,
+              }}
+              secondary={{
+                label: "Read loan rules",
+                onClick: () => navigate(`/family/${familySlug}/loan-history`),
+              }}
+            />
+          ) : (
           <div className="space-y-4">
             {loans.map((loan) => {
               const { totalOwed, totalPaid, remaining } = calculateTotalOwed(loan);
@@ -616,6 +633,7 @@ export default function Loans() {
               );
             })}
           </div>
+          )}
         </div>
       </Card>
     </div>
