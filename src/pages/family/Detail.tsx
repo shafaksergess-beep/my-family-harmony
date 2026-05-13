@@ -47,8 +47,32 @@ const FamilyDetail = () => {
   const [categories, setCategories] = useState<ModuleCategory[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [loadingModules, setLoadingModules] = useState(true);
+  const [pendingApprovalsCount, setPendingApprovalsCount] = useState(0);
   
   const canManageInvitations = isFamilyHead || isFamilyAdmin;
+
+  useEffect(() => {
+    if (!family || !canManageInvitations) return;
+    let cancelled = false;
+    (async () => {
+      const [{ count: jr }, { count: sav }] = await Promise.all([
+        supabase
+          .from("join_requests")
+          .select("id", { count: "exact", head: true })
+          .eq("family_id", family.id)
+          .eq("status", "pending"),
+        supabase
+          .from("savings")
+          .select("id", { count: "exact", head: true })
+          .eq("family_id", family.id)
+          .eq("status", "pending"),
+      ]);
+      if (!cancelled) setPendingApprovalsCount((jr || 0) + (sav || 0));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [family, canManageInvitations]);
 
   useEffect(() => {
     const requestNotificationPermission = async () => {
@@ -249,11 +273,16 @@ const FamilyDetail = () => {
             <FamilyHealthWidget familyId={family.id} />
             <div className="flex justify-end">
               <Button
-                variant="outline"
+                variant={pendingApprovalsCount > 0 ? "default" : "outline"}
                 size="sm"
                 onClick={() => navigate(`/family/${family.slug}/pending-approvals`)}
               >
                 Pending approvals
+                {pendingApprovalsCount > 0 && (
+                  <span className="ml-2 inline-flex items-center justify-center rounded-full bg-background/20 px-2 py-0.5 text-xs font-semibold">
+                    {pendingApprovalsCount}
+                  </span>
+                )}
               </Button>
             </div>
           </>
