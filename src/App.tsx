@@ -11,6 +11,7 @@ import { MedianProvider } from "@/contexts/MedianContext";
 import { CurrencyProvider } from "@/context/CurrencyContext";
 import { PageLoadingSkeleton } from "@/components/PageLoadingSkeleton";
 import { RoutePageViewTracker } from "@/components/RoutePageViewTracker";
+import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 // Lazy load core pages
 const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
@@ -41,6 +42,8 @@ const DigestSettings = lazy(() => import("./pages/admin/DigestSettings"));
 const CustomizeDashboard = lazy(() => import("./pages/admin/CustomizeDashboard"));
 const ModuleManagement = lazy(() => import("./pages/admin/ModuleManagement"));
 const RoleManagement = lazy(() => import("./pages/admin/RoleManagement"));
+const AdminAnnouncements = lazy(() => import("./pages/admin/Announcements"));
+const PendingApprovals = lazy(() => import("./pages/family/PendingApprovals"));
 
 // Lazy load family pages
 const FamilyDetail = lazy(() => import("./pages/family/Detail"));
@@ -122,6 +125,7 @@ const App = () => (
             <Sonner />
         <BrowserRouter>
           <RoutePageViewTracker />
+          <AnnouncementBanner />
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
             <Route path="/" element={<Index />} />
@@ -148,6 +152,7 @@ const App = () => (
         <Route path="/admin/modules" element={<AdminModule><ModuleManagement /></AdminModule>} />
         <Route path="/admin/role-permissions" element={<AdminModule><RolePermissions /></AdminModule>} />
         <Route path="/admin/user-activity" element={<AdminModule><UserActivity /></AdminModule>} />
+        <Route path="/admin/announcements" element={<AdminModule><AdminAnnouncements /></AdminModule>} />
           
           {/* Family Role Management */}
           <Route path="/family/:familySlug/role-management" element={<FamilyModule><RoleManagement /></FamilyModule>} />
@@ -201,6 +206,7 @@ const App = () => (
           <Route path="/family/:familySlug/more" element={<FamilyModule><FamilyMore /></FamilyModule>} />
           <Route path="/family/:familySlug/chat" element={<FamilyModule><FamilyChat /></FamilyModule>} />
           <Route path="/family/:familySlug/calendar" element={<FamilyModule><FamilyCalendar /></FamilyModule>} />
+          <Route path="/family/:familySlug/pending-approvals" element={<FamilyModule><PendingApprovals /></FamilyModule>} />
           <Route path="/accept-invitation" element={<AcceptInvitation />} />
           <Route path="/join" element={<JoinFamily />} />
           <Route path="/join/:familySlug" element={<JoinFamily />} />
