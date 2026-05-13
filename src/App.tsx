@@ -154,6 +154,7 @@ const App = () => (
         <Route path="/admin/role-permissions" element={<AdminModule><RolePermissions /></AdminModule>} />
         <Route path="/admin/user-activity" element={<AdminModule><UserActivity /></AdminModule>} />
         <Route path="/admin/announcements" element={<AdminModule><AdminAnnouncements /></AdminModule>} />
+        <Route path="/admin/system-health" element={<AdminModule><SystemHealth /></AdminModule>} />
           
           {/* Family Role Management */}
           <Route path="/family/:familySlug/role-management" element={<FamilyModule><RoleManagement /></FamilyModule>} />
