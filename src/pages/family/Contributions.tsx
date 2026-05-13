@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
-import { ArrowLeft, Plus, DollarSign, TrendingUp, Download, Loader2, FileText } from "lucide-react";
+import { ArrowLeft, Plus, DollarSign, TrendingUp, Download, Loader2, FileText, Bell } from "lucide-react";
 import { useCurrency } from "@/context/CurrencyContext";
 import { CurrencySelector } from "@/components/CurrencySelector";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -345,6 +345,51 @@ export default function Contributions() {
     exportToCSV(csvData, "contributions.csv");
   };
 
+  const [reminding, setReminding] = useState(false);
+  const handleRemindEveryone = async () => {
+    if (!family) return;
+    const unpaidMemberIds = Array.from(
+      new Set(
+        contributions
+          .filter((c) => c.status !== "paid")
+          .map((c) => c.member_id),
+      ),
+    );
+    if (unpaidMemberIds.length === 0) {
+      toast({ title: "No unpaid contributions to remind." });
+      return;
+    }
+    if (!confirm(`Send a reminder to ${unpaidMemberIds.length} member(s)?`)) return;
+    setReminding(true);
+    try {
+      const { data: rows } = await supabase
+        .from("family_members")
+        .select("user_id")
+        .in("id", unpaidMemberIds);
+      const userIds = (rows || []).map((r: { user_id: string }) => r.user_id).filter(Boolean);
+      const { error } = await supabase.functions.invoke("send-notification", {
+        body: {
+          user_ids: userIds,
+          family_id: family.id,
+          title: `Contribution reminder — ${family.name}`,
+          body: "You have an unpaid contribution. Please settle it as soon as possible.",
+          type: "contribution_reminder",
+          link: `/family/${familySlug}/contributions`,
+        },
+      });
+      if (error) throw error;
+      toast({
+        title: "Reminders sent",
+        description: `Notified ${userIds.length} member(s).`,
+      });
+    } catch (e) {
+      const err = e as Error;
+      toast({ title: "Failed to send reminders", description: err.message, variant: "destructive" });
+    } finally {
+      setReminding(false);
+    }
+  };
+
   const totalContributions = contributions.reduce((sum, c) => sum + c.amount, 0);
   const paidContributions = contributions.filter((c) => c.status === "paid").reduce((sum, c) => sum + c.amount, 0);
   const pendingContributions = totalContributions - paidContributions;
@@ -397,6 +442,16 @@ export default function Contributions() {
                 <Download className="w-4 h-4 mr-2" />
                 Export CSV
               </Button>
+              {canManageFinances && (
+                <Button variant="outline" onClick={handleRemindEveryone} disabled={reminding}>
+                  {reminding ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Bell className="w-4 h-4 mr-2" />
+                  )}
+                  Remind everyone
+                </Button>
+              )}
               {canManageFinances && (
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
