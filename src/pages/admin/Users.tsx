@@ -463,7 +463,29 @@ export default function Users() {
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div className="space-y-2">
-                    <Label>CSV Format (paste data below)</Label>
+                    <div className="flex items-center justify-between">
+                      <Label>CSV Format (paste data below)</Label>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          const sample =
+                            "email,password,full_name,phone,family_name,role\n" +
+                            "user1@example.com,password123,John Doe,+1234567890,Smith Family,member\n" +
+                            "user2@example.com,password456,Jane Smith,,Jones Family,treasurer\n";
+                          const blob = new Blob([sample], { type: "text/csv;charset=utf-8;" });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement("a");
+                          a.href = url;
+                          a.download = "users-import-template.csv";
+                          a.click();
+                          URL.revokeObjectURL(url);
+                        }}
+                      >
+                        <Download className="w-3 h-3 mr-1" /> Download template
+                      </Button>
+                    </div>
                     <div className="text-xs text-muted-foreground bg-muted p-2 rounded font-mono">
                       email,password,full_name,phone,family_name,role
                       <br />
