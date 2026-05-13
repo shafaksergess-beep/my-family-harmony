@@ -17,6 +17,7 @@ import { MeetingsCalendar } from "@/components/MeetingsCalendar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MobileMeetings } from "@/components/mobile";
 import SEO from "@/components/SEO";
+import { EmptyState } from "@/components/EmptyState";
 
 interface Meeting {
   id: string;
@@ -584,17 +585,21 @@ const FamilyMeetings = () => {
 
       <main className="container mx-auto px-4 py-8">
         {meetings.length === 0 ? (
-          <Card className="p-12 text-center">
-            <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-xl font-semibold mb-2 text-foreground">No meetings scheduled</h3>
-            <p className="text-muted-foreground mb-6">Create your first meeting to get started</p>
-            {canScheduleMeetings && (
-              <Button onClick={() => setIsDialogOpen(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Create Meeting
-              </Button>
-            )}
-          </Card>
+          <EmptyState
+            icon={Calendar}
+            title="No meetings scheduled"
+            description="Bring your family together. Schedule monthly gatherings, send automatic reminders and track attendance with QR check-in."
+            primary={canScheduleMeetings ? {
+              label: "Schedule first meeting",
+              onClick: () => setIsDialogOpen(true),
+              icon: <Plus className="w-4 h-4 mr-2" />,
+            } : undefined}
+            secondary={canScheduleMeetings ? {
+              label: "Schedule a full year",
+              onClick: () => setIsBulkDialogOpen(true),
+              icon: <CalendarRange className="w-4 h-4 mr-2" />,
+            } : undefined}
+          />
         ) : (
           <Tabs defaultValue="upcoming" className="space-y-6">
             <TabsList>

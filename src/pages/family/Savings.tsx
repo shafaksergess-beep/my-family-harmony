@@ -17,6 +17,7 @@ import { useCurrency } from "@/context/CurrencyContext";
 import { CurrencySelector } from "@/components/CurrencySelector";
 import { Badge } from "@/components/ui/badge";
 import SEO from "@/components/SEO";
+import { EmptyState } from "@/components/EmptyState";
 
 interface Saving {
   id: string;
@@ -438,6 +439,22 @@ export default function FamilySavings() {
           </DialogContent>
         </Dialog>
 
+        {savings.length === 0 ? (
+          <EmptyState
+            icon={DollarSign}
+            title="No savings recorded yet"
+            description="Members can record monthly savings — leadership reviews and approves each entry. Encourage your first deposit today."
+            primary={{
+              label: canManageFinances ? "Add first savings entry" : "Record my savings",
+              onClick: () => {
+                setEditingSaving(null);
+                setFormData({ member_id: canManageFinances ? "" : memberId, month: new Date().toISOString().slice(0, 7), amount: family?.min_savings_amount?.toString() || "5000", notes: "" });
+                setIsDialogOpen(true);
+              },
+              icon: <Plus className="w-4 h-4 mr-2" />,
+            }}
+          />
+        ) : (
         <Card>
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -498,6 +515,7 @@ export default function FamilySavings() {
             </table>
           </div>
         </Card>
+        )}
       </div>
     </div>
     </>

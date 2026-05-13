@@ -17,6 +17,8 @@ import { useCurrency } from "@/context/CurrencyContext";
 import { CurrencySelector } from "@/components/CurrencySelector";
 import { LoanDeductionDialog } from "@/components/LoanDeductionDialog";
 import SEO from "@/components/SEO";
+import { EmptyState } from "@/components/EmptyState";
+import { Repeat } from "lucide-react";
 
 interface NjangiCycle {
   id: string;

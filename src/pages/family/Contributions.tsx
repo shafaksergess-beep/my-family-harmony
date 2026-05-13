@@ -23,6 +23,7 @@ import { contributionSchema, type ContributionInput } from "@/lib/validation";
 import { usePlatform } from "@/hooks/usePlatform";
 import { MobileContributions } from "@/components/mobile";
 import SEO from "@/components/SEO";
+import { EmptyState } from "@/components/EmptyState";
 
 interface Contribution {
   id: string;
@@ -589,6 +590,22 @@ export default function Contributions() {
             <CardTitle>Contribution History</CardTitle>
           </CardHeader>
           <CardContent>
+            {contributions.length === 0 ? (
+              <EmptyState
+                icon={DollarSign}
+                title="No contributions recorded yet"
+                description="Start tracking your family's monthly contributions. Record the first one to see totals, generate receipts and watch trends grow."
+                primary={canManageFinances ? {
+                  label: "Record first contribution",
+                  onClick: () => setIsDialogOpen(true),
+                  icon: <Plus className="w-4 h-4 mr-2" />,
+                } : undefined}
+                secondary={{
+                  label: "Set monthly amount",
+                  onClick: () => navigate(`/family/${familySlug}/contribution-settings`),
+                }}
+              />
+            ) : (
             <div className="space-y-4">
               {contributions.map((contribution) => (
                 <div key={contribution.id} className="flex items-center justify-between p-4 border rounded-lg">
@@ -635,6 +652,7 @@ export default function Contributions() {
                 </div>
               ))}
             </div>
+            )}
           </CardContent>
         </Card>
       </main>
