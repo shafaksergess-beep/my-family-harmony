@@ -43,6 +43,7 @@ const CustomizeDashboard = lazy(() => import("./pages/admin/CustomizeDashboard")
 const ModuleManagement = lazy(() => import("./pages/admin/ModuleManagement"));
 const RoleManagement = lazy(() => import("./pages/admin/RoleManagement"));
 const AdminAnnouncements = lazy(() => import("./pages/admin/Announcements"));
+const SystemHealth = lazy(() => import("./pages/admin/SystemHealth"));
 const PendingApprovals = lazy(() => import("./pages/family/PendingApprovals"));
 
 // Lazy load family pages
@@ -153,6 +154,7 @@ const App = () => (
         <Route path="/admin/role-permissions" element={<AdminModule><RolePermissions /></AdminModule>} />
         <Route path="/admin/user-activity" element={<AdminModule><UserActivity /></AdminModule>} />
         <Route path="/admin/announcements" element={<AdminModule><AdminAnnouncements /></AdminModule>} />
+        <Route path="/admin/system-health" element={<AdminModule><SystemHealth /></AdminModule>} />
           
           {/* Family Role Management */}
           <Route path="/family/:familySlug/role-management" element={<FamilyModule><RoleManagement /></FamilyModule>} />
