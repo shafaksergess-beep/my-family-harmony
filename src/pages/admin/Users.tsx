@@ -10,7 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Plus, Search, UserPlus, Edit, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Search, UserPlus, Edit, Trash2, Download } from "lucide-react";
+import { exportToCSV } from "@/lib/export";
 import { useTranslation } from "react-i18next";
 
 interface UserProfile {
@@ -410,6 +411,19 @@ export default function Users() {
     user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleExportCSV = () => {
+    const rows = filteredUsers.map((u) => ({
+      Name: u.full_name,
+      Email: u.email,
+      Phone: u.phone || "",
+      Working: u.is_working ? "yes" : "no",
+      "Super admin": u.is_super_admin ? "yes" : "no",
+      Families: u.families.map((f) => `${f.family.name} (${f.role})`).join(" | "),
+      "Joined at": new Date(u.created_at).toISOString().split("T")[0],
+    }));
+    exportToCSV(rows, `users-${new Date().toISOString().split("T")[0]}`);
+  };
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -433,6 +447,9 @@ export default function Users() {
           </div>
 
           <div className="flex gap-2">
+            <Button variant="outline" onClick={handleExportCSV} disabled={!filteredUsers.length}>
+              <Download className="mr-2 h-4 w-4" /> Export CSV
+            </Button>
             <Dialog open={isBulkImportOpen} onOpenChange={setIsBulkImportOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline">
