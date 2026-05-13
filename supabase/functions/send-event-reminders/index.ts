@@ -29,17 +29,24 @@ serve(async (req) => {
   try {
     // Verify cron secret
     const cronSecret = req.headers.get('x-cron-secret');
-    if (cronSecret !== Deno.env.get('CRON_SECRET')) {
+    const envSecret = Deno.env.get('CRON_SECRET');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    let authorized = !!cronSecret && cronSecret === envSecret;
+    if (!authorized && cronSecret) {
+      try {
+        const { data } = await supabase.rpc('verify_cron_secret', { provided: cronSecret });
+        authorized = data === true;
+      } catch (e) { console.error('verify_cron_secret rpc failed', e); }
+    }
+    if (!authorized) {
       console.error('Invalid cron secret');
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     console.log('Checking for upcoming family events...');
 

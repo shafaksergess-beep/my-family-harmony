@@ -11,14 +11,21 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Verify cron secret for security
+  // Verify cron secret (env var or DB-stored value)
   const cronSecret = req.headers.get('x-cron-secret');
-  const expectedSecret = Deno.env.get('CRON_SECRET');
-  
-  if (!cronSecret || cronSecret !== expectedSecret) {
+  const envSecret = Deno.env.get('CRON_SECRET');
+  let authorized = !!cronSecret && cronSecret === envSecret;
+  if (!authorized && cronSecret) {
+    try {
+      const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+      const { data } = await sb.rpc('verify_cron_secret', { provided: cronSecret });
+      authorized = data === true;
+    } catch (e) { console.error('verify_cron_secret rpc failed', e); }
+  }
+  if (!authorized) {
     console.error('Unauthorized: Invalid or missing cron secret');
     return new Response(
-      JSON.stringify({ error: 'Unauthorized' }), 
+      JSON.stringify({ error: 'Unauthorized' }),
       { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
