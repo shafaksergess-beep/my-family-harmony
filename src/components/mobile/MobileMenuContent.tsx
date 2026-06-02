@@ -92,12 +92,12 @@ export function MobileMenuContent({
   const handleLogout = async () => {
     await haptics.medium();
     try {
-      await supabase.auth.signOut();
-      toast({ title: 'Signed out successfully' });
-      navigate('/auth');
+      await supabase.auth.signOut({ scope: 'local' });
     } catch (error) {
-      toast({ title: 'Error signing out', variant: 'destructive' });
+      console.warn('signOut error (ignored):', error);
     }
+    toast({ title: 'Signed out' });
+    navigate('/auth', { replace: true });
   };
 
   return (
