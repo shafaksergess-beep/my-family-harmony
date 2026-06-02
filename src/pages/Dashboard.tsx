@@ -164,6 +164,7 @@ const Dashboard = () => {
                 <UserIcon className="w-4 h-4 mr-2" />
                 Profile
               </Button>
+              <NotificationInbox familySlug={userFamilies[0]?.family_slug} />
               <LanguageSwitcher />
               <CurrencySelector />
               <Button variant="ghost" onClick={handleLogout}>
