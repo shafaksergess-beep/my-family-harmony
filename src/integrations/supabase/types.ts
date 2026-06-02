@@ -1935,11 +1935,14 @@ export type Database = {
       }
       notification_preferences: {
         Row: {
+          announcements: boolean
           assistance_notifications: boolean
+          attendance_deadlines: boolean
           created_at: string | null
           digest_frequency: string
           email_enabled: boolean
           family_id: string | null
+          fines: boolean
           id: string
           loan_updates: boolean
           meeting_reminders: boolean
@@ -1950,11 +1953,14 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          announcements?: boolean
           assistance_notifications?: boolean
+          attendance_deadlines?: boolean
           created_at?: string | null
           digest_frequency?: string
           email_enabled?: boolean
           family_id?: string | null
+          fines?: boolean
           id?: string
           loan_updates?: boolean
           meeting_reminders?: boolean
@@ -1965,11 +1971,14 @@ export type Database = {
           user_id: string
         }
         Update: {
+          announcements?: boolean
           assistance_notifications?: boolean
+          attendance_deadlines?: boolean
           created_at?: string | null
           digest_frequency?: string
           email_enabled?: boolean
           family_id?: string | null
+          fines?: boolean
           id?: string
           loan_updates?: boolean
           meeting_reminders?: boolean
@@ -2247,6 +2256,36 @@ export type Database = {
           preferred_language?: string | null
           push_token?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      push_notification_log: {
+        Row: {
+          family_id: string | null
+          fcm_status: number | null
+          id: string
+          notification_type: string
+          reference_id: string | null
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          family_id?: string | null
+          fcm_status?: number | null
+          id?: string
+          notification_type: string
+          reference_id?: string | null
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          family_id?: string | null
+          fcm_status?: number | null
+          id?: string
+          notification_type?: string
+          reference_id?: string | null
+          sent_at?: string
+          user_id?: string
         }
         Relationships: []
       }
