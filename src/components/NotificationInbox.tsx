@@ -78,12 +78,13 @@ export function NotificationInbox({ familySlug }: { familySlug?: string }) {
   const refresh = async (uid: string) => {
     const { data } = await supabase
       .from("in_app_notifications")
-      .select("id, title, body, notification_type, link, read_at, created_at")
+      .select("id, title, body, notification_type, link, read_at, created_at, notification_deliveries(channel, status)")
       .eq("user_id", uid)
       .order("created_at", { ascending: false })
       .limit(30);
-    setItems(data ?? []);
+    setItems((data ?? []) as InboxItem[]);
   };
+
 
   const markRead = async (id: string) => {
     await supabase
