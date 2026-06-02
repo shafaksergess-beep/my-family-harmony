@@ -12,6 +12,11 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDistanceToNow } from "date-fns";
 
+interface DeliveryRow {
+  channel: string;
+  status: string;
+}
+
 interface InboxItem {
   id: string;
   title: string;
@@ -20,7 +25,9 @@ interface InboxItem {
   link: string | null;
   read_at: string | null;
   created_at: string;
+  notification_deliveries?: DeliveryRow[];
 }
+
 
 /**
  * In-app notification bell. Subscribes to in_app_notifications via realtime,
