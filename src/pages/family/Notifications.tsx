@@ -311,6 +311,8 @@ const Notifications = () => {
                           <p className="text-xs text-muted-foreground">
                             {new Date(notification.created_at).toLocaleString()}
                           </p>
+                          <DeliveryRow deliveries={notification.deliveries} />
+
                         </div>
                       </div>
                       <div className="flex gap-2">
