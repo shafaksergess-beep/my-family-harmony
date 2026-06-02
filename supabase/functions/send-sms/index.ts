@@ -19,6 +19,10 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const { requireAuth } = await import("../_shared/auth.ts");
+  const auth = await requireAuth(req, corsHeaders);
+  if (auth instanceof Response) return auth;
+
   try {
     const { to, message }: SMSRequest = await req.json();
 

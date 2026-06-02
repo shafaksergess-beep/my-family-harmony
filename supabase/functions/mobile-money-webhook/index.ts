@@ -69,7 +69,11 @@ const handler = async (req: Request): Promise<Response> => {
         });
       }
     } else {
-      console.warn("MOBILE_MONEY_SECRET not set, signature verification skipped in dev mode");
+      console.error("MOBILE_MONEY_SECRET not configured - refusing request");
+      return new Response(JSON.stringify({ error: "Webhook not configured" }), {
+        status: 503,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
     }
 
     const payload: MobileMoneyPayload = JSON.parse(bodyText);
