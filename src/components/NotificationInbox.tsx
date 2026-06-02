@@ -11,6 +11,31 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDistanceToNow } from "date-fns";
+import { cn } from "@/lib/utils";
+
+function DeliveryBadge({ channel, status }: { channel: string; status: string }) {
+  if (channel === "inapp") return null;
+  const label = channel === "push" ? "Push" : channel === "sms" ? "SMS" : channel;
+  const tone =
+    status === "sent"
+      ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+      : status === "failed"
+      ? "bg-red-500/10 text-red-600 border-red-500/20"
+      : "bg-muted text-muted-foreground border-border";
+  const symbol = status === "sent" ? "✓" : status === "failed" ? "✕" : "–";
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-sm border text-[9px] font-medium",
+        tone
+      )}
+      title={`${label}: ${status}`}
+    >
+      {symbol} {label}
+    </span>
+  );
+}
+
 
 interface DeliveryRow {
   channel: string;
