@@ -67,6 +67,10 @@ const Index = () => {
               <img
                 src="/logo.jpg"
                 alt="Family Together Logo"
+                width="128"
+                height="128"
+                fetchPriority="high"
+                decoding="async"
                 className="w-32 h-32 mx-auto rounded-full object-cover shadow-2xl border-4 border-primary-foreground/20"
               />
             </div>
