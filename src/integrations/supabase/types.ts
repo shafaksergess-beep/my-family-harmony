@@ -512,6 +512,51 @@ export type Database = {
           },
         ]
       }
+      disciplinary_records: {
+        Row: {
+          created_at: string
+          description: string | null
+          family_id: string
+          id: string
+          issued_by: string | null
+          member_id: string
+          record_type: string
+          related_record_id: string | null
+          severity: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          family_id: string
+          id?: string
+          issued_by?: string | null
+          member_id: string
+          record_type: string
+          related_record_id?: string | null
+          severity?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          family_id?: string
+          id?: string
+          issued_by?: string | null
+          member_id?: string
+          record_type?: string
+          related_record_id?: string | null
+          severity?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       dividend_payments: {
         Row: {
           amount: number
@@ -1073,6 +1118,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      fines: {
+        Row: {
+          amount: number
+          created_at: string
+          due_date: string | null
+          family_id: string
+          id: string
+          issued_by: string | null
+          member_id: string
+          notes: string | null
+          reason: string
+          source_id: string | null
+          source_table: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          due_date?: string | null
+          family_id: string
+          id?: string
+          issued_by?: string | null
+          member_id: string
+          notes?: string | null
+          reason: string
+          source_id?: string | null
+          source_table?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          due_date?: string | null
+          family_id?: string
+          id?: string
+          issued_by?: string | null
+          member_id?: string
+          notes?: string | null
+          reason?: string
+          source_id?: string | null
+          source_table?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       in_app_notifications: {
         Row: {
@@ -1977,6 +2070,50 @@ export type Database = {
             columns: ["member_id"]
             isOneToOne: false
             referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_deliveries: {
+        Row: {
+          channel: string
+          created_at: string
+          error_message: string | null
+          id: string
+          notification_id: string
+          provider_status: string | null
+          recipient: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          notification_id: string
+          provider_status?: string | null
+          recipient?: string | null
+          status: string
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          notification_id?: string
+          provider_status?: string | null
+          recipient?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_deliveries_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "in_app_notifications"
             referencedColumns: ["id"]
           },
         ]
