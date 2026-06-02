@@ -12,6 +12,9 @@ import { CurrencyProvider } from "@/context/CurrencyContext";
 import { PageLoadingSkeleton } from "@/components/PageLoadingSkeleton";
 import { RoutePageViewTracker } from "@/components/RoutePageViewTracker";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
+import { OfflineIndicator } from "@/components/mobile/OfflineIndicator";
+import { OfflineBootstrap } from "@/components/OfflineBootstrap";
+import { PWAUpdatePrompt } from "@/components/PWAUpdatePrompt";
 // Lazy load core pages
 const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
@@ -125,6 +128,9 @@ const App = () => (
             <Toaster />
             <Sonner />
         <BrowserRouter>
+          <OfflineBootstrap />
+          <PWAUpdatePrompt />
+          <OfflineIndicator />
           <RoutePageViewTracker />
           <AnnouncementBanner />
           <Suspense fallback={<LoadingFallback />}>
