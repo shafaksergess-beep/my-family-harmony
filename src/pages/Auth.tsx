@@ -346,7 +346,7 @@ const Auth = () => {
               className="w-24 h-24 mx-auto rounded-full object-cover shadow-lg"
             />
           </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Family Together</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Family Together — Heritage-rooted family management</h1>
           <p className="text-muted-foreground">
             {pendingInvitation 
               ? "Sign in or create an account to accept your invitation"

@@ -1,0 +1,16 @@
+# Kinsroot
+
+> Kinsroot (Family Together) is an all-in-one family management platform for meetings, contributions, savings, njangi, loans, assistance and heritage — rooted in Bota Land tradition, built for tomorrow. Multi-language (English, French, Bota Land dialect), offline-first PWA.
+
+Kinsroot helps extended families coordinate their financial and social life: monthly contributions, rotating savings (njangi), loans with surety, member assistance for life events (birth, death, sickness, joyful), annual balloting, meeting attendance with QR check-in, and full audit trails — all scoped per family with strict privacy.
+
+## Pages
+
+- [Home](/): Product overview, value proposition and platform stats.
+- [Sign in or create an account](/auth): Authentication for members, leaders and admins.
+- [Install the app](/install): PWA installation guide for iOS, Android and desktop.
+- [Join a family](/join): Accept an invitation or request to join a family group.
+
+## Optional
+
+- [Reset password](/reset-password): Password recovery flow (auth-gated).

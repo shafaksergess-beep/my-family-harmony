@@ -144,8 +144,11 @@ const Dashboard = () => {
               />
               <div>
                 <h1 className="text-2xl font-bold text-foreground">
-                  Welcome, {profile?.full_name || "User"}!
+                  My Family Dashboard
                 </h1>
+                <p className="text-sm text-muted-foreground">
+                  Welcome, {profile?.full_name || "User"}!
+                </p>
                 {isSuperAdmin && (
                   <p className="text-sm text-secondary font-medium">Super Administrator</p>
                 )}
