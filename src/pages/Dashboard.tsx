@@ -15,6 +15,7 @@ import { NotificationsFeed } from "@/components/dashboard/NotificationsFeed";
 import { PendingActionsWidget } from "@/components/dashboard/PendingActionsWidget";
 import { FinancialOverviewWidget } from "@/components/dashboard/FinancialOverviewWidget";
 import { FamilyChatbot } from "@/components/chat/FamilyChatbot";
+import { NotificationInbox } from "@/components/NotificationInbox";
 import SEO from "@/components/SEO";
 
 interface UserFamily {
@@ -163,6 +164,7 @@ const Dashboard = () => {
                 <UserIcon className="w-4 h-4 mr-2" />
                 Profile
               </Button>
+              <NotificationInbox familySlug={userFamilies[0]?.family_slug} />
               <LanguageSwitcher />
               <CurrencySelector />
               <Button variant="ghost" onClick={handleLogout}>

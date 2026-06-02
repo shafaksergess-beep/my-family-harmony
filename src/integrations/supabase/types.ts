@@ -1074,6 +1074,54 @@ export type Database = {
           },
         ]
       }
+      in_app_notifications: {
+        Row: {
+          body: string
+          channels: string[]
+          created_at: string
+          data: Json | null
+          family_id: string | null
+          id: string
+          link: string | null
+          notification_type: string
+          read_at: string | null
+          reference_id: string | null
+          reference_table: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          channels?: string[]
+          created_at?: string
+          data?: Json | null
+          family_id?: string | null
+          id?: string
+          link?: string | null
+          notification_type: string
+          read_at?: string | null
+          reference_id?: string | null
+          reference_table?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          channels?: string[]
+          created_at?: string
+          data?: Json | null
+          family_id?: string | null
+          id?: string
+          link?: string | null
+          notification_type?: string
+          read_at?: string | null
+          reference_id?: string | null
+          reference_table?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       invitations: {
         Row: {
           accepted_at: string | null

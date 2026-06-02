@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { requestFcmToken } from '@/lib/firebase';
+import { useMobilePush } from '@/hooks/useMobilePush';
 
 interface NotificationSettings {
   email_enabled: boolean;
@@ -53,6 +53,7 @@ export function NotificationPreferences() {
     typeof Notification !== 'undefined' ? Notification.permission : 'default'
   );
   const [hasFcmToken, setHasFcmToken] = useState(false);
+  const { enable: enableMobilePush, platform } = useMobilePush(userId);
 
   const loadSettings = useCallback(async (uid: string) => {
     const { data, error } = await supabase
@@ -131,15 +132,15 @@ export function NotificationPreferences() {
     }
     setIsEnablingPush(true);
     try {
-      const token = await requestFcmToken();
+      const token = await enableMobilePush();
       setPushPermission(
         typeof Notification !== 'undefined' ? Notification.permission : 'denied'
       );
       if (!token) {
         toast.error(
-          Notification.permission === 'denied'
-            ? 'Notifications blocked. Enable them in your browser settings.'
-            : 'Push notifications are not available on this device.'
+          typeof Notification !== 'undefined' && Notification.permission === 'denied'
+            ? 'Notifications blocked. Enable them in your device settings.'
+            : `Push notifications are not available (${platform}).`
         );
         return;
       }
