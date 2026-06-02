@@ -238,7 +238,7 @@ const MemberLeaderboard = () => {
       case 1:
         return <Crown className="w-5 h-5 text-yellow-500" />;
       case 2:
-        return <Medal className="w-5 h-5 text-gray-400" />;
+        return <Medal className="w-5 h-5 text-muted-foreground" aria-label="Silver medal" />;
       case 3:
         return <Award className="w-5 h-5 text-amber-700" />;
       default:
