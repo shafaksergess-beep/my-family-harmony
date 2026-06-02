@@ -260,7 +260,7 @@ const FamilyReports = () => {
               <h2 className="text-3xl font-bold tracking-tight">{family?.name}</h2>
               <p className="text-white/60 mt-1 text-sm">{monthLabel}</p>
             </div>
-            <div className="text-right text-xs text-white/40 space-y-1">
+            <div className="text-right text-xs text-white/80 space-y-1">
               <p>Generated: {generatedAt}</p>
               <p>Version 1.0</p>
             </div>
