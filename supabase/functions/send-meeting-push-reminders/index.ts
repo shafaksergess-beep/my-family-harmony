@@ -174,12 +174,12 @@ Deno.serve(async (req) => {
 
       const { data: profiles } = await admin
         .from("profiles")
-        .select("id, push_token")
+        .select("id, push_token, phone")
         .in("id", userIds);
 
       const { data: prefs } = await admin
         .from("notification_preferences")
-        .select("user_id, push_enabled, meeting_reminders, attendance_deadlines")
+        .select("user_id, push_enabled, sms_enabled, meeting_reminders, attendance_deadlines")
         .in("user_id", userIds)
         .is("family_id", null);
 
@@ -197,36 +197,46 @@ Deno.serve(async (req) => {
 
       type Job = {
         userId: string;
-        token: string;
+        token: string | null;
+        phone: string | null;
+        smsEnabled: boolean;
         type: "meeting_reminder_1d" | "attendance_deadline";
         title: string;
         body: string;
+        critical: boolean;
       };
       const jobs: Job[] = [];
 
       for (const p of profiles ?? []) {
-        if (!p.push_token) continue;
         const pref = prefMap.get(p.id);
-        // Default: opt-in (true) if no row exists
         const pushOn = pref?.push_enabled ?? true;
-        if (!pushOn) continue;
+        const smsOn = pref?.sms_enabled ?? false;
+
+        // Skip if user opted out of both channels
+        if (!pushOn && !smsOn) continue;
 
         if (send24h && (pref?.meeting_reminders ?? true)) {
           jobs.push({
             userId: p.id,
-            token: p.push_token,
+            token: pushOn ? p.push_token : null,
+            phone: p.phone,
+            smsEnabled: smsOn,
             type: "meeting_reminder_1d",
             title: `📅 ${familyName} meeting tomorrow`,
             body: `${m.meeting_date} at ${meetingTimeStr}${m.location ? ` — ${m.location}` : ""}`,
+            critical: false,
           });
         }
         if (send1h && (pref?.attendance_deadlines ?? true)) {
           jobs.push({
             userId: p.id,
-            token: p.push_token,
+            token: pushOn ? p.push_token : null,
+            phone: p.phone,
+            smsEnabled: smsOn,
             type: "attendance_deadline",
             title: `⏰ Check in for ${familyName}`,
             body: `Meeting starts in under an hour. Check in to be marked present.`,
+            critical: true,
           });
         }
       }
@@ -242,12 +252,40 @@ Deno.serve(async (req) => {
           .maybeSingle();
         if (existing) continue;
 
+        let delivered = false;
+        let status = 0;
         try {
-          const status = await sendFcm(sa, job.token, job.title, job.body, {
-            url,
-            meeting_id: m.id,
-            type: job.type,
+          if (job.token) {
+            status = await sendFcm(sa, job.token, job.title, job.body, {
+              url,
+              meeting_id: m.id,
+              type: job.type,
+            });
+            if (status >= 200 && status < 300) delivered = true;
+          }
+
+          // SMS fallback for critical reminders when push didn't deliver
+          if (!delivered && job.critical && job.smsEnabled && job.phone) {
+            const smsOk = await sendSms(job.phone, `${job.title}\n${job.body}`);
+            if (smsOk) {
+              delivered = true;
+              status = 200;
+            }
+          }
+
+          // Inbox row regardless of channel
+          await admin.from("in_app_notifications").insert({
+            user_id: job.userId,
+            family_id: m.family_id,
+            title: job.title,
+            body: job.body,
+            notification_type: job.type,
+            reference_table: "meetings",
+            reference_id: m.id,
+            link: url,
+            channels: [job.token ? "push" : null, job.smsEnabled && !delivered ? null : (job.smsEnabled && job.critical ? "sms" : null), "inapp"].filter(Boolean),
           });
+
           await admin.from("push_notification_log").insert({
             user_id: job.userId,
             family_id: m.family_id,
@@ -255,7 +293,7 @@ Deno.serve(async (req) => {
             reference_id: m.id,
             fcm_status: status,
           });
-          if (status >= 200 && status < 300) {
+          if (delivered) {
             if (job.type === "meeting_reminder_1d") pushedReminder++;
             else pushedDeadline++;
           } else {
