@@ -25,6 +25,16 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Verify webhook secret - only callable by trusted DB webhook
+  const provided = req.headers.get('x-webhook-secret') || req.headers.get('x-cron-secret');
+  const expected = Deno.env.get('WEBHOOK_SECRET') || Deno.env.get('CRON_SECRET');
+  if (!expected || !provided || provided !== expected) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    });
+  }
+
   try {
     // Use service role to bypass RLS
     const supabaseAdmin = createClient(
