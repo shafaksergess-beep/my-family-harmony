@@ -132,15 +132,15 @@ export function NotificationPreferences() {
     }
     setIsEnablingPush(true);
     try {
-      const token = await requestFcmToken();
+      const token = await enableMobilePush();
       setPushPermission(
         typeof Notification !== 'undefined' ? Notification.permission : 'denied'
       );
       if (!token) {
         toast.error(
-          Notification.permission === 'denied'
-            ? 'Notifications blocked. Enable them in your browser settings.'
-            : 'Push notifications are not available on this device.'
+          typeof Notification !== 'undefined' && Notification.permission === 'denied'
+            ? 'Notifications blocked. Enable them in your device settings.'
+            : `Push notifications are not available (${platform}).`
         );
         return;
       }
