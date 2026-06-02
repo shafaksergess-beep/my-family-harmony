@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { requestFcmToken } from '@/lib/firebase';
+import { useMobilePush } from '@/hooks/useMobilePush';
 
 interface NotificationSettings {
   email_enabled: boolean;
