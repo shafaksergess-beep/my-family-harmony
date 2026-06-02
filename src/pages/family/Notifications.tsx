@@ -16,10 +16,11 @@ interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'contribution' | 'loan' | 'meeting' | 'assistance' | 'general';
+  type: string;
   priority: 'low' | 'medium' | 'high';
   read: boolean;
   created_at: string;
+  link?: string | null;
   role_specific?: string;
 }
 
