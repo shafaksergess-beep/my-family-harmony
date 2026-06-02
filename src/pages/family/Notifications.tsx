@@ -31,6 +31,33 @@ interface Notification {
   deliveries?: DeliveryRow[];
 }
 
+function DeliveryStatusRow({ deliveries }: { deliveries?: DeliveryRow[] }) {
+  const list = (deliveries ?? []).filter((d) => d.channel !== "inapp");
+  if (list.length === 0) return null;
+  const tone = (s: string) =>
+    s === "sent"
+      ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+      : s === "failed"
+      ? "bg-red-500/10 text-red-600 border-red-500/20"
+      : "bg-muted text-muted-foreground border-border";
+  return (
+    <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+      {list.map((d, i) => (
+        <Badge
+          key={i}
+          variant="outline"
+          className={tone(d.status)}
+          title={d.error_message ?? `${d.channel}: ${d.status}`}
+        >
+          {d.channel === "push" ? "Push" : d.channel === "sms" ? "SMS" : d.channel}{" "}
+          {d.status === "sent" ? "✓" : d.status === "failed" ? "✕" : "–"}
+        </Badge>
+      ))}
+    </div>
+  );
+}
+
+
 
 const Notifications = () => {
   const { familySlug } = useParams();
