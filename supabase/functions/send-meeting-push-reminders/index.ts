@@ -174,14 +174,11 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      // Pull all family members for this family with a push token
-      const { data: members } = await admin
-        .from("family_members")
-        .select("user_id, profiles!inner(push_token), notification_preferences:notification_preferences!inner(push_enabled, meeting_reminders, attendance_deadlines)")
-        .eq("family_id", m.family_id);
-
-      // Fallback shape — Supabase nested join can vary; fetch separately for safety
+      // Fetch family members for this family
       const { data: fm } = await admin
+        .from("family_members")
+        .select("user_id")
+        .eq("family_id", m.family_id);
         .from("family_members")
         .select("user_id")
         .eq("family_id", m.family_id);
