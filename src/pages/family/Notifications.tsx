@@ -115,83 +115,77 @@ const Notifications = () => {
   };
 
   const loadNotifications = async () => {
-    // In a real implementation, these would come from a notifications table
-    // For now, we'll generate sample notifications based on role
-    const sampleNotifications: Notification[] = [];
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
 
-    if (userRole === 'family_head' || userRole === 'treasurer') {
-      sampleNotifications.push({
-        id: '1',
-        title: 'Pending Contributions',
-        message: '5 members have pending contributions for this month',
-        type: 'contribution',
-        priority: 'high',
-        read: false,
-        created_at: new Date().toISOString(),
-        role_specific: 'treasurer',
-      });
+    const { data: familyRow } = await supabase
+      .from("families")
+      .select("id")
+      .eq("slug", familySlug)
+      .maybeSingle();
+
+    const query = supabase
+      .from("in_app_notifications")
+      .select("id, title, body, notification_type, link, read_at, created_at, family_id")
+      .eq("user_id", session.user.id)
+      .order("created_at", { ascending: false })
+      .limit(100);
+
+    if (familyRow?.id) query.or(`family_id.eq.${familyRow.id},family_id.is.null`);
+
+    const { data, error } = await query;
+    if (error) {
+      console.error("[notifications] load error", error);
+      return;
     }
 
-    if (userRole === 'loan_committee' || userRole === 'family_head') {
-      sampleNotifications.push({
-        id: '2',
-        title: 'Loan Applications',
-        message: '2 new loan applications require your review',
-        type: 'loan',
-        priority: 'medium',
-        read: false,
-        created_at: new Date().toISOString(),
-        role_specific: 'loan_committee',
-      });
-    }
+    const priorityFor = (type: string): 'low' | 'medium' | 'high' => {
+      if (type.startsWith("loan_") || type === "attendance_deadline" || type === "fine_issued") return 'high';
+      if (type === "meeting_reminder_1d" || type === "assistance_created") return 'medium';
+      return 'low';
+    };
 
-    sampleNotifications.push({
-      id: '3',
-      title: 'Upcoming Meeting',
-      message: 'Monthly family meeting scheduled for next Saturday at 1:00 PM',
-      type: 'meeting',
-      priority: 'medium',
-      read: false,
-      created_at: new Date().toISOString(),
-    });
-
-    sampleNotifications.push({
-      id: '4',
-      title: 'Assistance Request',
-      message: 'New assistance event has been added to the system',
-      type: 'assistance',
-      priority: 'low',
-      read: true,
-      created_at: new Date(Date.now() - 86400000).toISOString(),
-    });
-
-    setNotifications(sampleNotifications);
+    setNotifications(
+      (data ?? []).map((r) => ({
+        id: r.id,
+        title: r.title,
+        message: r.body,
+        type: r.notification_type,
+        priority: priorityFor(r.notification_type),
+        read: !!r.read_at,
+        created_at: r.created_at,
+        link: r.link,
+      }))
+    );
   };
 
-  const handleMarkAsRead = (id: string) => {
-    setNotifications(notifications.map(n => 
-      n.id === id ? { ...n, read: true } : n
-    ));
-    toast({
-      title: "Success",
-      description: "Notification marked as read",
-    });
+  const handleMarkAsRead = async (id: string) => {
+    await supabase
+      .from("in_app_notifications")
+      .update({ read_at: new Date().toISOString() })
+      .eq("id", id);
+    setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n));
   };
 
-  const handleMarkAllAsRead = () => {
+  const handleMarkAllAsRead = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    await supabase
+      .from("in_app_notifications")
+      .update({ read_at: new Date().toISOString() })
+      .eq("user_id", session.user.id)
+      .is("read_at", null);
     setNotifications(notifications.map(n => ({ ...n, read: true })));
-    toast({
-      title: "Success",
-      description: "All notifications marked as read",
-    });
+    toast({ title: "Success", description: "All notifications marked as read" });
   };
 
-  const handleDeleteNotification = (id: string) => {
+  const handleDeleteNotification = async (id: string) => {
+    // Soft hide locally — keep DB row for audit
+    await supabase
+      .from("in_app_notifications")
+      .update({ read_at: new Date().toISOString() })
+      .eq("id", id);
     setNotifications(notifications.filter(n => n.id !== id));
-    toast({
-      title: "Success",
-      description: "Notification deleted",
-    });
   };
 
   const handleSaveSettings = () => {
