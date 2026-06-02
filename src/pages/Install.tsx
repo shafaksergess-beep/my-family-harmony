@@ -54,7 +54,7 @@ export default function Install() {
           <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
             <Smartphone className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-3xl">Install Kinsroot</CardTitle>
+          <CardTitle asChild className="text-3xl"><h1>Install Kinsroot</h1></CardTitle>
           <p className="text-muted-foreground mt-2">
             Get the full app experience with offline access and faster loading
           </p>
