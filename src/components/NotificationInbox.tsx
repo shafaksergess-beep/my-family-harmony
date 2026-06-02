@@ -11,6 +11,36 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDistanceToNow } from "date-fns";
+import { cn } from "@/lib/utils";
+
+function DeliveryBadge({ channel, status }: { channel: string; status: string }) {
+  if (channel === "inapp") return null;
+  const label = channel === "push" ? "Push" : channel === "sms" ? "SMS" : channel;
+  const tone =
+    status === "sent"
+      ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+      : status === "failed"
+      ? "bg-red-500/10 text-red-600 border-red-500/20"
+      : "bg-muted text-muted-foreground border-border";
+  const symbol = status === "sent" ? "✓" : status === "failed" ? "✕" : "–";
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-sm border text-[9px] font-medium",
+        tone
+      )}
+      title={`${label}: ${status}`}
+    >
+      {symbol} {label}
+    </span>
+  );
+}
+
+
+interface DeliveryRow {
+  channel: string;
+  status: string;
+}
 
 interface InboxItem {
   id: string;
@@ -20,7 +50,9 @@ interface InboxItem {
   link: string | null;
   read_at: string | null;
   created_at: string;
+  notification_deliveries?: DeliveryRow[];
 }
+
 
 /**
  * In-app notification bell. Subscribes to in_app_notifications via realtime,
@@ -71,12 +103,13 @@ export function NotificationInbox({ familySlug }: { familySlug?: string }) {
   const refresh = async (uid: string) => {
     const { data } = await supabase
       .from("in_app_notifications")
-      .select("id, title, body, notification_type, link, read_at, created_at")
+      .select("id, title, body, notification_type, link, read_at, created_at, notification_deliveries(channel, status)")
       .eq("user_id", uid)
       .order("created_at", { ascending: false })
       .limit(30);
-    setItems(data ?? []);
+    setItems((data ?? []) as InboxItem[]);
   };
+
 
   const markRead = async (id: string) => {
     await supabase
@@ -154,10 +187,16 @@ export function NotificationInbox({ familySlug }: { familySlug?: string }) {
                       <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
                         {item.body}
                       </p>
-                      <p className="text-[10px] text-muted-foreground mt-1">
-                        {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
-                      </p>
+                      <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                        <p className="text-[10px] text-muted-foreground">
+                          {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
+                        </p>
+                        {(item.notification_deliveries ?? []).map((d, i) => (
+                          <DeliveryBadge key={i} channel={d.channel} status={d.status} />
+                        ))}
+                      </div>
                     </div>
+
                   </div>
                 </li>
               ))}

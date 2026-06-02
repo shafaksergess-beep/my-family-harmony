@@ -12,6 +12,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
+interface DeliveryRow {
+  channel: string;
+  status: string;
+  error_message?: string | null;
+}
+
 interface Notification {
   id: string;
   title: string;
@@ -22,7 +28,36 @@ interface Notification {
   created_at: string;
   link?: string | null;
   role_specific?: string;
+  deliveries?: DeliveryRow[];
 }
+
+function DeliveryStatusRow({ deliveries }: { deliveries?: DeliveryRow[] }) {
+  const list = (deliveries ?? []).filter((d) => d.channel !== "inapp");
+  if (list.length === 0) return null;
+  const tone = (s: string) =>
+    s === "sent"
+      ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+      : s === "failed"
+      ? "bg-red-500/10 text-red-600 border-red-500/20"
+      : "bg-muted text-muted-foreground border-border";
+  return (
+    <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+      {list.map((d, i) => (
+        <Badge
+          key={i}
+          variant="outline"
+          className={tone(d.status)}
+          title={d.error_message ?? `${d.channel}: ${d.status}`}
+        >
+          {d.channel === "push" ? "Push" : d.channel === "sms" ? "SMS" : d.channel}{" "}
+          {d.status === "sent" ? "✓" : d.status === "failed" ? "✕" : "–"}
+        </Badge>
+      ))}
+    </div>
+  );
+}
+
+
 
 const Notifications = () => {
   const { familySlug } = useParams();
@@ -126,7 +161,7 @@ const Notifications = () => {
 
     const query = supabase
       .from("in_app_notifications")
-      .select("id, title, body, notification_type, link, read_at, created_at, family_id")
+      .select("id, title, body, notification_type, link, read_at, created_at, family_id, notification_deliveries(channel, status, error_message)")
       .eq("user_id", session.user.id)
       .order("created_at", { ascending: false })
       .limit(100);
@@ -140,8 +175,8 @@ const Notifications = () => {
     }
 
     const priorityFor = (type: string): 'low' | 'medium' | 'high' => {
-      if (type.startsWith("loan_") || type === "attendance_deadline" || type === "fine_issued") return 'high';
-      if (type === "meeting_reminder_1d" || type === "assistance_created") return 'medium';
+      if (type.startsWith("loan_") || type === "attendance_deadline" || type === "fine_issued" || type === "sanction_recorded") return 'high';
+      if (type === "meeting_reminder_1d" || type === "assistance_created" || type === "discipline_recorded" || type === "apology_recorded") return 'medium';
       return 'low';
     };
 
@@ -155,9 +190,11 @@ const Notifications = () => {
         read: !!r.read_at,
         created_at: r.created_at,
         link: r.link,
+        deliveries: (r as { notification_deliveries?: DeliveryRow[] }).notification_deliveries ?? [],
       }))
     );
   };
+
 
   const handleMarkAsRead = async (id: string) => {
     await supabase
@@ -301,6 +338,8 @@ const Notifications = () => {
                           <p className="text-xs text-muted-foreground">
                             {new Date(notification.created_at).toLocaleString()}
                           </p>
+                          <DeliveryStatusRow deliveries={notification.deliveries} />
+
                         </div>
                       </div>
                       <div className="flex gap-2">
@@ -354,6 +393,8 @@ const Notifications = () => {
                           <p className="text-xs text-muted-foreground">
                             {new Date(notification.created_at).toLocaleString()}
                           </p>
+                          <DeliveryStatusRow deliveries={notification.deliveries} />
+
                         </div>
                       </div>
                       <div className="flex gap-2">

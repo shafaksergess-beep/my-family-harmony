@@ -191,16 +191,44 @@ async function build(payload: Payload, admin: ReturnType<typeof createClient>): 
     case "fine_issued":
       return {
         title: `⚠️ New fine`,
-        body: `You have a new fine of ${payload.amount ?? ""}.`,
+        body: `You have a new fine of ${payload.amount ?? ""}${payload.reason ? ` — ${payload.reason}` : ""}.`,
         link: `${familyBase}/contributions`,
         prefField: "fines",
         recipients: "member",
         critical: true,
       };
+    case "discipline_recorded":
+      return {
+        title: `📝 Disciplinary note`,
+        body: String(payload.title ?? "A disciplinary record was added."),
+        link: `${familyBase}/members`,
+        prefField: "announcements",
+        recipients: "member",
+        critical: false,
+      };
+    case "sanction_recorded":
+      return {
+        title: `⛔ Sanction issued`,
+        body: String(payload.title ?? "A sanction has been issued against you."),
+        link: `${familyBase}/members`,
+        prefField: "announcements",
+        recipients: "member",
+        critical: true,
+      };
+    case "apology_recorded":
+      return {
+        title: `🕊️ Apology letter`,
+        body: String(payload.title ?? "An apology letter has been recorded."),
+        link: `${familyBase}/members`,
+        prefField: "announcements",
+        recipients: "leaders",
+        critical: false,
+      };
     default:
       return null;
   }
 }
+
 
 async function recipientUserIds(
   payload: Payload,
@@ -279,7 +307,7 @@ Deno.serve(async (req) => {
       (profiles ?? []).map((p) => [String(p.id), { push_token: p.push_token, phone: p.phone }])
     );
 
-    // 1) Inbox rows for everyone (always)
+    // 1) Inbox rows for everyone (always) — capture inserted ids for delivery tracking
     const inboxRows = userIds.map((uid) => ({
       user_id: uid,
       family_id: payload.family_id ?? null,
@@ -292,7 +320,22 @@ Deno.serve(async (req) => {
       data: payload as unknown as Record<string, unknown>,
       channels: ["inapp"],
     }));
-    await admin.from("in_app_notifications").insert(inboxRows);
+    const { data: insertedInbox } = await admin
+      .from("in_app_notifications")
+      .insert(inboxRows)
+      .select("id, user_id");
+
+    const inboxIdByUser = new Map<string, string>(
+      (insertedInbox ?? []).map((r) => [String(r.user_id), String(r.id)])
+    );
+
+    // Log inapp deliveries
+    const deliveries: Array<Record<string, unknown>> = (insertedInbox ?? []).map((r) => ({
+      notification_id: r.id,
+      user_id: r.user_id,
+      channel: "inapp",
+      status: "sent",
+    }));
 
     // 2) Push + SMS fanout
     const sa: ServiceAccount | null = FIREBASE_SERVICE_ACCOUNT ? JSON.parse(FIREBASE_SERVICE_ACCOUNT) : null;
@@ -303,39 +346,98 @@ Deno.serve(async (req) => {
       userIds.map(async (uid) => {
         const pref = prefMap.get(uid);
         const prof = profMap.get(uid);
+        const notifId = inboxIdByUser.get(uid);
         const typeOptIn = (pref?.[msg.prefField] as boolean | undefined) ?? true;
-        if (!typeOptIn) return;
+        if (!typeOptIn) {
+          if (notifId) {
+            deliveries.push({
+              notification_id: notifId,
+              user_id: uid,
+              channel: "push",
+              status: "skipped",
+              error_message: "user opted out of this category",
+            });
+          }
+          return;
+        }
 
         const pushOn = pref?.push_enabled ?? true;
         let delivered = false;
+        let pushStatus: number | null = null;
+        let pushError: string | null = null;
+
         if (pushOn && prof?.push_token && sa) {
           try {
-            const status = await sendFcm(sa, prof.push_token, msg.title, msg.body, {
+            pushStatus = await sendFcm(sa, prof.push_token, msg.title, msg.body, {
               url: msg.link,
               type: payload.event,
               reference_id: payload.record_id,
             });
-            if (status >= 200 && status < 300) {
+            if (pushStatus >= 200 && pushStatus < 300) {
               pushed++;
               delivered = true;
+            } else {
+              pushError = `FCM HTTP ${pushStatus}`;
             }
           } catch (e) {
+            pushError = e instanceof Error ? e.message : String(e);
             console.warn("[dispatch] fcm failed", e);
           }
+        } else if (!pushOn) {
+          pushError = "push disabled by user";
+        } else if (!prof?.push_token) {
+          pushError = "no push token registered";
+        } else if (!sa) {
+          pushError = "firebase service account not configured";
+        }
+
+        if (notifId) {
+          deliveries.push({
+            notification_id: notifId,
+            user_id: uid,
+            channel: "push",
+            status: delivered ? "sent" : pushOn && prof?.push_token && sa ? "failed" : "skipped",
+            provider_status: pushStatus !== null ? String(pushStatus) : null,
+            error_message: pushError,
+            recipient: prof?.push_token ? `${prof.push_token.slice(0, 12)}…` : null,
+          });
         }
 
         // SMS fallback only for critical events when push didn't go through
         if (!delivered && msg.critical && (pref?.sms_enabled ?? false) && prof?.phone) {
           const ok = await sendSms(prof.phone, `${msg.title}\n${msg.body}`);
           if (ok) smsSent++;
+          if (notifId) {
+            deliveries.push({
+              notification_id: notifId,
+              user_id: uid,
+              channel: "sms",
+              status: ok ? "sent" : "failed",
+              recipient: prof.phone,
+              error_message: ok ? null : "twilio send failed",
+            });
+          }
+        } else if (!delivered && msg.critical && notifId) {
+          deliveries.push({
+            notification_id: notifId,
+            user_id: uid,
+            channel: "sms",
+            status: "skipped",
+            error_message: !(pref?.sms_enabled ?? false) ? "sms disabled by user" : "no phone on file",
+          });
         }
       })
     );
+
+    if (deliveries.length > 0) {
+      await admin.from("notification_deliveries").insert(deliveries);
+    }
 
     return new Response(
       JSON.stringify({ ok: true, recipients: userIds.length, pushed, smsSent }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
+
   } catch (e) {
     console.error("[dispatch-event-push] error", e);
     return new Response(
