@@ -1,7 +1,10 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
+Disallow: /admin
 Disallow: /api/
 Disallow: /accept-invitation
 Disallow: /reset-password
+Disallow: /dashboard
+Disallow: /profile
 Sitemap: https://kinsroot.softgroupsolutions.com/sitemap.xml
