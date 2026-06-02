@@ -72,6 +72,14 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // SECURITY: Disable in production - test users have predictable shared passwords
+    if (Deno.env.get('ALLOW_TEST_USERS') !== 'true') {
+      return new Response(
+        JSON.stringify({ error: 'Test user creation is disabled in this environment' }),
+        { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
     // SECURITY: Require authentication
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
