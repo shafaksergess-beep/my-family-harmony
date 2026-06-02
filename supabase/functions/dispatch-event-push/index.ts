@@ -191,16 +191,44 @@ async function build(payload: Payload, admin: ReturnType<typeof createClient>): 
     case "fine_issued":
       return {
         title: `⚠️ New fine`,
-        body: `You have a new fine of ${payload.amount ?? ""}.`,
+        body: `You have a new fine of ${payload.amount ?? ""}${payload.reason ? ` — ${payload.reason}` : ""}.`,
         link: `${familyBase}/contributions`,
         prefField: "fines",
         recipients: "member",
         critical: true,
       };
+    case "discipline_recorded":
+      return {
+        title: `📝 Disciplinary note`,
+        body: String(payload.title ?? "A disciplinary record was added."),
+        link: `${familyBase}/members`,
+        prefField: "announcements",
+        recipients: "member",
+        critical: false,
+      };
+    case "sanction_recorded":
+      return {
+        title: `⛔ Sanction issued`,
+        body: String(payload.title ?? "A sanction has been issued against you."),
+        link: `${familyBase}/members`,
+        prefField: "announcements",
+        recipients: "member",
+        critical: true,
+      };
+    case "apology_recorded":
+      return {
+        title: `🕊️ Apology letter`,
+        body: String(payload.title ?? "An apology letter has been recorded."),
+        link: `${familyBase}/members`,
+        prefField: "announcements",
+        recipients: "leaders",
+        critical: false,
+      };
     default:
       return null;
   }
 }
+
 
 async function recipientUserIds(
   payload: Payload,
