@@ -134,7 +134,7 @@ const Notifications = () => {
 
     const query = supabase
       .from("in_app_notifications")
-      .select("id, title, body, notification_type, link, read_at, created_at, family_id")
+      .select("id, title, body, notification_type, link, read_at, created_at, family_id, notification_deliveries(channel, status, error_message)")
       .eq("user_id", session.user.id)
       .order("created_at", { ascending: false })
       .limit(100);
@@ -148,8 +148,8 @@ const Notifications = () => {
     }
 
     const priorityFor = (type: string): 'low' | 'medium' | 'high' => {
-      if (type.startsWith("loan_") || type === "attendance_deadline" || type === "fine_issued") return 'high';
-      if (type === "meeting_reminder_1d" || type === "assistance_created") return 'medium';
+      if (type.startsWith("loan_") || type === "attendance_deadline" || type === "fine_issued" || type === "sanction_recorded") return 'high';
+      if (type === "meeting_reminder_1d" || type === "assistance_created" || type === "discipline_recorded" || type === "apology_recorded") return 'medium';
       return 'low';
     };
 
@@ -163,9 +163,11 @@ const Notifications = () => {
         read: !!r.read_at,
         created_at: r.created_at,
         link: r.link,
+        deliveries: (r as { notification_deliveries?: DeliveryRow[] }).notification_deliveries ?? [],
       }))
     );
   };
+
 
   const handleMarkAsRead = async (id: string) => {
     await supabase
