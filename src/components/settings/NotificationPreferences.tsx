@@ -53,6 +53,7 @@ export function NotificationPreferences() {
     typeof Notification !== 'undefined' ? Notification.permission : 'default'
   );
   const [hasFcmToken, setHasFcmToken] = useState(false);
+  const { enable: enableMobilePush, platform } = useMobilePush(userId);
 
   const loadSettings = useCallback(async (uid: string) => {
     const { data, error } = await supabase
