@@ -1,12 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Bell, Mail, MessageSquare, Loader2 } from 'lucide-react';
+import { Bell, Mail, MessageSquare, Loader2, BellRing, AlertTriangle } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -14,79 +13,167 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { requestFcmToken } from '@/lib/firebase';
 
 interface NotificationSettings {
   email_enabled: boolean;
   sms_enabled: boolean;
   push_enabled: boolean;
   meeting_reminders: boolean;
+  attendance_deadlines: boolean;
   payment_reminders: boolean;
+  fines: boolean;
   loan_updates: boolean;
   assistance_notifications: boolean;
+  announcements: boolean;
   digest_frequency: 'daily' | 'weekly' | 'monthly' | 'never';
 }
 
+const DEFAULTS: NotificationSettings = {
+  email_enabled: true,
+  sms_enabled: false,
+  push_enabled: true,
+  meeting_reminders: true,
+  attendance_deadlines: true,
+  payment_reminders: true,
+  fines: true,
+  loan_updates: true,
+  assistance_notifications: true,
+  announcements: true,
+  digest_frequency: 'weekly',
+};
+
 export function NotificationPreferences() {
-  const { familySlug } = useParams();
-  const [settings, setSettings] = useState<NotificationSettings>({
-    email_enabled: true,
-    sms_enabled: false,
-    push_enabled: true,
-    meeting_reminders: true,
-    payment_reminders: true,
-    loan_updates: true,
-    assistance_notifications: true,
-    digest_frequency: 'weekly',
-  });
+  const [userId, setUserId] = useState<string | null>(null);
+  const [settings, setSettings] = useState<NotificationSettings>(DEFAULTS);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isEnablingPush, setIsEnablingPush] = useState(false);
+  const [pushPermission, setPushPermission] = useState<NotificationPermission>(
+    typeof Notification !== 'undefined' ? Notification.permission : 'default'
+  );
+  const [hasFcmToken, setHasFcmToken] = useState(false);
+
+  const loadSettings = useCallback(async (uid: string) => {
+    const { data, error } = await supabase
+      .from('notification_preferences')
+      .select('*')
+      .eq('user_id', uid)
+      .is('family_id', null)
+      .maybeSingle();
+    if (error) console.warn('[notifications] load error', error);
+    if (data) {
+      setSettings({
+        email_enabled: data.email_enabled,
+        sms_enabled: data.sms_enabled,
+        push_enabled: data.push_enabled,
+        meeting_reminders: data.meeting_reminders,
+        attendance_deadlines: (data as { attendance_deadlines?: boolean }).attendance_deadlines ?? true,
+        payment_reminders: data.payment_reminders,
+        fines: (data as { fines?: boolean }).fines ?? true,
+        loan_updates: data.loan_updates,
+        assistance_notifications: data.assistance_notifications,
+        announcements: (data as { announcements?: boolean }).announcements ?? true,
+        digest_frequency: data.digest_frequency as NotificationSettings['digest_frequency'],
+      });
+    }
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('push_token')
+      .eq('id', uid)
+      .maybeSingle();
+    setHasFcmToken(!!profile?.push_token);
+  }, []);
 
   useEffect(() => {
-    loadSettings();
-  }, [familySlug]);
-
-  const loadSettings = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // TODO: Load from database when notification_preferences table is created
-      setIsLoading(false);
-    } catch (error) {
-      console.error('Error loading notification settings:', error);
-      toast.error('Failed to load notification preferences');
-      setIsLoading(false);
-    }
-  };
+    (async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setIsLoading(false);
+          return;
+        }
+        setUserId(user.id);
+        await loadSettings(user.id);
+      } catch (e) {
+        console.error(e);
+        toast.error('Failed to load notification preferences');
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+  }, [loadSettings]);
 
   const handleSave = async () => {
+    if (!userId) return;
     setIsSaving(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not found');
-
-      // TODO: Save to database when notification_preferences table is created
-      // await supabase.from('notification_preferences').upsert({
-      //   user_id: user.id,
-      //   family_slug: familySlug,
-      //   ...settings,
-      // });
-
-      toast.success('Notification preferences saved successfully');
-    } catch (error) {
-      console.error('Error saving notification settings:', error);
-      toast.error('Failed to save notification preferences');
+      const { error } = await supabase
+        .from('notification_preferences')
+        .upsert(
+          { user_id: userId, family_id: null, ...settings },
+          { onConflict: 'user_id,family_id' }
+        );
+      if (error) throw error;
+      toast.success('Notification preferences saved');
+    } catch (e) {
+      console.error(e);
+      toast.error('Failed to save preferences');
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleToggle = (key: keyof NotificationSettings) => {
-    setSettings((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
+  const handleEnablePush = async () => {
+    if (!userId) {
+      toast.error('You must be signed in');
+      return;
+    }
+    setIsEnablingPush(true);
+    try {
+      const token = await requestFcmToken();
+      setPushPermission(
+        typeof Notification !== 'undefined' ? Notification.permission : 'denied'
+      );
+      if (!token) {
+        toast.error(
+          Notification.permission === 'denied'
+            ? 'Notifications blocked. Enable them in your browser settings.'
+            : 'Push notifications are not available on this device.'
+        );
+        return;
+      }
+      const { error } = await supabase
+        .from('profiles')
+        .update({ push_token: token })
+        .eq('id', userId);
+      if (error) throw error;
+      setHasFcmToken(true);
+      setSettings((p) => ({ ...p, push_enabled: true }));
+      toast.success('Push notifications enabled');
+    } catch (e) {
+      console.error(e);
+      toast.error('Failed to enable push notifications');
+    } finally {
+      setIsEnablingPush(false);
+    }
   };
+
+  const handleTestPush = async () => {
+    if (!('Notification' in window)) return;
+    if (Notification.permission !== 'granted') {
+      toast.error('Enable push notifications first');
+      return;
+    }
+    new Notification('Kinsroot', {
+      body: 'Test notification — your device is set up correctly.',
+      icon: '/app-icon.png',
+    });
+    toast.success('Test notification sent');
+  };
+
+  const handleToggle = (key: keyof NotificationSettings) =>
+    setSettings((p) => ({ ...p, [key]: !p[key] }));
 
   if (isLoading) {
     return (
@@ -96,6 +183,8 @@ export function NotificationPreferences() {
     );
   }
 
+  const pushReady = pushPermission === 'granted' && hasFcmToken;
+
   return (
     <div className="space-y-6">
       <Card>
@@ -104,20 +193,67 @@ export function NotificationPreferences() {
             <Bell className="h-5 w-5" />
             Notification Channels
           </CardTitle>
-          <CardDescription>
-            Choose how you want to receive notifications
-          </CardDescription>
+          <CardDescription>Choose how you want to receive notifications</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Push */}
+          <div className="flex items-center justify-between gap-4">
+            <div className="space-y-0.5">
+              <Label htmlFor="push" className="flex items-center gap-2">
+                <BellRing className="h-4 w-4" />
+                Push Notifications
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                {pushReady
+                  ? 'This device is registered for push notifications.'
+                  : pushPermission === 'denied'
+                  ? 'Blocked. Enable notifications in your browser settings to receive pushes.'
+                  : 'Get instant alerts on this device.'}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              {pushReady ? (
+                <Button variant="outline" size="sm" onClick={handleTestPush}>
+                  Test
+                </Button>
+              ) : (
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={handleEnablePush}
+                  disabled={isEnablingPush || pushPermission === 'denied'}
+                >
+                  {isEnablingPush && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
+                  Enable
+                </Button>
+              )}
+              <Switch
+                id="push"
+                checked={settings.push_enabled}
+                onCheckedChange={() => handleToggle('push_enabled')}
+                disabled={!pushReady}
+              />
+            </div>
+          </div>
+
+          {pushPermission === 'denied' && (
+            <div className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+              <span>
+                Notifications are blocked at the browser level. Click the lock icon in your
+                address bar → Site settings → Notifications → Allow.
+              </span>
+            </div>
+          )}
+
+          {/* Email */}
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="email" className="flex items-center gap-2">
                 <Mail className="h-4 w-4" />
                 Email Notifications
               </Label>
-              <p className="text-sm text-muted-foreground">
-                Receive notifications via email
-              </p>
+              <p className="text-sm text-muted-foreground">Receive notifications via email</p>
             </div>
             <Switch
               id="email"
@@ -126,15 +262,14 @@ export function NotificationPreferences() {
             />
           </div>
 
+          {/* SMS */}
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="sms" className="flex items-center gap-2">
                 <MessageSquare className="h-4 w-4" />
                 SMS Notifications
               </Label>
-              <p className="text-sm text-muted-foreground">
-                Receive notifications via SMS
-              </p>
+              <p className="text-sm text-muted-foreground">Receive notifications via SMS</p>
             </div>
             <Switch
               id="sms"
@@ -142,111 +277,51 @@ export function NotificationPreferences() {
               onCheckedChange={() => handleToggle('sms_enabled')}
             />
           </div>
-
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="push" className="flex items-center gap-2">
-                <Bell className="h-4 w-4" />
-                Push Notifications
-              </Label>
-              <p className="text-sm text-muted-foreground">
-                Receive push notifications in your browser
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={async () => {
-                  if ('Notification' in window) {
-                    const permission = await Notification.requestPermission();
-                    if (permission === 'granted') {
-                      new Notification('Kinsroot', {
-                        body: 'This is a test notification!',
-                        icon: '/logo.jpg'
-                      });
-                      if ('setAppBadge' in navigator) {
-                        navigator.setAppBadge(1).catch(console.error);
-                      }
-                      toast.success('Test notification sent!');
-                    } else {
-                      toast.error('Notification permission denied');
-                    }
-                  }
-                }}
-              >
-                Test
-              </Button>
-              <Switch
-                id="push"
-                checked={settings.push_enabled}
-                onCheckedChange={() => handleToggle('push_enabled')}
-              />
-            </div>
-          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
           <CardTitle>Notification Types</CardTitle>
-          <CardDescription>
-            Select which events you want to be notified about
-          </CardDescription>
+          <CardDescription>Choose which events you want to be notified about</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="meetings">Meeting Reminders</Label>
-            <Switch
-              id="meetings"
-              checked={settings.meeting_reminders}
-              onCheckedChange={() => handleToggle('meeting_reminders')}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <Label htmlFor="payments">Payment Reminders</Label>
-            <Switch
-              id="payments"
-              checked={settings.payment_reminders}
-              onCheckedChange={() => handleToggle('payment_reminders')}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <Label htmlFor="loans">Loan Updates</Label>
-            <Switch
-              id="loans"
-              checked={settings.loan_updates}
-              onCheckedChange={() => handleToggle('loan_updates')}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <Label htmlFor="assistance">Assistance Notifications</Label>
-            <Switch
-              id="assistance"
-              checked={settings.assistance_notifications}
-              onCheckedChange={() => handleToggle('assistance_notifications')}
-            />
-          </div>
+          {([
+            ['meeting_reminders', 'Meeting Reminders', 'Upcoming family meetings'],
+            ['attendance_deadlines', 'Attendance Deadlines', 'Reminders to check in before meetings'],
+            ['payment_reminders', 'Payment Reminders', 'Contributions, dues, and njangi'],
+            ['fines', 'Fines', 'When a fine is recorded against you'],
+            ['loan_updates', 'Loan Updates', 'Approvals, payments, and deadlines'],
+            ['assistance_notifications', 'Assistance Events', 'Births, deaths, sickness, weddings'],
+            ['announcements', 'Family Announcements', 'Messages from family leadership'],
+          ] as const).map(([key, label, desc]) => (
+            <div key={key} className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor={key}>{label}</Label>
+                <p className="text-xs text-muted-foreground">{desc}</p>
+              </div>
+              <Switch
+                id={key}
+                checked={settings[key]}
+                onCheckedChange={() => handleToggle(key)}
+              />
+            </div>
+          ))}
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
           <CardTitle>Email Digest</CardTitle>
-          <CardDescription>
-            Receive a summary of family activity
-          </CardDescription>
+          <CardDescription>Receive a summary of family activity</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
             <Label htmlFor="digest">Digest Frequency</Label>
             <Select
               value={settings.digest_frequency}
-              onValueChange={(value: 'daily' | 'weekly' | 'monthly' | 'never') =>
-                setSettings((prev) => ({ ...prev, digest_frequency: value }))
+              onValueChange={(v: NotificationSettings['digest_frequency']) =>
+                setSettings((p) => ({ ...p, digest_frequency: v }))
               }
             >
               <SelectTrigger id="digest">
