@@ -77,7 +77,7 @@ const Index = () => {
 
             <div className="mb-6 inline-flex items-center gap-3 bg-primary-foreground/10 backdrop-blur-sm px-6 py-3 rounded-full border border-primary-foreground/20">
               <Home className="w-5 h-5" />
-              <span className="text-sm font-medium">EN · FR · Bota Land · Works offline</span>
+              <span className="text-sm font-medium">EN · FR · Works offline</span>
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
