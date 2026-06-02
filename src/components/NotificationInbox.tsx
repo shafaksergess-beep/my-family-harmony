@@ -162,10 +162,16 @@ export function NotificationInbox({ familySlug }: { familySlug?: string }) {
                       <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
                         {item.body}
                       </p>
-                      <p className="text-[10px] text-muted-foreground mt-1">
-                        {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
-                      </p>
+                      <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                        <p className="text-[10px] text-muted-foreground">
+                          {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
+                        </p>
+                        {(item.notification_deliveries ?? []).map((d, i) => (
+                          <DeliveryBadge key={i} channel={d.channel} status={d.status} />
+                        ))}
+                      </div>
                     </div>
+
                   </div>
                 </li>
               ))}
