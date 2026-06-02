@@ -12,6 +12,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
+interface DeliveryRow {
+  channel: string;
+  status: string;
+  error_message?: string | null;
+}
+
 interface Notification {
   id: string;
   title: string;
@@ -22,7 +28,9 @@ interface Notification {
   created_at: string;
   link?: string | null;
   role_specific?: string;
+  deliveries?: DeliveryRow[];
 }
+
 
 const Notifications = () => {
   const { familySlug } = useParams();
