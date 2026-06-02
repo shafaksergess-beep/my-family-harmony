@@ -49,18 +49,11 @@ const Notifications = () => {
 
   const setupRealtimeSubscription = () => {
     const channel = supabase
-      .channel('notifications-changes')
+      .channel('inapp-notifications')
       .on(
         'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'contributions'
-        },
-        () => {
-          // Reload notifications when contributions change
-          loadNotifications();
-        }
+        { event: 'INSERT', schema: 'public', table: 'in_app_notifications' },
+        () => loadNotifications()
       )
       .subscribe();
 
