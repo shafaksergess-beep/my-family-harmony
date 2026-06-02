@@ -101,12 +101,16 @@ const Dashboard = () => {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut({ scope: "local" });
+    } catch (err) {
+      console.warn("signOut error (ignored):", err);
+    }
     toast({
       title: "Logged out",
       description: "You've been successfully logged out.",
     });
-    navigate("/");
+    navigate("/auth", { replace: true });
   };
 
   if (loading) {
