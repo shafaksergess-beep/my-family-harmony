@@ -303,6 +303,7 @@ const JoinFamily = () => {
               </div>
             </CardContent>
           </Card>
+          </>
         )}
 
         {/* Step: Confirm & Request */}
