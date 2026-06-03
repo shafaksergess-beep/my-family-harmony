@@ -233,6 +233,8 @@ const JoinFamily = () => {
 
         {/* Step: Enter Code */}
         {step === "code" && (
+          <>
+          <h2 className="sr-only">Enter your invitation code</h2>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
