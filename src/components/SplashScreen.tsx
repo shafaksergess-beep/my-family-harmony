@@ -48,6 +48,9 @@ const SplashScreen = ({ onComplete, duration = 3000 }: SplashScreenProps) => {
           <img
             src="/logo.jpg"
             alt="Kinsroot Logo"
+            width={160}
+            height={160}
+            decoding="async"
             className="w-full h-full object-cover"
           />
         </div>
