@@ -403,6 +403,7 @@ const Auth = () => {
                       className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                       onClick={() => setShowLoginPassword(!showLoginPassword)}
                       tabIndex={-1}
+                      aria-label={showLoginPassword ? "Hide password" : "Show password"}
                     >
                       {showLoginPassword ? (
                         <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -526,6 +527,7 @@ const Auth = () => {
                       className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                       onClick={() => setShowSignupPassword(!showSignupPassword)}
                       tabIndex={-1}
+                      aria-label={showSignupPassword ? "Hide password" : "Show password"}
                     >
                       {showSignupPassword ? (
                         <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -564,6 +566,7 @@ const Auth = () => {
                       className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                       onClick={() => setShowSignupConfirmPassword(!showSignupConfirmPassword)}
                       tabIndex={-1}
+                      aria-label={showSignupConfirmPassword ? "Hide password confirmation" : "Show password confirmation"}
                     >
                       {showSignupConfirmPassword ? (
                         <EyeOff className="h-4 w-4 text-muted-foreground" />

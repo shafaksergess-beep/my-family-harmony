@@ -30,10 +30,10 @@ const NotFound = () => {
         className="mb-6 h-20 w-20 rounded-full object-cover shadow-lg"
         loading="lazy"
       />
-      <h1 className="mb-3 text-5xl font-bold text-primary">404</h1>
-      <p className="mb-2 text-xl font-semibold text-foreground">
-        We couldn't find that page
-      </p>
+      <p className="mb-3 text-5xl font-bold text-primary" aria-hidden="true">404</p>
+      <h1 className="mb-2 text-xl font-semibold text-foreground">
+        Page Not Found
+      </h1>
       <p className="mb-8 max-w-md text-muted-foreground">
         The link may be broken, or the page may have been moved. Let's get you
         back to your family.
