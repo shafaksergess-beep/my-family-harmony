@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Smartphone, Download, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { haptics } from "@/lib/haptics";
+import SEO from "@/components/SEO";
 
 export default function Install() {
   const navigate = useNavigate();
@@ -49,12 +50,17 @@ export default function Install() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center p-6 safe-area-inset">
+      <SEO
+        title="Install Kinsroot"
+        description="Install the Kinsroot family management app on your phone for offline access, faster loading, and a home-screen icon."
+      />
       <Card className="max-w-2xl w-full">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
             <Smartphone className="h-8 w-8 text-primary" />
           </div>
           <h1 className="text-3xl font-semibold leading-none tracking-tight">Install Kinsroot</h1>
+          <h2 className="sr-only">Add Kinsroot to your home screen</h2>
           <p className="text-muted-foreground mt-2">
             Get the full app experience with offline access and faster loading
           </p>

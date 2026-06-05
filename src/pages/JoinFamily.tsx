@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Users, CheckCircle, AlertCircle, ArrowRight, Sparkles, Shield, Calendar, Wallet, Eye, Edit, Lock } from "lucide-react";
 import { PermissionExplanation } from "@/components/invitations/PermissionExplanation";
+import SEO from "@/components/SEO";
 
 interface FamilyInfo {
   id: string;
@@ -219,6 +220,10 @@ const JoinFamily = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 flex items-center justify-center p-4">
+      <SEO
+        title="Join a family"
+        description="Enter your invitation code to join a Kinsroot family and start sharing meetings, contributions and savings together."
+      />
       <div className="w-full max-w-md">
         {/* Logo & Header */}
         <div className="text-center mb-6">

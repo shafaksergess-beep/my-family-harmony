@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Eye, EyeOff, CheckCircle2, ShieldCheck } from "lucide-react";
 import { z } from "zod";
+import SEO from "@/components/SEO";
 
 const passwordSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
@@ -121,6 +122,11 @@ const ResetPassword = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 flex items-center justify-center p-4">
+      <SEO
+        title="Reset your password"
+        description="Set a new password for your Kinsroot account to regain secure access to your family workspace."
+        noIndex
+      />
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <img
@@ -156,6 +162,7 @@ const ResetPassword = () => {
                   className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                   onClick={() => setShowPassword(!showPassword)}
                   tabIndex={-1}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
                 </Button>
@@ -185,6 +192,7 @@ const ResetPassword = () => {
                   className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   tabIndex={-1}
+                  aria-label={showConfirmPassword ? "Hide password confirmation" : "Show password confirmation"}
                 >
                   {showConfirmPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
                 </Button>

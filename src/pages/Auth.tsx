@@ -347,6 +347,7 @@ const Auth = () => {
             />
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-2">Family Together — Heritage-rooted family management</h1>
+          <h2 className="sr-only">Sign in to your account or create a new one</h2>
           <p className="text-muted-foreground">
             {pendingInvitation 
               ? "Sign in or create an account to accept your invitation"

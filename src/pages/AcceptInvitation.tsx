@@ -11,6 +11,7 @@ import {
   Shield, Heart, ArrowRight, Sparkles, PartyPopper, UserCheck 
 } from "lucide-react";
 import { FamilyJoinOnboarding } from "@/components/onboarding/FamilyJoinOnboarding";
+import SEO from "@/components/SEO";
 
 interface InvitationData {
   id: string;
@@ -393,6 +394,11 @@ const AcceptInvitation = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 flex items-center justify-center p-4">
       <div className="w-full max-w-lg space-y-4">
+        <SEO
+          title={invitation ? `Join ${invitation.families.name}` : "Accept family invitation"}
+          description="Review and accept your family invitation to join Kinsroot — manage meetings, contributions, savings, and more together."
+          noIndex
+        />
         {/* Family Header Card */}
         <Card className="overflow-hidden">
           <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6">
@@ -411,6 +417,7 @@ const AcceptInvitation = () => {
                   Family Invitation
                 </Badge>
                 <h1 className="text-xl font-bold">{invitation.families.name}</h1>
+                <h2 className="sr-only">Review and respond to your family invitation</h2>
                 {invitation.families.description && (
                   <p className="text-sm text-muted-foreground line-clamp-2">
                     {invitation.families.description}
@@ -481,6 +488,7 @@ const AcceptInvitation = () => {
                 disabled={processing}
                 variant="outline"
                 size="lg"
+                aria-label="Decline invitation"
               >
                 <XCircle className="w-4 h-4" />
               </Button>
