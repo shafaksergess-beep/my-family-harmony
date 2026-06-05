@@ -394,6 +394,11 @@ const AcceptInvitation = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 flex items-center justify-center p-4">
       <div className="w-full max-w-lg space-y-4">
+        <SEO
+          title={invitation ? `Join ${invitation.families.name}` : "Accept family invitation"}
+          description="Review and accept your family invitation to join Kinsroot — manage meetings, contributions, savings, and more together."
+          noIndex
+        />
         {/* Family Header Card */}
         <Card className="overflow-hidden">
           <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6">
