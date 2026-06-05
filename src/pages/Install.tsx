@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Smartphone, Download, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { haptics } from "@/lib/haptics";
+import SEO from "@/components/SEO";
 
 export default function Install() {
   const navigate = useNavigate();
