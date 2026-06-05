@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Eye, EyeOff, CheckCircle2, ShieldCheck } from "lucide-react";
 import { z } from "zod";
+import SEO from "@/components/SEO";
 
 const passwordSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
