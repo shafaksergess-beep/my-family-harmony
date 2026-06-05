@@ -122,6 +122,11 @@ const ResetPassword = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 flex items-center justify-center p-4">
+      <SEO
+        title="Reset your password"
+        description="Set a new password for your Kinsroot account to regain secure access to your family workspace."
+        noIndex
+      />
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <img
