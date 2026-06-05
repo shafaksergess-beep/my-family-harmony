@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Users, CheckCircle, AlertCircle, ArrowRight, Sparkles, Shield, Calendar, Wallet, Eye, Edit, Lock } from "lucide-react";
 import { PermissionExplanation } from "@/components/invitations/PermissionExplanation";
+import SEO from "@/components/SEO";
 
 interface FamilyInfo {
   id: string;
