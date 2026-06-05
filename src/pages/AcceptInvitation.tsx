@@ -412,6 +412,7 @@ const AcceptInvitation = () => {
                   Family Invitation
                 </Badge>
                 <h1 className="text-xl font-bold">{invitation.families.name}</h1>
+                <h2 className="sr-only">Review and respond to your family invitation</h2>
                 {invitation.families.description && (
                   <p className="text-sm text-muted-foreground line-clamp-2">
                     {invitation.families.description}
