@@ -11,6 +11,7 @@ import {
   Shield, Heart, ArrowRight, Sparkles, PartyPopper, UserCheck 
 } from "lucide-react";
 import { FamilyJoinOnboarding } from "@/components/onboarding/FamilyJoinOnboarding";
+import SEO from "@/components/SEO";
 
 interface InvitationData {
   id: string;
