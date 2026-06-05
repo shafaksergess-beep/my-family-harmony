@@ -483,6 +483,7 @@ const AcceptInvitation = () => {
                 disabled={processing}
                 variant="outline"
                 size="lg"
+                aria-label="Decline invitation"
               >
                 <XCircle className="w-4 h-4" />
               </Button>
