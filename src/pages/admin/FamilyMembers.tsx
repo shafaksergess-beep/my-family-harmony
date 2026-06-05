@@ -576,7 +576,7 @@ const FamilyMembers = () => {
                       {member.profiles?.avatar_url && (
                         <img 
                           src={member.profiles.avatar_url} 
-                          alt={member.profiles.full_name || 'User'} 
+                          alt={member.profiles?.full_name ? `${member.profiles.full_name} member photo` : 'Family member photo'} 
                           className="w-12 h-12 rounded-full object-cover"
                         />
                       )}
