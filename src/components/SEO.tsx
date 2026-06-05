@@ -10,9 +10,13 @@ interface SEOProps {
 const DEFAULT_DESCRIPTION =
   "Kinsroot is the all-in-one family management platform for meetings, contributions, savings, loans and heritage — rooted in tradition, built for tomorrow.";
 
+const ANDROID_PACKAGE = "app.lovable.3138229105464a70a015b86eb65a55a3";
+const SITE_ORIGIN = "https://kinsroot.softgroupsolutions.com";
+
 /**
- * Per-page SEO helper. Sets a unique title, meta description and canonical URL.
- * Use exactly one <SEO /> per route.
+ * Per-page SEO helper. Sets title, description, canonical, and an
+ * android-app:// alternate so Google can deep-link search results into
+ * the installed Play Store app (App Indexing).
  */
 export const SEO = ({ title, description, canonical, noIndex }: SEOProps) => {
   const fullTitle = title.includes("Kinsroot") ? title : `${title} | Kinsroot`;
@@ -21,11 +25,22 @@ export const SEO = ({ title, description, canonical, noIndex }: SEOProps) => {
     canonical ??
     (typeof window !== "undefined" ? window.location.href : undefined);
 
+  let androidAlternate: string | undefined;
+  if (url) {
+    try {
+      const u = new URL(url);
+      androidAlternate = `android-app://${ANDROID_PACKAGE}/https/${u.host}${u.pathname}${u.search}`;
+    } catch {
+      androidAlternate = `android-app://${ANDROID_PACKAGE}/https/${SITE_ORIGIN.replace(/^https?:\/\//, "")}/`;
+    }
+  }
+
   return (
     <Helmet>
       <title>{fullTitle}</title>
       <meta name="description" content={desc} />
       {url && <link rel="canonical" href={url} />}
+      {androidAlternate && <link rel="alternate" href={androidAlternate} />}
       {noIndex && <meta name="robots" content="noindex,nofollow" />}
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={desc} />
