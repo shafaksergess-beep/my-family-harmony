@@ -12,7 +12,7 @@ i18n
       fr: { translation: fr },
       bota: { translation: bota },
     },
-    lng: "en",
+    lng: (typeof localStorage !== "undefined" && localStorage.getItem("preferredLanguage")) || "en",
     fallbackLng: "en",
     interpolation: {
       escapeValue: false,
