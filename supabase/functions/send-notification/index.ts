@@ -100,10 +100,20 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Handle meeting_scheduled notification type
     if (type === 'meeting_scheduled' && familyId) {
+      const { requireFamilyMember } = await import("../_shared/auth.ts");
+      const membership = await requireFamilyMember(
+        auth.userId,
+        familyId,
+        corsHeaders,
+        ['family_head', 'family_admin'],
+      );
+      if (membership instanceof Response) return membership;
+
       const supabaseClient = createClient(
         Deno.env.get("SUPABASE_URL") ?? "",
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       );
+
 
       const { data: family, error: familyError } = await supabaseClient
         .from("families")
@@ -190,7 +200,18 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Original notification handling for direct email sending
+    // Free-form direct email path is restricted to trusted internal callers only.
+    // Requires x-cron-secret matching CRON_SECRET; otherwise reject to prevent
+    // authenticated users from sending arbitrary emails through the platform.
+    const { requireCronSecret } = await import("../_shared/auth.ts");
+    const cronCheck = await requireCronSecret(req, corsHeaders);
+    if (cronCheck instanceof Response) {
+      return new Response(
+        JSON.stringify({ error: "Notification type not permitted" }),
+        { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
     const { to, subject, userName, familyName, eventType, eventDetails, actionUrl } = requestData;
 
     if (!to || !subject) {
@@ -199,6 +220,7 @@ const handler = async (req: Request): Promise<Response> => {
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
+
 
     const toArray = Array.isArray(to) ? to : [to];
 

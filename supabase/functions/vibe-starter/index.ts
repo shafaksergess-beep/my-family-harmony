@@ -11,6 +11,10 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const { requireAuth, requireFamilyMember } = await import("../_shared/auth.ts");
+  const auth = await requireAuth(req, corsHeaders);
+  if (auth instanceof Response) return auth;
+
   try {
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -25,6 +29,10 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    const membership = await requireFamilyMember(auth.userId, familyId, corsHeaders);
+    if (membership instanceof Response) return membership;
+
 
     // Get family details for context
     const { data: family, error: familyError } = await supabaseClient

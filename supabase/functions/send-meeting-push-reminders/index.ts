@@ -125,7 +125,12 @@ interface MeetingRow {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  const { requireCronSecret } = await import("../_shared/auth.ts");
+  const cronCheck = await requireCronSecret(req, corsHeaders);
+  if (cronCheck instanceof Response) return cronCheck;
+
   try {
+
     if (!FIREBASE_SERVICE_ACCOUNT) {
       return new Response(
         JSON.stringify({ error: "FIREBASE_SERVICE_ACCOUNT not configured" }),
