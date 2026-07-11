@@ -106,29 +106,40 @@ serve(async (req) => {
         },
       });
 
-      // Send email notification if email exists
+      // Send email notification directly via Resend if email exists
       if (member.email) {
-        await supabaseClient.functions.invoke('send-notification', {
-          body: {
-            type: 'email',
-            to: member.email,
-            subject: `Attendance Reminder: ${(meeting.families as any)?.name} Meeting`,
-            html: `
-              <h2>Meeting Attendance Reminder</h2>
-              <p>Hi ${member.name},</p>
-              <p>We noticed your attendance rate is currently at ${member.attendance_rate}%.</p>
-              <p>We'd love to see you at our upcoming meeting:</p>
-              <ul>
-                <li><strong>Date:</strong> ${new Date(meeting.meeting_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</li>
-                <li><strong>Time:</strong> ${meeting.meeting_time}</li>
-                ${meeting.location ? `<li><strong>Location:</strong> ${meeting.location}</li>` : ''}
-              </ul>
-              <p>Please let us know if you can attend. Your participation is important to us!</p>
-              <p>Best regards,<br>${(meeting.families as any)?.name}</p>
-            `,
-          },
-        });
+        const resendApiKey = Deno.env.get('RESEND_API_KEY');
+        if (resendApiKey) {
+          try {
+            await fetch('https://api.resend.com/emails', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${resendApiKey}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                from: 'Family Together <onboarding@resend.dev>',
+                to: [member.email],
+                subject: `Attendance Reminder: ${(meeting.families as any)?.name} Meeting`,
+                html: `
+                  <h2>Meeting Attendance Reminder</h2>
+                  <p>Hi ${member.name},</p>
+                  <p>We noticed your attendance rate is currently at ${member.attendance_rate}%.</p>
+                  <p>We'd love to see you at our upcoming meeting:</p>
+                  <ul>
+                    <li><strong>Date:</strong> ${new Date(meeting.meeting_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</li>
+                    <li><strong>Time:</strong> ${meeting.meeting_time}</li>
+                    ${meeting.location ? `<li><strong>Location:</strong> ${meeting.location}</li>` : ''}
+                  </ul>
+                  <p>Please let us know if you can attend. Your participation is important to us!</p>
+                  <p>Best regards,<br>${(meeting.families as any)?.name}</p>
+                `,
+              }),
+            });
+          } catch (e) { console.error('resend send failed', e); }
+        }
       }
+
     }
 
     return new Response(
