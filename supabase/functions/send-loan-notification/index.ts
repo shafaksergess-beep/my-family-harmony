@@ -27,9 +27,47 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { loanId, familyId, memberName, amount, purpose }: NotificationRequest = await req.json();
+    const { loanId }: NotificationRequest = await req.json();
+    if (!loanId) {
+      return new Response(JSON.stringify({ error: 'loanId is required' }), {
+        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
-    console.log('Processing loan notification:', { loanId, familyId, memberName, amount, purpose });
+    // Load the loan server-side and derive trusted values (do not trust client-supplied familyId/amount/purpose/memberName)
+    const { data: loan, error: loanError } = await supabase
+      .from('loans')
+      .select('id, family_id, member_id, amount, purpose')
+      .eq('id', loanId)
+      .maybeSingle();
+    if (loanError || !loan) {
+      return new Response(JSON.stringify({ error: 'Loan not found' }), {
+        status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const familyId = loan.family_id as string;
+    const amount = Number(loan.amount) || 0;
+    const purpose = String(loan.purpose ?? '');
+
+    // Caller must belong to the loan's family
+    const { requireFamilyMember } = await import("../_shared/auth.ts");
+    const membership = await requireFamilyMember(auth.userId, familyId, corsHeaders);
+    if (membership instanceof Response) return membership;
+
+    // Resolve requester's display name from the loan's member
+    let memberName = 'A member';
+    if (loan.member_id) {
+      const { data: memberRow } = await supabase
+        .from('family_members')
+        .select('profiles:user_id(full_name)')
+        .eq('id', loan.member_id)
+        .maybeSingle();
+      const p = (memberRow?.profiles as any);
+      if (p?.full_name) memberName = p.full_name;
+    }
+
+    console.log('Processing loan notification:', { loanId, familyId, amount });
+
 
     // Get loan committee members and family head
     const { data: members, error: membersError } = await supabase
