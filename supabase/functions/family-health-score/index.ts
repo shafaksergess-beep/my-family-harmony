@@ -11,7 +11,7 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const { requireAuth } = await import("../_shared/auth.ts");
+  const { requireAuth, requireFamilyMember } = await import("../_shared/auth.ts");
   const auth = await requireAuth(req, corsHeaders);
   if (auth instanceof Response) return auth;
 
@@ -29,6 +29,10 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    const membership = await requireFamilyMember(auth.userId, familyId, corsHeaders);
+    if (membership instanceof Response) return membership;
+
 
     // Fetch data for health score calculation
     const [
