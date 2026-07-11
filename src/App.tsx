@@ -17,6 +17,7 @@ import { OfflineBootstrap } from "@/components/OfflineBootstrap";
 import { PWAUpdatePrompt } from "@/components/PWAUpdatePrompt";
 // Lazy load core pages
 const Index = lazy(() => import("./pages/Index"));
+const WhatIsNjangi = lazy(() => import("./pages/blog/WhatIsNjangi"));
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -136,6 +137,7 @@ const App = () => (
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/blog/what-is-njangi" element={<WhatIsNjangi />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/admin" element={<AdminModule><AdminDashboard /></AdminModule>} />
