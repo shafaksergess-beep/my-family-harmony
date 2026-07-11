@@ -11,7 +11,7 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const { requireAuth } = await import("../_shared/auth.ts");
+  const { requireAuth, requireFamilyMember } = await import("../_shared/auth.ts");
   const auth = await requireAuth(req, corsHeaders);
   if (auth instanceof Response) return auth;
 
@@ -40,6 +40,16 @@ serve(async (req) => {
     if (meetingError || !meeting) {
       throw new Error('Meeting not found');
     }
+
+    // Only family leaders may trigger attendance-prediction outreach for a family
+    const membership = await requireFamilyMember(
+      auth.userId,
+      meeting.family_id,
+      corsHeaders,
+      ['family_head', 'family_admin'],
+    );
+    if (membership instanceof Response) return membership;
+
 
     // Get all family members
     const { data: members, error: membersError } = await supabaseClient
