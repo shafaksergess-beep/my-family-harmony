@@ -137,6 +137,7 @@ const App = () => (
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/blog/what-is-njangi" element={<WhatIsNjangi />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/admin" element={<AdminModule><AdminDashboard /></AdminModule>} />
