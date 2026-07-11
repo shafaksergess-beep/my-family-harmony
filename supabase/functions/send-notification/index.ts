@@ -100,10 +100,20 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Handle meeting_scheduled notification type
     if (type === 'meeting_scheduled' && familyId) {
+      const { requireFamilyMember } = await import("../_shared/auth.ts");
+      const membership = await requireFamilyMember(
+        auth.userId,
+        familyId,
+        corsHeaders,
+        ['family_head', 'family_admin'],
+      );
+      if (membership instanceof Response) return membership;
+
       const supabaseClient = createClient(
         Deno.env.get("SUPABASE_URL") ?? "",
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       );
+
 
       const { data: family, error: familyError } = await supabaseClient
         .from("families")
