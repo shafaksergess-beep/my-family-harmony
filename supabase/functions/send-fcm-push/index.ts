@@ -74,7 +74,12 @@ async function getAccessToken(serviceAccount: {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  const { requireCronSecret } = await import("../_shared/auth.ts");
+  const cronCheck = await requireCronSecret(req, corsHeaders);
+  if (cronCheck instanceof Response) return cronCheck;
+
   try {
+
     const raw = Deno.env.get("FIREBASE_SERVICE_ACCOUNT");
     if (!raw) {
       return new Response(
