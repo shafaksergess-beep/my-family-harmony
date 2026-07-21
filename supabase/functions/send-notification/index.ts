@@ -272,7 +272,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
 
-    const toArray = Array.isArray(to) ? to : [to];
+    const toArray = normalizedTo.length > 0 ? normalizedTo : (Array.isArray(to) ? to : [to]);
 
     const emailHtml = userName && familyName && eventType && eventDetails ? `
       <!DOCTYPE html>
