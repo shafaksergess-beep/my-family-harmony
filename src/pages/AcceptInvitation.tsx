@@ -76,9 +76,8 @@ const AcceptInvitation = () => {
       setUser(currentUser);
       
       if (!currentUser) {
-        // Store invitation token and redirect to auth
-        localStorage.setItem("pendingInvitationToken", token);
-        navigate(`/auth?redirect=/accept-invitation?token=${token}`);
+        // Redirect to auth with token in redirect URL
+        navigate(`/auth?redirect=${encodeURIComponent(`/accept-invitation?token=${token}`)}`);
         return;
       }
 
