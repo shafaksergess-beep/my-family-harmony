@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Download, Upload, Clock, AlertTriangle } from 'lucide-react';
 import { backupService } from '@/lib/backupService';
+import { useFamilyAuth } from '@/hooks/useFamilyAuth';
 import { toast } from 'sonner';
 import {
   Alert,
@@ -13,15 +14,20 @@ import {
 
 export default function BackupRestore() {
   const { familySlug } = useParams();
+  const { family } = useFamilyAuth(familySlug);
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExport = async () => {
-    if (!familySlug) return;
+    if (!familySlug || !family?.id) {
+      if (!family?.id && familySlug) {
+        toast.error("Family data not loaded. Please try again.");
+      }
+      return;
+    }
     
     setIsExporting(true);
     try {
-      // TODO: Get family ID from slug
-      await backupService.downloadBackup('family-id', familySlug);
+      await backupService.downloadBackup(family.id, familySlug);
     } catch (error) {
       console.error('Export error:', error);
     } finally {
