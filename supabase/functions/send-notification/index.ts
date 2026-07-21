@@ -200,18 +200,6 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Free-form direct email path is restricted to trusted internal callers only.
-    // Requires x-cron-secret matching CRON_SECRET; otherwise reject to prevent
-    // authenticated users from sending arbitrary emails through the platform.
-    const { requireCronSecret } = await import("../_shared/auth.ts");
-    const cronCheck = await requireCronSecret(req, corsHeaders);
-    if (cronCheck instanceof Response) {
-      return new Response(
-        JSON.stringify({ error: "Notification type not permitted" }),
-        { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
-
     const { to, subject, userName, familyName, eventType, eventDetails, actionUrl } = requestData;
 
     if (!to || !subject) {
@@ -219,6 +207,68 @@ const handler = async (req: Request): Promise<Response> => {
         JSON.stringify({ error: "Missing required fields: to and subject" }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
+    }
+
+    const toArrayRaw = Array.isArray(to) ? to : [to];
+    const normalizedTo = Array.from(new Set(
+      toArrayRaw
+        .filter((e): e is string => typeof e === "string" && e.length > 0)
+        .map((e) => e.trim().toLowerCase())
+    ));
+
+    // Authorize recipients. To prevent authenticated users from using this
+    // function as a generic email relay, restrict recipients to either:
+    //   - the caller's own auth email (e.g. "send test email"), or
+    //   - emails belonging to members of a family the caller belongs to
+    //     (leader-only for bulk/general sends).
+    // Internal cron jobs presenting a valid x-cron-secret bypass these checks.
+    const { requireCronSecret, requireFamilyMember } = await import("../_shared/auth.ts");
+    const cronCheck = await requireCronSecret(req, corsHeaders);
+    const isCron = !(cronCheck instanceof Response);
+
+    if (!isCron) {
+      const adminClient = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      );
+
+      const { data: callerProfile } = await adminClient
+        .from("profiles")
+        .select("email")
+        .eq("id", auth.userId)
+        .maybeSingle();
+      const callerEmail = (callerProfile?.email ?? "").toLowerCase();
+
+      let allowedEmails = new Set<string>();
+      if (callerEmail) allowedEmails.add(callerEmail);
+
+      if (familyId) {
+        // Bulk/family sends require caller to be a leader of that family.
+        const membership = await requireFamilyMember(
+          auth.userId,
+          familyId,
+          corsHeaders,
+          ['family_head', 'family_admin', 'loan_committee'],
+        );
+        if (membership instanceof Response) return membership;
+
+        const { data: famMembers } = await adminClient
+          .from("family_members")
+          .select("profiles:user_id(email)")
+          .eq("family_id", familyId);
+        for (const m of famMembers ?? []) {
+          const em = (m as any)?.profiles?.email;
+          if (em) allowedEmails.add(String(em).toLowerCase());
+        }
+      }
+
+      const disallowed = normalizedTo.filter((e) => !allowedEmails.has(e));
+      if (disallowed.length > 0) {
+        return new Response(
+          JSON.stringify({ error: "Recipients not permitted" }),
+          { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
     }
 
 
