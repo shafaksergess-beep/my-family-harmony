@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.3138229105464a70a015b86eb65a55a3',
+  appId: 'com.softserge.kinsroot',
   appName: 'Kinsroot',
   webDir: 'dist',
   server: {
@@ -44,6 +44,9 @@ const config: CapacitorConfig = {
     },
     Haptics: {
       enabled: true,
+    },
+    FirebaseMessaging: {
+      presentationOptions: ['badge', 'sound', 'alert'],
     },
   },
 };
