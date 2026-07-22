@@ -32,7 +32,10 @@ export function InstallMenuItem() {
       e.preventDefault();
       setEvt(e as BeforeInstallPromptEvent);
     };
-    const onInstalled = () => setInstalled(true);
+    const onInstalled = () => {
+      setInstalled(true);
+      trackAppInstalled("menu");
+    };
     window.addEventListener("beforeinstallprompt", handler);
     window.addEventListener("appinstalled", onInstalled);
     return () => {
@@ -54,6 +57,7 @@ export function InstallMenuItem() {
     if (evt) {
       await evt.prompt();
       const { outcome } = await evt.userChoice;
+      trackInstallOutcome(outcome, "menu");
       if (outcome === "accepted") setInstalled(true);
       setEvt(null);
     } else {

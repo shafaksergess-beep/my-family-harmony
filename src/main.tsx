@@ -4,12 +4,16 @@ import "./index.css";
 import "./i18n/config";
 import "./lib/median"; // Initialize global isMedianApp
 import { getAnalyticsSafe, logAnalyticsEvent } from "./lib/firebase";
+import { trackStandaloneLaunch } from "./lib/pwaAnalytics";
 
 // Service worker is managed by vite-plugin-pwa (autoUpdate mode)
 // It automatically skips waiting and claims clients on new deployments
 
 // Initialize Firebase Analytics (no-op if unsupported, e.g. in-app webviews)
 void getAnalyticsSafe();
+
+// Track PWA standalone launches once per day
+trackStandaloneLaunch();
 
 // Crashlytics-equivalent for web: forward JS errors → Analytics `exception` event
 window.addEventListener("error", (e) => {
