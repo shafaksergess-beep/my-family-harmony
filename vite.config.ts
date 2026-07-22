@@ -93,9 +93,9 @@ export default defineConfig(({ mode }) => ({
               cacheName: "supabase-rest-cache",
               expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 },
               cacheableResponse: { statuses: [0, 200] },
-              },
             },
           },
+
           {
             // Supabase auth/storage/functions — NetworkFirst (fresh preferred,
             // fall back to cache offline).
