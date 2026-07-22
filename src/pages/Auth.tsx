@@ -15,6 +15,7 @@ import { useRecaptcha } from "@/hooks/useRecaptcha";
 import SEO from "@/components/SEO";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PasswordStrength } from "@/components/PasswordStrength";
+import { lovable } from "@/integrations/lovable";
 
 interface PendingInvitation {
   familyName: string;
