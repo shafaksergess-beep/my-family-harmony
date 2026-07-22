@@ -14,7 +14,10 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === "development" && componentTagger(),
     VitePWA({
-      registerType: "autoUpdate",
+      // "prompt" — the app's PWAUpdatePrompt controls when the new SW takes
+      // over. Avoids blank-screen races where a mid-navigation SW swap serves
+      // a new index.html referencing chunk hashes the open tab never loaded.
+      registerType: "prompt",
       injectRegister: null,
       devOptions: { enabled: false },
       includeAssets: ["favicon.ico", "favicon.jpg", "robots.txt", "logo.jpg", "pwa-192x192.png", "pwa-512x512.png"],
@@ -70,8 +73,12 @@ export default defineConfig(({ mode }) => ({
         globPatterns: ["**/*.{js,css,html,ico,png,jpg,svg,woff,woff2}"],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         cleanupOutdatedCaches: true,
-        skipWaiting: true,
-        clientsClaim: true,
+        // IMPORTANT: do NOT skipWaiting / clientsClaim automatically.
+        // PWAUpdatePrompt calls updateServiceWorker(true) on user consent,
+        // which posts SKIP_WAITING and reloads cleanly. Auto-claiming open
+        // tabs mid-navigation causes blank screens after deploys.
+        skipWaiting: false,
+        clientsClaim: false,
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//, /^\/functions\//],
         // Warm the SPA shell + top routes so first navigation to each is instant.
