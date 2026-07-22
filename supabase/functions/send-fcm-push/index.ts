@@ -111,6 +111,14 @@ Deno.serve(async (req) => {
               ...(body.data ?? {}),
               ...(body.url ? { url: body.url } : {}),
             },
+            android: {
+              priority: "HIGH" as const,
+              notification: {
+                channel_id: "kinsroot_default",
+                notification_count: 1,
+                default_sound: true,
+              },
+            },
             webpush: body.url
               ? { fcm_options: { link: body.url } }
               : undefined,

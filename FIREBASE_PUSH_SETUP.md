@@ -23,25 +23,34 @@ returned FCM token is saved to the profile.
 
 `public/firebase-messaging-sw.js` handles background notifications.
 
-## 2. Capacitor (iOS + Android native)
+## 2. Capacitor (Android native)
 
-### Android
-1. In Firebase Console → Project Settings → **Your apps** → add Android app
-   `app.lovable.3138229105464a70a015b86eb65a55a3`.
-2. Download `google-services.json` and place it in `android/app/`.
-3. `npx cap sync android`.
+Native Android push uses **@capacitor-firebase/messaging** with the
+`com.softserge.kinsroot` package (Firebase project `kinsroot-7a831`).
+The `google-services.json` is already committed at
+`android/app/google-services.json`.
 
-### iOS
-1. In Firebase Console → add iOS app with the same bundle ID.
-2. Download `GoogleService-Info.plist` and add it to the Xcode project
-   (drag into `ios/App/App/`).
-3. In Xcode, enable **Push Notifications** and **Background Modes → Remote
-   notifications** capabilities.
-4. Upload your APNs Auth Key (`.p8`) in Firebase Console → Cloud Messaging.
-5. `npx cap sync ios`.
+After `git pull`:
 
-The `useMobilePush` hook auto-detects the native runtime and uses the
-Capacitor plugin — no app code changes needed.
+```bash
+npm install
+npx cap sync android
+npx cap run android
+```
+
+Capacitor 6+ auto-registers the Google Services Gradle plugin; no manual
+`build.gradle` edits are required. In the app, open
+**Settings → Notifications → Enable Notifications** to grant permission
+and register the FCM token to `profiles.push_token`.
+
+### iOS (pending)
+Not configured yet. When ready, add `GoogleService-Info.plist` to the
+Xcode project, enable Push Notifications + Background Modes → Remote
+notifications, and upload the APNs `.p8` auth key in Firebase Console
+→ Cloud Messaging.
+
+The `useMobilePush` hook auto-detects the native runtime — no app code
+changes needed.
 
 ## 3. Median.co wrapper
 
