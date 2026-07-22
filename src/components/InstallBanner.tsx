@@ -3,6 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Download, Share, Plus, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import {
+  trackInstallOutcome,
+  trackInstallPromptShown,
+  trackAppInstalled,
+} from "@/lib/pwaAnalytics";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
