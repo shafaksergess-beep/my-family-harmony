@@ -94,7 +94,7 @@ const LinkedAccounts = () => {
       <SEO
         title="Linked accounts | Kinsroot"
         description="View and manage the sign-in providers connected to your Kinsroot account."
-        canonicalPath="/profile/linked-accounts"
+        canonical="/profile/linked-accounts"
       />
       <div className="max-w-3xl mx-auto p-4 md:p-8">
         <Button variant="ghost" size="sm" onClick={() => navigate("/profile")} className="mb-4">
