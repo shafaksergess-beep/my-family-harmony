@@ -89,9 +89,18 @@ const Auth = () => {
     checkPendingInvitation();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" && session) {
-        navigate(redirectUrl);
+        try {
+          const { isNewProfile } = await syncUserProfile(session.user);
+          if (isNewProfile) {
+            localStorage.setItem("family-together-first-login", "true");
+          }
+        } catch (e) {
+          console.warn("profile sync failed", e);
+        }
+        const stashed = consumeOAuthRedirect();
+        navigate(stashed || redirectUrl, { replace: true });
       }
     });
 
