@@ -88,7 +88,7 @@ const Terms = () => {
             <li>Share account credentials or resell access to the Service without our written consent.</li>
           </ul>
 
-          <h2 className="text-2xl function-bold mt-10 mb-4">6. User content</h2>
+          <h2 className="text-2xl font-bold mt-10 mb-4">6. User content</h2>
           <p>
             You retain ownership of the content you post to the Service (messages, minutes, records, media).
             You grant Kinsroot a worldwide, non-exclusive, royalty-free license to host, store, reproduce,
