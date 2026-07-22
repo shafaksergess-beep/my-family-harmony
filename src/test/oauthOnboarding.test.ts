@@ -66,15 +66,14 @@ function mockProfilesTable({ existing }: { existing: any }) {
 }
 
 function mockFamilyMembersCount(count: number, error: any = null) {
+  fromMock.mockReset();
   fromMock.mockImplementation((table: string) => {
-    if (table === "family_members") {
-      return {
-        select: () => ({
-          eq: () => Promise.resolve({ count, error }),
-        }),
-      };
-    }
-    throw new Error("unexpected table " + table);
+    if (table !== "family_members") throw new Error("unexpected table " + table);
+    return {
+      select: () => ({
+        eq: () => Promise.resolve({ count, error }),
+      }),
+    };
   });
 }
 
