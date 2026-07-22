@@ -1,52 +1,77 @@
-## Implementation Plan — 4 Bundles
 
-I'll deliver this in 4 sequential passes, each shippable on its own. To keep scope realistic I'm picking the highest-impact items per bundle and skipping nice-to-haves that overlap with what already exists (e.g. you already have `NewUserOnboarding`, `FamilyJoinOnboarding`, `PendingActionsWidget`, `NotificationsFeed`, `FamilyHealthScore`, dashboard widgets, i18n, theme toggle, PWA manifest, etc.).
+## Goal
 
----
+Audit the existing PWA setup, fix issues, and make "Add to Home Screen" install prominent and reliable across Chrome/Android and iOS Safari.
 
-### Pass 1 — Onboarding + Empty-State CTAs
+## Audit findings (verified in code)
 
-1. **Reusable `<EmptyState />` component** — icon, headline, subline, primary CTA, secondary CTA. Themed via design tokens.
-2. **Wire empty-states into the 5 modules with zero data**:
-   - Contributions → "Record first contribution" + "Set monthly amount"
-   - Loans → "Request a loan" + "Read loan rules"
-   - Savings → "Add savings entry"
-   - Njangi → "Start a cycle"
-   - Meetings → "Schedule first meeting"
-3. **Dashboard empty-state coach card** — shown when user has 0 contributions/0 meetings: 3 numbered next steps with deep-links.
-4. **Onboarding completion nudge** — if `useOnboarding.isFirstTime` and the user is on Dashboard, surface a dismissible banner pointing at the existing tutorial.
+1. **Preview leakage**: `vite.config.ts` uses `injectRegister: "auto"` + `PWAUpdatePrompt` also calls `useRegisterSW`. This registers a service worker inside the Lovable preview iframe (`id-preview--*.lovable.app`), which the PWA skill explicitly forbids — stale caches will haunt the editor preview.
+2. **Double-registration risk**: `injectRegister: "auto"` injects its own registration AND `useRegisterSW` registers again. Only one path should register.
+3. **Duplicate route**: `/install` is declared twice in `src/App.tsx` (lines 148 and 229).
+4. **iOS blind spot**: `InstallBanner.tsx` only shows when `beforeinstallprompt` fires — iOS Safari never fires it, so iPhone users never see the prompt or instructions.
+5. **No prominent entry point**: `/install` page exists but nothing in the app chrome links to it. Users don't know it's installable.
+6. **Manifest**: `logo.jpg` at 192x192 is declared with `purpose: "any"` — jpeg is allowed but a PNG is preferred; existing `pwa-192x192.png` / `pwa-512x512.png` already cover this.
 
-### Pass 2 — Landing Page + SEO Revamp
+## Changes
 
-1. **Rewrite `/` hero** with stronger value prop, real screenshot/illustration, dual CTA (Get started / See how it works).
-2. **Add Trust/Testimonials section** (placeholder quotes wired to a constants file so you can edit later).
-3. **Add "How it works" 3-step section** with icons.
-4. **PWA install banner** — small dismissible bottom-right card using `beforeinstallprompt`.
-5. **OG/Twitter polish** + JSON-LD `Organization` + `SoftwareApplication` schema in `index.html`.
-6. **Multi-language landing**: hook the existing 3 buttons (EN/FR/Bota) to actually switch i18n.
+### 1. Guarded service-worker registration (per PWA skill)
 
-### Pass 3 — Owner Retention
+Create `src/lib/pwaRegister.ts` — single registration wrapper that:
+- refuses when `!import.meta.env.PROD`
+- refuses inside iframes
+- refuses on hostnames starting with `id-preview--` / `preview--`
+- refuses on `*.lovableproject.com`, `*.lovableproject-dev.com`, `*.beta.lovable.dev`
+- refuses when `?sw=off` — and unregisters any existing `/sw.js` in that case
+- otherwise calls `useRegisterSW` (via the existing `PWAUpdatePrompt`)
 
-1. **Family Health widget on family Dashboard** — surface the existing `family-health-score` edge function (web side currently lacks it; mobile has `FamilyHealthScore.tsx`).
-2. **Consolidated "Pending Approvals" page** — single list combining join-requests, savings approvals, loan approvals, with one-click action.
-3. **"Remind everyone" button** on Contributions page — calls existing `send-loan-payment-reminder`/`check-late-payments` style edge to nudge unpaid members.
-4. **Bulk invite** — multi-email textarea on Invitations page (single submit, fans out to existing `send-invitation`).
+Update `vite.config.ts`:
+- `injectRegister: null` (skill requirement — wrapper is the only registrar)
+- `devOptions: { enabled: false }` (explicit, prevent dev SW)
 
-### Pass 4 — Admin Observability
+Refactor `src/components/PWAUpdatePrompt.tsx` to short-circuit and unregister in refused contexts before touching `useRegisterSW`. Keep the update-toast + offline-ready toast behavior.
 
-1. **Fix empty activity logs** — `useActivityTracking` is only mounted in one place. Mount it in `App.tsx` so every route logs a `page_view`, and add explicit `logActivity` calls at signup/login.
-2. **Admin KPI refresh** — top of `/admin/Dashboard` shows: DAU (7d), new signups (7d), pending approvals, edge-function errors (24h).
-3. **In-app announcement banner** — admin can post a string in `system_settings` table; renders globally as a dismissible banner.
-4. **CSV export buttons** on Admin Users + Families lists.
+### 2. Cross-platform install UX
 
----
+Replace the current single-shot `InstallBanner.tsx` with a smarter component:
+- **Android/Chromium**: capture `beforeinstallprompt`, show banner with "Install" button.
+- **iOS Safari** (detect `/iphone|ipad|ipod/` + not standalone + not Chrome-on-iOS): show a banner with the Share → Add to Home Screen instructions.
+- Suppress when already installed (`display-mode: standalone` or `navigator.standalone`).
+- Dismissal stored in `localStorage` for 14 days (not just session) so it isn't nagging every reload.
+- "Learn more" link → `/install` for full instructions.
 
-### Technical notes
+Add a persistent **"Install app"** entry in the profile/settings menu so users can trigger installation any time (fires the deferred prompt on Android, links to `/install` on iOS).
 
-- New DB objects (Pass 4): `system_announcements` (id, message, level, active, created_at) with admin-only RLS write, public read; reuse existing activity_logs table.
-- All new UI uses semantic tokens (no raw colors).
-- Empty-state component lives at `src/components/EmptyState.tsx`.
-- All copy goes through i18n where modules already use `useTranslation`; otherwise inline EN strings.
-- I'll batch DB migrations into a single migration call before Pass 4.
+### 3. Fix duplicate `/install` route
 
-I'll start with **Pass 1** now and post progress between passes so you can stop me anywhere.
+Remove the duplicate `<Route path="/install" />` on line 229 of `src/App.tsx`.
+
+### 4. `/install` page polish
+
+`src/pages/Install.tsx` already exists and covers Android + iOS manual instructions. Small tweaks:
+- Detect standalone mode more robustly (both `display-mode: standalone` and iOS `navigator.standalone`).
+- Add a "Copy link" button so users on desktop can send the URL to their phone.
+
+### 5. Manifest sanity
+
+`public/manifest.webmanifest` and the manifest embedded in `vite.config.ts` diverge slightly. Keep the vite-plugin-pwa generated one authoritative; delete `public/manifest.webmanifest` to avoid two competing manifests being served. Confirm `index.html` `<link rel="manifest">` still resolves (plugin injects it in `injectManifest`/`generateSW` mode automatically).
+
+## Verification
+
+- Run build; confirm `dist/sw.js` and `dist/manifest.webmanifest` are emitted.
+- Load preview in the Lovable editor iframe → confirm no SW registers (check Application tab via Playwright).
+- Load published site in a normal Chrome tab → confirm SW registers, install banner appears, `/install` works.
+- Simulate iOS UA in Playwright → confirm iOS instructions render.
+
+## Files touched
+
+```text
+vite.config.ts                              (injectRegister: null, devOptions off)
+src/lib/pwaRegister.ts                      (new — guard helper)
+src/components/PWAUpdatePrompt.tsx          (apply guard, unregister in refused ctx)
+src/components/InstallBanner.tsx            (add iOS branch, 14-day dismiss)
+src/components/InstallMenuItem.tsx          (new — reusable install trigger)
+src/pages/Profile.tsx                       (add InstallMenuItem in settings list)
+src/pages/Install.tsx                       (better standalone detection, share link)
+src/App.tsx                                 (remove duplicate /install route)
+public/manifest.webmanifest                 (delete — plugin generates it)
+```
