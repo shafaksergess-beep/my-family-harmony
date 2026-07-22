@@ -1,21 +1,24 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Capacitor } from "@capacitor/core";
 import { supabase } from "@/integrations/supabase/client";
 import { requestFcmToken } from "@/lib/firebase";
+import { incrementAppBadge } from "@/lib/appBadge";
 
 /**
  * Platform-aware push registration.
  *
- * - Native iOS/Android (Capacitor): uses @capacitor/push-notifications and
- *   stores the platform-native FCM/APNs token on profiles.push_token.
- * - Median.co wrappers: relies on the Median bridge if present, otherwise
- *   falls back to the web FCM token (works inside the in-app webview).
- * - Web/PWA: requests browser permission and registers a web FCM token.
+ * - Native iOS/Android (Capacitor): uses @capacitor-firebase/messaging.
+ *   Tokens land in profiles.push_token; foreground notifications trigger
+ *   a badge bump; taps deep-link via data.url.
+ * - Median.co wrappers: uses Median bridge when available, otherwise the
+ *   web FCM fallback inside the in-app webview.
+ * - Web/PWA: browser Notification permission + web FCM token.
  */
 export function useMobilePush(userId?: string | null) {
   const [token, setToken] = useState<string | null>(null);
   const [platform, setPlatform] = useState<"native" | "median" | "web">("web");
   const [enabling, setEnabling] = useState(false);
+  const badgeCountRef = useRef(0);
 
   useEffect(() => {
     if (Capacitor.isNativePlatform()) setPlatform("native");
@@ -36,27 +39,55 @@ export function useMobilePush(userId?: string | null) {
     [userId]
   );
 
+  // Wire native listeners once on mount so background tap deep-links + foreground
+  // badge updates keep working after the first registration.
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    let cleanup: Array<() => void> = [];
+
+    (async () => {
+      const { FirebaseMessaging } = await import("@capacitor-firebase/messaging");
+
+      const received = await FirebaseMessaging.addListener("notificationReceived", async () => {
+        badgeCountRef.current += 1;
+        await incrementAppBadge(badgeCountRef.current - 1);
+      });
+      cleanup.push(() => received.remove());
+
+      const tapped = await FirebaseMessaging.addListener(
+        "notificationActionPerformed",
+        (evt) => {
+          const url = (evt.notification.data as Record<string, string> | undefined)?.url;
+          if (url && typeof window !== "undefined") {
+            window.location.assign(url);
+          }
+        }
+      );
+      cleanup.push(() => tapped.remove());
+
+      const rotated = await FirebaseMessaging.addListener("tokenReceived", async (evt) => {
+        if (evt.token) await persist(evt.token);
+      });
+      cleanup.push(() => rotated.remove());
+    })();
+
+    return () => {
+      cleanup.forEach((fn) => fn());
+    };
+  }, [persist]);
+
   const enable = useCallback(async (): Promise<string | null> => {
     setEnabling(true);
     try {
       if (Capacitor.isNativePlatform()) {
-        const { PushNotifications } = await import("@capacitor/push-notifications");
-        let perm = await PushNotifications.checkPermissions();
-        if (perm.receive !== "granted") perm = await PushNotifications.requestPermissions();
+        const { FirebaseMessaging } = await import("@capacitor-firebase/messaging");
+        let perm = await FirebaseMessaging.checkPermissions();
+        if (perm.receive !== "granted") perm = await FirebaseMessaging.requestPermissions();
         if (perm.receive !== "granted") return null;
 
-        return await new Promise<string | null>((resolve) => {
-          const regHandle = PushNotifications.addListener("registration", async (t) => {
-            await persist(t.value);
-            resolve(t.value);
-            (await regHandle).remove();
-          });
-          PushNotifications.addListener("registrationError", (err) => {
-            console.warn("[push] registration error", err);
-            resolve(null);
-          });
-          PushNotifications.register();
-        });
+        const { token: t } = await FirebaseMessaging.getToken();
+        if (t) await persist(t);
+        return t ?? null;
       }
 
       // Median bridge — best-effort token grab when running inside Median app
