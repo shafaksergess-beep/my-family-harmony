@@ -1,10 +1,10 @@
 {
-  "version": "1.4.0",
+  "version": "1.5.0",
   "releasedAt": "2026-07-22",
   "highlights": [
-    "Push notifications for meeting reminders, due contributions, and new assistance events",
-    "Faster route loading — dashboard, meetings, and ledger now open instantly after first visit",
-    "Improved install experience across iPhone and Android",
-    "New \"What's new\" release notes"
+    "Notification settings screen: enable or disable meeting reminders, due contributions, and assistance-event alerts per account",
+    "Faster offline experience — Supabase data and images now use a stale-while-revalidate cache so pages load instantly and refresh in the background",
+    "Automated update: your app now force-refreshes to the latest version without losing your current page",
+    "New end-to-end tests covering push registration, scheduled reminders, and the update flow"
   ]
 }

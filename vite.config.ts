@@ -85,28 +85,53 @@ export default defineConfig(({ mode }) => ({
         ],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
+            // Supabase REST (PostgREST) — stale-while-revalidate so pages render
+            // instantly from cache and refresh in the background.
+            urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/v1\/.*/i,
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "supabase-rest-cache",
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+
+          {
+            // Supabase auth/storage/functions — NetworkFirst (fresh preferred,
+            // fall back to cache offline).
+            urlPattern: /^https:\/\/.*\.supabase\.co\/(auth|storage|functions)\/.*/i,
             handler: "NetworkFirst",
             options: {
-              cacheName: "supabase-cache",
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 300,
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
+              cacheName: "supabase-api-cache",
+              networkTimeoutSeconds: 5,
+              expiration: { maxEntries: 50, maxAgeSeconds: 300 },
+              cacheableResponse: { statuses: [0, 200] },
             },
           },
           {
-            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
-            handler: "CacheFirst",
+            // Same-origin images (avatars, uploads) — SWR keeps them fresh.
+            urlPattern: ({ request, sameOrigin }) =>
+              sameOrigin && request.destination === "image",
+            handler: "StaleWhileRevalidate",
             options: {
               cacheName: "image-cache",
               expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+                maxEntries: 200,
+                maxAgeSeconds: 60 * 60 * 24 * 30,
               },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            // Cross-origin images (Supabase storage, gravatar, etc).
+            urlPattern: ({ url, sameOrigin, request }: { url: URL; sameOrigin: boolean; request: Request }) =>
+              request.destination === "image" && !sameOrigin,
+
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "image-cache-external",
+              expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 7 },
+              cacheableResponse: { statuses: [0, 200] },
             },
           },
           {
@@ -116,11 +141,12 @@ export default defineConfig(({ mode }) => ({
               cacheName: "font-cache",
               expiration: {
                 maxEntries: 20,
-                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+                maxAgeSeconds: 60 * 60 * 24 * 365,
               },
             },
           },
         ],
+
       },
     }),
   ].filter(Boolean),

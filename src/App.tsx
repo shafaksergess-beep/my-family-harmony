@@ -219,6 +219,8 @@ const App = () => (
           <Route path="/family/:familySlug/assistance-reports" element={<FamilyModule><FamilyAssistanceReports /></FamilyModule>} />
           <Route path="/family/:familySlug/backup-restore" element={<FamilyModule><BackupRestore /></FamilyModule>} />
           <Route path="/family/:familySlug/notification-settings" element={<FamilyModule><NotificationSettings /></FamilyModule>} />
+          <Route path="/settings/notifications" element={<Suspense fallback={<PageLoadingSkeleton />}><NotificationSettings /></Suspense>} />
+
           <Route path="/family/:familySlug/more" element={<FamilyModule><FamilyMore /></FamilyModule>} />
           <Route path="/family/:familySlug/chat" element={<FamilyModule><FamilyChat /></FamilyModule>} />
           <Route path="/family/:familySlug/calendar" element={<FamilyModule><FamilyCalendar /></FamilyModule>} />
