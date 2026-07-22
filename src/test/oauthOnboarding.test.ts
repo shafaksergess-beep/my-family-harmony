@@ -12,11 +12,8 @@ const { authState, fromMock } = vi.hoisted(() => ({
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
-    auth: {
-      linkIdentity: (...a: any[]) => authState.linkIdentity(...a),
-      getUserIdentities: (...a: any[]) => authState.getUserIdentities(...a),
-    },
-    from: (t: string) => fromMock(t),
+    auth: authState,
+    from: fromMock,
   },
 }));
 
