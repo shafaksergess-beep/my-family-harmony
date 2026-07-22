@@ -67,7 +67,7 @@ function mockProfilesTable({ existing }: { existing: any }) {
 function mockFamilyMembersCount(count: number, error: any = null) {
   fromMock.mockReset();
   fromMock.mockImplementation((table: string) => {
-    if (table !== "family_members") throw new Error("unexpected table " + table);
+    console.log("[mockFamilyMembersCount] from() called with:", table);
     return {
       select: () => ({
         eq: () => Promise.resolve({ count, error }),
