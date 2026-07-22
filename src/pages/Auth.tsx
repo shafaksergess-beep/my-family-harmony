@@ -16,6 +16,12 @@ import SEO from "@/components/SEO";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PasswordStrength } from "@/components/PasswordStrength";
 import { lovable } from "@/integrations/lovable";
+import {
+  syncUserProfile,
+  stashOAuthRedirect,
+  consumeOAuthRedirect,
+  describeOAuthError,
+} from "@/lib/authSync";
 
 interface PendingInvitation {
   familyName: string;
