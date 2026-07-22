@@ -148,6 +148,8 @@ const App = () => (
             <Route path="/install" element={<Install />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/linked-accounts" element={<LinkedAccounts />} />
+            <Route path="/onboarding/join-family" element={<JoinFamilyOnboarding />} />
             <Route path="/admin/dashboard" element={<AdminModule><AdminDashboard /></AdminModule>} />
             <Route path="/admin/families" element={<AdminModule><AdminFamilies /></AdminModule>} />
           <Route path="/admin/families/:familyId/members" element={<AdminModule><FamilyMembers /></AdminModule>} />
