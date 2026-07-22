@@ -60,9 +60,18 @@ export function AuthBootstrap() {
         if (event === "SIGNED_IN" && session) {
           await handleSession(session.user);
           const stashed = consumeOAuthRedirect();
-          const target = stashed || "/dashboard";
-          // Only auto-navigate away from public/landing routes; don't fight
-          // component-level navigation on /auth (Auth.tsx handles its own).
+          // If OAuth user has no family memberships yet, funnel them through
+          // the onboarding step so they can join before landing on an empty
+          // dashboard. Skip if they had a specific stashed destination
+          // (e.g. an invitation link) — that already handles onboarding.
+          let target = stashed || "/dashboard";
+          if (!stashed) {
+            try {
+              if (await needsFamilyOnboarding(session.user.id)) {
+                target = "/onboarding/join-family";
+              }
+            } catch { /* fall through to dashboard */ }
+          }
           if (
             location.pathname === "/" ||
             location.pathname === "/install"
