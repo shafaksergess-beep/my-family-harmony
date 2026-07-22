@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@capacitor-community/contacts": "^7.1.0",
+    "@capacitor-firebase/messaging": "6",
     "@capacitor/android": "^7.4.4",
     "@capacitor/app": "^7.1.0",
     "@capacitor/cli": "^7.4.4",
