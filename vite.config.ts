@@ -72,7 +72,17 @@ export default defineConfig(({ mode }) => ({
         cleanupOutdatedCaches: true,
         skipWaiting: true,
         clientsClaim: true,
-        navigateFallbackDenylist: [/^\/~oauth/],
+        navigateFallback: "/index.html",
+        navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//, /^\/functions\//],
+        // Warm the SPA shell + top routes so first navigation to each is instant.
+        // (The SPA fallback serves index.html for these; the JS chunks are
+        // already precached via globPatterns above.)
+        additionalManifestEntries: [
+          { url: "/dashboard", revision: null },
+          { url: "/profile", revision: null },
+          { url: "/install", revision: null },
+          { url: "/onboarding/join-family", revision: null },
+        ],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,

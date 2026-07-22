@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Download, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { trackAppInstalled, trackInstallOutcome } from "@/lib/pwaAnalytics";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -31,7 +32,10 @@ export function InstallMenuItem() {
       e.preventDefault();
       setEvt(e as BeforeInstallPromptEvent);
     };
-    const onInstalled = () => setInstalled(true);
+    const onInstalled = () => {
+      setInstalled(true);
+      trackAppInstalled("menu");
+    };
     window.addEventListener("beforeinstallprompt", handler);
     window.addEventListener("appinstalled", onInstalled);
     return () => {
@@ -53,6 +57,7 @@ export function InstallMenuItem() {
     if (evt) {
       await evt.prompt();
       const { outcome } = await evt.userChoice;
+      trackInstallOutcome(outcome, "menu");
       if (outcome === "accepted") setInstalled(true);
       setEvt(null);
     } else {

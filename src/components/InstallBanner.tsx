@@ -3,6 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Download, Share, Plus, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import {
+  trackInstallOutcome,
+  trackInstallPromptShown,
+  trackAppInstalled,
+} from "@/lib/pwaAnalytics";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -54,8 +59,12 @@ export const InstallBanner = () => {
     const handler = (e: Event) => {
       e.preventDefault();
       setEvt(e as BeforeInstallPromptEvent);
+      trackInstallPromptShown("android");
     };
-    const installed = () => setStandalone(true);
+    const installed = () => {
+      setStandalone(true);
+      trackAppInstalled("android");
+    };
     window.addEventListener("beforeinstallprompt", handler);
     window.addEventListener("appinstalled", installed);
     return () => {
@@ -63,6 +72,11 @@ export const InstallBanner = () => {
       window.removeEventListener("appinstalled", installed);
     };
   }, []);
+
+  // Track iOS banner exposure once when it becomes visible
+  useEffect(() => {
+    if (ios && !standalone && !dismissed) trackInstallPromptShown("ios");
+  }, [ios, standalone, dismissed]);
 
   if (standalone || dismissed) return null;
 
@@ -78,7 +92,8 @@ export const InstallBanner = () => {
   const install = async () => {
     if (!evt) return;
     await evt.prompt();
-    await evt.userChoice;
+    const { outcome } = await evt.userChoice;
+    trackInstallOutcome(outcome, "android");
     dismiss();
   };
 
