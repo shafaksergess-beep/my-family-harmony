@@ -15,6 +15,7 @@ import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { OfflineIndicator } from "@/components/mobile/OfflineIndicator";
 import { OfflineBootstrap } from "@/components/OfflineBootstrap";
 import { PWAUpdatePrompt } from "@/components/PWAUpdatePrompt";
+import { AuthBootstrap } from "@/components/AuthBootstrap";
 // Lazy load core pages
 const Index = lazy(() => import("./pages/Index"));
 const WhatIsNjangi = lazy(() => import("./pages/blog/WhatIsNjangi"));
