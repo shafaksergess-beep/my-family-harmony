@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { JoinFamilyOptions } from "@/components/invitations/JoinFamilyOptions";
+import { InstallMenuItem } from "@/components/InstallMenuItem";
 import SEO from "@/components/SEO";
 
 const Profile = () => {
@@ -239,6 +240,9 @@ const Profile = () => {
               <Hash className="w-4 h-4" />
               Join a Family
             </Button>
+
+            {/* Install as app */}
+            <InstallMenuItem />
           </CardContent>
         </Card>
 

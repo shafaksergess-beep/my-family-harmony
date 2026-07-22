@@ -1,13 +1,27 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRegisterSW } from "virtual:pwa-register/react";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { shouldRegisterServiceWorker, unregisterAppServiceWorkers } from "@/lib/pwaRegister";
 
 /**
- * Listens for new service worker versions and prompts the user to update.
- * Also surfaces an "App ready to work offline" toast on first install.
+ * Registers the service worker in safe contexts and prompts on updates.
+ * In Lovable preview / iframes / dev, it refuses and unregisters any existing SW.
  */
 export function PWAUpdatePrompt() {
+  const [enabled] = useState(() => shouldRegisterServiceWorker());
+
+  useEffect(() => {
+    if (!enabled) {
+      void unregisterAppServiceWorkers();
+    }
+  }, [enabled]);
+
+  if (!enabled) return null;
+  return <PWAUpdatePromptInner />;
+}
+
+function PWAUpdatePromptInner() {
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     offlineReady: [offlineReady, setOfflineReady],
@@ -40,10 +54,7 @@ export function PWAUpdatePrompt() {
         description: "A new version of Kinsroot is ready.",
         duration: 10000,
         action: (
-          <Button
-            size="sm"
-            onClick={() => updateServiceWorker(true)}
-          >
+          <Button size="sm" onClick={() => updateServiceWorker(true)}>
             Reload
           </Button>
         ) as any,
