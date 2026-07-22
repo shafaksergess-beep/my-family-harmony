@@ -171,6 +171,22 @@ const Profile = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 max-w-2xl space-y-6">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2">
+              <User className="w-5 h-5" /> Sign-in methods
+            </CardTitle>
+            <CardDescription>
+              Review the Google, Apple, or email accounts linked to your profile.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button variant="outline" onClick={() => navigate("/profile/linked-accounts")}>
+              Manage linked accounts <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </CardContent>
+        </Card>
+
         {/* Join Family Card */}
         <Card className="border-dashed border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
           <CardHeader className="pb-3">

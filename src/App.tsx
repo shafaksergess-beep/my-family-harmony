@@ -27,6 +27,8 @@ const Install = lazy(() => import("./pages/Install"));
 const AcceptInvitation = lazy(() => import("./pages/AcceptInvitation"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const JoinFamily = lazy(() => import("./pages/JoinFamily"));
+const LinkedAccounts = lazy(() => import("./pages/LinkedAccounts"));
+const JoinFamilyOnboarding = lazy(() => import("./pages/onboarding/JoinFamilyOnboarding"));
 
 // Lazy load admin pages
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
@@ -146,6 +148,8 @@ const App = () => (
             <Route path="/install" element={<Install />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/linked-accounts" element={<LinkedAccounts />} />
+            <Route path="/onboarding/join-family" element={<JoinFamilyOnboarding />} />
             <Route path="/admin/dashboard" element={<AdminModule><AdminDashboard /></AdminModule>} />
             <Route path="/admin/families" element={<AdminModule><AdminFamilies /></AdminModule>} />
           <Route path="/admin/families/:familyId/members" element={<AdminModule><FamilyMembers /></AdminModule>} />
