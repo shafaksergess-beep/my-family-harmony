@@ -82,8 +82,7 @@ export function subscribeRealtimeCache<T extends Row = Row>(
   const channel: RealtimeChannel = supabase
     .channel(channelName)
     .on(
-      // @ts-expect-error — supabase-js typing quirk for postgres_changes
-      "postgres_changes",
+      "postgres_changes" as any,
       { event: "*", schema: "public", table, ...(filter ? { filter } : {}) },
       async (payload: RealtimePostgresChangesPayload<T>) => {
         // 1. Patch React Query cache in place.
