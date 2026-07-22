@@ -27,6 +27,8 @@ const Install = lazy(() => import("./pages/Install"));
 const AcceptInvitation = lazy(() => import("./pages/AcceptInvitation"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const JoinFamily = lazy(() => import("./pages/JoinFamily"));
+const LinkedAccounts = lazy(() => import("./pages/LinkedAccounts"));
+const JoinFamilyOnboarding = lazy(() => import("./pages/onboarding/JoinFamilyOnboarding"));
 
 // Lazy load admin pages
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
