@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import SEO from "@/components/SEO";
 
 const JoinFamilyOnboarding = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [displayName, setDisplayName] = useState<string>("");
   const [showJoin, setShowJoin] = useState(false);
@@ -20,7 +22,6 @@ const JoinFamilyOnboarding = () => {
         navigate("/auth", { replace: true });
         return;
       }
-      // If user is already in a family, skip onboarding.
       const { count } = await supabase
         .from("family_members")
         .select("id", { count: "exact", head: true })
@@ -52,11 +53,13 @@ const JoinFamilyOnboarding = () => {
     );
   }
 
+  const firstName = displayName ? displayName.split(" ")[0] : "";
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <SEO
-        title="Join your family | Kinsroot"
-        description="Connect your Kinsroot account to a family to start tracking contributions, meetings, and more."
+        title={t("joinFamilyOnboarding.seoTitle")}
+        description={t("joinFamilyOnboarding.seoDescription")}
         canonical="/onboarding/join-family"
       />
       <div className="w-full max-w-2xl space-y-4">
@@ -65,29 +68,33 @@ const JoinFamilyOnboarding = () => {
             <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-2">
               <Sparkles className="h-7 w-7" />
             </div>
-            <CardTitle>Welcome{displayName ? `, ${displayName.split(" ")[0]}` : ""}!</CardTitle>
+            <CardTitle>
+              {firstName
+                ? t("joinFamilyOnboarding.welcomeNamed", { name: firstName })
+                : t("joinFamilyOnboarding.welcome")}
+            </CardTitle>
             <CardDescription>
-              Your account is ready. To finish setup, join or request to join a family.
+              {t("joinFamilyOnboarding.description")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <Button className="w-full" size="lg" onClick={() => setShowJoin(true)}>
-              <Users className="h-4 w-4 mr-2" /> Join a family
+              <Users className="h-4 w-4 mr-2" /> {t("joinFamilyOnboarding.joinFamily")}
             </Button>
             <Button
               variant="outline"
               className="w-full"
               onClick={() => navigate("/dashboard")}
             >
-              Skip for now — go to dashboard
+              {t("joinFamilyOnboarding.skipForNow")}
             </Button>
             <Button variant="ghost" className="w-full" onClick={signOut}>
-              <LogOut className="h-4 w-4 mr-2" /> Sign out
+              <LogOut className="h-4 w-4 mr-2" /> {t("joinFamilyOnboarding.signOut")}
             </Button>
           </CardContent>
         </Card>
         <p className="text-center text-xs text-muted-foreground">
-          Have an invitation link or reference code? Use "Join a family" above.
+          {t("joinFamilyOnboarding.hint")}
         </p>
       </div>
       <JoinFamilyOptions open={showJoin} onOpenChange={setShowJoin} />
@@ -96,3 +103,4 @@ const JoinFamilyOnboarding = () => {
 };
 
 export default JoinFamilyOnboarding;
+

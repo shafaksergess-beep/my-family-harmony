@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +16,7 @@ import {
   CheckCircle, PartyPopper, ArrowRight, ArrowLeft,
   FileText, ClipboardList,
 } from "lucide-react";
+
 
 interface RoleCapability {
   icon: any;
@@ -76,6 +78,7 @@ export function FamilyJoinOnboarding({
   role,
   userName,
 }: FamilyJoinOnboardingProps) {
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
 
   const roleLabel = role.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
@@ -83,23 +86,23 @@ export function FamilyJoinOnboarding({
 
   const steps = [
     {
-      title: `Welcome to ${familyName}! 🎉`,
+      title: t("joinFamilyOnboarding.roleWelcomeTitle", { family: familyName }),
       description: userName
-        ? `Congratulations ${userName}! You've joined ${familyName}. Let's get you started with your new role.`
-        : `Congratulations! You've joined ${familyName}. Let's get you started with your new role.`,
+        ? t("joinFamilyOnboarding.roleWelcomeDescNamed", { name: userName, family: familyName })
+        : t("joinFamilyOnboarding.roleWelcomeDesc", { family: familyName }),
       icon: PartyPopper,
       content: (
         <div className="flex items-center justify-center py-4">
           <Badge className="text-sm px-4 py-2" variant="secondary">
             <Shield className="w-4 h-4 mr-2" />
-            Your Role: {roleLabel}
+            {t("joinFamilyOnboarding.yourRole", { role: roleLabel })}
           </Badge>
         </div>
       ),
     },
     {
-      title: `Your Role: ${roleLabel}`,
-      description: "Here's what you can do in this family:",
+      title: t("joinFamilyOnboarding.yourRole", { role: roleLabel }),
+      description: t("joinFamilyOnboarding.roleCapabilitiesDesc"),
       icon: Shield,
       content: (
         <div className="space-y-3 py-2">
@@ -121,30 +124,30 @@ export function FamilyJoinOnboarding({
       ),
     },
     {
-      title: "You're All Set!",
-      description: `You're ready to start participating in ${familyName}. Explore your dashboard to see meetings, contributions, and more.`,
+      title: t("joinFamilyOnboarding.allSet"),
+      description: t("joinFamilyOnboarding.allSetDesc", { family: familyName }),
       icon: CheckCircle,
       content: (
         <div className="space-y-3 py-2">
           <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
             <Calendar className="w-5 h-5 text-primary" />
             <div>
-              <p className="text-sm font-medium">Check upcoming meetings</p>
-              <p className="text-xs text-muted-foreground">Stay updated on family gatherings</p>
+              <p className="text-sm font-medium">{t("joinFamilyOnboarding.checkMeetings")}</p>
+              <p className="text-xs text-muted-foreground">{t("joinFamilyOnboarding.checkMeetingsDesc")}</p>
             </div>
           </div>
           <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
             <DollarSign className="w-5 h-5 text-primary" />
             <div>
-              <p className="text-sm font-medium">View your contributions</p>
-              <p className="text-xs text-muted-foreground">Track payments and balances</p>
+              <p className="text-sm font-medium">{t("joinFamilyOnboarding.viewContributions")}</p>
+              <p className="text-xs text-muted-foreground">{t("joinFamilyOnboarding.viewContributionsDesc")}</p>
             </div>
           </div>
           <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
             <Users className="w-5 h-5 text-primary" />
             <div>
-              <p className="text-sm font-medium">Meet your family members</p>
-              <p className="text-xs text-muted-foreground">View profiles and connect</p>
+              <p className="text-sm font-medium">{t("joinFamilyOnboarding.meetMembers")}</p>
+              <p className="text-xs text-muted-foreground">{t("joinFamilyOnboarding.meetMembersDesc")}</p>
             </div>
           </div>
         </div>
@@ -177,7 +180,7 @@ export function FamilyJoinOnboarding({
 
         <div className="space-y-2">
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Step {currentStep + 1} of {steps.length}</span>
+            <span>{t("joinFamilyOnboarding.stepOf", { current: currentStep + 1, total: steps.length })}</span>
             <span>{Math.round(progress)}%</span>
           </div>
           <Progress value={progress} />
@@ -191,17 +194,17 @@ export function FamilyJoinOnboarding({
             size="sm"
           >
             <ArrowLeft className="w-4 h-4 mr-1" />
-            Back
+            {t("joinFamilyOnboarding.back")}
           </Button>
           <div className="flex gap-2">
             <Button variant="ghost" size="sm" onClick={onComplete}>
-              Skip
+              {t("joinFamilyOnboarding.skip")}
             </Button>
             <Button
               onClick={() => isLastStep ? onComplete() : setCurrentStep(currentStep + 1)}
               size="sm"
             >
-              {isLastStep ? "Let's Go!" : "Next"}
+              {isLastStep ? t("joinFamilyOnboarding.letsGo") : t("joinFamilyOnboarding.next")}
               {!isLastStep && <ArrowRight className="w-4 h-4 ml-1" />}
             </Button>
           </div>
@@ -210,3 +213,4 @@ export function FamilyJoinOnboarding({
     </Dialog>
   );
 }
+
