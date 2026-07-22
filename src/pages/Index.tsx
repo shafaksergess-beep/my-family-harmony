@@ -321,7 +321,12 @@ const Index = () => {
       {/* Footer */}
       <footer className="bg-card border-t border-border py-12">
         <div className="container mx-auto px-4">
-          <div className="text-center text-muted-foreground space-y-1">
+          <div className="text-center text-muted-foreground space-y-2">
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm">
+              <a href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</a>
+              <span aria-hidden="true">·</span>
+              <a href="/terms" className="hover:text-foreground transition-colors">Terms of Service</a>
+            </div>
             <p>Developed by Softserge.</p>
             <p>Copyright 2026 All rights reserved.</p>
             <p className="text-sm">
