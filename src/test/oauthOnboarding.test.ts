@@ -63,14 +63,11 @@ function mockProfilesTable({ existing }: { existing: any }) {
 
 function mockFamilyMembersCount(count: number, error: any = null) {
   fromMock.mockReset();
-  fromMock.mockImplementation((table: string) => {
-    console.log("[mockFamilyMembersCount] from() called with:", table);
-    return {
-      select: () => ({
-        eq: () => Promise.resolve({ count, error }),
-      }),
-    };
-  });
+  fromMock.mockImplementation(() => ({
+    select: () => ({
+      eq: () => Promise.resolve({ count, error }),
+    }),
+  }));
 }
 
 describe("syncUserProfile — profile upsert after OAuth", () => {
