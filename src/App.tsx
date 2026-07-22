@@ -29,6 +29,8 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const JoinFamily = lazy(() => import("./pages/JoinFamily"));
 const LinkedAccounts = lazy(() => import("./pages/LinkedAccounts"));
 const JoinFamilyOnboarding = lazy(() => import("./pages/onboarding/JoinFamilyOnboarding"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
 
 // Lazy load admin pages
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
