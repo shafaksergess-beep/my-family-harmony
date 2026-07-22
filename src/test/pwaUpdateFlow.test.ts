@@ -100,7 +100,7 @@ describe("'New version ready' reload preserves state", () => {
   });
 
   it("clientsClaim + skipWaiting are enabled in vite.config", async () => {
-    const fs = await import("node:fs/promises");
+    const fs = (await (import as any)("node:fs/promises"));
     const cfg = await fs.readFile("vite.config.ts", "utf8");
     expect(cfg).toMatch(/skipWaiting:\s*true/);
     expect(cfg).toMatch(/clientsClaim:\s*true/);
@@ -108,7 +108,7 @@ describe("'New version ready' reload preserves state", () => {
   });
 
   it("changelog.json exposes a version + highlights for the update dialog", async () => {
-    const fs = await import("node:fs/promises");
+    const fs = (await (import as any)("node:fs/promises"));
     const raw = await fs.readFile("public/changelog.json", "utf8");
     const changelog = JSON.parse(raw);
     expect(changelog.version).toMatch(/^\d+\.\d+\.\d+$/);
