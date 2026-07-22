@@ -131,6 +131,7 @@ const App = () => (
             <Sonner />
         <BrowserRouter>
           <OfflineBootstrap />
+          <AuthBootstrap />
           <PWAUpdatePrompt />
           <OfflineIndicator />
           <RoutePageViewTracker />
