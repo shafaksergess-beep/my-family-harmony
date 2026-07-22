@@ -2,16 +2,13 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // vi.mock is hoisted; use vi.hoisted so shared state is initialized before
 // the mock factory runs.
-const { authState, fromMock } = vi.hoisted(() => {
-  const { vi } = require("vitest");
-  return {
-    authState: {
-      linkIdentity: vi.fn(),
-      getUserIdentities: vi.fn(),
-    },
-    fromMock: vi.fn(),
-  };
-});
+const { authState, fromMock } = vi.hoisted(() => ({
+  authState: {
+    linkIdentity: vi.fn(),
+    getUserIdentities: vi.fn(),
+  },
+  fromMock: vi.fn(),
+}));
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
