@@ -60,10 +60,15 @@ export function AuthBootstrap() {
         if (event === "SIGNED_IN" && session) {
           await handleSession(session.user);
           const stashed = consumeOAuthRedirect();
-          // If OAuth user has no family memberships yet, funnel them through
-          // the onboarding step so they can join before landing on an empty
-          // dashboard. Skip if they had a specific stashed destination
-          // (e.g. an invitation link) — that already handles onboarding.
+          // Read the pathname at handler time — the effect deps are [], so
+          // `location` from useLocation is stale after client-side navigation.
+          const currentPath = window.location.pathname;
+          // Only handle the OAuth full-page-redirect case where the provider
+          // lands the user back on `/` or `/install`. In every other case
+          // (including `/auth`), the sign-in page's own listener owns routing.
+          if (currentPath !== "/" && currentPath !== "/install") {
+            return;
+          }
           let target = stashed || "/dashboard";
           if (!stashed) {
             try {
@@ -72,9 +77,11 @@ export function AuthBootstrap() {
               }
             } catch { /* fall through to dashboard */ }
           }
+          // Re-check path after async work — user may have been navigated away
+          // by another listener (e.g. Auth.tsx handling ?redirect=...).
           if (
-            location.pathname === "/" ||
-            location.pathname === "/install"
+            window.location.pathname === "/" ||
+            window.location.pathname === "/install"
           ) {
             navigate(target, { replace: true });
           }
