@@ -13,22 +13,25 @@ export default function Install() {
   const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
-    // Check if app is already installed
-    if (window.matchMedia("(display-mode: standalone)").matches) {
-      setIsInstalled(true);
-    }
+    // Check if app is already installed (standalone mode or iOS home-screen launch)
+    const checkInstalled = () =>
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as any).standalone === true;
+    setIsInstalled(checkInstalled());
 
-    // Listen for the beforeinstallprompt event
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
       setIsInstallable(true);
     };
+    const onInstalled = () => setIsInstalled(true);
 
     window.addEventListener("beforeinstallprompt", handler);
+    window.addEventListener("appinstalled", onInstalled);
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handler);
+      window.removeEventListener("appinstalled", onInstalled);
     };
   }, []);
 
