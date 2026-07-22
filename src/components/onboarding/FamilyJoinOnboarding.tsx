@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +16,7 @@ import {
   CheckCircle, PartyPopper, ArrowRight, ArrowLeft,
   FileText, ClipboardList,
 } from "lucide-react";
+
 
 interface RoleCapability {
   icon: any;
