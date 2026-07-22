@@ -124,8 +124,9 @@ export default defineConfig(({ mode }) => ({
           },
           {
             // Cross-origin images (Supabase storage, gravatar, etc).
-            urlPattern: ({ url, request }) =>
-              request.destination === "image" && url.origin !== self.location.origin,
+            urlPattern: ({ url, sameOrigin, request }: { url: URL; sameOrigin: boolean; request: Request }) =>
+              request.destination === "image" && !sameOrigin,
+
             handler: "StaleWhileRevalidate",
             options: {
               cacheName: "image-cache-external",
