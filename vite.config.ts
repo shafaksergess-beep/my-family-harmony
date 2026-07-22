@@ -93,7 +93,7 @@ export default defineConfig(({ mode }) => ({
               cacheName: "supabase-rest-cache",
               expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 },
               cacheableResponse: { statuses: [0, 200] },
-              broadcastUpdate: { channelName: "supabase-rest-updates" },
+              },
             },
           },
           {
