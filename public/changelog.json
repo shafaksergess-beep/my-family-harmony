@@ -1,0 +1,10 @@
+{
+  "version": "1.4.0",
+  "releasedAt": "2026-07-22",
+  "highlights": [
+    "Push notifications for meeting reminders, due contributions, and new assistance events",
+    "Faster route loading — dashboard, meetings, and ledger now open instantly after first visit",
+    "Improved install experience across iPhone and Android",
+    "New \"What's new\" release notes"
+  ]
+}
