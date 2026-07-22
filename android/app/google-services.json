@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "937659945781",
+    "project_id": "kinsroot-7a831",
+    "storage_bucket": "kinsroot-7a831.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:937659945781:android:fe3cedba791dcfa370b27c",
+        "android_client_info": {
+          "package_name": "com.softserge.kinsroot"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3_1b_sjfd0Bjh1RP8l1yHsEiI3zWFswI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

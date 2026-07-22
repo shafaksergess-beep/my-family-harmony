@@ -1,77 +1,52 @@
-
 ## Goal
 
-Audit the existing PWA setup, fix issues, and make "Add to Home Screen" install prominent and reliable across Chrome/Android and iOS Safari.
-
-## Audit findings (verified in code)
-
-1. **Preview leakage**: `vite.config.ts` uses `injectRegister: "auto"` + `PWAUpdatePrompt` also calls `useRegisterSW`. This registers a service worker inside the Lovable preview iframe (`id-preview--*.lovable.app`), which the PWA skill explicitly forbids — stale caches will haunt the editor preview.
-2. **Double-registration risk**: `injectRegister: "auto"` injects its own registration AND `useRegisterSW` registers again. Only one path should register.
-3. **Duplicate route**: `/install` is declared twice in `src/App.tsx` (lines 148 and 229).
-4. **iOS blind spot**: `InstallBanner.tsx` only shows when `beforeinstallprompt` fires — iOS Safari never fires it, so iPhone users never see the prompt or instructions.
-5. **No prominent entry point**: `/install` page exists but nothing in the app chrome links to it. Users don't know it's installable.
-6. **Manifest**: `logo.jpg` at 192x192 is declared with `purpose: "any"` — jpeg is allowed but a PNG is preferred; existing `pwa-192x192.png` / `pwa-512x512.png` already cover this.
+Native Android push notifications delivered through Firebase Cloud Messaging (FCM) that:
+- Show in the phone's notification bar (foreground + background + app-killed states)
+- Update the app icon badge count
+- Deep-link to the correct in-app route on tap
+- Reuse the existing `send-fcm-push` / `dispatch-event-push` backend
 
 ## Changes
 
-### 1. Guarded service-worker registration (per PWA skill)
+### 1. Capacitor config
+- `capacitor.config.ts`: change `appId` from `app.lovable.3138229105464a70a015b86eb65a55a3` to `com.softserge.kinsroot` to match the uploaded `google-services.json`.
+- Add `FirebaseMessaging` plugin config block with a default Android notification channel (`kinsroot_default`, high importance, badge + sound enabled) and default small icon reference (`ic_stat_notify`).
 
-Create `src/lib/pwaRegister.ts` — single registration wrapper that:
-- refuses when `!import.meta.env.PROD`
-- refuses inside iframes
-- refuses on hostnames starting with `id-preview--` / `preview--`
-- refuses on `*.lovableproject.com`, `*.lovableproject-dev.com`, `*.beta.lovable.dev`
-- refuses when `?sw=off` — and unregisters any existing `/sw.js` in that case
-- otherwise calls `useRegisterSW` (via the existing `PWAUpdatePrompt`)
+### 2. Install native plugin
+- `bun add @capacitor-firebase/messaging @capacitor/app @capacitor/badge`
+  - `@capacitor-firebase/messaging`: native FCM token + tray notifications
+  - `@capacitor/badge`: app icon badge count updates
+  - `@capacitor/app`: handle deep-link on notification tap (already may be present)
 
-Update `vite.config.ts`:
-- `injectRegister: null` (skill requirement — wrapper is the only registrar)
-- `devOptions: { enabled: false }` (explicit, prevent dev SW)
+### 3. Native Android files (documented, user copies after `git pull`)
+- Save uploaded `google-services.json` to `android/app/google-services.json` (committed into repo so future `npx cap sync` picks it up).
+- Add note in `FIREBASE_PUSH_SETUP.md`: after `npx cap sync android`, the plugin auto-registers the Google Services Gradle plugin; no manual Gradle edits needed on Capacitor 6+.
 
-Refactor `src/components/PWAUpdatePrompt.tsx` to short-circuit and unregister in refused contexts before touching `useRegisterSW`. Keep the update-toast + offline-ready toast behavior.
+### 4. Refactor `src/hooks/useMobilePush.tsx`
+Replace the `@capacitor/push-notifications` path with `@capacitor-firebase/messaging`:
+- `FirebaseMessaging.requestPermissions()` → `getToken()` → save to `profiles.push_token`.
+- Listen to `notificationReceived` (foreground) → show local tray notification via the plugin's `createChannel` + optionally update badge.
+- Listen to `notificationActionPerformed` → parse `data.url` and route via React Router.
+- Listen to `tokenReceived` → re-persist rotated tokens.
+- Keep Median + web fallback branches unchanged.
 
-### 2. Cross-platform install UX
+### 5. Badge count
+- New small helper `src/lib/appBadge.ts` wrapping `@capacitor/badge` (`set`, `clear`).
+- Bump badge on each `notificationReceived`; clear when the in-app notification inbox is opened (hook into existing `NotificationInbox`).
 
-Replace the current single-shot `InstallBanner.tsx` with a smarter component:
-- **Android/Chromium**: capture `beforeinstallprompt`, show banner with "Install" button.
-- **iOS Safari** (detect `/iphone|ipad|ipod/` + not standalone + not Chrome-on-iOS): show a banner with the Share → Add to Home Screen instructions.
-- Suppress when already installed (`display-mode: standalone` or `navigator.standalone`).
-- Dismissal stored in `localStorage` for 14 days (not just session) so it isn't nagging every reload.
-- "Learn more" link → `/install` for full instructions.
+### 6. Backend adjustments (small)
+- `supabase/functions/send-fcm-push/index.ts`: extend the FCM v1 payload with an `android` block (`notification.channel_id: "kinsroot_default"`, `notification.notification_count` for badge) so native devices route to the right channel and increment the badge. Web `webpush.fcm_options.link` stays as-is.
 
-Add a persistent **"Install app"** entry in the profile/settings menu so users can trigger installation any time (fires the deferred prompt on Android, links to `/install` on iOS).
+### 7. Docs
+- Update `FIREBASE_PUSH_SETUP.md` Android section: replace `@capacitor/push-notifications` steps with `@capacitor-firebase/messaging`, note the new `appId`, and list the exact commands the user runs locally after `git pull`:
+  1. `npm install`
+  2. `npx cap sync android`
+  3. `npx cap run android`
 
-### 3. Fix duplicate `/install` route
-
-Remove the duplicate `<Route path="/install" />` on line 229 of `src/App.tsx`.
-
-### 4. `/install` page polish
-
-`src/pages/Install.tsx` already exists and covers Android + iOS manual instructions. Small tweaks:
-- Detect standalone mode more robustly (both `display-mode: standalone` and iOS `navigator.standalone`).
-- Add a "Copy link" button so users on desktop can send the URL to their phone.
-
-### 5. Manifest sanity
-
-`public/manifest.webmanifest` and the manifest embedded in `vite.config.ts` diverge slightly. Keep the vite-plugin-pwa generated one authoritative; delete `public/manifest.webmanifest` to avoid two competing manifests being served. Confirm `index.html` `<link rel="manifest">` still resolves (plugin injects it in `injectManifest`/`generateSW` mode automatically).
+## Out of scope (per your answers)
+- iOS setup (no plist/APNs key yet) — will be added when you upload those.
+- Firebase project consolidation — plan uses the uploaded `kinsroot-7a831` project for Android; web keeps using `kinsroot`. Backend `FIREBASE_SERVICE_ACCOUNT` secret must be the service account of whichever project owns the target tokens. Since Android and Web tokens live in different projects, we'll need **two service accounts** eventually. For now, Android push will require you to update `FIREBASE_SERVICE_ACCOUNT` to the `kinsroot-7a831` service account, OR I can extend `send-fcm-push` to accept a second secret `FIREBASE_SERVICE_ACCOUNT_ANDROID` and route by token. Say the word and I'll add the dual-project routing.
 
 ## Verification
-
-- Run build; confirm `dist/sw.js` and `dist/manifest.webmanifest` are emitted.
-- Load preview in the Lovable editor iframe → confirm no SW registers (check Application tab via Playwright).
-- Load published site in a normal Chrome tab → confirm SW registers, install banner appears, `/install` works.
-- Simulate iOS UA in Playwright → confirm iOS instructions render.
-
-## Files touched
-
-```text
-vite.config.ts                              (injectRegister: null, devOptions off)
-src/lib/pwaRegister.ts                      (new — guard helper)
-src/components/PWAUpdatePrompt.tsx          (apply guard, unregister in refused ctx)
-src/components/InstallBanner.tsx            (add iOS branch, 14-day dismiss)
-src/components/InstallMenuItem.tsx          (new — reusable install trigger)
-src/pages/Profile.tsx                       (add InstallMenuItem in settings list)
-src/pages/Install.tsx                       (better standalone detection, share link)
-src/App.tsx                                 (remove duplicate /install route)
-public/manifest.webmanifest                 (delete — plugin generates it)
-```
+- `tsgo` typecheck after edits.
+- User runs `npx cap sync android && npx cap run android` on a physical device, taps "Enable Notifications" in Settings → Notifications, then triggers a test push from the admin panel — notification should appear in the tray and increment the app icon badge.
