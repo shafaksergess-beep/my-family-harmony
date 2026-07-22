@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,10 +17,6 @@ import type { UserIdentity } from "@supabase/supabase-js";
 
 type Provider = "google" | "apple";
 
-const PROVIDER_META: Record<Provider, { label: string; hint: string }> = {
-  google: { label: "Google", hint: "Sign in with your Google account" },
-  apple: { label: "Apple", hint: "Sign in with your Apple ID" },
-};
 
 const LinkedAccounts = () => {
   const navigate = useNavigate();
