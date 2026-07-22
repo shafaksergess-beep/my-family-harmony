@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Download, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { trackAppInstalled, trackInstallOutcome } from "@/lib/pwaAnalytics";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
