@@ -54,7 +54,7 @@ export async function syncUserProfile(user: User) {
 
   const { error } = await supabase
     .from("profiles")
-    .upsert(payload, { onConflict: "id" });
+    .upsert([payload as any], { onConflict: "id" });
 
   if (error) console.warn("[authSync] profile upsert failed:", error.message);
 
