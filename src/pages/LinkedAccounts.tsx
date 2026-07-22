@@ -16,16 +16,19 @@ import { describeOAuthError, stashOAuthRedirect } from "@/lib/authSync";
 import type { UserIdentity } from "@supabase/supabase-js";
 
 type Provider = "google" | "apple";
-
+const PROVIDERS: Provider[] = ["google", "apple"];
 
 const LinkedAccounts = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [identities, setIdentities] = useState<UserIdentity[]>([]);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [unlinkTarget, setUnlinkTarget] = useState<UserIdentity | null>(null);
+
+  const providerLabel = (p: Provider) => t(`linkedAccounts.providers.${p}`);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -37,12 +40,12 @@ const LinkedAccounts = () => {
     setUserEmail(session.user.email ?? null);
     const { data, error } = await supabase.auth.getUserIdentities();
     if (error) {
-      toast({ title: "Couldn't load linked accounts", description: error.message, variant: "destructive" });
+      toast({ title: t("linkedAccounts.loadErrorTitle"), description: error.message, variant: "destructive" });
     } else {
       setIdentities(data?.identities ?? []);
     }
     setLoading(false);
-  }, [navigate, toast]);
+  }, [navigate, toast, t]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -57,7 +60,7 @@ const LinkedAccounts = () => {
       if (error) throw error;
     } catch (err) {
       toast({
-        title: `Couldn't link ${PROVIDER_META[provider].label}`,
+        title: t("linkedAccounts.linkErrorTitle", { provider: providerLabel(provider) }),
         description: describeOAuthError(provider, err),
         variant: "destructive",
       });
@@ -73,12 +76,15 @@ const LinkedAccounts = () => {
     const { error } = await supabase.auth.unlinkIdentity(identity);
     if (error) {
       toast({
-        title: "Couldn't unlink",
+        title: t("linkedAccounts.unlinkErrorTitle"),
         description: error.message,
         variant: "destructive",
       });
     } else {
-      toast({ title: "Account unlinked", description: `${identity.provider} disconnected.` });
+      toast({
+        title: t("linkedAccounts.unlinkedTitle"),
+        description: t("linkedAccounts.unlinkedDescription", { provider: identity.provider }),
+      });
       await load();
     }
     setBusy(null);
@@ -89,24 +95,24 @@ const LinkedAccounts = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Linked accounts | Kinsroot"
-        description="View and manage the sign-in providers connected to your Kinsroot account."
+        title={t("linkedAccounts.seoTitle")}
+        description={t("linkedAccounts.seoDescription")}
         canonical="/profile/linked-accounts"
       />
       <div className="max-w-3xl mx-auto p-4 md:p-8">
         <Button variant="ghost" size="sm" onClick={() => navigate("/profile")} className="mb-4">
-          <ArrowLeft className="h-4 w-4 mr-2" /> Back to profile
+          <ArrowLeft className="h-4 w-4 mr-2" /> {t("linkedAccounts.backToProfile")}
         </Button>
 
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5" /> Linked accounts
+              <ShieldCheck className="h-5 w-5" /> {t("linkedAccounts.title")}
             </CardTitle>
             <CardDescription>
-              These sign-in methods can access your Kinsroot account
-              {userEmail ? <> (<span className="font-medium">{userEmail}</span>)</> : null}.
-              Linking another provider with the same verified email keeps everything on one account.
+              {t("linkedAccounts.description")}
+              {userEmail ? <> (<span className="font-medium">{userEmail}</span>)</> : null}.{" "}
+              {t("linkedAccounts.descriptionSuffix")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -115,12 +121,17 @@ const LinkedAccounts = () => {
             ) : (
               <>
                 <section aria-labelledby="linked-heading" className="space-y-3">
-                  <h2 id="linked-heading" className="text-sm font-semibold text-muted-foreground">Currently linked</h2>
+                  <h2 id="linked-heading" className="text-sm font-semibold text-muted-foreground">
+                    {t("linkedAccounts.currentlyLinked")}
+                  </h2>
                   <ul className="space-y-2">
                     {identities.map((identity) => {
                       const isEmail = identity.provider === "email";
-                      const meta = PROVIDER_META[identity.provider as Provider];
-                      const label = isEmail ? "Email & password" : meta?.label ?? identity.provider;
+                      const label = isEmail
+                        ? t("linkedAccounts.emailPassword")
+                        : PROVIDERS.includes(identity.provider as Provider)
+                          ? providerLabel(identity.provider as Provider)
+                          : identity.provider;
                       const identityEmail =
                         (identity.identity_data as any)?.email ?? userEmail ?? "";
                       return (
@@ -137,17 +148,17 @@ const LinkedAccounts = () => {
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Badge variant="secondary">Linked</Badge>
+                            <Badge variant="secondary">{t("linkedAccounts.linked")}</Badge>
                             <Button
                               variant="outline"
                               size="sm"
                               disabled={!canUnlink || busy === identity.identity_id}
-                              aria-label={`Unlink ${label}`}
+                              aria-label={t("linkedAccounts.unlinkAria", { label })}
                               onClick={() => setUnlinkTarget(identity)}
                             >
                               {busy === identity.identity_id
                                 ? <Loader2 className="h-4 w-4 animate-spin" />
-                                : <><Unlink className="h-4 w-4 mr-1" /> Unlink</>}
+                                : <><Unlink className="h-4 w-4 mr-1" /> {t("linkedAccounts.unlink")}</>}
                             </Button>
                           </div>
                         </li>
@@ -156,15 +167,17 @@ const LinkedAccounts = () => {
                   </ul>
                   {!canUnlink && (
                     <p className="text-xs text-muted-foreground">
-                      You need at least one sign-in method. Link another provider before unlinking this one.
+                      {t("linkedAccounts.needOneMethod")}
                     </p>
                   )}
                 </section>
 
                 <section aria-labelledby="available-heading" className="space-y-3">
-                  <h2 id="available-heading" className="text-sm font-semibold text-muted-foreground">Add another method</h2>
+                  <h2 id="available-heading" className="text-sm font-semibold text-muted-foreground">
+                    {t("linkedAccounts.addAnother")}
+                  </h2>
                   <div className="grid gap-2 sm:grid-cols-2">
-                    {(Object.keys(PROVIDER_META) as Provider[])
+                    {PROVIDERS
                       .filter((p) => !identities.some((i) => i.provider === p))
                       .map((p) => (
                         <Button
@@ -177,13 +190,12 @@ const LinkedAccounts = () => {
                           {busy === p
                             ? <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                             : <LinkIcon className="h-4 w-4 mr-2" />}
-                          Link {PROVIDER_META[p].label}
+                          {t("linkedAccounts.linkProvider", { provider: providerLabel(p) })}
                         </Button>
                       ))}
-                    {(Object.keys(PROVIDER_META) as Provider[])
-                      .every((p) => identities.some((i) => i.provider === p)) && (
+                    {PROVIDERS.every((p) => identities.some((i) => i.provider === p)) && (
                       <p className="text-sm text-muted-foreground col-span-full">
-                        All supported providers are already linked.
+                        {t("linkedAccounts.allLinked")}
                       </p>
                     )}
                   </div>
@@ -197,16 +209,14 @@ const LinkedAccounts = () => {
       <AlertDialog open={!!unlinkTarget} onOpenChange={(o) => !o && setUnlinkTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Unlink this sign-in method?</AlertDialogTitle>
+            <AlertDialogTitle>{t("linkedAccounts.confirmTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              You won't be able to sign in with{" "}
-              <span className="font-medium">{unlinkTarget?.provider}</span> anymore.
-              You'll still have access with your other linked methods.
+              {t("linkedAccounts.confirmDescription", { provider: unlinkTarget?.provider ?? "" })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmUnlink}>Unlink</AlertDialogAction>
+            <AlertDialogCancel>{t("linkedAccounts.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmUnlink}>{t("linkedAccounts.confirmAction")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
