@@ -1,23 +1,25 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-// ---- Mock the Supabase client BEFORE importing modules under test ----
-const authState: {
-  linkIdentity: ReturnType<typeof vi.fn>;
-  getUserIdentities: ReturnType<typeof vi.fn>;
-} = {
-  linkIdentity: vi.fn(),
-  getUserIdentities: vi.fn(),
-};
-
-const fromMock = vi.fn();
+// vi.mock is hoisted; use vi.hoisted so shared state is initialized before
+// the mock factory runs.
+const { authState, fromMock } = vi.hoisted(() => {
+  const { vi } = require("vitest");
+  return {
+    authState: {
+      linkIdentity: vi.fn(),
+      getUserIdentities: vi.fn(),
+    },
+    fromMock: vi.fn(),
+  };
+});
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
     auth: {
-      linkIdentity: (...a: any[]) => (authState.linkIdentity as any)(...a),
-      getUserIdentities: (...a: any[]) => (authState.getUserIdentities as any)(...a),
+      linkIdentity: (...a: any[]) => authState.linkIdentity(...a),
+      getUserIdentities: (...a: any[]) => authState.getUserIdentities(...a),
     },
-    from: (t: string) => (fromMock as any)(t),
+    from: (t: string) => fromMock(t),
   },
 }));
 
