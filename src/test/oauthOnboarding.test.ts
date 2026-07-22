@@ -14,10 +14,10 @@ const fromMock = vi.fn();
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
     auth: {
-      linkIdentity: (...a: unknown[]) => authState.linkIdentity(...a),
-      getUserIdentities: (...a: unknown[]) => authState.getUserIdentities(...a),
+      linkIdentity: (...a: any[]) => (authState.linkIdentity as any)(...a),
+      getUserIdentities: (...a: any[]) => (authState.getUserIdentities as any)(...a),
     },
-    from: (t: string) => fromMock(t),
+    from: (t: string) => (fromMock as any)(t),
   },
 }));
 
