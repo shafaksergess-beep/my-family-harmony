@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { syncUserProfile, consumeOAuthRedirect } from "@/lib/authSync";
 import { needsFamilyOnboarding } from "@/lib/membershipSync";
+import { sessionManager } from "@/lib/sessionManager";
 
 /**
  * Global auth listener mounted at the app root.
@@ -59,6 +60,8 @@ export function AuthBootstrap() {
       async (event, session) => {
         if (event === "SIGNED_IN" && session) {
           await handleSession(session.user);
+          // Record device metadata and enforce concurrent-session cap.
+          sessionManager.recordCurrent().then(() => sessionManager.enforceLimit()).catch(() => {});
           const stashed = consumeOAuthRedirect();
           // Read the pathname at handler time — the effect deps are [], so
           // `location` from useLocation is stale after client-side navigation.
