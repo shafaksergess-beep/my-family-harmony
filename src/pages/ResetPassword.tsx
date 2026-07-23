@@ -67,6 +67,14 @@ const ResetPassword = () => {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
 
+      // Kill every other active session on password change.
+      try {
+        const { sessionManager } = await import("@/lib/sessionManager");
+        await sessionManager.revokeOthers();
+      } catch (e) {
+        console.warn("Could not revoke other sessions after password change", e);
+      }
+
       setSuccess(true);
       toast({
         title: "Password updated",

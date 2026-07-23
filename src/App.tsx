@@ -16,6 +16,8 @@ import { OfflineIndicator } from "@/components/mobile/OfflineIndicator";
 import { OfflineBootstrap } from "@/components/OfflineBootstrap";
 import { PWAUpdatePrompt } from "@/components/PWAUpdatePrompt";
 import { AuthBootstrap } from "@/components/AuthBootstrap";
+import { IdleWarningDialog } from "@/components/IdleWarningDialog";
+const SessionManagementPage = lazy(() => import("./pages/SessionManagement"));
 // Lazy load core pages
 const Index = lazy(() => import("./pages/Index"));
 const WhatIsNjangi = lazy(() => import("./pages/blog/WhatIsNjangi"));
@@ -137,6 +139,7 @@ const App = () => (
           <OfflineBootstrap />
           <AuthBootstrap />
           <PWAUpdatePrompt />
+          <IdleWarningDialog />
           <OfflineIndicator />
           <RoutePageViewTracker />
           <AnnouncementBanner />
@@ -151,6 +154,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/linked-accounts" element={<LinkedAccounts />} />
+            <Route path="/profile/sessions" element={<SessionManagementPage />} />
             <Route path="/onboarding/join-family" element={<JoinFamilyOnboarding />} />
             <Route path="/admin/dashboard" element={<AdminModule><AdminDashboard /></AdminModule>} />
             <Route path="/admin/families" element={<AdminModule><AdminFamilies /></AdminModule>} />

@@ -181,12 +181,16 @@ const Profile = () => {
               Review the Google, Apple, or email accounts linked to your profile.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Button variant="outline" onClick={() => navigate("/profile/linked-accounts")}>
+          <CardContent className="space-y-2">
+            <Button variant="outline" className="w-full justify-between" onClick={() => navigate("/profile/linked-accounts")}>
               Manage linked accounts <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            <Button variant="outline" className="w-full justify-between" onClick={() => navigate("/profile/sessions")}>
+              Active sessions & devices <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </CardContent>
         </Card>
+
 
         {/* Join Family Card */}
         <Card className="border-dashed border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
