@@ -16,12 +16,12 @@ const structuredData = {
     name: "Kinsroot",
     logo: {
       "@type": "ImageObject",
-      url: "https://kinsroot.softgroupsolutions.com/logo.jpg",
+      url: "https://kinsroot.softserge.com/logo.jpg",
     },
   },
   datePublished: "2026-07-11",
   dateModified: "2026-07-11",
-  mainEntityOfPage: "https://kinsroot.softgroupsolutions.com/blog/what-is-njangi",
+  mainEntityOfPage: "https://kinsroot.softserge.com/blog/what-is-njangi",
 };
 
 export default function WhatIsNjangi() {

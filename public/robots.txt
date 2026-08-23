@@ -7,4 +7,4 @@ Disallow: /accept-invitation
 Disallow: /reset-password
 Disallow: /dashboard
 Disallow: /profile
-Sitemap: https://kinsroot.softgroupsolutions.com/sitemap.xml
+Sitemap: https://kinsroot.softserge.com/sitemap.xml
