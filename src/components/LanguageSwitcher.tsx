@@ -20,7 +20,7 @@ export const LanguageSwitcher = () => {
     <div className="flex items-center gap-2">
       <Languages className="w-4 h-4 text-muted-foreground" />
       <Select value={i18n.language} onValueChange={handleLanguageChange}>
-        <SelectTrigger className="w-32">
+        <SelectTrigger className="w-32" aria-label="Select language">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

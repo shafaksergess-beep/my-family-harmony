@@ -139,7 +139,7 @@ const ResetPassword = () => {
         <div className="text-center mb-8">
           <img
             src="/logo.jpg"
-            alt="Family Together Logo"
+            alt="Kinsroot heritage-rooted family management logo"
             className="w-20 h-20 mx-auto rounded-full object-cover shadow-lg"
           />
           <h1 className="text-2xl font-bold text-foreground mt-4">Set New Password</h1>
