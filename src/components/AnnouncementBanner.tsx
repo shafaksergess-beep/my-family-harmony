@@ -99,7 +99,7 @@ export function AnnouncementBanner() {
                       rel="noopener noreferrer"
                       className="ml-2 underline text-primary"
                     >
-                      {a.link_label || "Learn more"}
+                      {a.link_label || "See announcement details"}
                     </a>
                   )}
                 </AlertDescription>

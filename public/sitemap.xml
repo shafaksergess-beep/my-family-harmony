@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://kinsroot.softgroupsolutions.com/</loc>
+    <loc>https://kinsroot.softserge.com/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://kinsroot.softgroupsolutions.com/auth</loc>
+    <loc>https://kinsroot.softserge.com/auth</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://kinsroot.softgroupsolutions.com/install</loc>
+    <loc>https://kinsroot.softserge.com/install</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://kinsroot.softgroupsolutions.com/join</loc>
+    <loc>https://kinsroot.softserge.com/join</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://kinsroot.softgroupsolutions.com/blog/what-is-njangi</loc>
+    <loc>https://kinsroot.softserge.com/blog/what-is-njangi</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://kinsroot.softgroupsolutions.com/privacy</loc>
+    <loc>https://kinsroot.softserge.com/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://kinsroot.softgroupsolutions.com/terms</loc>
+    <loc>https://kinsroot.softserge.com/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>

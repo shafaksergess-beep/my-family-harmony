@@ -358,7 +358,7 @@ const Auth = () => {
           <div className="mb-4">
             <img 
               src="/logo.jpg" 
-              alt="Family Together Logo" 
+              alt="Kinsroot heritage-rooted family management logo" 
               className="w-24 h-24 mx-auto rounded-full object-cover shadow-lg"
             />
           </div>

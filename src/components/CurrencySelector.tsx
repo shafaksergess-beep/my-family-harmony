@@ -9,7 +9,7 @@ export function CurrencySelector() {
     <div className="flex items-center gap-2">
       <Coins className="h-4 w-4 text-muted-foreground" />
       <Select value={currency} onValueChange={(value) => setCurrency(value as Currency)}>
-        <SelectTrigger className="w-[100px] h-8 text-xs bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-colors">
+        <SelectTrigger aria-label="Select currency" className="w-[100px] h-8 text-xs bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-colors">
           <SelectValue placeholder="Currency" />
         </SelectTrigger>
         <SelectContent>

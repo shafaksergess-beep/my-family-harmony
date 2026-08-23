@@ -66,7 +66,7 @@ const Index = () => {
             <div className="mb-8">
               <img
                 src="/logo.jpg"
-                alt="Family Together Logo"
+                alt="Kinsroot heritage-rooted family management logo"
                 width="128"
                 height="128"
                 fetchPriority="high"
@@ -106,7 +106,7 @@ const Index = () => {
                 }
                 className="border-primary-foreground/30 text-primary-foreground text-lg px-8 py-6 bg-yellow-600 hover:bg-yellow-500"
               >
-                Learn More
+                See how Kinsroot works
               </Button>
             </div>
 
