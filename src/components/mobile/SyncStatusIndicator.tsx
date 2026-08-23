@@ -28,6 +28,13 @@ export function SyncStatusIndicator({ className }: SyncStatusIndicatorProps) {
         <Button
           variant="ghost"
           size="icon"
+          aria-label={
+            !isOnline
+              ? 'Offline — view sync status'
+              : hasIssues
+                ? 'Sync issues — view sync status'
+                : 'View sync status'
+          }
           className={cn(
             'relative h-8 w-8 text-primary-foreground hover:bg-primary-foreground/10',
             !isOnline && 'text-primary-foreground/70',

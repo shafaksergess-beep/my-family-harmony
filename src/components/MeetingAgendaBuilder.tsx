@@ -369,6 +369,7 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
             {templates.length > 0 && (
               <div className="flex gap-2">
                 <select
+                  aria-label="Select an agenda template"
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
                   value={selectedTemplate}
                   onChange={(e) => setSelectedTemplate(e.target.value)}
