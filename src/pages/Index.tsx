@@ -22,7 +22,7 @@ const isNativeShell = (() => {
 const Index = () => {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(isNativeShell);
   const [lang, setLang] = useState(i18n.language || "en");
   const [stats, setStats] = useState({ activeMembers: 0, avgContribution: 0, avgInterestRate: 0, meetingsPerYear: 0 });
 
