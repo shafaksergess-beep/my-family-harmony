@@ -8,6 +8,16 @@ import { Users, Calendar, DollarSign, TrendingUp, Heart, Shield, Home, PiggyBank
 import SplashScreen from "@/components/SplashScreen";
 import SEO from "@/components/SEO";
 import InstallBanner from "@/components/InstallBanner";
+import { Capacitor } from "@capacitor/core";
+
+// Splash is a native cold-start experience only — on the web it delays LCP.
+const isNativeShell = (() => {
+  try {
+    return Capacitor.isNativePlatform();
+  } catch {
+    return false;
+  }
+})();
 
 const Index = () => {
   const navigate = useNavigate();
