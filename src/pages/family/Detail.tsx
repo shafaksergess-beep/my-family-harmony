@@ -42,12 +42,13 @@ interface Module {
 const FamilyDetail = () => {
   const { familySlug } = useParams();
   const navigate = useNavigate();
-  const { family, userRole, userId, isLoading, isFamilyHead, isFamilyAdmin } = useFamilyAuth(familySlug);
+  const { family, userRole, userRoles, userId, isLoading, isFamilyHead, isFamilyAdmin, isSuperAdmin } = useFamilyAuth(familySlug);
   const { isMobile } = usePlatform();
   const [categories, setCategories] = useState<ModuleCategory[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [loadingModules, setLoadingModules] = useState(true);
   const [pendingApprovalsCount, setPendingApprovalsCount] = useState(0);
+  const [modulesError, setModulesError] = useState<string | null>(null);
   
   const canManageInvitations = isFamilyHead || isFamilyAdmin;
 
@@ -92,15 +93,19 @@ const FamilyDetail = () => {
     }
   }, [family, userRole, userId]);
 
+  // Load modules as soon as auth resolves — never gate on userRole being
+  // truthy, or roles that don't resolve (e.g. super admins without a
+  // family_members row) leave the page spinning forever.
   useEffect(() => {
-    if (userRole) {
-      loadModulesAndCategories();
-    }
-  }, [userRole]);
+    if (isLoading) return;
+    loadModulesAndCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, userRole]);
 
   const loadModulesAndCategories = async () => {
     try {
       setLoadingModules(true);
+      setModulesError(null);
       
       const [categoriesRes, modulesRes] = await Promise.all([
         supabase.from("module_categories").select("*").order("order_index"),
@@ -118,14 +123,19 @@ const FamilyDetail = () => {
         if (!requiredRoles || requiredRoles.length === 0) {
           return true;
         }
-        // Check if user has one of the required roles
-        return requiredRoles.includes(userRole);
+        // Super admins see every module; otherwise match any of the
+        // member's roles.
+        if (isSuperAdmin) return true;
+        return requiredRoles.some((r) => userRoles.includes(r));
       });
 
       setCategories(categoriesRes.data || []);
       setModules(filteredModules);
     } catch (error) {
       console.error("Error loading modules:", error);
+      setModulesError(
+        error instanceof Error ? error.message : "Could not load modules"
+      );
     } finally {
       setLoadingModules(false);
     }
@@ -141,6 +151,28 @@ const FamilyDetail = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (modulesError || !family) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-6">
+        <div className="max-w-md text-center space-y-4">
+          <h1 className="text-xl font-semibold text-foreground">
+            We couldn't load this family
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {modulesError ||
+              "The family data is unavailable or you no longer have access."}
+          </p>
+          <div className="flex justify-center gap-2">
+            <Button variant="outline" onClick={() => navigate("/dashboard")}>
+              Back to dashboard
+            </Button>
+            <Button onClick={() => loadModulesAndCategories()}>Try again</Button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -253,7 +285,9 @@ const FamilyDetail = () => {
                 <h1 className="text-2xl font-bold text-foreground">{family?.name}</h1>
                 <p className="text-sm text-muted-foreground">
                   {family?.description || "Family management dashboard"}
-                  {userRole && ` • Your role: ${userRole.replace("_", " ").toUpperCase()}`}
+                  {isSuperAdmin
+                    ? " • Viewing as SUPER ADMIN"
+                    : userRole && ` • Your role: ${userRole.replace("_", " ").toUpperCase()}`}
                 </p>
               </div>
             </div>
