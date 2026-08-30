@@ -121,7 +121,7 @@ const PaymentIntegration = () => {
                     <li>Member initiates payment via MTN Mobile Money</li>
                     <li>Include the payment transaction ID as reference</li>
                     <li>MTN sends webhook notification to our system</li>
-                    <li>Payment status automatically updated in Family Together</li>
+                    <li>Payment status automatically updated in Kinsroot</li>
                   </ol>
                 </div>
 
@@ -180,7 +180,7 @@ const PaymentIntegration = () => {
                     <li>Member initiates payment via Orange Money</li>
                     <li>Include the payment transaction ID as reference</li>
                     <li>Orange sends webhook notification to our system</li>
-                    <li>Payment status automatically updated in Family Together</li>
+                    <li>Payment status automatically updated in Kinsroot</li>
                   </ol>
                 </div>
 

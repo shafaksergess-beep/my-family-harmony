@@ -143,7 +143,7 @@ const Dashboard = () => {
             <div className="flex items-center gap-4">
               <img 
                 src="/logo.jpg" 
-                alt="Family Together Logo" 
+                alt="Kinsroot Logo" 
                 className="w-12 h-12 rounded-full object-cover shadow-md cursor-pointer"
                 onClick={() => navigate("/dashboard")}
               />

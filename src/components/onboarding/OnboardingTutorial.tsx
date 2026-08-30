@@ -22,7 +22,7 @@ interface OnboardingStep {
 
 const ONBOARDING_STEPS: OnboardingStep[] = [
   {
-    title: 'Welcome to Family Together',
+    title: 'Welcome to Kinsroot',
     description: 'Manage your family meetings, contributions, loans, and assistance events all in one place.',
     icon: Users,
   },
@@ -49,7 +49,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
   },
   {
     title: 'You\'re All Set!',
-    description: 'You\'re ready to start using Family Together. Explore the dashboard to get started.',
+    description: 'You\'re ready to start using Kinsroot. Explore the dashboard to get started.',
     icon: CheckCircle,
   },
 ];

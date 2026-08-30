@@ -229,7 +229,7 @@ const JoinFamily = () => {
         <div className="text-center mb-6">
           <img 
             src="/logo.jpg" 
-            alt="Family Together" 
+            alt="Kinsroot Logo" 
             className="w-16 h-16 mx-auto rounded-full shadow-lg mb-4"
           />
           <h1 className="text-2xl font-bold text-foreground">Join a Family</h1>

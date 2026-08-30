@@ -146,11 +146,11 @@ const EmailSettings = () => {
       const { error } = await supabase.functions.invoke("send-notification", {
         body: {
           to: profile.email,
-          subject: "Test Email - Family Together",
+          subject: "Test Email - Kinsroot",
           userName: profile.full_name,
           familyName,
           eventType: "Test",
-          eventDetails: "This is a test email from the Family Together app.",
+          eventDetails: "This is a test email from the Kinsroot app.",
         },
       });
 

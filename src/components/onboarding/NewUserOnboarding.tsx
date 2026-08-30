@@ -22,8 +22,8 @@ interface NewUserOnboardingProps {
 
 const STEPS = [
   {
-    title: "Welcome to Family Together! 🎉",
-    description: "We're glad you're here. Family Together helps you manage family meetings, contributions, loans, and assistance — all in one place.",
+    title: "Welcome to Kinsroot! 🎉",
+    description: "We're glad you're here. Kinsroot helps you manage family meetings, contributions, loans, and assistance — all in one place.",
     icon: Sparkles,
   },
   {
