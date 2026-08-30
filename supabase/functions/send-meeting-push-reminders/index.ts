@@ -184,9 +184,6 @@ Deno.serve(async (req) => {
         .from("family_members")
         .select("user_id")
         .eq("family_id", m.family_id);
-        .from("family_members")
-        .select("user_id")
-        .eq("family_id", m.family_id);
 
       const userIds = (fm ?? []).map((r) => r.user_id);
       if (userIds.length === 0) {
