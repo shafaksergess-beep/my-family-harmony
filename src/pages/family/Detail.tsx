@@ -92,11 +92,14 @@ const FamilyDetail = () => {
     }
   }, [family, userRole, userId]);
 
+  // Load modules as soon as auth resolves — never gate on userRole being
+  // truthy, or roles that don't resolve (e.g. super admins without a
+  // family_members row) leave the page spinning forever.
   useEffect(() => {
-    if (userRole) {
-      loadModulesAndCategories();
-    }
-  }, [userRole]);
+    if (isLoading) return;
+    loadModulesAndCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, userRole]);
 
   const loadModulesAndCategories = async () => {
     try {
