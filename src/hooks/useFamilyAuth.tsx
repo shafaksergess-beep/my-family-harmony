@@ -23,6 +23,7 @@ export const useFamilyAuth = (familySlug?: string) => {
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [userId, setUserId] = useState<string>("");
   const [memberId, setMemberId] = useState<string>("");
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -153,5 +154,6 @@ export const useFamilyAuth = (familySlug?: string) => {
     isTreasurer,
     isSecretary,
     isLoanCommittee,
+    isSuperAdmin,
   };
 };
