@@ -64,9 +64,22 @@ export const useFamilyAuth = (familySlug?: string) => {
           .select("id, role")
           .eq("family_id", familyData.id)
           .eq("user_id", session.user.id)
-          .single();
-        
+          .maybeSingle();
+
         if (!memberData) {
+          // Super admins can open any family without a family_members row.
+          const { data: superAdmin } = await supabase.rpc("is_super_admin", {
+            check_user_id: session.user.id,
+          });
+
+          if (superAdmin) {
+            setIsSuperAdmin(true);
+            // Treat platform admins with family-head level access so every
+            // module renders instead of the page stalling on an empty role.
+            setUserRoles(["super_admin", "family_head"]);
+            return;
+          }
+
           toast({
             title: "Access Denied",
             description: "You are not a member of this family",
@@ -84,8 +97,10 @@ export const useFamilyAuth = (familySlug?: string) => {
           .select("role")
           .eq("member_id", memberData.id);
 
-        const roles = rolesData?.map(r => r.role) || [memberData.role];
-        setUserRoles(roles);
+        const roles = rolesData?.length
+          ? rolesData.map((r) => r.role)
+          : [memberData.role].filter(Boolean);
+        setUserRoles(roles.length ? roles : ["member"]);
       }
     } catch (error) {
       console.error("Auth check error:", error);
