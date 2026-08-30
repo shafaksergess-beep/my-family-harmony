@@ -48,8 +48,9 @@ export async function syncUserProfile(user: User) {
     id: user.id,
     email: user.email ?? null,
   };
-  if (!existing) payload.full_name = fullName;
-  else if (!existing.full_name) payload.full_name = fullName;
+  // Always include full_name: Postgres validates the NOT NULL constraint on the
+  // INSERT portion of an upsert even when the conflict resolves to an UPDATE.
+  payload.full_name = existing?.full_name || fullName;
   if (!existing?.avatar_url && avatarUrl) payload.avatar_url = avatarUrl;
 
   const { error } = await supabase
