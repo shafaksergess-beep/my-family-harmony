@@ -8,7 +8,7 @@ interface SEOProps {
 }
 
 const DEFAULT_DESCRIPTION =
-  "Kinsroot is the all-in-one family management platform for meetings, contributions, savings, loans and heritage — rooted in tradition, built for tomorrow.";
+  "Run your family njangi, contributions and meetings — all in one place. Kinsroot tracks savings, loans, assistance and attendance in one platform.";
 
 const ANDROID_PACKAGE = "app.lovable.3138229105464a70a015b86eb65a55a3";
 const SITE_ORIGIN = "https://kinsroot.softserge.com";

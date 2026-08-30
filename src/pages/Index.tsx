@@ -65,7 +65,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <SEO
         title="Kinsroot — Rooted in Heritage, Built for Tomorrow"
-        description="Kinsroot helps families run meetings, track contributions, manage savings, loans and njangi — all in one heritage-rooted platform."
+        description="Run your family njangi, contributions and meetings — all in one place. Kinsroot tracks savings, loans, assistance and attendance in one platform."
       />
       <main id="main-content">
       {/* Hero Section */}
