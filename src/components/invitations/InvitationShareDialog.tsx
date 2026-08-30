@@ -56,7 +56,7 @@ export const InvitationShareDialog = ({
 
   const handleShare = async () => {
     const shareData = {
-      title: `Join ${familyName} on Family Together`,
+      title: `Join ${familyName} on Kinsroot`,
       text: `You've been invited to join ${familyName}. Use code: ${referenceCode}`,
       url: inviteLink,
     };

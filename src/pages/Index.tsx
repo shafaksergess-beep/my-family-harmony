@@ -76,7 +76,7 @@ const Index = () => {
             <div className="mb-8">
               <img
                 src="/logo.jpg"
-                alt="Kinsroot heritage-rooted family management logo"
+                alt="Kinsroot Logo"
                 width="128"
                 height="128"
                 fetchPriority="high"

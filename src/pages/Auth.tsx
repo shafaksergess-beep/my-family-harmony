@@ -303,7 +303,7 @@ const Auth = () => {
 
       toast({
         title: "Account created!",
-        description: "Welcome to Family Together. Please check your email to verify your account.",
+        description: "Welcome to Kinsroot. Please check your email to verify your account.",
       });
 
       // Switch to login tab
@@ -358,11 +358,11 @@ const Auth = () => {
           <div className="mb-4">
             <img 
               src="/logo.jpg" 
-              alt="Kinsroot heritage-rooted family management logo" 
+              alt="Kinsroot Logo" 
               className="w-24 h-24 mx-auto rounded-full object-cover shadow-lg"
             />
           </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Family Together — Heritage-rooted family management</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Kinsroot — Rooted in Heritage, Built for Tomorrow</h1>
           <h2 className="sr-only">Sign in to your account or create a new one</h2>
           <p className="text-muted-foreground">
             {pendingInvitation 

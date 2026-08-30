@@ -26,7 +26,7 @@ const NotFound = () => {
       />
       <img
         src="/logo.jpg"
-        alt="Kinsroot logo"
+        alt="Kinsroot Logo"
         className="mb-6 h-20 w-20 rounded-full object-cover shadow-lg"
         loading="lazy"
       />

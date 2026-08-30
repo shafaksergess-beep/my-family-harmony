@@ -49,12 +49,12 @@ export const getAdminActionEmailTemplate = ({
                 <!-- Header -->
                 <tr>
                   <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 8px 8px 0 0; text-align: center;">
-                    <img src="https://31382291-0546-4a70-a015-b86eb65a55a3.lovableproject.com/logo.jpg" alt="Family Together" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 16px; border: 3px solid rgba(255,255,255,0.3);" />
+                    <img src="https://31382291-0546-4a70-a015-b86eb65a55a3.lovableproject.com/logo.jpg" alt="Kinsroot" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 16px; border: 3px solid rgba(255,255,255,0.3);" />
                     <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">
                       🔔 Admin Activity Alert
                     </h1>
                     <p style="margin: 8px 0 0 0; color: rgba(255,255,255,0.9); font-size: 14px;">
-                      Family Together Platform
+                      Kinsroot Platform
                     </p>
                   </td>
                 </tr>
@@ -134,11 +134,11 @@ export const getAdminActionEmailTemplate = ({
                 <tr>
                   <td style="background-color: #f9fafb; padding: 24px; border-radius: 0 0 8px 8px; border-top: 1px solid #e5e7eb;">
                     <p style="margin: 0; color: #6b7280; font-size: 12px; text-align: center;">
-                      This is an automated notification from the Family Together platform.<br/>
+                      This is an automated notification from the Kinsroot platform.<br/>
                       <span style="color: #9ca3af;">Please do not reply to this email.</span>
                     </p>
                     <p style="margin: 16px 0 0 0; color: #9ca3af; font-size: 11px; text-align: center;">
-                      © ${new Date().getFullYear()} Family Together. All rights reserved.
+                      © ${new Date().getFullYear()} Kinsroot. All rights reserved.
                     </p>
                   </td>
                 </tr>
@@ -158,7 +158,7 @@ export const getWelcomeEmailTemplate = (userName: string): string => {
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Welcome to Family Together</title>
+        <title>Welcome to Kinsroot</title>
       </head>
       <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
         <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 40px 20px;">
@@ -167,13 +167,13 @@ export const getWelcomeEmailTemplate = (userName: string): string => {
               <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                 <tr>
                   <td style="padding: 40px; text-align: center;">
-                    <img src="https://31382291-0546-4a70-a015-b86eb65a55a3.lovableproject.com/logo.jpg" alt="Family Together" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+                    <img src="https://31382291-0546-4a70-a015-b86eb65a55a3.lovableproject.com/logo.jpg" alt="Kinsroot" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
                     <h1 style="margin: 0 0 16px 0; color: #1f2937; font-size: 28px;">
-                      Welcome to Family Together! 🎉
+                      Welcome to Kinsroot! 🎉
                     </h1>
                     <p style="margin: 0; color: #6b7280; font-size: 16px; line-height: 1.6;">
                       Hi ${userName},<br/><br/>
-                      Your account has been successfully created. You're now part of the Family Together platform where families can manage their reunions, finances, and stay connected.
+                      Your account has been successfully created. You're now part of the Kinsroot platform where families can manage their reunions, finances, and stay connected.
                     </p>
                   </td>
                 </tr>
@@ -189,7 +189,7 @@ export const getWelcomeEmailTemplate = (userName: string): string => {
                 <tr>
                   <td style="background-color: #f9fafb; padding: 24px; border-radius: 0 0 8px 8px; text-align: center;">
                     <p style="margin: 0; color: #9ca3af; font-size: 12px;">
-                      © ${new Date().getFullYear()} Family Together. All rights reserved.
+                      © ${new Date().getFullYear()} Kinsroot. All rights reserved.
                     </p>
                   </td>
                 </tr>
