@@ -285,7 +285,9 @@ const FamilyDetail = () => {
                 <h1 className="text-2xl font-bold text-foreground">{family?.name}</h1>
                 <p className="text-sm text-muted-foreground">
                   {family?.description || "Family management dashboard"}
-                  {userRole && ` • Your role: ${userRole.replace("_", " ").toUpperCase()}`}
+                  {isSuperAdmin
+                    ? " • Viewing as SUPER ADMIN"
+                    : userRole && ` • Your role: ${userRole.replace("_", " ").toUpperCase()}`}
                 </p>
               </div>
             </div>
