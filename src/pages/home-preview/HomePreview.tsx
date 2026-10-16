@@ -41,7 +41,7 @@ function Reveal({ children, className = "", delay = 0 }: { children: ReactNode; 
 }
 
 function Avatar({ i, tone }: { i: string; tone: string }) {
-  return <span className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-semibold ring-2" style={{ background: c(tone, 0.18), color: c(tone === "hp-gold" ? "hp-ink" : tone), boxShadow: `0 0 0 2px ${c("hp-paper")}` }}>{i}</span>;
+  return <span className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[11px] font-semibold ring-2" style={{ background: c(tone, 0.18), color: c(tone === "hp-gold" ? "hp-ink" : tone), boxShadow: `0 0 0 2px ${c("hp-paper")}` }}>{i}</span>;
 }
 
 function ProductPreview() {
@@ -95,7 +95,7 @@ function ProductPreview() {
         </ul>
       </div>
 
-      <div className="absolute -bottom-8 -left-4 w-56 rounded-2xl p-4 sm:-left-12" style={{ background: c("hp-paper"), boxShadow: "var(--hp-shadow-lg)", border: `1px solid ${c("hp-line")}` }}>
+      <div className="absolute -bottom-16 -left-4 w-56 rounded-2xl p-4 sm:-left-12" style={{ background: c("hp-paper"), boxShadow: "var(--hp-shadow-lg)", border: `1px solid ${c("hp-line")}` }}>
         <div className="flex items-center gap-2 text-sm font-medium"><CheckCircle2 className="h-4 w-4" style={{ color: c("hp-forest") }} /> Payment approved</div>
         <p className="mt-1 text-xs" style={{ color: c("hp-ink-soft") }}>MTN MoMo · 15,000 FCFA · verified by treasurer</p>
       </div>
