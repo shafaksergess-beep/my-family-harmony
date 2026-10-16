@@ -655,6 +655,16 @@ const AdminDashboard = () => {
           <Button
             variant="outline"
             className="h-auto py-6"
+            onClick={() => navigate("/admin/languages")}
+          >
+            <div className="flex flex-col items-center gap-2">
+              <Globe className="w-8 h-8" />
+              <span>{t("admin.languages.title")}</span>
+            </div>
+          </Button>
+          <Button
+            variant="outline"
+            className="h-auto py-6"
             onClick={() => navigate("/admin/system-health")}
           >
             <div className="flex flex-col items-center gap-2">
