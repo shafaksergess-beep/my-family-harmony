@@ -29,6 +29,13 @@
       "when": 1792145667732,
       "tag": "0003_secure_account_deletion",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792145731592,
+      "tag": "0004_account_deletion_cleanup_trigger",
+      "breakpoints": true
     }
   ]
 }

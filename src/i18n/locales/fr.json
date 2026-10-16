@@ -2616,5 +2616,15 @@
     "reminder": "Rappel de réunion",
     "newAssistance": "Nouvel événement d'assistance",
     "newAssistanceBody": "Un nouvel événement d'assistance a été créé"
+  },
+  "accountDeletion": {
+    "title": "Supprimer le compte",
+    "summary": "Supprimez définitivement votre compte Kinsroot et votre profil personnel.",
+    "confirmTitle": "Supprimer définitivement votre compte ?",
+    "warning": "Vos comptes de connexion, coordonnées, messages et reçus téléversés seront supprimés. Les adhésions anonymisées et écritures financières sont conservées pour la comptabilité ; les obligations en cours ne sont pas annulées. Cette action est irréversible. Reconnectez-vous au préalable si votre dernière connexion date de plus de 15 minutes.",
+    "type": "Saisissez DELETE pour confirmer",
+    "confirm": "Supprimer définitivement",
+    "reauth": "Pour votre sécurité, déconnectez-vous puis reconnectez-vous et revenez ici dans les 15 minutes.",
+    "failed": "Votre compte n’a pas pu être supprimé. Réessayez ou contactez l’assistance."
   }
 }

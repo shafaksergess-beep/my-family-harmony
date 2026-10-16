@@ -3220,6 +3220,10 @@ export type Database = {
         }
         Returns: string
       }
+      prepare_account_deletion: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       review_payment_proof: {
         Args: { p_decision: string; p_notes?: string; p_proof_id: string }
         Returns: string
