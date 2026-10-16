@@ -1,9 +1,12 @@
 # Roadmap
 
-- [ ] Replace Median integration with verified Natively bridge
-- [ ] Secure self-account deletion with English/French confirmation
-- [ ] Generate branded master icon and store graphics with listing guidance
-- [ ] Verify browser flow, deletion safeguards, and native adapter tests
+- [x] Replace Median integration with verified Natively bridge
+- [x] Add authenticated self-account deletion with English/French confirmation
+- [x] Generate branded master icon and store graphics with listing guidance
+- [x] Verify signed-in confirmation, authorization rejection, and native adapter tests (27 tests pass)
+- [ ] Verify irreversible deletion using a disposable member (requires a designated test account)
+- [ ] Verify native push/OAuth and capture store screenshots (requires Natively device builds)
+- [ ] Resolve existing session-management failure (unsupported listUserSessions API; separate prelaunch blocker)
 
 - [x] New homepage at / (old design retired, /home-preview redirects)
 - [x] Remove Bota; English + French built in
