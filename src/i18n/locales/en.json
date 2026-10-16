@@ -15,7 +15,8 @@
     "search": "Search",
     "filter": "Filter",
     "success": "Success",
-    "error": "Error"
+    "error": "Error",
+    "selectLanguage": "Select language"
   },
   "auth": {
     "login": "Login",
@@ -301,5 +302,119 @@
     "skip": "Skip",
     "next": "Next",
     "letsGo": "Let's Go!"
+  },
+  "home": {
+    "seoTitle": "Kinsroot — Bring the family together",
+    "seoDesc": "Run your family njangi, contributions and meetings — all in one place. Kinsroot tracks savings, loans, assistance and attendance in one platform.",
+    "nav": {
+      "platform": "Platform",
+      "contributions": "Contributions",
+      "how": "How it works",
+      "stories": "Stories",
+      "main": "Main",
+      "language": "Language",
+      "open": "Open menu",
+      "close": "Close menu"
+    },
+    "getStarted": "Get started",
+    "getStartedFree": "Get started free",
+    "explore": "Explore the platform",
+    "badge": "Built for African families · Works offline",
+    "h1a": "Bring the family together.",
+    "h1b": "Keep traditions moving forward.",
+    "sub": "Kinsroot gives your family one shared home for meetings, contributions, njangi, loans and support — clear for everyone, even offline.",
+    "privacy": "Private to your family. Every record visible to the people who should see it.",
+    "preview": {
+      "aria": "Sample Kinsroot dashboard preview",
+      "family": "Ndoko Family · Douala",
+      "greeting": "Good evening, Ebude",
+      "next": "Next gathering",
+      "meeting": "Sunday family meeting",
+      "when": "Nov 2 · 3:00 PM · Hosted by Mama Agnes",
+      "month": "Nov",
+      "agenda1": "Opening prayer",
+      "agenda2": "Njangi payout",
+      "agenda3": "Treasurer's report",
+      "contrib": "October contributions",
+      "ofPaid": "of 12 paid",
+      "cycle": "Njangi cycle",
+      "round": "Round 5",
+      "nextUp": "Next: Joseph T.",
+      "act1": "Marie A. paid her house levy",
+      "act1When": "2h",
+      "act2": "Loan request reviewed by committee",
+      "act2When": "Yesterday",
+      "approved": "Payment approved",
+      "approvedDetail": "MTN MoMo · 15,000 FCFA · verified by treasurer",
+      "offline": "Saved offline · syncs later"
+    },
+    "proof": {
+      "aria": "Why families choose Kinsroot",
+      "t1": "Family-first",
+      "d1": "Roles for heads, treasurers, secretaries and members.",
+      "t2": "Transparent contributions",
+      "d2": "Everyone sees the same record, with receipts.",
+      "t3": "Works offline",
+      "d3": "Record at the meeting, sync when you reconnect."
+    },
+    "platform": {
+      "eyebrow": "The platform",
+      "title": "Everything a family association runs on, in one calm place.",
+      "meetingsTitle": "Meetings that run themselves",
+      "meetingsDesc": "Plan the whole year of hosting in one go, build the agenda, check members in by QR, and let lateness fines and minutes follow automatically.",
+      "jan": "Jan",
+      "feb": "Feb",
+      "mar": "Mar",
+      "njangiT": "Njangi cycles",
+      "njangiD": "Ballot the payout order and track every round.",
+      "loansT": "Savings & loans",
+      "loansD": "Committee review, interest and deadlines built in.",
+      "supportT": "Family support",
+      "supportD": "Births, bereavement, sickness and joyful events — handled with care and clear rules.",
+      "paymentsT": "Verified payments",
+      "paymentsD": "MTN & Orange proofs reviewed before they reach the ledger."
+    },
+    "prosperity": {
+      "eyebrow": "Shared prosperity",
+      "title": "Every contribution tells a story.",
+      "body": "A house levy, a njangi round, a gift for a newborn. Kinsroot keeps each one with its receipt and its reason, so the family’s growth is something everyone can see — and trust.",
+      "sample": "Sample family fund · this year",
+      "contributions": "Contributions",
+      "njangi": "Njangi",
+      "support": "Support fund"
+    },
+    "how": {
+      "title": "Up and running in an afternoon.",
+      "s1": "Create your family space",
+      "d1": "Name it, choose your currency and invite members by link or QR.",
+      "s2": "Assign the right roles",
+      "d2": "Head, treasurer, secretary, committee — each sees what they need.",
+      "s3": "Run your first meeting",
+      "d3": "Agenda, check-in, contributions and minutes, all recorded together."
+    },
+    "stats": {
+      "members": "Active members",
+      "meetings": "Meetings this year",
+      "interest": "Average loan interest"
+    },
+    "stories": {
+      "title": "What families tell us they want.",
+      "tag": "Sample quotes",
+      "q1": "“We used to argue over who paid what. Now everyone sees the same record.”",
+      "w1": "Treasurer",
+      "q2": "“Planning the year of hosting in one sitting changed our rhythm.”",
+      "w2": "Family head",
+      "q3": "“Our njangi payouts and reminders just work.”",
+      "w3": "Diaspora member"
+    },
+    "cta": {
+      "title": "Give your family a home for what matters.",
+      "sub": "Start with one meeting. Grow into everything else."
+    },
+    "footer": {
+      "credit": "Developed by Softserge. Copyright 2026 All rights reserved.",
+      "privacy": "Privacy",
+      "terms": "Terms"
+    }
   }
 }

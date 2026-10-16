@@ -15,7 +15,8 @@
     "search": "Rechercher",
     "filter": "Filtrer",
     "success": "Succès",
-    "error": "Erreur"
+    "error": "Erreur",
+    "selectLanguage": "Choisir la langue"
   },
   "auth": {
     "login": "Connexion",
@@ -301,5 +302,119 @@
     "skip": "Passer",
     "next": "Suivant",
     "letsGo": "C'est parti !"
+  },
+  "home": {
+    "seoTitle": "Kinsroot — Rassemblez la famille",
+    "seoDesc": "Gérez njangi, cotisations et réunions familiales en un seul endroit. Kinsroot suit l’épargne, les prêts, l’entraide et les présences.",
+    "nav": {
+      "platform": "Plateforme",
+      "contributions": "Cotisations",
+      "how": "Fonctionnement",
+      "stories": "Témoignages",
+      "main": "Principal",
+      "language": "Langue",
+      "open": "Ouvrir le menu",
+      "close": "Fermer le menu"
+    },
+    "getStarted": "Commencer",
+    "getStartedFree": "Commencer gratuitement",
+    "explore": "Découvrir la plateforme",
+    "badge": "Conçu pour les familles africaines · Fonctionne hors ligne",
+    "h1a": "Rassemblez la famille.",
+    "h1b": "Faites vivre les traditions.",
+    "sub": "Kinsroot réunit réunions, cotisations, njangi, prêts et entraide dans un seul espace familial — clair pour tous, même hors ligne.",
+    "privacy": "Privé pour votre famille. Chaque donnée n’est visible que par les bonnes personnes.",
+    "preview": {
+      "aria": "Aperçu d’un tableau de bord Kinsroot",
+      "family": "Famille Ndoko · Douala",
+      "greeting": "Bonsoir, Ebude",
+      "next": "Prochaine rencontre",
+      "meeting": "Réunion familiale du dimanche",
+      "when": "2 nov. · 15h00 · Chez Maman Agnès",
+      "month": "Nov",
+      "agenda1": "Prière d’ouverture",
+      "agenda2": "Versement njangi",
+      "agenda3": "Rapport du trésorier",
+      "contrib": "Cotisations d’octobre",
+      "ofPaid": "sur 12 payées",
+      "cycle": "Cycle njangi",
+      "round": "Tour 5",
+      "nextUp": "Suivant : Joseph T.",
+      "act1": "Marie A. a payé sa cotisation de maison",
+      "act1When": "2 h",
+      "act2": "Demande de prêt examinée par le comité",
+      "act2When": "Hier",
+      "approved": "Paiement approuvé",
+      "approvedDetail": "MTN MoMo · 15 000 FCFA · vérifié par le trésorier",
+      "offline": "Enregistré hors ligne · synchronisé plus tard"
+    },
+    "proof": {
+      "aria": "Pourquoi les familles choisissent Kinsroot",
+      "t1": "La famille d’abord",
+      "d1": "Des rôles pour chefs, trésoriers, secrétaires et membres.",
+      "t2": "Cotisations transparentes",
+      "d2": "Tout le monde voit le même registre, avec reçus.",
+      "t3": "Fonctionne hors ligne",
+      "d3": "Saisissez pendant la réunion, synchronisez à la reconnexion."
+    },
+    "platform": {
+      "eyebrow": "La plateforme",
+      "title": "Tout ce dont une association familiale a besoin, dans un seul espace serein.",
+      "meetingsTitle": "Des réunions qui s’organisent seules",
+      "meetingsDesc": "Planifiez toute l’année d’accueil d’un coup, préparez l’ordre du jour, pointez les membres par QR, et laissez amendes de retard et procès-verbaux suivre automatiquement.",
+      "jan": "Jan",
+      "feb": "Fév",
+      "mar": "Mar",
+      "njangiT": "Cycles njangi",
+      "njangiD": "Tirez au sort l’ordre des versements et suivez chaque tour.",
+      "loansT": "Épargne et prêts",
+      "loansD": "Examen par le comité, intérêts et échéances intégrés.",
+      "supportT": "Entraide familiale",
+      "supportD": "Naissances, deuils, maladies et événements heureux — gérés avec soin et des règles claires.",
+      "paymentsT": "Paiements vérifiés",
+      "paymentsD": "Preuves MTN et Orange vérifiées avant d’entrer au registre."
+    },
+    "prosperity": {
+      "eyebrow": "Prospérité partagée",
+      "title": "Chaque cotisation raconte une histoire.",
+      "body": "Une cotisation de maison, un tour de njangi, un cadeau pour un nouveau-né. Kinsroot garde chacun avec son reçu et son motif, pour que la croissance de la famille soit visible — et digne de confiance.",
+      "sample": "Exemple de caisse familiale · cette année",
+      "contributions": "Cotisations",
+      "njangi": "Njangi",
+      "support": "Fonds d’entraide"
+    },
+    "how": {
+      "title": "Opérationnel en un après-midi.",
+      "s1": "Créez votre espace familial",
+      "d1": "Nommez-le, choisissez votre devise et invitez les membres par lien ou QR.",
+      "s2": "Attribuez les bons rôles",
+      "d2": "Chef, trésorier, secrétaire, comité — chacun voit ce dont il a besoin.",
+      "s3": "Tenez votre première réunion",
+      "d3": "Ordre du jour, pointage, cotisations et procès-verbal, tout enregistré ensemble."
+    },
+    "stats": {
+      "members": "Membres actifs",
+      "meetings": "Réunions cette année",
+      "interest": "Intérêt moyen des prêts"
+    },
+    "stories": {
+      "title": "Ce que les familles nous disent vouloir.",
+      "tag": "Exemples de témoignages",
+      "q1": "« Nous nous disputions pour savoir qui avait payé quoi. Maintenant, tout le monde voit le même registre. »",
+      "w1": "Trésorier",
+      "q2": "« Planifier toute l’année d’accueil en une séance a changé notre rythme. »",
+      "w2": "Chef de famille",
+      "q3": "« Nos versements njangi et rappels fonctionnent, tout simplement. »",
+      "w3": "Membre de la diaspora"
+    },
+    "cta": {
+      "title": "Offrez à votre famille un foyer pour l’essentiel.",
+      "sub": "Commencez par une réunion. Développez le reste ensuite."
+    },
+    "footer": {
+      "credit": "Développé par Softserge. Copyright 2026 Tous droits réservés.",
+      "privacy": "Confidentialité",
+      "terms": "Conditions"
+    }
   }
 }
