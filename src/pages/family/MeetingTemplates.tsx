@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +20,7 @@ interface Template {
 }
 
 const MeetingTemplates = () => {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -57,8 +59,8 @@ const MeetingTemplates = () => {
     } catch (error: any) {
       console.error("Error loading templates:", error);
       toast({
-        title: "Error",
-        description: "Failed to load templates",
+        title: t("famMeetingTemplates.error"),
+        description: t("famMeetingTemplates.failedToLoadTemplates"),
         variant: "destructive",
       });
     } finally {
@@ -69,8 +71,8 @@ const MeetingTemplates = () => {
   const handleCreateTemplate = async () => {
     if (!family || !newTemplate.name.trim()) {
       toast({
-        title: "Error",
-        description: "Please enter a template name",
+        title: t("famMeetingTemplates.error"),
+        description: t("famMeetingTemplates.pleaseEnterATemplateName"),
         variant: "destructive",
       });
       return;
@@ -89,8 +91,8 @@ const MeetingTemplates = () => {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Template created",
+        title: t("famMeetingTemplates.success"),
+        description: t("famMeetingTemplates.templateCreated"),
       });
 
       setNewTemplate({ name: "", description: "", agenda_items: [] });
@@ -99,7 +101,7 @@ const MeetingTemplates = () => {
     } catch (error: any) {
       console.error("Error creating template:", error);
       toast({
-        title: "Error",
+        title: t("famMeetingTemplates.error"),
         description: error.message || "Failed to create template",
         variant: "destructive",
       });
@@ -116,14 +118,14 @@ const MeetingTemplates = () => {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Template deleted",
+        title: t("famMeetingTemplates.success"),
+        description: t("famMeetingTemplates.templateDeleted"),
       });
       loadTemplates();
     } catch (error: any) {
       console.error("Error deleting template:", error);
       toast({
-        title: "Error",
+        title: t("famMeetingTemplates.error"),
         description: error.message || "Failed to delete template",
         variant: "destructive",
       });
@@ -141,7 +143,7 @@ const MeetingTemplates = () => {
   if (!isFamilyHead) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <p>Only family heads can manage meeting templates</p>
+        <p>{t("famMeetingTemplates.onlyFamilyHeadsCanManage")}</p>
       </div>
     );
   }
@@ -153,15 +155,15 @@ const MeetingTemplates = () => {
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+              {t("famMeetingTemplates.back")}
             </Button>
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-foreground">Meeting Templates</h1>
+              <h1 className="text-2xl font-bold text-foreground">{t("famMeetingTemplates.meetingTemplates")}</h1>
               <p className="text-sm text-muted-foreground">{family?.name}</p>
             </div>
             <Button onClick={() => setShowForm(!showForm)}>
               <Plus className="w-4 h-4 mr-2" />
-              New Template
+              {t("famMeetingTemplates.newTemplate")}
             </Button>
           </div>
         </div>
@@ -171,11 +173,11 @@ const MeetingTemplates = () => {
         {showForm && (
           <Card>
             <CardHeader>
-              <CardTitle>Create New Template</CardTitle>
+              <CardTitle>{t("famMeetingTemplates.createNewTemplate")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="name">Template Name</Label>
+                <Label htmlFor="name">{t("famMeetingTemplates.templateName")}</Label>
                 <Input
                   id="name"
                   value={newTemplate.name}
@@ -184,18 +186,18 @@ const MeetingTemplates = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">{t("famMeetingTemplates.description")}</Label>
                 <Textarea
                   id="description"
                   value={newTemplate.description}
                   onChange={(e) => setNewTemplate({ ...newTemplate, description: e.target.value })}
-                  placeholder="Brief description of this template"
+                  placeholder={t("famMeetingTemplates.briefDescriptionOfThisTemplate")}
                   rows={3}
                 />
               </div>
               <div className="flex gap-2">
-                <Button onClick={handleCreateTemplate}>Create Template</Button>
-                <Button variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
+                <Button onClick={handleCreateTemplate}>{t("famMeetingTemplates.createTemplate")}</Button>
+                <Button variant="outline" onClick={() => setShowForm(false)}>{t("famMeetingTemplates.cancel")}</Button>
               </div>
             </CardContent>
           </Card>
@@ -205,7 +207,7 @@ const MeetingTemplates = () => {
           <Card>
             <CardContent className="py-12 text-center text-muted-foreground">
               <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>No templates yet. Create your first meeting template.</p>
+              <p>{t("famMeetingTemplates.noTemplatesYetCreateYour")}</p>
             </CardContent>
           </Card>
         ) : (

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,6 +33,7 @@ interface Expense {
 }
 
 export default function BudgetPlanning() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { family, canManageFinances } = useFamilyAuth(familySlug);
@@ -108,7 +110,7 @@ export default function BudgetPlanning() {
       setExpenses(expensesData || []);
     } catch (error) {
       console.error("Error loading budget data:", error);
-      toast.error("Failed to load budget data");
+      toast.error(t("famBudgetPlanning.failedToLoadBudgetData"));
     } finally {
       setLoading(false);
     }
@@ -116,7 +118,7 @@ export default function BudgetPlanning() {
 
   const handleSaveCategory = async () => {
     if (!family?.id || !categoryForm.name || !categoryForm.monthly_limit) {
-      toast.error("Please fill in all required fields");
+      toast.error(t("famBudgetPlanning.pleaseFillInAllRequired"));
       return;
     }
 
@@ -133,7 +135,7 @@ export default function BudgetPlanning() {
           .eq("id", editingCategory.id);
 
         if (error) throw error;
-        toast.success("Category updated");
+        toast.success(t("famBudgetPlanning.categoryUpdated"));
       } else {
         const { error } = await supabase
           .from("budget_categories")
@@ -146,7 +148,7 @@ export default function BudgetPlanning() {
           });
 
         if (error) throw error;
-        toast.success("Category created");
+        toast.success(t("famBudgetPlanning.categoryCreated"));
       }
 
       setCategoryDialogOpen(false);
@@ -155,13 +157,13 @@ export default function BudgetPlanning() {
       loadData();
     } catch (error) {
       console.error("Error saving category:", error);
-      toast.error("Failed to save category");
+      toast.error(t("famBudgetPlanning.failedToSaveCategory"));
     }
   };
 
   const handleSaveExpense = async () => {
     if (!family?.id || !expenseForm.amount || !expenseForm.description) {
-      toast.error("Please fill in all required fields");
+      toast.error(t("famBudgetPlanning.pleaseFillInAllRequired"));
       return;
     }
 
@@ -182,7 +184,7 @@ export default function BudgetPlanning() {
 
       if (error) throw error;
 
-      toast.success("Expense recorded");
+      toast.success(t("famBudgetPlanning.expenseRecorded"));
       setExpenseDialogOpen(false);
       setExpenseForm({
         category_id: "",
@@ -194,7 +196,7 @@ export default function BudgetPlanning() {
       loadData();
     } catch (error) {
       console.error("Error saving expense:", error);
-      toast.error("Failed to save expense");
+      toast.error(t("famBudgetPlanning.failedToSaveExpense"));
     }
   };
 
@@ -208,11 +210,11 @@ export default function BudgetPlanning() {
         .eq("id", categoryId);
 
       if (error) throw error;
-      toast.success("Category deleted");
+      toast.success(t("famBudgetPlanning.categoryDeleted"));
       loadData();
     } catch (error) {
       console.error("Error deleting category:", error);
-      toast.error("Failed to delete category");
+      toast.error(t("famBudgetPlanning.failedToDeleteCategory"));
     }
   };
 
@@ -226,11 +228,11 @@ export default function BudgetPlanning() {
         .eq("id", expenseId);
 
       if (error) throw error;
-      toast.success("Expense deleted");
+      toast.success(t("famBudgetPlanning.expenseDeleted"));
       loadData();
     } catch (error) {
       console.error("Error deleting expense:", error);
-      toast.error("Failed to delete expense");
+      toast.error(t("famBudgetPlanning.failedToDeleteExpense"));
     }
   };
 
@@ -239,7 +241,7 @@ export default function BudgetPlanning() {
   const remaining = totalBudget - totalSpent;
 
   if (!family) {
-    return <div className="p-6">Loading...</div>;
+    return <div className="p-6">{t("famBudgetPlanning.loading")}</div>;
   }
 
   return (
@@ -253,8 +255,8 @@ export default function BudgetPlanning() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Budget Planning</h1>
-            <p className="text-muted-foreground">Track expenses and manage budgets</p>
+            <h1 className="text-3xl font-bold">{t("famBudgetPlanning.budgetPlanning")}</h1>
+            <p className="text-muted-foreground">{t("famBudgetPlanning.trackExpensesAndManageBudgets")}</p>
           </div>
         </div>
 
@@ -262,7 +264,7 @@ export default function BudgetPlanning() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Budget</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">{t("famBudgetPlanning.totalBudget")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2">
@@ -274,7 +276,7 @@ export default function BudgetPlanning() {
 
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Spent</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">{t("famBudgetPlanning.totalSpent")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2">
@@ -289,7 +291,7 @@ export default function BudgetPlanning() {
 
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Remaining</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">{t("famBudgetPlanning.remaining")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2">
@@ -306,8 +308,8 @@ export default function BudgetPlanning() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Budget Categories</CardTitle>
-                  <CardDescription>Monthly spending limits by category</CardDescription>
+                  <CardTitle>{t("famBudgetPlanning.budgetCategories")}</CardTitle>
+                  <CardDescription>{t("famBudgetPlanning.monthlySpendingLimitsByCategory")}</CardDescription>
                 </div>
                 {canManageFinances && (
                   <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
@@ -317,7 +319,7 @@ export default function BudgetPlanning() {
                         setCategoryForm({ name: "", description: "", monthly_limit: "", color: "#667eea" });
                       }}>
                         <Plus className="h-4 w-4 mr-1" />
-                        Add Category
+                        {t("famBudgetPlanning.addCategory")}
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
@@ -326,7 +328,7 @@ export default function BudgetPlanning() {
                       </DialogHeader>
                       <div className="space-y-4">
                         <div>
-                          <Label>Category Name</Label>
+                          <Label>{t("famBudgetPlanning.categoryName")}</Label>
                           <Input
                             value={categoryForm.name}
                             onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
@@ -334,11 +336,11 @@ export default function BudgetPlanning() {
                           />
                         </div>
                         <div>
-                          <Label>Description</Label>
+                          <Label>{t("famBudgetPlanning.description")}</Label>
                           <Textarea
                             value={categoryForm.description}
                             onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
-                            placeholder="Optional description"
+                            placeholder={t("famBudgetPlanning.optionalDescription")}
                           />
                         </div>
                         <div>
@@ -351,7 +353,7 @@ export default function BudgetPlanning() {
                           />
                         </div>
                         <div>
-                          <Label>Color</Label>
+                          <Label>{t("famBudgetPlanning.color")}</Label>
                           <Input
                             type="color"
                             value={categoryForm.color}
@@ -437,7 +439,7 @@ export default function BudgetPlanning() {
                 ))}
                 {categories.length === 0 && (
                   <p className="text-center text-muted-foreground py-8">
-                    No budget categories yet. Create one to start tracking expenses.
+                    {t("famBudgetPlanning.noBudgetCategoriesYetCreate")}
                   </p>
                 )}
               </div>
@@ -449,24 +451,24 @@ export default function BudgetPlanning() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Recent Expenses</CardTitle>
-                  <CardDescription>This month's spending activity</CardDescription>
+                  <CardTitle>{t("famBudgetPlanning.recentExpenses")}</CardTitle>
+                  <CardDescription>{t("famBudgetPlanning.thisMonthSSpendingActivity")}</CardDescription>
                 </div>
                 {canManageFinances && (
                   <Dialog open={expenseDialogOpen} onOpenChange={setExpenseDialogOpen}>
                     <DialogTrigger asChild>
                       <Button size="sm">
                         <Plus className="h-4 w-4 mr-1" />
-                        Add Expense
+                        {t("famBudgetPlanning.addExpense")}
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Record Expense</DialogTitle>
+                        <DialogTitle>{t("famBudgetPlanning.recordExpense")}</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4">
                         <div>
-                          <Label>Category</Label>
+                          <Label>{t("famBudgetPlanning.category")}</Label>
                           <Select
                             value={expenseForm.category_id}
                             onValueChange={(value) => setExpenseForm({ ...expenseForm, category_id: value })}
@@ -493,15 +495,15 @@ export default function BudgetPlanning() {
                           />
                         </div>
                         <div>
-                          <Label>Description</Label>
+                          <Label>{t("famBudgetPlanning.description")}</Label>
                           <Input
                             value={expenseForm.description}
                             onChange={(e) => setExpenseForm({ ...expenseForm, description: e.target.value })}
-                            placeholder="What was purchased?"
+                            placeholder={t("famBudgetPlanning.whatWasPurchased")}
                           />
                         </div>
                         <div>
-                          <Label>Date</Label>
+                          <Label>{t("famBudgetPlanning.date")}</Label>
                           <Input
                             type="date"
                             value={expenseForm.expense_date}
@@ -509,15 +511,15 @@ export default function BudgetPlanning() {
                           />
                         </div>
                         <div>
-                          <Label>Notes</Label>
+                          <Label>{t("famBudgetPlanning.notes")}</Label>
                           <Textarea
                             value={expenseForm.notes}
                             onChange={(e) => setExpenseForm({ ...expenseForm, notes: e.target.value })}
-                            placeholder="Optional notes"
+                            placeholder={t("famBudgetPlanning.optionalNotes")}
                           />
                         </div>
                         <Button onClick={handleSaveExpense} className="w-full">
-                          Record Expense
+                          {t("famBudgetPlanning.recordExpense")}
                         </Button>
                       </div>
                     </DialogContent>
@@ -562,7 +564,7 @@ export default function BudgetPlanning() {
                 ))}
                 {expenses.length === 0 && (
                   <p className="text-center text-muted-foreground py-8">
-                    No expenses recorded this month.
+                    {t("famBudgetPlanning.noExpensesRecordedThisMonth")}
                   </p>
                 )}
               </div>

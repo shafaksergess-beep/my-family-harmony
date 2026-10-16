@@ -108,8 +108,8 @@ export default function AuditTrailEnhanced() {
     } catch (error) {
       console.error("Error fetching audit logs:", error);
       toast({
-        title: "Error",
-        description: "Failed to load audit trail",
+        title: t("famAuditTrailEnhanced.error"),
+        description: t("famAuditTrailEnhanced.failedToLoadAuditTrail"),
         variant: "destructive",
       });
     } finally {
@@ -120,8 +120,8 @@ export default function AuditTrailEnhanced() {
   const handleRollback = async () => {
     if (!selectedLog || !selectedLog.details?.before) {
       toast({
-        title: "Error",
-        description: "Cannot rollback: No previous state available",
+        title: t("famAuditTrailEnhanced.error"),
+        description: t("famAuditTrailEnhanced.cannotRollbackNoPreviousState"),
         variant: "destructive",
       });
       return;
@@ -159,8 +159,8 @@ export default function AuditTrailEnhanced() {
       }
 
       toast({
-        title: "Success",
-        description: "Successfully rolled back changes",
+        title: t("famAuditTrailEnhanced.success"),
+        description: t("famAuditTrailEnhanced.successfullyRolledBackChanges"),
       });
 
       setShowRollback(false);
@@ -169,7 +169,7 @@ export default function AuditTrailEnhanced() {
     } catch (error: any) {
       console.error("Error rolling back:", error);
       toast({
-        title: "Error",
+        title: t("famAuditTrailEnhanced.error"),
         description: error.message || "Failed to rollback changes",
         variant: "destructive",
       });
@@ -212,9 +212,9 @@ export default function AuditTrailEnhanced() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Enhanced Audit Trail</h1>
+            <h1 className="text-3xl font-bold">{t("famAuditTrailEnhanced.enhancedAuditTrail")}</h1>
             <p className="text-muted-foreground">
-              Detailed change history with rollback capabilities
+              {t("famAuditTrailEnhanced.detailedChangeHistoryWithRollback")}
             </p>
           </div>
         </div>
@@ -225,7 +225,7 @@ export default function AuditTrailEnhanced() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
-                  placeholder="Search audit logs..."
+                  placeholder={t("famAuditTrailEnhanced.searchAuditLogs")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -233,10 +233,10 @@ export default function AuditTrailEnhanced() {
               </div>
               <Select value={entityFilter} onValueChange={setEntityFilter}>
                 <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Filter by type" />
+                  <SelectValue placeholder={t("famAuditTrailEnhanced.filterByType")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="all">{t("famAuditTrailEnhanced.allTypes")}</SelectItem>
                   {entityTypes.map((type) => (
                     <SelectItem key={type} value={type!}>
                       {type}
@@ -252,11 +252,11 @@ export default function AuditTrailEnhanced() {
           <CardContent>
             {loading ? (
               <div className="text-center py-8 text-muted-foreground">
-                Loading audit trail...
+                {t("famAuditTrailEnhanced.loadingAuditTrail")}
               </div>
             ) : filteredLogs.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                No audit logs found
+                {t("famAuditTrailEnhanced.noAuditLogsFound")}
               </div>
             ) : (
               <div className="space-y-4">
@@ -287,7 +287,7 @@ export default function AuditTrailEnhanced() {
 
                           {log.details?.changes && log.details.changes.length > 0 && (
                             <div className="text-sm">
-                              <span className="text-muted-foreground">Changed fields: </span>
+                              <span className="text-muted-foreground">{t("famAuditTrailEnhanced.changedFields")} </span>
                               <span className="font-medium">
                                 {log.details.changes.join(", ")}
                               </span>
@@ -298,7 +298,7 @@ export default function AuditTrailEnhanced() {
                             <div className="grid grid-cols-2 gap-4 mt-2">
                               <div className="bg-red-50 dark:bg-red-900/10 p-3 rounded">
                                 <div className="text-xs font-semibold mb-1 text-red-700 dark:text-red-400">
-                                  Before
+                                  {t("famAuditTrailEnhanced.before")}
                                 </div>
                                 <pre className="text-xs overflow-x-auto">
                                   {JSON.stringify(log.details.before, null, 2)}
@@ -306,7 +306,7 @@ export default function AuditTrailEnhanced() {
                               </div>
                               <div className="bg-green-50 dark:bg-green-900/10 p-3 rounded">
                                 <div className="text-xs font-semibold mb-1 text-green-700 dark:text-green-400">
-                                  After
+                                  {t("famAuditTrailEnhanced.after")}
                                 </div>
                                 <pre className="text-xs overflow-x-auto">
                                   {JSON.stringify(log.details.after, null, 2)}
@@ -333,7 +333,7 @@ export default function AuditTrailEnhanced() {
                               }}
                             >
                               <History className="h-3 w-3 mr-1" />
-                              Rollback
+                              {t("famAuditTrailEnhanced.rollback")}
                             </Button>
                           )}
                         </div>
@@ -352,7 +352,7 @@ export default function AuditTrailEnhanced() {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-yellow-500" />
-              Confirm Rollback
+              {t("famAuditTrailEnhanced.confirmRollback")}
             </AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to rollback this change? This will restore the previous state and create a new audit log entry.
@@ -361,16 +361,16 @@ export default function AuditTrailEnhanced() {
                   <div className="font-semibold">Action: {selectedLog.action_type}</div>
                   <div>Entity: {selectedLog.entity_type}</div>
                   <div className="mt-2">
-                    This will restore the data to its previous state.
+                    {t("famAuditTrailEnhanced.thisWillRestoreTheData")}
                   </div>
                 </div>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("famAuditTrailEnhanced.cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleRollback}>
-              Rollback Changes
+              {t("famAuditTrailEnhanced.rollbackChanges")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

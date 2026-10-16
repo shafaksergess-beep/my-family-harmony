@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
@@ -26,6 +27,7 @@ interface Reminder {
 }
 
 const MeetingReminders = () => {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { family, isFamilyHead, isLoading } = useFamilyAuth(familySlug);
@@ -70,8 +72,8 @@ const MeetingReminders = () => {
     } catch (error) {
       console.error("Error loading data:", error);
       toast({
-        title: "Error",
-        description: "Failed to load meeting reminders",
+        title: t("famMeetingReminders.error"),
+        description: t("famMeetingReminders.failedToLoadMeetingReminders"),
         variant: "destructive",
       });
     } finally {
@@ -93,14 +95,14 @@ const MeetingReminders = () => {
       } else {
         // SMS implementation would go here
         toast({
-          title: "Coming Soon",
-          description: "SMS reminders will be available soon",
+          title: t("famMeetingReminders.comingSoon"),
+          description: t("famMeetingReminders.smsRemindersWillBeAvailable"),
         });
         return;
       }
 
       toast({
-        title: "Reminder Sent",
+        title: t("famMeetingReminders.reminderSent"),
         description: `${type.toUpperCase()} reminder sent successfully`,
       });
 
@@ -108,7 +110,7 @@ const MeetingReminders = () => {
     } catch (error: any) {
       console.error("Error sending reminder:", error);
       toast({
-        title: "Error",
+        title: t("famMeetingReminders.error"),
         description: error.message || "Failed to send reminder",
         variant: "destructive",
       });
@@ -130,8 +132,8 @@ const MeetingReminders = () => {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="max-w-md">
           <CardHeader>
-            <CardTitle>Access Denied</CardTitle>
-            <CardDescription>Only family heads can manage meeting reminders</CardDescription>
+            <CardTitle>{t("famMeetingReminders.accessDenied")}</CardTitle>
+            <CardDescription>{t("famMeetingReminders.onlyFamilyHeadsCanManage")}</CardDescription>
           </CardHeader>
         </Card>
       </div>
@@ -145,11 +147,11 @@ const MeetingReminders = () => {
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+              {t("famMeetingReminders.back")}
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Meeting Reminders</h1>
-              <p className="text-sm text-muted-foreground">Send reminders for upcoming meetings</p>
+              <h1 className="text-2xl font-bold text-foreground">{t("famMeetingReminders.meetingReminders")}</h1>
+              <p className="text-sm text-muted-foreground">{t("famMeetingReminders.sendRemindersForUpcomingMeetings")}</p>
             </div>
           </div>
         </div>
@@ -160,11 +162,11 @@ const MeetingReminders = () => {
           <TabsList>
             <TabsTrigger value="upcoming">
               <Calendar className="w-4 h-4 mr-2" />
-              Upcoming Meetings
+              {t("famMeetingReminders.upcomingMeetings")}
             </TabsTrigger>
             <TabsTrigger value="history">
               <Bell className="w-4 h-4 mr-2" />
-              Reminder History
+              {t("famMeetingReminders.reminderHistory")}
             </TabsTrigger>
           </TabsList>
 
@@ -173,7 +175,7 @@ const MeetingReminders = () => {
               <Card>
                 <CardContent className="py-12 text-center">
                   <Calendar className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                  <p className="text-muted-foreground">No upcoming meetings</p>
+                  <p className="text-muted-foreground">{t("famMeetingReminders.noUpcomingMeetings")}</p>
                 </CardContent>
               </Card>
             ) : (
@@ -224,12 +226,12 @@ const MeetingReminders = () => {
                           {sending[`${meeting.id}-email`] ? (
                             <>
                               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              Sending...
+                              {t("famMeetingReminders.sending")}
                             </>
                           ) : (
                             <>
                               <Mail className="w-4 h-4 mr-2" />
-                              Send Email
+                              {t("famMeetingReminders.sendEmail")}
                             </>
                           )}
                         </Button>
@@ -240,7 +242,7 @@ const MeetingReminders = () => {
                           disabled={sending[`${meeting.id}-sms`]}
                         >
                           <MessageSquare className="w-4 h-4 mr-2" />
-                          Send SMS
+                          {t("famMeetingReminders.sendSms")}
                         </Button>
                       </div>
                     </CardContent>
@@ -255,7 +257,7 @@ const MeetingReminders = () => {
               <Card>
                 <CardContent className="py-12 text-center">
                   <Bell className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                  <p className="text-muted-foreground">No reminders sent yet</p>
+                  <p className="text-muted-foreground">{t("famMeetingReminders.noRemindersSentYet")}</p>
                 </CardContent>
               </Card>
             ) : (
@@ -278,7 +280,7 @@ const MeetingReminders = () => {
                             {new Date(reminder.sent_at).toLocaleString()}
                           </p>
                         </div>
-                        <Badge variant="outline">Sent</Badge>
+                        <Badge variant="outline">{t("famMeetingReminders.sent")}</Badge>
                       </div>
                     ))}
                   </div>

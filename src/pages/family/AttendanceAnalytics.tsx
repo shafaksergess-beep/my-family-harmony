@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,6 +22,7 @@ interface MemberStats {
 }
 
 const AttendanceAnalytics = () => {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -148,8 +150,8 @@ const AttendanceAnalytics = () => {
     } catch (error: any) {
       console.error("Error loading analytics:", error);
       toast({
-        title: "Error",
-        description: "Failed to load analytics",
+        title: t("famAttendanceAnalytics.error"),
+        description: t("famAttendanceAnalytics.failedToLoadAnalytics"),
         variant: "destructive",
       });
     } finally {
@@ -174,11 +176,11 @@ const AttendanceAnalytics = () => {
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+              {t("famAttendanceAnalytics.back")}
             </Button>
             <div>
               <h1 className="text-2xl font-bold text-foreground">{family?.name} - Attendance Analytics</h1>
-              <p className="text-sm text-muted-foreground">Member attendance trends and insights</p>
+              <p className="text-sm text-muted-foreground">{t("famAttendanceAnalytics.memberAttendanceTrendsAndInsights")}</p>
             </div>
           </div>
         </div>
@@ -189,7 +191,7 @@ const AttendanceAnalytics = () => {
         <div className="grid gap-4 md:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Meetings</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famAttendanceAnalytics.totalMeetings")}</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -199,7 +201,7 @@ const AttendanceAnalytics = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Average Attendance</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famAttendanceAnalytics.averageAttendance")}</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -209,7 +211,7 @@ const AttendanceAnalytics = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Fines</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famAttendanceAnalytics.totalFines")}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -219,7 +221,7 @@ const AttendanceAnalytics = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Best Attender</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famAttendanceAnalytics.bestAttender")}</CardTitle>
               <TrendingUp className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
@@ -231,7 +233,7 @@ const AttendanceAnalytics = () => {
         {/* Attendance Rate Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>Attendance Rates by Member</CardTitle>
+            <CardTitle>{t("famAttendanceAnalytics.attendanceRatesByMember")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={400}>
@@ -255,21 +257,21 @@ const AttendanceAnalytics = () => {
         {/* Member Stats Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Detailed Member Statistics</CardTitle>
+            <CardTitle>{t("famAttendanceAnalytics.detailedMemberStatistics")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left p-2">Member</th>
-                    <th className="text-center p-2">Meetings</th>
-                    <th className="text-center p-2">Present</th>
-                    <th className="text-center p-2">Absent</th>
-                    <th className="text-center p-2">Excused</th>
-                    <th className="text-center p-2">Rate</th>
+                    <th className="text-left p-2">{t("famAttendanceAnalytics.member")}</th>
+                    <th className="text-center p-2">{t("famAttendanceAnalytics.meetings")}</th>
+                    <th className="text-center p-2">{t("famAttendanceAnalytics.present")}</th>
+                    <th className="text-center p-2">{t("famAttendanceAnalytics.absent")}</th>
+                    <th className="text-center p-2">{t("famAttendanceAnalytics.excused")}</th>
+                    <th className="text-center p-2">{t("famAttendanceAnalytics.rate")}</th>
                     <th className="text-center p-2">Avg Late (min)</th>
-                    <th className="text-right p-2">Fines</th>
+                    <th className="text-right p-2">{t("famAttendanceAnalytics.fines")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -298,7 +300,7 @@ const AttendanceAnalytics = () => {
         {/* Fines Distribution */}
         <Card>
           <CardHeader>
-            <CardTitle>Fines Distribution</CardTitle>
+            <CardTitle>{t("famAttendanceAnalytics.finesDistribution")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>

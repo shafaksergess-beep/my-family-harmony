@@ -135,8 +135,8 @@ const AuditTrail = () => {
     } catch (error) {
       console.error("Error loading data:", error);
       toast({
-        title: "Error",
-        description: "Failed to load audit trail",
+        title: t("famAuditTrail.error"),
+        description: t("famAuditTrail.failedToLoadAuditTrail"),
         variant: "destructive",
       });
     } finally {
@@ -214,8 +214,8 @@ const AuditTrail = () => {
     a.click();
 
     toast({
-      title: "Success",
-      description: "Audit trail exported successfully",
+      title: t("famAuditTrail.success"),
+      description: t("famAuditTrail.auditTrailExportedSuccessfully"),
     });
   };
 
@@ -240,7 +240,7 @@ const AuditTrail = () => {
               <div>
                 <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                   <FileText className="w-6 h-6" />
-                  Audit Trail
+                  {t("famAuditTrail.auditTrail")}
                 </h1>
                 <p className="text-sm text-muted-foreground">{family?.name}</p>
               </div>
@@ -250,7 +250,7 @@ const AuditTrail = () => {
               {filteredEntries.length > 0 && (
                 <Button variant="outline" size="sm" onClick={handleExport}>
                   <Download className="w-4 h-4 mr-2" />
-                  Export
+                  {t("famAuditTrail.export")}
                 </Button>
               )}
               <LanguageSwitcher />
@@ -265,7 +265,7 @@ const AuditTrail = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Filter className="w-5 h-5" />
-              Filters
+              {t("famAuditTrail.filters")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -273,7 +273,7 @@ const AuditTrail = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search by entity ID, user, or changes..."
+                  placeholder={t("famAuditTrail.searchByEntityIdUser")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
@@ -283,10 +283,10 @@ const AuditTrail = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Select value={filterEntity} onValueChange={setFilterEntity}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Filter by entity" />
+                    <SelectValue placeholder={t("famAuditTrail.filterByEntity")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Entities</SelectItem>
+                    <SelectItem value="all">{t("famAuditTrail.allEntities")}</SelectItem>
                     {uniqueEntities.map((entity) => (
                       <SelectItem key={entity} value={entity}>
                         {entity}
@@ -297,10 +297,10 @@ const AuditTrail = () => {
 
                 <Select value={filterAction} onValueChange={setFilterAction}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Filter by action" />
+                    <SelectValue placeholder={t("famAuditTrail.filterByAction")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Actions</SelectItem>
+                    <SelectItem value="all">{t("famAuditTrail.allActions")}</SelectItem>
                     {uniqueActions.map((action) => (
                       <SelectItem key={action} value={action}>
                         {action}
@@ -339,7 +339,7 @@ const AuditTrail = () => {
               {hasActiveFilters && (
                 <Button variant="ghost" size="sm" onClick={clearFilters} className="w-full">
                   <X className="w-4 h-4 mr-2" />
-                  Clear All Filters
+                  {t("famAuditTrail.clearAllFilters")}
                 </Button>
               )}
             </div>
@@ -351,8 +351,8 @@ const AuditTrail = () => {
           {filteredEntries.length === 0 ? (
             <Card className="p-12 text-center">
               <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-xl font-semibold mb-2">No audit entries</h3>
-              <p className="text-muted-foreground">No changes match your filters</p>
+              <h3 className="text-xl font-semibold mb-2">{t("famAuditTrail.noAuditEntries")}</h3>
+              <p className="text-muted-foreground">{t("famAuditTrail.noChangesMatchYourFilters")}</p>
             </Card>
           ) : (
             filteredEntries.map((entry) => (
@@ -374,7 +374,7 @@ const AuditTrail = () => {
                           Changed by: {entry.changed_by_name}
                         </p>
                         <div className="text-sm text-muted-foreground">
-                          <strong>Changes:</strong>
+                          <strong>{t("famAuditTrail.changes")}</strong>
                           <pre className="mt-1 p-2 bg-muted rounded text-xs overflow-x-auto">
                             {JSON.stringify(entry.changes, null, 2)}
                           </pre>

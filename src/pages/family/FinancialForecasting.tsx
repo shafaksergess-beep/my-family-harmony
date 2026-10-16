@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +18,7 @@ interface ForecastData {
 }
 
 export default function FinancialForecasting() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -180,7 +182,7 @@ export default function FinancialForecasting() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Financial Forecasting</h1>
+            <h1 className="text-3xl font-bold">{t("famFinancialForecasting.financialForecasting")}</h1>
             <p className="text-muted-foreground">6-month financial projections based on historical trends</p>
           </div>
         </div>
@@ -200,21 +202,21 @@ export default function FinancialForecasting() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-primary" />
-              AI Financial Analysis
+              {t("famFinancialForecasting.aiFinancialAnalysis")}
             </CardTitle>
-            <CardDescription>Intelligent observations based on your family's data</CardDescription>
+            <CardDescription>{t("famFinancialForecasting.intelligentObservationsBasedOnYour")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <h4 className="font-semibold text-sm mb-1 uppercase tracking-wider text-primary/70">Summary</h4>
+              <h4 className="font-semibold text-sm mb-1 uppercase tracking-wider text-primary/70">{t("famFinancialForecasting.summary")}</h4>
               <p className="text-sm leading-relaxed">{aiInsight.summary}</p>
             </div>
             <div>
-              <h4 className="font-semibold text-sm mb-1 uppercase tracking-wider text-red-600/70">Potential Risks</h4>
+              <h4 className="font-semibold text-sm mb-1 uppercase tracking-wider text-red-600/70">{t("famFinancialForecasting.potentialRisks")}</h4>
               <p className="text-sm leading-relaxed">{aiInsight.risks}</p>
             </div>
             <div>
-              <h4 className="font-semibold text-sm mb-2 uppercase tracking-wider text-green-600/70">Recommendations</h4>
+              <h4 className="font-semibold text-sm mb-2 uppercase tracking-wider text-green-600/70">{t("famFinancialForecasting.recommendations")}</h4>
               <ul className="list-disc list-inside text-sm space-y-1">
                 {aiInsight.recommendations.map((rec, idx) => (
                   <li key={idx} className="leading-relaxed">{rec}</li>
@@ -249,7 +251,7 @@ export default function FinancialForecasting() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Projected Net Balance</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("famFinancialForecasting.projectedNetBalance")}</CardTitle>
             <DollarSign className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
@@ -262,7 +264,7 @@ export default function FinancialForecasting() {
       <Card>
         <CardHeader>
           <CardTitle>6-Month Cash Flow Projection</CardTitle>
-          <CardDescription>Expected income and expenses by month</CardDescription>
+          <CardDescription>{t("famFinancialForecasting.expectedIncomeAndExpensesBy")}</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -283,8 +285,8 @@ export default function FinancialForecasting() {
       {/* Historical Contribution Trends */}
       <Card>
         <CardHeader>
-          <CardTitle>Historical Contribution Trends</CardTitle>
-          <CardDescription>Past 12 months actual contributions</CardDescription>
+          <CardTitle>{t("famFinancialForecasting.historicalContributionTrends")}</CardTitle>
+          <CardDescription>{t("famFinancialForecasting.past12MonthsActualContributions")}</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={250}>
@@ -303,8 +305,8 @@ export default function FinancialForecasting() {
       {forecast && forecast.loanRepaymentsForecast.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Upcoming Loan Repayments</CardTitle>
-            <CardDescription>Expected loan repayments by due date</CardDescription>
+            <CardTitle>{t("famFinancialForecasting.upcomingLoanRepayments")}</CardTitle>
+            <CardDescription>{t("famFinancialForecasting.expectedLoanRepaymentsByDue")}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -314,7 +316,7 @@ export default function FinancialForecasting() {
                     <Calendar className="h-5 w-5 text-muted-foreground" />
                     <div>
                       <p className="font-medium">Due: {new Date(loan.dueDate).toLocaleDateString()}</p>
-                      <p className="text-sm text-muted-foreground">Expected repayment</p>
+                      <p className="text-sm text-muted-foreground">{t("famFinancialForecasting.expectedRepayment")}</p>
                     </div>
                   </div>
                   <div className="text-lg font-bold">{formatCurrency(loan.expectedAmount)}</div>

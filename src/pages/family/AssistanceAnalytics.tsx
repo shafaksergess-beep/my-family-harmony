@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,6 +38,7 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
 const COLORS = ['#8b5cf6', '#ec4899', '#06b6d4', '#f59e0b', '#10b981', '#ef4444', '#3b82f6', '#a855f7', '#14b8a6'];
 
 export default function AssistanceAnalytics() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { family, isLoading: authLoading } = useFamilyAuth(familySlug);
@@ -143,11 +145,11 @@ export default function AssistanceAnalytics() {
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
+              {t("famAssistanceAnalytics.backToDashboard")}
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Assistance Analytics</h1>
-              <p className="text-sm text-muted-foreground">Track assistance trends and budget</p>
+              <h1 className="text-2xl font-bold text-foreground">{t("famAssistanceAnalytics.assistanceAnalytics")}</h1>
+              <p className="text-sm text-muted-foreground">{t("famAssistanceAnalytics.trackAssistanceTrendsAndBudget")}</p>
             </div>
           </div>
         </div>
@@ -158,7 +160,7 @@ export default function AssistanceAnalytics() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Events</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famAssistanceAnalytics.totalEvents")}</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -167,17 +169,17 @@ export default function AssistanceAnalytics() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famAssistanceAnalytics.totalSpent")}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{paidAmount.toLocaleString()} FCFA</div>
-              <p className="text-xs text-muted-foreground">Paid assistance</p>
+              <p className="text-xs text-muted-foreground">{t("famAssistanceAnalytics.paidAssistance")}</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Budget Remaining</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famAssistanceAnalytics.budgetRemaining")}</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -189,7 +191,7 @@ export default function AssistanceAnalytics() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Pending Amount</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famAssistanceAnalytics.pendingAmount")}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -202,13 +204,13 @@ export default function AssistanceAnalytics() {
         {/* Budget Monitor */}
         <Card>
           <CardHeader>
-            <CardTitle>Budget Monitor</CardTitle>
-            <CardDescription>Annual assistance budget tracking</CardDescription>
+            <CardTitle>{t("famAssistanceAnalytics.budgetMonitor")}</CardTitle>
+            <CardDescription>{t("famAssistanceAnalytics.annualAssistanceBudgetTracking")}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex justify-between text-sm">
-                <span>Allocated Budget:</span>
+                <span>{t("famAssistanceAnalytics.allocatedBudget")}</span>
                 <span className="font-semibold">{budget.allocated.toLocaleString()} FCFA</span>
               </div>
               <div className="flex justify-between text-sm">
@@ -216,11 +218,11 @@ export default function AssistanceAnalytics() {
                 <span className="font-semibold text-red-600">{budget.spent.toLocaleString()} FCFA</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Pending:</span>
+                <span>{t("famAssistanceAnalytics.pending")}</span>
                 <span className="font-semibold text-orange-600">{pendingAmount.toLocaleString()} FCFA</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Remaining:</span>
+                <span>{t("famAssistanceAnalytics.remaining")}</span>
                 <span className="font-semibold text-green-600">{(budget.allocated - budget.spent).toLocaleString()} FCFA</span>
               </div>
               <div className="w-full bg-muted rounded-full h-4">
@@ -235,17 +237,17 @@ export default function AssistanceAnalytics() {
 
         <Tabs defaultValue="breakdown" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="breakdown">Event Type Breakdown</TabsTrigger>
-            <TabsTrigger value="trends">Monthly Trends</TabsTrigger>
-            <TabsTrigger value="members">Member Statistics</TabsTrigger>
-            <TabsTrigger value="status">Payment Status</TabsTrigger>
+            <TabsTrigger value="breakdown">{t("famAssistanceAnalytics.eventTypeBreakdown")}</TabsTrigger>
+            <TabsTrigger value="trends">{t("famAssistanceAnalytics.monthlyTrends")}</TabsTrigger>
+            <TabsTrigger value="members">{t("famAssistanceAnalytics.memberStatistics")}</TabsTrigger>
+            <TabsTrigger value="status">{t("famAssistanceAnalytics.paymentStatus")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="breakdown" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Assistance by Event Type</CardTitle>
-                <CardDescription>Distribution of assistance events and amounts</CardDescription>
+                <CardTitle>{t("famAssistanceAnalytics.assistanceByEventType")}</CardTitle>
+                <CardDescription>{t("famAssistanceAnalytics.distributionOfAssistanceEventsAnd")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={400}>
@@ -267,8 +269,8 @@ export default function AssistanceAnalytics() {
           <TabsContent value="trends" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Monthly Assistance Trends</CardTitle>
-                <CardDescription>Events and spending over the last 12 months</CardDescription>
+                <CardTitle>{t("famAssistanceAnalytics.monthlyAssistanceTrends")}</CardTitle>
+                <CardDescription>{t("famAssistanceAnalytics.eventsAndSpendingOverThe")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={400}>
@@ -290,8 +292,8 @@ export default function AssistanceAnalytics() {
           <TabsContent value="members" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Member-Level Statistics</CardTitle>
-                <CardDescription>Assistance received by family members</CardDescription>
+                <CardTitle>{t("famAssistanceAnalytics.memberLevelStatistics")}</CardTitle>
+                <CardDescription>{t("famAssistanceAnalytics.assistanceReceivedByFamilyMembers")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -307,7 +309,7 @@ export default function AssistanceAnalytics() {
                     </div>
                   ))}
                   {memberStats.length === 0 && (
-                    <p className="text-center text-muted-foreground py-8">No assistance events recorded</p>
+                    <p className="text-center text-muted-foreground py-8">{t("famAssistanceAnalytics.noAssistanceEventsRecorded")}</p>
                   )}
                 </div>
               </CardContent>
@@ -317,8 +319,8 @@ export default function AssistanceAnalytics() {
           <TabsContent value="status" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Payment Status Distribution</CardTitle>
-                <CardDescription>Paid vs pending assistance events</CardDescription>
+                <CardTitle>{t("famAssistanceAnalytics.paymentStatusDistribution")}</CardTitle>
+                <CardDescription>{t("famAssistanceAnalytics.paidVsPendingAssistanceEvents")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex justify-center">

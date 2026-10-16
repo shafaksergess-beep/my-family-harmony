@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
@@ -22,6 +23,7 @@ interface DigestSettings {
 }
 
 export default function EmailReports() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { family, canManageFinances } = useFamilyAuth(familySlug);
@@ -54,8 +56,8 @@ export default function EmailReports() {
     } catch (error) {
       console.error('Error loading settings:', error);
       toast({
-        title: "Error",
-        description: "Failed to load settings",
+        title: t("famEmailReports.error"),
+        description: t("famEmailReports.failedToLoadSettings"),
         variant: "destructive",
       });
       setIsLoading(false);
@@ -69,14 +71,14 @@ export default function EmailReports() {
     try {
       // In a real implementation, save to database and configure cron job
       toast({
-        title: "Settings saved",
-        description: "Email report settings have been updated",
+        title: t("famEmailReports.settingsSaved"),
+        description: t("famEmailReports.emailReportSettingsHaveBeen"),
       });
     } catch (error) {
       console.error('Error saving settings:', error);
       toast({
-        title: "Error",
-        description: "Failed to save settings",
+        title: t("famEmailReports.error"),
+        description: t("famEmailReports.failedToSaveSettings"),
         variant: "destructive",
       });
     } finally {
@@ -106,7 +108,7 @@ export default function EmailReports() {
       <div className="container mx-auto p-6">
         <Card>
           <CardContent className="p-6">
-            <p className="text-muted-foreground">You don't have permission to manage reports.</p>
+            <p className="text-muted-foreground">{t("famEmailReports.youDonTHavePermission")}</p>
           </CardContent>
         </Card>
       </div>
@@ -118,7 +120,7 @@ export default function EmailReports() {
       <div className="container mx-auto p-6">
         <Card>
           <CardContent className="p-6">
-            <p className="text-muted-foreground">Loading...</p>
+            <p className="text-muted-foreground">{t("famEmailReports.loading")}</p>
           </CardContent>
         </Card>
       </div>
@@ -132,8 +134,8 @@ export default function EmailReports() {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
-          <h1 className="text-3xl font-bold">Automated Email Reports</h1>
-          <p className="text-muted-foreground">Configure scheduled financial and activity reports</p>
+          <h1 className="text-3xl font-bold">{t("famEmailReports.automatedEmailReports")}</h1>
+          <p className="text-muted-foreground">{t("famEmailReports.configureScheduledFinancialAndActivity")}</p>
         </div>
       </div>
 
@@ -142,16 +144,16 @@ export default function EmailReports() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Mail className="h-5 w-5" />
-              <CardTitle>Report Configuration</CardTitle>
+              <CardTitle>{t("famEmailReports.reportConfiguration")}</CardTitle>
             </div>
-            <CardDescription>Set up automated email digests for family updates</CardDescription>
+            <CardDescription>{t("famEmailReports.setUpAutomatedEmailDigests")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="enabled">Enable Automated Reports</Label>
+                <Label htmlFor="enabled">{t("famEmailReports.enableAutomatedReports")}</Label>
                 <p className="text-sm text-muted-foreground">
-                  Send regular email updates to specified recipients
+                  {t("famEmailReports.sendRegularEmailUpdatesTo")}
                 </p>
               </div>
               <Switch
@@ -162,7 +164,7 @@ export default function EmailReports() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="frequency">Report Frequency</Label>
+              <Label htmlFor="frequency">{t("famEmailReports.reportFrequency")}</Label>
               <Select
                 value={settings.frequency}
                 onValueChange={(value: any) => setSettings({ ...settings, frequency: value })}
@@ -171,7 +173,7 @@ export default function EmailReports() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="daily">Daily</SelectItem>
+                  <SelectItem value="daily">{t("famEmailReports.daily")}</SelectItem>
                   <SelectItem value="weekly">Weekly (Monday mornings)</SelectItem>
                   <SelectItem value="monthly">Monthly (1st of month)</SelectItem>
                 </SelectContent>
@@ -184,9 +186,9 @@ export default function EmailReports() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              <CardTitle>Recipients</CardTitle>
+              <CardTitle>{t("famEmailReports.recipients")}</CardTitle>
             </div>
-            <CardDescription>Email addresses that will receive reports</CardDescription>
+            <CardDescription>{t("famEmailReports.emailAddressesThatWillReceive")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex gap-2">
@@ -197,7 +199,7 @@ export default function EmailReports() {
                 onChange={(e) => setNewRecipient(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && addRecipient()}
               />
-              <Button onClick={addRecipient}>Add</Button>
+              <Button onClick={addRecipient}>{t("famEmailReports.add")}</Button>
             </div>
 
             <div className="space-y-2">
@@ -209,12 +211,12 @@ export default function EmailReports() {
                     size="sm"
                     onClick={() => removeRecipient(email)}
                   >
-                    Remove
+                    {t("famEmailReports.remove")}
                   </Button>
                 </div>
               ))}
               {settings.recipients.length === 0 && (
-                <p className="text-sm text-muted-foreground">No recipients added yet</p>
+                <p className="text-sm text-muted-foreground">{t("famEmailReports.noRecipientsAddedYet")}</p>
               )}
             </div>
           </CardContent>
@@ -224,13 +226,13 @@ export default function EmailReports() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              <CardTitle>Report Contents</CardTitle>
+              <CardTitle>{t("famEmailReports.reportContents")}</CardTitle>
             </div>
-            <CardDescription>Select what information to include in reports</CardDescription>
+            <CardDescription>{t("famEmailReports.selectWhatInformationToInclude")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
-              <Label htmlFor="contributions">Contribution Summary</Label>
+              <Label htmlFor="contributions">{t("famEmailReports.contributionSummary")}</Label>
               <Switch
                 id="contributions"
                 checked={settings.include_contributions}
@@ -238,7 +240,7 @@ export default function EmailReports() {
               />
             </div>
             <div className="flex items-center justify-between">
-              <Label htmlFor="loans">Loan Status</Label>
+              <Label htmlFor="loans">{t("famEmailReports.loanStatus")}</Label>
               <Switch
                 id="loans"
                 checked={settings.include_loans}
@@ -246,7 +248,7 @@ export default function EmailReports() {
               />
             </div>
             <div className="flex items-center justify-between">
-              <Label htmlFor="meetings">Upcoming Meetings</Label>
+              <Label htmlFor="meetings">{t("famEmailReports.upcomingMeetings")}</Label>
               <Switch
                 id="meetings"
                 checked={settings.include_meetings}
@@ -254,7 +256,7 @@ export default function EmailReports() {
               />
             </div>
             <div className="flex items-center justify-between">
-              <Label htmlFor="attendance">Attendance Summary</Label>
+              <Label htmlFor="attendance">{t("famEmailReports.attendanceSummary")}</Label>
               <Switch
                 id="attendance"
                 checked={settings.include_attendance}

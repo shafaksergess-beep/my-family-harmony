@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
@@ -31,6 +32,7 @@ interface Invitation {
 }
 
 const Invitations = () => {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { family, isFamilyHead, isFamilyAdmin, isLoading } = useFamilyAuth(familySlug);
@@ -85,8 +87,8 @@ const Invitations = () => {
     } catch (error) {
       console.error("Error loading invitations:", error);
       toast({
-        title: "Error",
-        description: "Failed to load invitations",
+        title: t("famInvitations.error"),
+        description: t("famInvitations.failedToLoadInvitations"),
         variant: "destructive",
       });
     } finally {
@@ -150,7 +152,7 @@ const Invitations = () => {
           body: { invitationId: invitation.id, recaptchaToken },
         });
         toast({
-          title: "Invitation Sent",
+          title: t("famInvitations.invitationSent"),
           description: `Invitation sent to ${data.email}`,
         });
       } else {
@@ -161,8 +163,8 @@ const Invitations = () => {
         });
         setShareDialogOpen(true);
         toast({
-          title: "Invitation Created",
-          description: "Share the link or code with your invitee",
+          title: t("famInvitations.invitationCreated"),
+          description: t("famInvitations.shareTheLinkOrCode"),
         });
       }
 
@@ -171,7 +173,7 @@ const Invitations = () => {
     } catch (error: any) {
       console.error("Error creating invitation:", error);
       toast({
-        title: "Error",
+        title: t("famInvitations.error"),
         description: error.message || "Failed to create invitation",
         variant: "destructive",
       });
@@ -191,23 +193,23 @@ const Invitations = () => {
   const copyToClipboard = async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      toast({ title: "Copied!", description: `${label} copied to clipboard` });
+      toast({ title: t("famInvitations.copied"), description: `${label} copied to clipboard` });
     } catch {
-      toast({ title: "Failed to copy", variant: "destructive" });
+      toast({ title: t("famInvitations.failedToCopy"), variant: "destructive" });
     }
   };
 
   const getStatusBadge = (invitation: Invitation) => {
     if (invitation.status === "accepted") {
-      return <Badge className="bg-green-600"><Check className="w-3 h-3 mr-1" />Accepted</Badge>;
+      return <Badge className="bg-green-600"><Check className="w-3 h-3 mr-1" />{t("famInvitations.accepted")}</Badge>;
     }
     if (invitation.status === "declined") {
-      return <Badge variant="destructive"><X className="w-3 h-3 mr-1" />Declined</Badge>;
+      return <Badge variant="destructive"><X className="w-3 h-3 mr-1" />{t("famInvitations.declined")}</Badge>;
     }
     if (new Date(invitation.expires_at) < new Date()) {
-      return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />Expired</Badge>;
+      return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />{t("famInvitations.expired")}</Badge>;
     }
-    return <Badge variant="outline"><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
+    return <Badge variant="outline"><Clock className="w-3 h-3 mr-1" />{t("famInvitations.pending")}</Badge>;
   };
 
   const getInviteLink = (invitation: Invitation) => {
@@ -227,8 +229,8 @@ const Invitations = () => {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="max-w-md">
           <CardHeader>
-            <CardTitle>Access Denied</CardTitle>
-            <CardDescription>Only family heads and admins can manage invitations</CardDescription>
+            <CardTitle>{t("famInvitations.accessDenied")}</CardTitle>
+            <CardDescription>{t("famInvitations.onlyFamilyHeadsAndAdmins")}</CardDescription>
           </CardHeader>
         </Card>
       </div>
@@ -243,10 +245,10 @@ const Invitations = () => {
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t("famInvitations.back")}
               </Button>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">Invitations & Join Requests</h1>
+                <h1 className="text-2xl font-bold text-foreground">{t("famInvitations.invitationsJoinRequests")}</h1>
                 <p className="text-sm text-muted-foreground">Manage who joins {family?.name}</p>
               </div>
             </div>
@@ -271,9 +273,9 @@ const Invitations = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <UserPlus className="w-5 h-5" />
-                Create Invitation
+                {t("famInvitations.createInvitation")}
               </CardTitle>
-              <CardDescription>Invite new members via email or shareable link</CardDescription>
+              <CardDescription>{t("famInvitations.inviteNewMembersViaEmail")}</CardDescription>
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="email" className="w-full">
@@ -284,21 +286,21 @@ const Invitations = () => {
                   </TabsTrigger>
                   <TabsTrigger value="bulk" className="gap-1">
                     <Users className="w-3 h-3" />
-                    Bulk
+                    {t("famInvitations.bulk")}
                   </TabsTrigger>
                   <TabsTrigger value="contacts" className="gap-1">
                     <Users className="w-3 h-3" />
-                    Contacts
+                    {t("famInvitations.contacts")}
                   </TabsTrigger>
                   <TabsTrigger value="link" className="gap-1">
                     <Link2 className="w-3 h-3" />
-                    Link
+                    {t("famInvitations.link")}
                   </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="email" className="space-y-4">
                   <div>
-                    <Label htmlFor="email">Email Address</Label>
+                    <Label htmlFor="email">{t("famInvitations.emailAddress")}</Label>
                     <Input
                       id="email"
                       type="email"
@@ -308,7 +310,7 @@ const Invitations = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="role">Role</Label>
+                    <Label htmlFor="role">{t("famInvitations.role")}</Label>
                     <Select
                       value={formData.role}
                       onValueChange={(value) => setFormData({ ...formData, role: value })}
@@ -317,15 +319,15 @@ const Invitations = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="member">Member</SelectItem>
-                        <SelectItem value="treasurer">Treasurer</SelectItem>
-                        <SelectItem value="loan_committee">Loan Committee</SelectItem>
-                        <SelectItem value="secretary">Secretary</SelectItem>
+                        <SelectItem value="member">{t("famInvitations.member")}</SelectItem>
+                        <SelectItem value="treasurer">{t("famInvitations.treasurer")}</SelectItem>
+                        <SelectItem value="loan_committee">{t("famInvitations.loanCommittee")}</SelectItem>
+                        <SelectItem value="secretary">{t("famInvitations.secretary")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="expiration">Expires In</Label>
+                    <Label htmlFor="expiration">{t("famInvitations.expiresIn")}</Label>
                     <Select
                       value={formData.expirationDays}
                       onValueChange={(value) => setFormData({ ...formData, expirationDays: value })}
@@ -372,7 +374,7 @@ const Invitations = () => {
                   <div className="text-center py-4">
                     <Users className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
                     <p className="text-sm text-muted-foreground mb-4">
-                      Import contacts from your phone to quickly invite family members
+                      {t("famInvitations.importContactsFromYourPhone")}
                     </p>
                     <ContactsPicker
                       disabled={sending}
@@ -388,20 +390,20 @@ const Invitations = () => {
                           }
                         }
                         toast({
-                          title: "Invitations Sent",
+                          title: t("famInvitations.invitationsSent"),
                           description: `Sent ${contacts.filter(c => c.email).length} email invitations`,
                         });
                       }}
                     />
                   </div>
                   <div className="text-xs text-muted-foreground text-center">
-                    Only contacts with email addresses will receive invitations
+                    {t("famInvitations.onlyContactsWithEmailAddresses")}
                   </div>
                 </TabsContent>
 
                 <TabsContent value="link" className="space-y-4">
                   <div>
-                    <Label htmlFor="link-role">Role</Label>
+                    <Label htmlFor="link-role">{t("famInvitations.role")}</Label>
                     <Select
                       value={formData.role}
                       onValueChange={(value) => setFormData({ ...formData, role: value })}
@@ -410,15 +412,15 @@ const Invitations = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="member">Member</SelectItem>
-                        <SelectItem value="treasurer">Treasurer</SelectItem>
-                        <SelectItem value="loan_committee">Loan Committee</SelectItem>
-                        <SelectItem value="secretary">Secretary</SelectItem>
+                        <SelectItem value="member">{t("famInvitations.member")}</SelectItem>
+                        <SelectItem value="treasurer">{t("famInvitations.treasurer")}</SelectItem>
+                        <SelectItem value="loan_committee">{t("famInvitations.loanCommittee")}</SelectItem>
+                        <SelectItem value="secretary">{t("famInvitations.secretary")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="link-expiration">Expires In</Label>
+                    <Label htmlFor="link-expiration">{t("famInvitations.expiresIn")}</Label>
                     <Select
                       value={formData.expirationDays}
                       onValueChange={(value) => setFormData({ ...formData, expirationDays: value })}
@@ -448,7 +450,7 @@ const Invitations = () => {
                     Generate Shareable Link
                   </Button>
                   <p className="text-xs text-muted-foreground text-center">
-                    Creates a link and reference code you can share via any channel
+                    {t("famInvitations.createsALinkAndReference")}
                   </p>
                 </TabsContent>
               </Tabs>
@@ -458,14 +460,14 @@ const Invitations = () => {
           {/* Invitations List */}
           <Card className="lg:col-span-2">
             <CardHeader>
-              <CardTitle>Sent Invitations</CardTitle>
-              <CardDescription>Track all invitations sent to potential members</CardDescription>
+              <CardTitle>{t("famInvitations.sentInvitations")}</CardTitle>
+              <CardDescription>{t("famInvitations.trackAllInvitationsSentTo")}</CardDescription>
             </CardHeader>
             <CardContent>
               {invitations.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <Mail className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>No invitations sent yet</p>
+                  <p>{t("famInvitations.noInvitationsSentYet")}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -503,7 +505,7 @@ const Invitations = () => {
                               variant="ghost"
                               size="icon"
                               onClick={() => copyToClipboard(invitation.reference_code || "", "Reference code")}
-                              title="Copy code"
+                              title={t("famInvitations.copyCode")}
                             >
                               <Copy className="w-4 h-4" />
                             </Button>
@@ -514,7 +516,7 @@ const Invitations = () => {
                                 setSelectedInvitation(invitation);
                                 setShareDialogOpen(true);
                               }}
-                              title="Share"
+                              title={t("famInvitations.share")}
                             >
                               <Share2 className="w-4 h-4" />
                             </Button>

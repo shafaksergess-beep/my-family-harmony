@@ -43,8 +43,8 @@ const PDFReports = () => {
     } catch (error) {
       console.error("Error loading data:", error);
       toast({
-        title: "Error",
-        description: "Failed to load family data",
+        title: t("famPDFReports.error"),
+        description: t("famPDFReports.failedToLoadFamilyData"),
         variant: "destructive",
       });
     } finally {
@@ -151,14 +151,14 @@ const PDFReports = () => {
       generateMonthlyReport(reportData);
 
       toast({
-        title: "Success",
-        description: "Monthly report generated successfully",
+        title: t("famPDFReports.success"),
+        description: t("famPDFReports.monthlyReportGeneratedSuccessfully"),
       });
     } catch (error) {
       console.error("Error generating report:", error);
       toast({
-        title: "Error",
-        description: "Failed to generate report",
+        title: t("famPDFReports.error"),
+        description: t("famPDFReports.failedToGenerateReport"),
         variant: "destructive",
       });
     } finally {
@@ -200,7 +200,7 @@ const PDFReports = () => {
               <div>
                 <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                   <FileText className="w-6 h-6" />
-                  PDF Reports
+                  {t("famPDFReports.pdfReports")}
                 </h1>
                 <p className="text-sm text-muted-foreground">{family?.name as string}</p>
               </div>
@@ -213,14 +213,14 @@ const PDFReports = () => {
       <main className="container mx-auto px-4 py-8 max-w-3xl">
         <Card>
           <CardHeader>
-            <CardTitle>Generate Monthly Report</CardTitle>
+            <CardTitle>{t("famPDFReports.generateMonthlyReport")}</CardTitle>
             <CardDescription>
-              Create a detailed PDF report with financial summaries and member data
+              {t("famPDFReports.createADetailedPdfReport")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Select Month</label>
+              <label className="text-sm font-medium">{t("famPDFReports.selectMonth")}</label>
               <Select value={selectedMonth} onValueChange={setSelectedMonth}>
                 <SelectTrigger>
                   <SelectValue />
@@ -236,7 +236,7 @@ const PDFReports = () => {
             </div>
 
             <div className="bg-muted p-4 rounded-lg">
-              <h3 className="font-semibold mb-2">Report Contents:</h3>
+              <h3 className="font-semibold mb-2">{t("famPDFReports.reportContents")}</h3>
               <ul className="space-y-1 text-sm text-muted-foreground">
                 <li>• Financial summary (contributions, loans, savings)</li>
                 <li>• Detailed contribution records</li>
@@ -255,12 +255,12 @@ const PDFReports = () => {
               {generating ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Generating...
+                  {t("famPDFReports.generating")}
                 </>
               ) : (
                 <>
                   <Download className="w-4 h-4 mr-2" />
-                  Generate PDF Report
+                  {t("famPDFReports.generatePdfReport")}
                 </>
               )}
             </Button>
@@ -269,18 +269,18 @@ const PDFReports = () => {
 
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Automated Reports</CardTitle>
+            <CardTitle>{t("famPDFReports.automatedReports")}</CardTitle>
             <CardDescription>
-              Schedule automatic monthly report generation
+              {t("famPDFReports.scheduleAutomaticMonthlyReportGeneration")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              Configure automatic monthly PDF reports to be generated and emailed to family heads and treasurers.
+              {t("famPDFReports.configureAutomaticMonthlyPdfReports")}
             </p>
             <Button variant="outline" onClick={() => navigate("/admin/email-reports")}>
               <Calendar className="w-4 h-4 mr-2" />
-              Configure Automated Reports
+              {t("famPDFReports.configureAutomatedReports")}
             </Button>
           </CardContent>
         </Card>

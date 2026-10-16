@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
@@ -37,6 +38,7 @@ interface MemberSummary {
 }
 
 const ContributionAnalytics = () => {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { family, canManageFinances, isLoading } = useFamilyAuth(familySlug);
@@ -184,8 +186,8 @@ const ContributionAnalytics = () => {
     } catch (error) {
       console.error("Error loading data:", error);
       toast({
-        title: "Error",
-        description: "Failed to load contribution analytics",
+        title: t("famContributionAnalytics.error"),
+        description: t("famContributionAnalytics.failedToLoadContributionAnalytics"),
         variant: "destructive",
       });
     } finally {
@@ -228,11 +230,11 @@ const ContributionAnalytics = () => {
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+              {t("famContributionAnalytics.back")}
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Contribution Analytics</h1>
-              <p className="text-sm text-muted-foreground">Track payment trends and member credit scores</p>
+              <h1 className="text-2xl font-bold text-foreground">{t("famContributionAnalytics.contributionAnalytics")}</h1>
+              <p className="text-sm text-muted-foreground">{t("famContributionAnalytics.trackPaymentTrendsAndMember")}</p>
             </div>
           </div>
         </div>
@@ -243,7 +245,7 @@ const ContributionAnalytics = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Collected</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">{t("famContributionAnalytics.totalCollected")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
@@ -255,7 +257,7 @@ const ContributionAnalytics = () => {
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Outstanding</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">{t("famContributionAnalytics.outstanding")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
@@ -267,7 +269,7 @@ const ContributionAnalytics = () => {
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Late Payments</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">{t("famContributionAnalytics.latePayments")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
@@ -279,7 +281,7 @@ const ContributionAnalytics = () => {
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Late Fines</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">{t("famContributionAnalytics.lateFines")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
@@ -292,16 +294,16 @@ const ContributionAnalytics = () => {
 
         <Tabs defaultValue="trends" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="trends">Payment Trends</TabsTrigger>
-            <TabsTrigger value="members">Member Analysis</TabsTrigger>
-            <TabsTrigger value="late">Late Payments</TabsTrigger>
+            <TabsTrigger value="trends">{t("famContributionAnalytics.paymentTrends")}</TabsTrigger>
+            <TabsTrigger value="members">{t("famContributionAnalytics.memberAnalysis")}</TabsTrigger>
+            <TabsTrigger value="late">{t("famContributionAnalytics.latePayments")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="trends">
             <Card>
               <CardHeader>
-                <CardTitle>Monthly Payment Trends</CardTitle>
-                <CardDescription>Track contributions collected vs outstanding over time</CardDescription>
+                <CardTitle>{t("famContributionAnalytics.monthlyPaymentTrends")}</CardTitle>
+                <CardDescription>{t("famContributionAnalytics.trackContributionsCollectedVsOutstanding")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={400}>
@@ -322,8 +324,8 @@ const ContributionAnalytics = () => {
           <TabsContent value="members">
             <Card>
               <CardHeader>
-                <CardTitle>Member Payment Analysis with Credit Scores</CardTitle>
-                <CardDescription>Individual contribution tracking and creditworthiness</CardDescription>
+                <CardTitle>{t("famContributionAnalytics.memberPaymentAnalysisWithCredit")}</CardTitle>
+                <CardDescription>{t("famContributionAnalytics.individualContributionTrackingAndCreditworthiness")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -373,12 +375,12 @@ const ContributionAnalytics = () => {
           <TabsContent value="late">
             <Card>
               <CardHeader>
-                <CardTitle>Late Payments</CardTitle>
-                <CardDescription>Overdue contributions requiring attention</CardDescription>
+                <CardTitle>{t("famContributionAnalytics.latePayments")}</CardTitle>
+                <CardDescription>{t("famContributionAnalytics.overdueContributionsRequiringAttention")}</CardDescription>
               </CardHeader>
               <CardContent>
                 {latePayments.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">No late payments</p>
+                  <p className="text-center text-muted-foreground py-8">{t("famContributionAnalytics.noLatePayments")}</p>
                 ) : (
                   <div className="space-y-4">
                   {latePayments.map(contribution => {
@@ -400,7 +402,7 @@ const ContributionAnalytics = () => {
                           </div>
                           <div className="text-right">
                             <p className="font-bold text-lg">{contribution.amount.toLocaleString()} FCFA</p>
-                            <Badge variant="destructive">Overdue</Badge>
+                            <Badge variant="destructive">{t("famContributionAnalytics.overdue")}</Badge>
                           </div>
                         </div>
                       );

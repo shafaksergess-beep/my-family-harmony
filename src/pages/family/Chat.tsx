@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { MessageCircle, Calendar, Loader2 } from 'lucide-react';
@@ -9,6 +10,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import SEO from "@/components/SEO";
 
 export default function Chat() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const isMobile = useIsMobile();
 
@@ -81,7 +83,7 @@ export default function Chat() {
     return (
       <Card>
         <CardContent className="py-12 text-center text-muted-foreground">
-          Unable to load chat. Please try again.
+          {t("famChat.unableToLoadChatPlease")}
         </CardContent>
       </Card>
     );
@@ -89,14 +91,14 @@ export default function Chat() {
 
   return (
     <>
-      <SEO title="Family Chat" description="Real-time conversations between family members on Kinsroot." />
+      <SEO title={t("famChat.familyChat")} description={t("famChat.realTimeConversationsBetweenFamily")} />
       <div className="container max-w-4xl mx-auto py-6 px-4">
       <div className="flex items-center gap-3 mb-6">
         <MessageCircle className="h-8 w-8 text-primary" />
         <div>
-          <h1 className="text-2xl font-bold">Family Chat</h1>
+          <h1 className="text-2xl font-bold">{t("famChat.familyChat")}</h1>
           <p className="text-muted-foreground">
-            Discuss meetings, events, and family matters
+            {t("famChat.discussMeetingsEventsAndFamily")}
           </p>
         </div>
       </div>
@@ -114,14 +116,12 @@ export default function Chat() {
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            Link Messages to Meetings
+            {t("famChat.linkMessagesToMeetings")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            Click the calendar icon in the chat input to link your message to an
-            upcoming meeting. This helps keep discussions organized and makes it
-            easy to reference agenda items.
+            {t("famChat.clickTheCalendarIconIn")}
           </p>
         </CardContent>
       </Card>

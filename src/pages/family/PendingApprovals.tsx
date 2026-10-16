@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,6 +32,7 @@ interface PendingSaving {
 }
 
 export default function PendingApprovals() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -80,7 +82,7 @@ export default function PendingApprovals() {
       .eq("id", id);
     setActingOn(null);
     if (error) {
-      toast({ title: "Action failed", description: error.message, variant: "destructive" });
+      toast({ title: t("famPendingApprovals.actionFailed"), description: error.message, variant: "destructive" });
       return;
     }
     toast({ title: approve ? "Request approved" : "Request rejected" });
@@ -100,7 +102,7 @@ export default function PendingApprovals() {
       .eq("id", id);
     setActingOn(null);
     if (error) {
-      toast({ title: "Action failed", description: error.message, variant: "destructive" });
+      toast({ title: t("famPendingApprovals.actionFailed"), description: error.message, variant: "destructive" });
       return;
     }
     toast({ title: approve ? "Saving approved" : "Saving rejected" });
@@ -121,16 +123,16 @@ export default function PendingApprovals() {
 
   return (
     <>
-      <SEO title="Pending approvals" description="Review and act on pending join requests and financial approvals for your family." />
+      <SEO title={t("famPendingApprovals.pendingApprovals")} description={t("famPendingApprovals.reviewAndActOnPending")} />
       <div className="min-h-screen bg-background">
         <header className="border-b border-border bg-card">
           <div className="container mx-auto px-4 py-4 flex items-center gap-3">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
-              <ArrowLeft className="w-4 h-4 mr-2" /> Back
+              <ArrowLeft className="w-4 h-4 mr-2" /> {t("famPendingApprovals.back")}
             </Button>
             <div>
               <h1 className="text-2xl font-bold flex items-center gap-2">
-                <Inbox className="w-6 h-6" /> Pending Approvals
+                <Inbox className="w-6 h-6" /> {t("famPendingApprovals.pendingApprovals")}
               </h1>
               <p className="text-sm text-muted-foreground">
                 {total} item{total === 1 ? "" : "s"} awaiting your review.
@@ -143,8 +145,8 @@ export default function PendingApprovals() {
           {total === 0 && (
             <EmptyState
               icon={Inbox}
-              title="All caught up"
-              description="No join requests or financial approvals are pending."
+              title={t("famPendingApprovals.allCaughtUp")}
+              description={t("famPendingApprovals.noJoinRequestsOrFinancial")}
             />
           )}
 
@@ -152,7 +154,7 @@ export default function PendingApprovals() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <UserPlus className="w-5 h-5" /> Join requests
+                  <UserPlus className="w-5 h-5" /> {t("famPendingApprovals.joinRequests")}
                   <Badge variant="secondary">{joinReqs.length}</Badge>
                 </CardTitle>
               </CardHeader>
@@ -173,14 +175,14 @@ export default function PendingApprovals() {
                         onClick={() => reviewJoin(r.id, false)}
                         disabled={actingOn === r.id}
                       >
-                        <X className="w-4 h-4 mr-1" /> Reject
+                        <X className="w-4 h-4 mr-1" /> {t("famPendingApprovals.reject")}
                       </Button>
                       <Button
                         size="sm"
                         onClick={() => reviewJoin(r.id, true)}
                         disabled={actingOn === r.id}
                       >
-                        <Check className="w-4 h-4 mr-1" /> Approve
+                        <Check className="w-4 h-4 mr-1" /> {t("famPendingApprovals.approve")}
                       </Button>
                     </div>
                   </div>
@@ -198,7 +200,7 @@ export default function PendingApprovals() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <PiggyBank className="w-5 h-5" /> Savings approvals
+                  <PiggyBank className="w-5 h-5" /> {t("famPendingApprovals.savingsApprovals")}
                   <Badge variant="secondary">{pendingSavings.length}</Badge>
                 </CardTitle>
               </CardHeader>
@@ -221,14 +223,14 @@ export default function PendingApprovals() {
                         onClick={() => reviewSaving(s.id, false)}
                         disabled={actingOn === s.id}
                       >
-                        <X className="w-4 h-4 mr-1" /> Reject
+                        <X className="w-4 h-4 mr-1" /> {t("famPendingApprovals.reject")}
                       </Button>
                       <Button
                         size="sm"
                         onClick={() => reviewSaving(s.id, true)}
                         disabled={actingOn === s.id}
                       >
-                        <Check className="w-4 h-4 mr-1" /> Approve
+                        <Check className="w-4 h-4 mr-1" /> {t("famPendingApprovals.approve")}
                       </Button>
                     </div>
                   </div>

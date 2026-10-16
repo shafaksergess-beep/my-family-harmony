@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +20,7 @@ interface EmailPreferences {
 }
 
 const EmailSettings = () => {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -57,8 +59,8 @@ const EmailSettings = () => {
 
       if (!family) {
         toast({
-          title: "Error",
-          description: "Family not found",
+          title: t("famEmailSettings.error"),
+          description: t("famEmailSettings.familyNotFound"),
           variant: "destructive",
         });
         navigate("/dashboard");
@@ -101,14 +103,14 @@ const EmailSettings = () => {
       );
 
       toast({
-        title: "Success",
-        description: "Email preferences saved successfully",
+        title: t("famEmailSettings.success"),
+        description: t("famEmailSettings.emailPreferencesSavedSuccessfully"),
       });
     } catch (error) {
       console.error("Error saving settings:", error);
       toast({
-        title: "Error",
-        description: "Failed to save preferences",
+        title: t("famEmailSettings.error"),
+        description: t("famEmailSettings.failedToSavePreferences"),
         variant: "destructive",
       });
     } finally {
@@ -136,8 +138,8 @@ const EmailSettings = () => {
 
       if (!profile?.email) {
         toast({
-          title: "Error",
-          description: "No email address found in your profile",
+          title: t("famEmailSettings.error"),
+          description: t("famEmailSettings.noEmailAddressFoundIn"),
           variant: "destructive",
         });
         return;
@@ -157,13 +159,13 @@ const EmailSettings = () => {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Test email sent successfully",
+        title: t("famEmailSettings.success"),
+        description: t("famEmailSettings.testEmailSentSuccessfully"),
       });
     } catch (error: any) {
       console.error("Error sending test email:", error);
       toast({
-        title: "Error",
+        title: t("famEmailSettings.error"),
         description: error.message || "Failed to send test email",
         variant: "destructive",
       });
@@ -181,44 +183,44 @@ const EmailSettings = () => {
   const settingsItems = [
     {
       key: "contributions" as keyof EmailPreferences,
-      label: "Contributions",
-      description: "Get notified when contributions are recorded or due",
+      label: t("famEmailSettings.contributions"),
+      description: t("famEmailSettings.getNotifiedWhenContributionsAre"),
       icon: DollarSign,
     },
     {
       key: "loans" as keyof EmailPreferences,
-      label: "Loans",
-      description: "Receive updates on loan requests and approvals",
+      label: t("famEmailSettings.loans"),
+      description: t("famEmailSettings.receiveUpdatesOnLoanRequests"),
       icon: CreditCard,
     },
     {
       key: "meetings" as keyof EmailPreferences,
-      label: "Meetings",
-      description: "Get reminders about upcoming family meetings",
+      label: t("famEmailSettings.meetings"),
+      description: t("famEmailSettings.getRemindersAboutUpcomingFamily"),
       icon: Calendar,
     },
     {
       key: "assistance" as keyof EmailPreferences,
-      label: "Assistance Events",
-      description: "Be notified of births, deaths, and sickness events",
+      label: t("famEmailSettings.assistanceEvents"),
+      description: t("famEmailSettings.beNotifiedOfBirthsDeaths"),
       icon: Heart,
     },
     {
       key: "savings" as keyof EmailPreferences,
-      label: "Savings Updates",
-      description: "Receive monthly savings summaries",
+      label: t("famEmailSettings.savingsUpdates"),
+      description: t("famEmailSettings.receiveMonthlySavingsSummaries"),
       icon: Bell,
     },
     {
       key: "shares" as keyof EmailPreferences,
-      label: "Shares & Dividends",
-      description: "Get notified about share purchases and dividend payouts",
+      label: t("famEmailSettings.sharesDividends"),
+      description: t("famEmailSettings.getNotifiedAboutSharePurchases"),
       icon: Bell,
     },
     {
       key: "attendance" as keyof EmailPreferences,
-      label: "Attendance Reminders",
-      description: "Receive attendance and fine notifications",
+      label: t("famEmailSettings.attendanceReminders"),
+      description: t("famEmailSettings.receiveAttendanceAndFineNotifications"),
       icon: Bell,
     },
   ];
@@ -236,21 +238,21 @@ const EmailSettings = () => {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-3xl font-bold">Email Notifications</h1>
+              <h1 className="text-3xl font-bold">{t("famEmailSettings.emailNotifications")}</h1>
               <p className="text-muted-foreground">{familyName}</p>
             </div>
           </div>
           <Button variant="outline" onClick={sendTestEmail}>
             <Mail className="h-4 w-4 mr-2" />
-            Send Test Email
+            {t("famEmailSettings.sendTestEmail")}
           </Button>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Configure Email Alerts</CardTitle>
+            <CardTitle>{t("famEmailSettings.configureEmailAlerts")}</CardTitle>
             <CardDescription>
-              Choose which events should trigger email notifications
+              {t("famEmailSettings.chooseWhichEventsShouldTrigger")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -283,7 +285,7 @@ const EmailSettings = () => {
                 variant="outline"
                 onClick={() => navigate(`/family/${familySlug}`)}
               >
-                Cancel
+                {t("famEmailSettings.cancel")}
               </Button>
               <Button onClick={handleSave} disabled={saving}>
                 {saving ? "Saving..." : "Save Preferences"}

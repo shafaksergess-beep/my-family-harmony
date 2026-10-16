@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +12,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 
 const ContributionSettings = () => {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -45,8 +47,8 @@ const ContributionSettings = () => {
     } catch (error: any) {
       console.error("Error loading settings:", error);
       toast({
-        title: "Error",
-        description: "Failed to load contribution settings",
+        title: t("famContributionSettings.error"),
+        description: t("famContributionSettings.failedToLoadContributionSettings"),
         variant: "destructive",
       });
     } finally {
@@ -70,13 +72,13 @@ const ContributionSettings = () => {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Contribution settings saved successfully",
+        title: t("famContributionSettings.success"),
+        description: t("famContributionSettings.contributionSettingsSavedSuccessfully"),
       });
     } catch (error: any) {
       console.error("Error saving settings:", error);
       toast({
-        title: "Error",
+        title: t("famContributionSettings.error"),
         description: error.message || "Failed to save settings",
         variant: "destructive",
       });
@@ -98,12 +100,12 @@ const ContributionSettings = () => {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="max-w-md">
           <CardHeader>
-            <CardTitle>Access Denied</CardTitle>
-            <CardDescription>Only family heads can access contribution settings</CardDescription>
+            <CardTitle>{t("famContributionSettings.accessDenied")}</CardTitle>
+            <CardDescription>{t("famContributionSettings.onlyFamilyHeadsCanAccess")}</CardDescription>
           </CardHeader>
           <CardContent>
             <Button onClick={() => navigate(`/family/${familySlug}`)}>
-              Go Back
+              {t("famContributionSettings.goBack")}
             </Button>
           </CardContent>
         </Card>
@@ -118,11 +120,11 @@ const ContributionSettings = () => {
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}/contributions`)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+              {t("famContributionSettings.back")}
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Contribution Settings</h1>
-              <p className="text-sm text-muted-foreground">Configure how contributions are tracked</p>
+              <h1 className="text-2xl font-bold text-foreground">{t("famContributionSettings.contributionSettings")}</h1>
+              <p className="text-sm text-muted-foreground">{t("famContributionSettings.configureHowContributionsAreTracked")}</p>
             </div>
           </div>
         </div>
@@ -131,23 +133,23 @@ const ContributionSettings = () => {
       <main className="container mx-auto px-4 py-8 max-w-2xl">
         <Card>
           <CardHeader>
-            <CardTitle>Contribution Type</CardTitle>
+            <CardTitle>{t("famContributionSettings.contributionType")}</CardTitle>
             <CardDescription>
-              Choose whether contributions are tracked per individual member or per house
+              {t("famContributionSettings.chooseWhetherContributionsAreTracked")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-4">
-              <Label>Contribution Scope</Label>
+              <Label>{t("famContributionSettings.contributionScope")}</Label>
               <RadioGroup value={contributionScope} onValueChange={(value) => setContributionScope(value as "member" | "house")}>
                 <div className="flex items-center space-x-2 p-4 border rounded-lg">
                   <RadioGroupItem value="member" id="member" />
                   <div className="flex-1">
                     <Label htmlFor="member" className="font-medium cursor-pointer">
-                      Per Member
+                      {t("famContributionSettings.perMember")}
                     </Label>
                     <p className="text-sm text-muted-foreground">
-                      Each family member pays individual contributions
+                      {t("famContributionSettings.eachFamilyMemberPaysIndividual")}
                     </p>
                   </div>
                 </div>
@@ -155,10 +157,10 @@ const ContributionSettings = () => {
                   <RadioGroupItem value="house" id="house" />
                   <div className="flex-1">
                     <Label htmlFor="house" className="font-medium cursor-pointer">
-                      Per House
+                      {t("famContributionSettings.perHouse")}
                     </Label>
                     <p className="text-sm text-muted-foreground">
-                      Each house pays a collective contribution regardless of number of members
+                      {t("famContributionSettings.eachHousePaysACollective")}
                     </p>
                   </div>
                 </div>
@@ -188,18 +190,18 @@ const ContributionSettings = () => {
 
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => navigate(`/family/${familySlug}/contributions`)}>
-                Cancel
+                {t("famContributionSettings.cancel")}
               </Button>
               <Button onClick={handleSave} disabled={saving}>
                 {saving ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Saving...
+                    {t("famContributionSettings.saving")}
                   </>
                 ) : (
                   <>
                     <Save className="w-4 h-4 mr-2" />
-                    Save Settings
+                    {t("famContributionSettings.saveSettings")}
                   </>
                 )}
               </Button>
@@ -209,18 +211,17 @@ const ContributionSettings = () => {
 
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Understanding Contribution Scopes</CardTitle>
+            <CardTitle>{t("famContributionSettings.understandingContributionScopes")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <h3 className="font-semibold mb-2">Per Member</h3>
+              <h3 className="font-semibold mb-2">{t("famContributionSettings.perMember")}</h3>
               <p className="text-sm text-muted-foreground">
-                In this mode, each individual family member is responsible for their own contribution.
-                If a family has 5 members and the contribution is 25,000 FCFA, the family owes 125,000 FCFA total.
+                {t("famContributionSettings.inThisModeEachIndividual")}
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-2">Per House</h3>
+              <h3 className="font-semibold mb-2">{t("famContributionSettings.perHouse")}</h3>
               <p className="text-sm text-muted-foreground">
                 In this mode, each house pays a fixed amount regardless of how many members belong to that house.
                 If there are 3 houses and the contribution is 25,000 FCFA, each house owes 25,000 FCFA (75,000 FCFA total).

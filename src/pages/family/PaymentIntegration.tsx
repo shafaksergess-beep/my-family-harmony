@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const PaymentIntegration = () => {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { family, canManageFinances, isLoading } = useFamilyAuth(familySlug);
@@ -18,8 +20,8 @@ const PaymentIntegration = () => {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
-      title: "Copied!",
-      description: "Webhook URL copied to clipboard",
+      title: t("famPaymentIntegration.copied"),
+      description: t("famPaymentIntegration.webhookUrlCopiedToClipboard"),
     });
   };
 
@@ -36,8 +38,8 @@ const PaymentIntegration = () => {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="max-w-md">
           <CardHeader>
-            <CardTitle>Access Denied</CardTitle>
-            <CardDescription>Only treasurers and family heads can manage payment integration</CardDescription>
+            <CardTitle>{t("famPaymentIntegration.accessDenied")}</CardTitle>
+            <CardDescription>{t("famPaymentIntegration.onlyTreasurersAndFamilyHeads")}</CardDescription>
           </CardHeader>
         </Card>
       </div>
@@ -51,11 +53,11 @@ const PaymentIntegration = () => {
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}/payments`)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Payments
+              {t("famPaymentIntegration.backToPayments")}
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Payment Integration</h1>
-              <p className="text-sm text-muted-foreground">Set up mobile money payment verification</p>
+              <h1 className="text-2xl font-bold text-foreground">{t("famPaymentIntegration.paymentIntegration")}</h1>
+              <p className="text-sm text-muted-foreground">{t("famPaymentIntegration.setUpMobileMoneyPayment")}</p>
             </div>
           </div>
         </div>
@@ -64,16 +66,16 @@ const PaymentIntegration = () => {
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <Alert className="mb-6">
           <Smartphone className="h-4 w-4" />
-          <AlertTitle>Mobile Money Integration</AlertTitle>
+          <AlertTitle>{t("famPaymentIntegration.mobileMoneyIntegration")}</AlertTitle>
           <AlertDescription>
-            Connect MTN Mobile Money and Orange Money to automatically verify member payments. This integration uses webhooks to receive payment confirmations.
+            {t("famPaymentIntegration.connectMtnMobileMoneyAnd")}
           </AlertDescription>
         </Alert>
 
         <Tabs defaultValue="mtn" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="mtn">MTN Mobile Money</TabsTrigger>
-            <TabsTrigger value="orange">Orange Money</TabsTrigger>
+            <TabsTrigger value="mtn">{t("famPaymentIntegration.mtnMobileMoney")}</TabsTrigger>
+            <TabsTrigger value="orange">{t("famPaymentIntegration.orangeMoney")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="mtn" className="space-y-4">
@@ -81,29 +83,29 @@ const PaymentIntegration = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Smartphone className="w-5 h-5 text-yellow-500" />
-                  MTN Mobile Money Setup
+                  {t("famPaymentIntegration.mtnMobileMoneySetup")}
                 </CardTitle>
-                <CardDescription>Configure MTN Mobile Money API integration</CardDescription>
+                <CardDescription>{t("famPaymentIntegration.configureMtnMobileMoneyApi")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <h3 className="font-semibold">Step 1: Register for MTN Developer Account</h3>
+                  <h3 className="font-semibold">{t("famPaymentIntegration.step1RegisterForMtn")}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Visit <a href="https://momodeveloper.mtn.com" target="_blank" rel="noopener noreferrer" className="text-primary underline">momodeveloper.mtn.com</a> and create a developer account.
+                    {t("famPaymentIntegration.visit")} <a href="https://momodeveloper.mtn.com" target="_blank" rel="noopener noreferrer" className="text-primary underline">momodeveloper.mtn.com</a> {t("famPaymentIntegration.andCreateADeveloperAccount")}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="font-semibold">Step 2: Create Collection API Product</h3>
+                  <h3 className="font-semibold">{t("famPaymentIntegration.step2CreateCollectionApi")}</h3>
                   <p className="text-sm text-muted-foreground">
-                    In your MTN Developer Portal, subscribe to the "Collection" product to receive payments.
+                    {t("famPaymentIntegration.inYourMtnDeveloperPortal")}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="font-semibold">Step 3: Configure Webhook</h3>
+                  <h3 className="font-semibold">{t("famPaymentIntegration.step3ConfigureWebhook")}</h3>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Add this webhook URL to your MTN MoMo API settings:
+                    {t("famPaymentIntegration.addThisWebhookUrlTo")}
                   </p>
                   <div className="flex items-center gap-2">
                     <code className="flex-1 p-2 bg-muted rounded text-xs break-all">
@@ -116,19 +118,19 @@ const PaymentIntegration = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="font-semibold">Step 4: Payment Flow</h3>
+                  <h3 className="font-semibold">{t("famPaymentIntegration.step4PaymentFlow")}</h3>
                   <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground ml-4">
-                    <li>Member initiates payment via MTN Mobile Money</li>
-                    <li>Include the payment transaction ID as reference</li>
-                    <li>MTN sends webhook notification to our system</li>
-                    <li>Payment status automatically updated in Kinsroot</li>
+                    <li>{t("famPaymentIntegration.memberInitiatesPaymentViaMtn")}</li>
+                    <li>{t("famPaymentIntegration.includeThePaymentTransactionId")}</li>
+                    <li>{t("famPaymentIntegration.mtnSendsWebhookNotificationTo")}</li>
+                    <li>{t("famPaymentIntegration.paymentStatusAutomaticallyUpdatedIn")}</li>
                   </ol>
                 </div>
 
                 <Alert>
                   <CheckCircle className="h-4 w-4" />
                   <AlertDescription>
-                    Once configured, all MTN Mobile Money payments will be automatically verified and recorded.
+                    {t("famPaymentIntegration.onceConfiguredAllMtnMobile")}
                   </AlertDescription>
                 </Alert>
               </CardContent>
@@ -140,29 +142,29 @@ const PaymentIntegration = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Smartphone className="w-5 h-5 text-orange-500" />
-                  Orange Money Setup
+                  {t("famPaymentIntegration.orangeMoneySetup")}
                 </CardTitle>
-                <CardDescription>Configure Orange Money API integration</CardDescription>
+                <CardDescription>{t("famPaymentIntegration.configureOrangeMoneyApiIntegration")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <h3 className="font-semibold">Step 1: Register for Orange Developer Account</h3>
+                  <h3 className="font-semibold">{t("famPaymentIntegration.step1RegisterForOrange")}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Visit <a href="https://developer.orange.com" target="_blank" rel="noopener noreferrer" className="text-primary underline">developer.orange.com</a> and create a developer account.
+                    {t("famPaymentIntegration.visit")} <a href="https://developer.orange.com" target="_blank" rel="noopener noreferrer" className="text-primary underline">developer.orange.com</a> {t("famPaymentIntegration.andCreateADeveloperAccount")}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="font-semibold">Step 2: Subscribe to Orange Money API</h3>
+                  <h3 className="font-semibold">{t("famPaymentIntegration.step2SubscribeToOrange")}</h3>
                   <p className="text-sm text-muted-foreground">
-                    In your Orange Developer Portal, subscribe to the Orange Money Web Payment API.
+                    {t("famPaymentIntegration.inYourOrangeDeveloperPortal")}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="font-semibold">Step 3: Configure Webhook</h3>
+                  <h3 className="font-semibold">{t("famPaymentIntegration.step3ConfigureWebhook")}</h3>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Add this webhook URL to your Orange Money API settings:
+                    {t("famPaymentIntegration.addThisWebhookUrlTo")}
                   </p>
                   <div className="flex items-center gap-2">
                     <code className="flex-1 p-2 bg-muted rounded text-xs break-all">
@@ -175,19 +177,19 @@ const PaymentIntegration = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="font-semibold">Step 4: Payment Flow</h3>
+                  <h3 className="font-semibold">{t("famPaymentIntegration.step4PaymentFlow")}</h3>
                   <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground ml-4">
-                    <li>Member initiates payment via Orange Money</li>
-                    <li>Include the payment transaction ID as reference</li>
-                    <li>Orange sends webhook notification to our system</li>
-                    <li>Payment status automatically updated in Kinsroot</li>
+                    <li>{t("famPaymentIntegration.memberInitiatesPaymentViaOrange")}</li>
+                    <li>{t("famPaymentIntegration.includeThePaymentTransactionId")}</li>
+                    <li>{t("famPaymentIntegration.orangeSendsWebhookNotificationTo")}</li>
+                    <li>{t("famPaymentIntegration.paymentStatusAutomaticallyUpdatedIn")}</li>
                   </ol>
                 </div>
 
                 <Alert>
                   <CheckCircle className="h-4 w-4" />
                   <AlertDescription>
-                    Once configured, all Orange Money payments will be automatically verified and recorded.
+                    {t("famPaymentIntegration.onceConfiguredAllOrangeMoney")}
                   </AlertDescription>
                 </Alert>
               </CardContent>
@@ -199,7 +201,7 @@ const PaymentIntegration = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertCircle className="w-5 h-5" />
-              Important Notes
+              {t("famPaymentIntegration.importantNotes")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
