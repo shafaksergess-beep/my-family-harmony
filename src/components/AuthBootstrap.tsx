@@ -57,7 +57,11 @@ export function AuthBootstrap() {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
+        // Auth callbacks run under the auth storage lock. Defer client requests
+        // so profile hydration and getSession cannot deadlock on page reload.
+        setTimeout(async () => {
+        if (!mounted) return;
         if (event === "SIGNED_IN" && session) {
           await handleSession(session.user);
           // Record device metadata and enforce concurrent-session cap.
@@ -89,6 +93,7 @@ export function AuthBootstrap() {
             navigate(target, { replace: true });
           }
         }
+        }, 0);
       }
     );
 
