@@ -118,7 +118,14 @@ interface BuiltMessage {
   recipients: "family" | "leaders" | "member" | "finance"; // who gets it
   email?: boolean;
   critical: boolean; // SMS fallback eligible
+  fr?: { title: string; body: string };
+  familyLang?: string;
 }
+
+const CAT_FR: Record<string, string> = {
+  contribution: "cotisation", fine: "amende", levy: "prélèvement", loan_repayment: "remboursement de prêt",
+  savings: "épargne", savings_withdrawal: "retrait d'épargne", other: "autre",
+};
 
 interface PrefRow {
   user_id: string;
@@ -135,11 +142,16 @@ interface PrefRow {
 }
 
 async function build(payload: Payload, admin: ReturnType<typeof createClient>): Promise<BuiltMessage | null> {
-  const { data: fam } = await admin.from("families").select("name, slug").eq("id", payload.family_id ?? "").maybeSingle();
+  const { data: fam } = await admin.from("families").select("name, slug, primary_language").eq("id", payload.family_id ?? "").maybeSingle();
   const familyName = (fam?.name as string) ?? "Family";
   const slug = (fam?.slug as string) ?? "";
   const familyBase = slug ? `/family/${slug}` : "";
 
+  const familyLang = (fam?.primary_language as string) ?? "en";
+  const m = await buildInner();
+  if (m) m.familyLang = familyLang;
+  return m;
+  async function buildInner(): Promise<BuiltMessage | null> {
   switch (payload.event) {
     case "loan_requested":
       return {
@@ -234,6 +246,7 @@ async function build(payload: Payload, admin: ReturnType<typeof createClient>): 
         recipients: "finance",
         critical: false,
         email: true,
+        fr: { title: `🧾 Preuve de paiement à vérifier — ${familyName}`, body: `Paiement ${String(payload.provider ?? "").toUpperCase()} de ${payload.amount ?? ""} FCFA (${CAT_FR[String(payload.category ?? "")] ?? payload.category ?? ""}) en attente de vérification.` },
       };
     case "payment_proof_partially_approved":
       return {
@@ -244,6 +257,7 @@ async function build(payload: Payload, admin: ReturnType<typeof createClient>): 
         recipients: "finance",
         critical: false,
         email: true,
+        fr: { title: `🔐 Deuxième validation requise`, body: `Un paiement de ${payload.amount ?? ""} FCFA a reçu sa première validation et nécessite un second vérificateur.` },
       };
     case "payment_proof_approved":
       return {
@@ -254,6 +268,7 @@ async function build(payload: Payload, admin: ReturnType<typeof createClient>): 
         recipients: "member",
         critical: false,
         email: true,
+        fr: { title: `✅ Paiement confirmé`, body: `Votre paiement de ${payload.amount ?? ""} FCFA a été vérifié et enregistré.` },
       };
     case "payment_proof_rejected":
       return {
@@ -264,9 +279,11 @@ async function build(payload: Payload, admin: ReturnType<typeof createClient>): 
         recipients: "member",
         critical: true,
         email: true,
+        fr: { title: `❌ Preuve de paiement rejetée`, body: `Votre preuve de paiement de ${payload.amount ?? ""} FCFA a été rejetée : ${payload.reason ?? ""}` },
       };
     default:
       return null;
+  }
   }
 }
 
@@ -352,7 +369,7 @@ Deno.serve(async (req) => {
     }
 
     const [{ data: profiles }, { data: prefs }] = await Promise.all([
-      admin.from("profiles").select("id, push_token, phone, email").in("id", userIds),
+      admin.from("profiles").select("id, push_token, phone, email, preferred_language").in("id", userIds),
       admin
         .from("notification_preferences")
         .select("user_id, push_enabled, sms_enabled, email_enabled, loan_updates, assistance_notifications, fines, meeting_reminders, attendance_deadlines, announcements, payment_reminders")
@@ -366,6 +383,9 @@ Deno.serve(async (req) => {
     const profMap = new Map<string, { push_token: string | null; phone: string | null }>(
       (profiles ?? []).map((p) => [String(p.id), { push_token: p.push_token, phone: p.phone }])
     );
+
+    const langOf = new Map<string, string>((profiles ?? []).map((p) => [String(p.id), String(p.preferred_language || msg.familyLang || "en")]));
+    const loc = (uid: string) => (msg.fr && (langOf.get(uid) ?? msg.familyLang ?? "en").startsWith("fr") ? msg.fr : { title: msg.title, body: msg.body });
 
     // 0) Email (payment proof events)
     const resendKey = Deno.env.get("RESEND_API_KEY");
@@ -381,8 +401,8 @@ Deno.serve(async (req) => {
             body: JSON.stringify({
               from: "Kinsroot <onboarding@resend.dev>",
               to: [p.email],
-              subject: msg.title,
-              html: `<div style="font-family:sans-serif"><h2 style="color:#1f4d2b">${msg.title}</h2><p>${msg.body}</p><p><a href="${appUrl}${msg.link}" style="background:#1f4d2b;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none">Open Kinsroot</a></p></div>`,
+              subject: loc(String(p.id)).title,
+              html: `<div style="font-family:sans-serif"><h2 style="color:#1f4d2b">${loc(String(p.id)).title}</h2><p>${loc(String(p.id)).body}</p><p><a href="${appUrl}${msg.link}" style="background:#1f4d2b;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none">${loc(String(p.id)).title === msg.title ? "Open Kinsroot" : "Ouvrir Kinsroot"}</a></p></div>`,
             }),
           });
         } catch (e) {
@@ -395,8 +415,8 @@ Deno.serve(async (req) => {
     const inboxRows = userIds.map((uid) => ({
       user_id: uid,
       family_id: payload.family_id ?? null,
-      title: msg.title,
-      body: msg.body,
+      title: loc(uid).title,
+      body: loc(uid).body,
       notification_type: payload.event,
       reference_table: payload.table,
       reference_id: payload.record_id,
@@ -452,7 +472,7 @@ Deno.serve(async (req) => {
 
         if (pushOn && prof?.push_token && sa) {
           try {
-            pushStatus = await sendFcm(sa, prof.push_token, msg.title, msg.body, {
+            pushStatus = await sendFcm(sa, prof.push_token, loc(uid).title, loc(uid).body, {
               url: msg.link,
               type: payload.event,
               reference_id: payload.record_id,
@@ -489,7 +509,7 @@ Deno.serve(async (req) => {
 
         // SMS fallback only for critical events when push didn't go through
         if (!delivered && msg.critical && (pref?.sms_enabled ?? false) && prof?.phone) {
-          const ok = await sendSms(prof.phone, `${msg.title}\n${msg.body}`);
+          const ok = await sendSms(prof.phone, `${loc(uid).title}\n${loc(uid).body}`);
           if (ok) smsSent++;
           if (notifId) {
             deliveries.push({

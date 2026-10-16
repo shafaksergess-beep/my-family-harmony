@@ -2605,5 +2605,16 @@
     "Notes_required_to_reject": "Notes (required to reject)",
     "Rejected": "Rejected:",
     "Requires_2_approvals_yours_will_be_the_first": "Requires 2 approvals — yours will be the first."
+  },
+  "notifRt": {
+    "newContribution": "New Contribution",
+    "newContributionBody": "A new contribution has been recorded",
+    "newLoan": "New Loan Request",
+    "newLoanBody": "A new loan request has been submitted",
+    "newMeeting": "New Meeting Scheduled",
+    "newMeetingBody": "A new family meeting has been scheduled",
+    "reminder": "Meeting Reminder",
+    "newAssistance": "New Assistance Event",
+    "newAssistanceBody": "A new assistance event has been created"
   }
 }

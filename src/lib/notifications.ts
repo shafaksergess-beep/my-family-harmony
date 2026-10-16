@@ -1,3 +1,4 @@
+import i18n from "@/i18n/config";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface NotificationPayload {
@@ -99,8 +100,8 @@ export class NotificationManager {
         (payload) => {
           if (["family_head", "treasurer"].includes(userRole)) {
             this.showNotification({
-              title: "New Contribution",
-              message: "A new contribution has been recorded",
+              title: i18n.t("notifRt.newContribution"),
+              message: i18n.t("notifRt.newContributionBody"),
               type: "contribution",
               familyId,
               link: `/family/${familyId}/contributions`,
@@ -124,8 +125,8 @@ export class NotificationManager {
         (payload) => {
           if (["family_head", "loan_committee", "treasurer"].includes(userRole)) {
             this.showNotification({
-              title: "New Loan Request",
-              message: "A new loan request has been submitted",
+              title: i18n.t("notifRt.newLoan"),
+              message: i18n.t("notifRt.newLoanBody"),
               type: "loan",
               familyId,
               link: `/family/${familyId}/loans`,
@@ -148,8 +149,8 @@ export class NotificationManager {
         },
         (payload) => {
           this.showNotification({
-            title: "New Meeting Scheduled",
-            message: "A new family meeting has been scheduled",
+            title: i18n.t("notifRt.newMeeting"),
+            message: i18n.t("notifRt.newMeetingBody"),
             type: "meeting",
             familyId,
             link: `/family/${familyId}/meetings`,
@@ -180,7 +181,7 @@ export class NotificationManager {
           if (meeting) {
             const daysText = payload.new.days_before === 1 ? "tomorrow" : `in ${payload.new.days_before} days`;
             this.showNotification({
-              title: "Meeting Reminder",
+              title: i18n.t("notifRt.reminder"),
               message: `Family meeting ${daysText} at ${meeting.meeting_time}`,
               type: "meeting",
               familyId,
@@ -204,8 +205,8 @@ export class NotificationManager {
         },
         (payload) => {
           this.showNotification({
-            title: "New Assistance Event",
-            message: "A new assistance event has been created",
+            title: i18n.t("notifRt.newAssistance"),
+            message: i18n.t("notifRt.newAssistanceBody"),
             type: "assistance",
             familyId,
             link: `/family/${familyId}/assistance`,
