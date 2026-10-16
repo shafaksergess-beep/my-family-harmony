@@ -224,7 +224,7 @@ Deno.serve(async (req) => {
         token: string | null;
         phone: string | null;
         smsEnabled: boolean;
-        type: "meeting_reminder_1d" | "attendance_deadline";
+        type: "meeting_reminder_1d" | "meeting_reminder_7d" | "meeting_reminder_morning" | "attendance_deadline" | "attendance_deadline_15m";
         title: string;
         body: string;
         critical: boolean;
@@ -262,6 +262,17 @@ Deno.serve(async (req) => {
             body: `Meeting starts in under an hour. Check in to be marked present.`,
             critical: true,
           });
+        }
+        const where = `${m.meeting_date} at ${meetingTimeStr}${m.location ? ` — ${m.location}` : ""}`;
+        const base = { userId: p.id, token: pushOn ? p.push_token : null, phone: p.phone, smsEnabled: smsOn };
+        if (send7d && (pref?.meeting_reminders ?? true)) {
+          jobs.push({ ...base, type: "meeting_reminder_7d", title: `🗓️ ${familyName} meeting next week`, body: where, critical: false });
+        }
+        if (sendMorning && (pref?.meeting_reminders ?? true)) {
+          jobs.push({ ...base, type: "meeting_reminder_morning", title: `☀️ ${familyName} meeting today`, body: `Today at ${meetingTimeStr}${m.location ? ` — ${m.location}` : ""}`, critical: false });
+        }
+        if (send15m && (pref?.attendance_deadlines ?? true)) {
+          jobs.push({ ...base, type: "attendance_deadline_15m", title: `🚨 15 minutes to check in — ${familyName}`, body: `The meeting starts in about 15 minutes. Check in now to avoid a lateness fine.`, critical: true });
         }
       }
 
