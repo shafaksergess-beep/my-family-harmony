@@ -2,7 +2,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import "./i18n/config";
-import "./lib/median"; // Initialize global isMedianApp
+import "./lib/natively";
 import { getAnalyticsSafe, logAnalyticsEvent } from "./lib/firebase";
 import { trackStandaloneLaunch } from "./lib/pwaAnalytics";
 

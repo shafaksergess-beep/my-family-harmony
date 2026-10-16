@@ -3,6 +3,7 @@ import { Capacitor } from "@capacitor/core";
 import { supabase } from "@/integrations/supabase/client";
 import { requestFcmToken } from "@/lib/firebase";
 import { incrementAppBadge } from "@/lib/appBadge";
+import { checkIsNativelyApp, requestNativelyFcmToken } from "@/lib/natively";
 
 /**
  * Platform-aware push registration.
@@ -10,19 +11,18 @@ import { incrementAppBadge } from "@/lib/appBadge";
  * - Native iOS/Android (Capacitor): uses @capacitor-firebase/messaging.
  *   Tokens land in profiles.push_token; foreground notifications trigger
  *   a badge bump; taps deep-link via data.url.
- * - Median.co wrappers: uses Median bridge when available, otherwise the
- *   web FCM fallback inside the in-app webview.
+ * - Natively wrappers: requests a native Firebase token (never a OneSignal ID).
  * - Web/PWA: browser Notification permission + web FCM token.
  */
 export function useMobilePush(userId?: string | null) {
   const [token, setToken] = useState<string | null>(null);
-  const [platform, setPlatform] = useState<"native" | "median" | "web">("web");
+  const [platform, setPlatform] = useState<"native" | "natively" | "web">("web");
   const [enabling, setEnabling] = useState(false);
   const badgeCountRef = useRef(0);
 
   useEffect(() => {
     if (Capacitor.isNativePlatform()) setPlatform("native");
-    else if (typeof window !== "undefined" && (window as any).median) setPlatform("median");
+    else if (checkIsNativelyApp()) setPlatform("natively");
     else setPlatform("web");
   }, []);
 
@@ -90,18 +90,10 @@ export function useMobilePush(userId?: string | null) {
         return t ?? null;
       }
 
-      // Median bridge — best-effort token grab when running inside Median app
-      if (platform === "median") {
-        const median = (window as any).median;
-        try {
-          const t: string | undefined = await median?.onesignal?.getRegistrationId?.();
-          if (t) {
-            await persist(t);
-            return t;
-          }
-        } catch (e) {
-          console.warn("[median push] bridge unavailable, falling back to web", e);
-        }
+      if (checkIsNativelyApp()) {
+        const nativeToken = await requestNativelyFcmToken();
+        if (nativeToken) await persist(nativeToken);
+        return nativeToken;
       }
 
       // Web / PWA fallback
