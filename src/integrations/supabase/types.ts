@@ -855,8 +855,13 @@ export type Database = {
           member_death_amount: number | null
           min_loan_amount: number | null
           min_savings_amount: number | null
+          momo_mtn_name: string | null
+          momo_mtn_number: string | null
+          momo_orange_name: string | null
+          momo_orange_number: string | null
           name: string
           njangi_amount: number | null
+          payment_dual_review_threshold: number
           primary_language: string | null
           share_value: number | null
           sickness_assistance_amount: number | null
@@ -890,8 +895,13 @@ export type Database = {
           member_death_amount?: number | null
           min_loan_amount?: number | null
           min_savings_amount?: number | null
+          momo_mtn_name?: string | null
+          momo_mtn_number?: string | null
+          momo_orange_name?: string | null
+          momo_orange_number?: string | null
           name: string
           njangi_amount?: number | null
+          payment_dual_review_threshold?: number
           primary_language?: string | null
           share_value?: number | null
           sickness_assistance_amount?: number | null
@@ -925,8 +935,13 @@ export type Database = {
           member_death_amount?: number | null
           min_loan_amount?: number | null
           min_savings_amount?: number | null
+          momo_mtn_name?: string | null
+          momo_mtn_number?: string | null
+          momo_orange_name?: string | null
+          momo_orange_number?: string | null
           name?: string
           njangi_amount?: number | null
+          payment_dual_review_threshold?: number
           primary_language?: string | null
           share_value?: number | null
           sickness_assistance_amount?: number | null
@@ -2256,6 +2271,108 @@ export type Database = {
           },
         ]
       }
+      payment_proofs: {
+        Row: {
+          ai_extracted: Json | null
+          ai_status: string
+          amount_mismatch: boolean
+          category: string
+          claimed_amount: number
+          claimed_reference: string | null
+          created_at: string
+          duplicate_of: string | null
+          family_id: string
+          first_notes: string | null
+          first_reviewed_at: string | null
+          first_reviewer: string | null
+          id: string
+          image_path: string
+          member_id: string
+          payment_transaction_id: string | null
+          provider: string
+          reason: string
+          rejection_reason: string | null
+          requires_dual_review: boolean
+          second_notes: string | null
+          second_reviewed_at: string | null
+          second_reviewer: string | null
+          status: string
+          submitted_by: string
+          updated_at: string
+        }
+        Insert: {
+          ai_extracted?: Json | null
+          ai_status?: string
+          amount_mismatch?: boolean
+          category: string
+          claimed_amount: number
+          claimed_reference?: string | null
+          created_at?: string
+          duplicate_of?: string | null
+          family_id: string
+          first_notes?: string | null
+          first_reviewed_at?: string | null
+          first_reviewer?: string | null
+          id?: string
+          image_path: string
+          member_id: string
+          payment_transaction_id?: string | null
+          provider: string
+          reason: string
+          rejection_reason?: string | null
+          requires_dual_review?: boolean
+          second_notes?: string | null
+          second_reviewed_at?: string | null
+          second_reviewer?: string | null
+          status?: string
+          submitted_by: string
+          updated_at?: string
+        }
+        Update: {
+          ai_extracted?: Json | null
+          ai_status?: string
+          amount_mismatch?: boolean
+          category?: string
+          claimed_amount?: number
+          claimed_reference?: string | null
+          created_at?: string
+          duplicate_of?: string | null
+          family_id?: string
+          first_notes?: string | null
+          first_reviewed_at?: string | null
+          first_reviewer?: string | null
+          id?: string
+          image_path?: string
+          member_id?: string
+          payment_transaction_id?: string | null
+          provider?: string
+          reason?: string
+          rejection_reason?: string | null
+          requires_dual_review?: boolean
+          second_notes?: string | null
+          second_reviewed_at?: string | null
+          second_reviewer?: string | null
+          status?: string
+          submitted_by?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_proofs_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_proofs_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_reminders: {
         Row: {
           contribution_id: string
@@ -2994,6 +3111,10 @@ export type Database = {
         Args: { check_family_id: string; check_user_id: string }
         Returns: boolean
       }
+      is_finance_reviewer: {
+        Args: { _family_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_super_admin: { Args: { check_user_id: string }; Returns: boolean }
       log_activity: {
         Args: {
@@ -3003,6 +3124,10 @@ export type Database = {
           p_entity_type?: string
           p_family_id?: string
         }
+        Returns: string
+      }
+      review_payment_proof: {
+        Args: { p_decision: string; p_notes?: string; p_proof_id: string }
         Returns: string
       }
       user_belongs_to_family: {
