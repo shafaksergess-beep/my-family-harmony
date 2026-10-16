@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +27,7 @@ interface MeetingAgendaBuilderProps {
 }
 
 export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilderProps) => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -93,8 +95,8 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
       }
 
       toast({
-        title: "Success",
-        description: "Template applied to agenda",
+        title: t("mtgUi.Success"),
+        description: t("mtgUi.Template_applied_to_agenda"),
       });
 
       setSelectedTemplate("");
@@ -102,8 +104,8 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
     } catch (error: any) {
       console.error("Error applying template:", error);
       toast({
-        title: "Error",
-        description: "Failed to apply template",
+        title: t("mtgUi.Error"),
+        description: t("mtgUi.Failed_to_apply_template"),
         variant: "destructive",
       });
     }
@@ -112,8 +114,8 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
   const saveAsTemplate = async () => {
     if (!templateName.trim()) {
       toast({
-        title: "Error",
-        description: "Please enter a template name",
+        title: t("mtgUi.Error"),
+        description: t("mtgUi.Please_enter_a_template_name"),
         variant: "destructive",
       });
       return;
@@ -121,8 +123,8 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
 
     if (agendaItems.length === 0) {
       toast({
-        title: "Error",
-        description: "No agenda items to save",
+        title: t("mtgUi.Error"),
+        description: t("mtgUi.No_agenda_items_to_save"),
         variant: "destructive",
       });
       return;
@@ -148,8 +150,8 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Agenda saved as template",
+        title: t("mtgUi.Success"),
+        description: t("mtgUi.Agenda_saved_as_template"),
       });
 
       setTemplateName("");
@@ -159,8 +161,8 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
     } catch (error: any) {
       console.error("Error saving template:", error);
       toast({
-        title: "Error",
-        description: "Failed to save template",
+        title: t("mtgUi.Error"),
+        description: t("mtgUi.Failed_to_save_template"),
         variant: "destructive",
       });
     }
@@ -186,8 +188,8 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
   const handleAddItem = async () => {
     if (!newItem.title.trim()) {
       toast({
-        title: "Error",
-        description: "Please enter an agenda title",
+        title: t("mtgUi.Error"),
+        description: t("mtgUi.Please_enter_an_agenda_title"),
         variant: "destructive",
       });
       return;
@@ -205,8 +207,8 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Agenda item added",
+        title: t("mtgUi.Success"),
+        description: t("mtgUi.Agenda_item_added"),
       });
 
       setNewItem({
@@ -220,8 +222,8 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
     } catch (error: any) {
       console.error("Error adding agenda item:", error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to add agenda item",
+        title: t("mtgUi.Error"),
+        description: error.message || t("mtgUi.Failed_to_add_agenda_item"),
         variant: "destructive",
       });
     }
@@ -237,15 +239,15 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Agenda item deleted",
+        title: t("mtgUi.Success"),
+        description: t("mtgUi.Agenda_item_deleted"),
       });
       loadAgenda();
     } catch (error: any) {
       console.error("Error deleting agenda item:", error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to delete agenda item",
+        title: t("mtgUi.Error"),
+        description: error.message || t("mtgUi.Failed_to_delete_agenda_item"),
         variant: "destructive",
       });
     }
@@ -254,14 +256,14 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
   const totalTime = agendaItems.reduce((sum, item) => sum + item.time_allocation, 0);
 
   if (loading) {
-    return <div>Loading agenda...</div>;
+    return <div>{t("mtgUi.Loading_agenda")}</div>;
   }
 
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Meeting Agenda</CardTitle>
+          <CardTitle>{t("mtgUi.Meeting_Agenda")}</CardTitle>
           <div className="flex items-center gap-2">
             <Badge variant="outline">
               <Clock className="w-3 h-3 mr-1" />
@@ -272,16 +274,16 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
                 <DialogTrigger asChild>
                   <Button size="sm" variant="outline">
                     <Save className="w-4 h-4 mr-2" />
-                    Save as Template
+                    {t("mtgUi.Save_as_Template")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Save Agenda as Template</DialogTitle>
+                    <DialogTitle>{t("mtgUi.Save_Agenda_as_Template")}</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="template-name">Template Name</Label>
+                      <Label htmlFor="template-name">{t("mtgUi.Template_Name")}</Label>
                       <Input
                         id="template-name"
                         value={templateName}
@@ -295,17 +297,17 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
                         id="template-desc"
                         value={templateDescription}
                         onChange={(e) => setTemplateDescription(e.target.value)}
-                        placeholder="Brief description of this template"
+                        placeholder={t("mtgUi.Brief_description_of_this_template")}
                         rows={2}
                       />
                     </div>
                     <div className="flex justify-end gap-2">
                       <Button variant="outline" onClick={() => setIsSaveDialogOpen(false)}>
-                        Cancel
+                        {t("mtgUi.Cancel")}
                       </Button>
                       <Button onClick={saveAsTemplate}>
                         <Save className="w-4 h-4 mr-2" />
-                        Save Template
+                        {t("mtgUi.Save_Template")}
                       </Button>
                     </div>
                   </div>
@@ -334,7 +336,7 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
                         {item.time_allocation} min
                       </Badge>
                       {item.requires_vote && (
-                        <Badge>Requires Vote</Badge>
+                        <Badge>{t("mtgUi.Requires_Vote")}</Badge>
                       )}
                     </div>
                   </div>
@@ -356,25 +358,25 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
           </div>
         ) : (
           <p className="text-center text-muted-foreground py-8">
-            No agenda items yet. Add items below to structure your meeting.
+            {t("mtgUi.No_agenda_items_yet_Add_items_below_to_structure_y")}
           </p>
         )}
 
         {/* Add New Item Form */}
         {canEdit && (
           <div className="space-y-4 pt-4 border-t">
-            <h4 className="font-semibold">Add Agenda Item</h4>
+            <h4 className="font-semibold">{t("mtgUi.Add_Agenda_Item")}</h4>
             
             {/* Template Selector */}
             {templates.length > 0 && (
               <div className="flex gap-2">
                 <select
-                  aria-label="Select an agenda template"
+                  aria-label={t("mtgUi.Select_an_agenda_template")}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
                   value={selectedTemplate}
                   onChange={(e) => setSelectedTemplate(e.target.value)}
                 >
-                  <option value="">Select a template...</option>
+                  <option value="">{t("mtgUi.Select_a_template")}</option>
                   {templates.map((template) => (
                     <option key={template.id} value={template.id}>
                       {template.name}
@@ -385,13 +387,13 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
                   onClick={() => selectedTemplate && applyTemplate(selectedTemplate)}
                   disabled={!selectedTemplate}
                 >
-                  Apply Template
+                  {t("mtgUi.Apply_Template")}
                 </Button>
               </div>
             )}
             <div className="space-y-3">
               <div>
-                <Label htmlFor="title">Title</Label>
+                <Label htmlFor="title">{t("mtgUi.Title")}</Label>
                 <Input
                   id="title"
                   value={newItem.title}
@@ -405,7 +407,7 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
                   id="description"
                   value={newItem.description}
                   onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                  placeholder="Brief description of the topic"
+                  placeholder={t("mtgUi.Brief_description_of_the_topic")}
                   rows={2}
                 />
               </div>
@@ -427,12 +429,12 @@ export const MeetingAgendaBuilder = ({ meetingId, canEdit }: MeetingAgendaBuilde
                     checked={newItem.requires_vote}
                     onCheckedChange={(checked) => setNewItem({ ...newItem, requires_vote: checked })}
                   />
-                  <Label htmlFor="vote">Requires Vote</Label>
+                  <Label htmlFor="vote">{t("mtgUi.Requires_Vote")}</Label>
                 </div>
               </div>
               <Button onClick={handleAddItem} className="w-full">
                 <Plus className="w-4 h-4 mr-2" />
-                Add Item
+                {t("mtgUi.Add_Item")}
               </Button>
             </div>
           </div>

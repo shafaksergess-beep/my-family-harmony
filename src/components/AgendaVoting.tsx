@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ interface AgendaVotingProps {
 }
 
 export const AgendaVoting = ({ agendaItemId, requiresVote, currentMemberId }: AgendaVotingProps) => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [votes, setVotes] = useState<Vote[]>([]);
   const [myVote, setMyVote] = useState<string | null>(null);
@@ -70,8 +72,8 @@ export const AgendaVoting = ({ agendaItemId, requiresVote, currentMemberId }: Ag
   const handleVote = async (vote: "yes" | "no" | "abstain") => {
     if (!currentMemberId) {
       toast({
-        title: "Error",
-        description: "You must be a member to vote",
+        title: t("mtgUi.Error"),
+        description: t("mtgUi.You_must_be_a_member_to_vote"),
         variant: "destructive",
       });
       return;
@@ -92,7 +94,7 @@ export const AgendaVoting = ({ agendaItemId, requiresVote, currentMemberId }: Ag
       if (error) throw error;
 
       toast({
-        title: "Success",
+        title: t("mtgUi.Success"),
         description: `Your vote (${vote}) has been recorded`,
       });
 
@@ -100,8 +102,8 @@ export const AgendaVoting = ({ agendaItemId, requiresVote, currentMemberId }: Ag
     } catch (error: any) {
       console.error("Error voting:", error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to record vote",
+        title: t("mtgUi.Error"),
+        description: error.message || t("mtgUi.Failed_to_record_vote"),
         variant: "destructive",
       });
     } finally {
@@ -121,7 +123,7 @@ export const AgendaVoting = ({ agendaItemId, requiresVote, currentMemberId }: Ag
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <CheckCircle className="w-5 h-5" />
-          Voting
+          {t("mtgUi.Voting")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -134,7 +136,7 @@ export const AgendaVoting = ({ agendaItemId, requiresVote, currentMemberId }: Ag
             className="flex-1"
           >
             <ThumbsUp className="w-4 h-4 mr-2" />
-            Yes
+            {t("mtgUi.Yes")}
           </Button>
           <Button
             onClick={() => handleVote("no")}
@@ -143,7 +145,7 @@ export const AgendaVoting = ({ agendaItemId, requiresVote, currentMemberId }: Ag
             className="flex-1"
           >
             <ThumbsDown className="w-4 h-4 mr-2" />
-            No
+            {t("mtgUi.No")}
           </Button>
           <Button
             onClick={() => handleVote("abstain")}
@@ -152,7 +154,7 @@ export const AgendaVoting = ({ agendaItemId, requiresVote, currentMemberId }: Ag
             className="flex-1"
           >
             <Minus className="w-4 h-4 mr-2" />
-            Abstain
+            {t("mtgUi.Abstain")}
           </Button>
         </div>
 
@@ -165,7 +167,7 @@ export const AgendaVoting = ({ agendaItemId, requiresVote, currentMemberId }: Ag
             </div>
             <div className="space-y-1">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-green-600">Yes</span>
+                <span className="text-green-600">{t("mtgUi.Yes")}</span>
                 <span className="font-medium">{yesCount} ({totalVotes > 0 ? Math.round((yesCount / totalVotes) * 100) : 0}%)</span>
               </div>
               <div className="w-full bg-muted rounded-full h-2">
@@ -177,7 +179,7 @@ export const AgendaVoting = ({ agendaItemId, requiresVote, currentMemberId }: Ag
             </div>
             <div className="space-y-1">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-red-600">No</span>
+                <span className="text-red-600">{t("mtgUi.No")}</span>
                 <span className="font-medium">{noCount} ({totalVotes > 0 ? Math.round((noCount / totalVotes) * 100) : 0}%)</span>
               </div>
               <div className="w-full bg-muted rounded-full h-2">
@@ -189,7 +191,7 @@ export const AgendaVoting = ({ agendaItemId, requiresVote, currentMemberId }: Ag
             </div>
             <div className="space-y-1">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Abstain</span>
+                <span className="text-muted-foreground">{t("mtgUi.Abstain")}</span>
                 <span className="font-medium">{abstainCount} ({totalVotes > 0 ? Math.round((abstainCount / totalVotes) * 100) : 0}%)</span>
               </div>
               <div className="w-full bg-muted rounded-full h-2">
