@@ -15,6 +15,7 @@ import { haptics } from "@/lib/haptics";
 import { FamilyChatbot } from "@/components/chat/FamilyChatbot";
 import SEO from "@/components/SEO";
 import { FamilyHealthWidget } from "@/components/family/FamilyHealthWidget";
+import { FamilyLanguageCard } from "@/components/family/FamilyLanguageCard";
 
 interface ModuleCategory {
   id: string;

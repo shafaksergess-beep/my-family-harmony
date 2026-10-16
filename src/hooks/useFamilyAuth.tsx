@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { applyFamilyLanguage } from "@/i18n/languages";
 
 export interface FamilyAuthData {
   family: any;
@@ -58,6 +59,7 @@ export const useFamilyAuth = (familySlug?: string) => {
         }
         
         setFamily(familyData);
+        applyFamilyLanguage(familyData.primary_language);
 
         // Get user's membership in this family
         const { data: memberData } = await supabase
