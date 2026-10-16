@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,17 +11,18 @@ import { Loader2, Eye, EyeOff, CheckCircle2, ShieldCheck } from "lucide-react";
 import { z } from "zod";
 import SEO from "@/components/SEO";
 
-const passwordSchema = z.object({
-  password: z.string().min(8, "Password must be at least 8 characters"),
+const makeSchema = (t: (k: string) => string) => z.object({
+  password: z.string().min(8, t("reset.min8")),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
+  message: t("auth.ui.noMatch"),
   path: ["confirmPassword"],
 });
 
 const ResetPassword = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -51,7 +53,7 @@ const ResetPassword = () => {
     e.preventDefault();
     setErrors({});
 
-    const result = passwordSchema.safeParse({ password, confirmPassword });
+    const result = makeSchema(t).safeParse({ password, confirmPassword });
     if (!result.success) {
       const fieldErrors: typeof errors = {};
       result.error.errors.forEach((err) => {
@@ -77,16 +79,16 @@ const ResetPassword = () => {
 
       setSuccess(true);
       toast({
-        title: "Password updated",
-        description: "Your password has been reset successfully.",
+        title: t("reset.updated"),
+        description: t("reset.updatedDesc"),
       });
 
       // Redirect to dashboard after a short delay
       setTimeout(() => navigate("/dashboard"), 2500);
     } catch (error: any) {
       toast({
-        title: "Reset failed",
-        description: error.message || "Could not update password. Please try again.",
+        title: t("reset.failed"),
+        description: error.message || t("reset.failedDesc"),
         variant: "destructive",
       });
     } finally {
@@ -103,8 +105,8 @@ const ResetPassword = () => {
           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
             <CheckCircle2 className="w-8 h-8 text-primary" />
           </div>
-          <h2 className="text-2xl font-bold text-foreground">Password Updated!</h2>
-          <p className="text-muted-foreground">Your password has been reset successfully. Redirecting you to the dashboard...</p>
+          <h2 className="text-2xl font-bold text-foreground">{t("reset.updatedTitle")}</h2>
+          <p className="text-muted-foreground">{t("reset.redirecting")}</p>
           <Loader2 className="w-5 h-5 animate-spin mx-auto text-primary" />
         </Card>
       </div>
@@ -116,12 +118,12 @@ const ResetPassword = () => {
       <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 flex items-center justify-center p-4">
         <Card className="p-8 max-w-md w-full text-center space-y-4">
           <ShieldCheck className="w-12 h-12 text-muted-foreground mx-auto" />
-          <h2 className="text-xl font-bold text-foreground">Invalid or Expired Link</h2>
+          <h2 className="text-xl font-bold text-foreground">{t("reset.invalid")}</h2>
           <p className="text-muted-foreground text-sm">
-            This password reset link is invalid or has expired. Please request a new one.
+            {t("reset.invalidDesc")}
           </p>
           <Button onClick={() => navigate("/auth")} className="w-full">
-            Back to Login
+            {t("auth.ui.backLogin")}
           </Button>
         </Card>
       </div>
@@ -131,8 +133,8 @@ const ResetPassword = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 flex items-center justify-center p-4">
       <SEO
-        title="Reset your password"
-        description="Set a new password for your Kinsroot account to regain secure access to your family workspace."
+        title={t("reset.seoTitle")}
+        description={t("reset.seoDesc")}
         noIndex
       />
       <div className="w-full max-w-md">
@@ -142,14 +144,14 @@ const ResetPassword = () => {
             alt="Kinsroot Logo"
             className="w-20 h-20 mx-auto rounded-full object-cover shadow-lg"
           />
-          <h1 className="text-2xl font-bold text-foreground mt-4">Set New Password</h1>
-          <p className="text-muted-foreground text-sm mt-1">Choose a strong password for your account</p>
+          <h1 className="text-2xl font-bold text-foreground mt-4">{t("reset.setNew")}</h1>
+          <p className="text-muted-foreground text-sm mt-1">{t("reset.choose")}</p>
         </div>
 
         <Card className="p-6 shadow-xl">
           <form onSubmit={handleReset} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="new-password">New Password</Label>
+              <Label htmlFor="new-password">{t("reset.newPw")}</Label>
               <div className="relative">
                 <Input
                   id="new-password"
@@ -170,7 +172,7 @@ const ResetPassword = () => {
                   className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                   onClick={() => setShowPassword(!showPassword)}
                   tabIndex={-1}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-label={showPassword ? t("auth.ui.hidePw") : t("auth.ui.showPw")}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
                 </Button>
@@ -179,7 +181,7 @@ const ResetPassword = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirm-new-password">Confirm New Password</Label>
+              <Label htmlFor="confirm-new-password">{t("reset.confirmNew")}</Label>
               <div className="relative">
                 <Input
                   id="confirm-new-password"
@@ -200,23 +202,23 @@ const ResetPassword = () => {
                   className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   tabIndex={-1}
-                  aria-label={showConfirmPassword ? "Hide password confirmation" : "Show password confirmation"}
+                  aria-label={showConfirmPassword ? t("auth.ui.hideConfirm") : t("auth.ui.showConfirm")}
                 >
                   {showConfirmPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
                 </Button>
               </div>
               {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword}</p>}
-              {passwordsMatch && <p className="text-sm text-primary flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Passwords match</p>}
+              {passwordsMatch && <p className="text-sm text-primary flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> {t("auth.ui.match")}</p>}
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Updating...
+                  {t("reset.updating")}
                 </>
               ) : (
-                "Reset Password"
+                t("auth.ui.resetPw")
               )}
             </Button>
           </form>

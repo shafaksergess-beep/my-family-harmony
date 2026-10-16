@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Download, Check } from "lucide-react";
@@ -23,6 +24,7 @@ function isStandalone(): boolean {
  * - Shows an "Installed" state when the app is running in standalone mode.
  */
 export function InstallMenuItem() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [evt, setEvt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(() => isStandalone());
@@ -48,7 +50,7 @@ export function InstallMenuItem() {
     return (
       <Button variant="outline" className="w-full gap-2" disabled>
         <Check className="w-4 h-4" />
-        App installed
+        {t("install.installed")}
       </Button>
     );
   }
@@ -68,7 +70,7 @@ export function InstallMenuItem() {
   return (
     <Button variant="outline" className="w-full gap-2" onClick={handleClick}>
       <Download className="w-4 h-4" />
-      Install app
+      {t("install.installApp")}
     </Button>
   );
 }
