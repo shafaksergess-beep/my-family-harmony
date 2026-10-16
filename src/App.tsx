@@ -7,7 +7,7 @@ import { lazy, Suspense, ReactNode } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ModuleErrorBoundary } from "@/components/ModuleErrorBoundary";
-import { MedianProvider } from "@/contexts/MedianContext";
+import { NativelyProvider } from "@/contexts/NativelyContext";
 import { CurrencyProvider } from "@/context/CurrencyContext";
 import { PageLoadingSkeleton } from "@/components/PageLoadingSkeleton";
 import { RoutePageViewTracker } from "@/components/RoutePageViewTracker";
@@ -133,7 +133,7 @@ const App = () => (
     <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <CurrencyProvider>
-      <MedianProvider>
+      <NativelyProvider>
         <TooltipProvider>
             <Toaster />
             <Sonner />
@@ -247,7 +247,7 @@ const App = () => (
           </Suspense>
         </BrowserRouter>
         </TooltipProvider>
-      </MedianProvider>
+      </NativelyProvider>
       </CurrencyProvider>
     </QueryClientProvider>
     </HelmetProvider>

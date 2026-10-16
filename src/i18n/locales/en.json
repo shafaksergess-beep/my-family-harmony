@@ -2616,5 +2616,15 @@
     "reminder": "Meeting Reminder",
     "newAssistance": "New Assistance Event",
     "newAssistanceBody": "A new assistance event has been created"
+  },
+  "accountDeletion": {
+    "title": "Delete account",
+    "summary": "Permanently remove your Kinsroot account and personal profile.",
+    "confirmTitle": "Delete your account permanently?",
+    "warning": "Your sign-in accounts, contact details, messages and uploaded receipts will be removed. Anonymized family membership and financial records remain for accounting; outstanding obligations are not cancelled. This cannot be undone. Sign in again first if your last sign-in was over 15 minutes ago.",
+    "type": "Type DELETE to confirm",
+    "confirm": "Permanently delete",
+    "reauth": "For your security, sign out and sign in again, then return here within 15 minutes.",
+    "failed": "Your account could not be deleted. Please try again or contact support."
   }
 }

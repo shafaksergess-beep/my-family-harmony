@@ -22,6 +22,27 @@
       "when": 1792142917711,
       "tag": "0002_languages_and_translations",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792145667732,
+      "tag": "0003_secure_account_deletion",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792145731592,
+      "tag": "0004_account_deletion_cleanup_trigger",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792145907218,
+      "tag": "0005_account_owned_file_lookup",
+      "breakpoints": true
     }
   ]
 }
