@@ -494,7 +494,7 @@ export default function FamilyAssistance() {
                       )}
                     </div>
                     <div>
-                      <Label htmlFor="amount">{t("famAssistance.totalAmountFcfa")}</Label>
+                      <Label htmlFor="amount">Total Amount (FCFA)</Label>
                       <Input
                         id="amount"
                         type="number"
@@ -515,7 +515,7 @@ export default function FamilyAssistance() {
                   </div>
                   {formData.event_type === 'birth' && (
                     <div>
-                      <Label htmlFor="contribution">{t("famAssistance.contributionPerMemberFcfa")}</Label>
+                      <Label htmlFor="contribution">Contribution Per Member (FCFA)</Label>
                       <Input
                         id="contribution"
                         type="number"
@@ -528,7 +528,7 @@ export default function FamilyAssistance() {
                   )}
                   {(formData.event_type.includes('death') || formData.event_type.includes('external')) && (
                     <div>
-                      <Label htmlFor="beneficiary">{t("famAssistance.beneficiaryNameOptional")}</Label>
+                      <Label htmlFor="beneficiary">Beneficiary Name (optional)</Label>
                       <Input
                         id="beneficiary"
                         value={formData.beneficiary_name}
@@ -546,7 +546,7 @@ export default function FamilyAssistance() {
                   )}
                   {formData.event_type === 'sickness' && (
                     <div>
-                      <Label htmlFor="hospitalization">{t("famAssistance.hospitalizationDaysMin5")}</Label>
+                      <Label htmlFor="hospitalization">Hospitalization Days (min 5)</Label>
                       <Input
                         id="hospitalization"
                         type="number"
@@ -564,7 +564,7 @@ export default function FamilyAssistance() {
                     </div>
                   )}
                   <div>
-                    <Label htmlFor="notes">{t("famAssistance.notesOptional")}</Label>
+                    <Label htmlFor="notes">Notes (optional)</Label>
                     <Textarea
                       id="notes"
                       value={formData.notes}

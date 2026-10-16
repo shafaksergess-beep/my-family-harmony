@@ -402,7 +402,7 @@ export default function Loans() {
                 )}
               </div>
               <div>
-                <Label>{t("famLoans.purposeMin10Characters")}</Label>
+                <Label>Purpose (min 10 characters)</Label>
                 <Input
                   value={newLoan.purpose}
                   onChange={(e) => {
@@ -418,7 +418,7 @@ export default function Loans() {
                 )}
               </div>
               <div>
-                <Label>{t("famLoans.termMonthsMax12")}</Label>
+                <Label>Term (months, max 12)</Label>
                 <Select 
                   value={newLoan.term_months} 
                   onValueChange={(value) => {
@@ -443,7 +443,7 @@ export default function Loans() {
                 )}
               </div>
               <div>
-                <Label>{t("famLoans.notesOptional")}</Label>
+                <Label>Notes (optional)</Label>
                 <Textarea
                   value={newLoan.notes}
                   onChange={(e) => {
@@ -527,7 +527,7 @@ export default function Loans() {
               description={t("famLoans.membersCanRequestLoansUp")}
               primary={{
                 label: t("famLoans.requestALoan"),
-                onClick: () => {t("famLoans.setisdialogopenTrueIcon")} <Plus className="w-4 h-4 mr-2" />,
+                onClick: () => setIsDialogOpen(true), icon: <Plus className="w-4 h-4 mr-2" />,
               }}
               secondary={{
                 label: t("famLoans.readLoanRules"),

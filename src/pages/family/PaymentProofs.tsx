@@ -201,8 +201,8 @@ const PaymentProofs = () => {
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>{Object.entries(CATEGORIES).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent>
                     </Select></div>
-                  <div><Label>{t("famPaymentProofs.amountSentFcfa")}</Label><Input type="number" inputMode="numeric" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></div>
-                  <div><Label>{t("famPaymentProofs.transactionIdOptional")}</Label><Input value={form.reference} maxLength={64} onChange={(e) => setForm({ ...form, reference: e.target.value })} /></div>
+                  <div><Label>Amount sent (FCFA)</Label><Input type="number" inputMode="numeric" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></div>
+                  <div><Label>Transaction ID (optional)</Label><Input value={form.reference} maxLength={64} onChange={(e) => setForm({ ...form, reference: e.target.value })} /></div>
                   <div><Label>{t("famPaymentProofs.receiptImage")}</Label><Input type="file" accept="image/*" capture="environment" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></div>
                 </div>
                 <div><Label>{t("famPaymentProofs.details")}</Label><Textarea maxLength={500} placeholder="e.g. October 2026 contribution" value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} /></div>
@@ -249,7 +249,7 @@ const PaymentProofs = () => {
                 {open.duplicate_of && <p className="rounded bg-destructive/10 p-2 text-destructive">{t("famPaymentProofs.possibleDuplicateThisTransactionId")}</p>}
                 {open.amount_mismatch && <p className="rounded bg-destructive/10 p-2 text-destructive">{t("famPaymentProofs.amountOnReceiptDoesNot")}</p>}
                 <table className="w-full">
-                  <thead><tr className="text-left text-muted-foreground"><th>{t("famPaymentProofs.field")}</th><th>{t("famPaymentProofs.memberSays")}</th><th>{t("famPaymentProofs.receiptAi")}</th></tr></thead>
+                  <thead><tr className="text-left text-muted-foreground"><th>{t("famPaymentProofs.field")}</th><th>{t("famPaymentProofs.memberSays")}</th><th>Receipt (AI)</th></tr></thead>
                   <tbody>
                     <tr><td>{t("famPaymentProofs.amount")}</td><td>{Number(open.claimed_amount).toLocaleString()}</td><td className={open.amount_mismatch ? "text-destructive font-semibold" : ""}>{String(ex.amount ?? "—")}</td></tr>
                     <tr><td>{t("famPaymentProofs.provider")}</td><td>{open.provider.toUpperCase()}</td><td>{String(ex.provider ?? "—")}</td></tr>
@@ -266,7 +266,7 @@ const PaymentProofs = () => {
                 {isReviewer && open.submitted_by !== userId && ["pending", "partially_approved"].includes(open.status) && (
                   <div className="space-y-2 border-t pt-3">
                     {open.requires_dual_review && <p className="text-muted-foreground">{open.status === "pending" ? "Requires 2 approvals — yours will be the first." : open.first_reviewer === userId ? "You gave the first approval; another reviewer must confirm." : "Your approval will finalize this payment."}</p>}
-                    <Textarea placeholder={t("famPaymentProofs.notesRequiredToReject")} value={notes} onChange={(e) => setNotes(e.target.value)} />
+                    <Textarea placeholder=Notes (required to reject) value={notes} onChange={(e) => setNotes(e.target.value)} />
                     <div className="flex flex-wrap gap-2">
                       <Button disabled={busy || open.first_reviewer === userId} onClick={() => review("approve")}>{t("famPaymentProofs.approve")}</Button>
                       <Button variant="destructive" disabled={busy} onClick={() => review("reject")}>{t("famPaymentProofs.reject")}</Button>

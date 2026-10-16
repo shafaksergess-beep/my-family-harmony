@@ -592,7 +592,7 @@ export default function Contributions() {
                         )}
                       </div>
                       <div>
-                        <Label>{t("famContributions.notesOptional")}</Label>
+                        <Label>Notes (optional)</Label>
                         <Textarea
                           maxLength={500}
                           value={newContribution.notes}
@@ -660,7 +660,7 @@ export default function Contributions() {
                 description={t("famContributions.startTrackingYourFamilyS")}
                 primary={canManageFinances ? {
                   label: t("famContributions.recordFirstContribution"),
-                  onClick: () => {t("famContributions.setisdialogopenTrueIcon")} <Plus className="w-4 h-4 mr-2" />,
+                  onClick: () => setIsDialogOpen(true), icon: <Plus className="w-4 h-4 mr-2" />,
                 } : undefined}
                 secondary={{
                   label: t("famContributions.setMonthlyAmount"),

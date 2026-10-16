@@ -407,7 +407,7 @@ export default function FamilyShares() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="share_value">{t("famShares.shareValuePerShare")}</Label>
+                      <Label htmlFor="share_value">Share Value (per share)</Label>
                       <Input
                         id="share_value"
                         type="number"
@@ -419,7 +419,7 @@ export default function FamilyShares() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="notes">{t("famShares.notesOptional")}</Label>
+                      <Label htmlFor="notes">Notes (optional)</Label>
                       <Textarea
                         id="notes"
                         value={shareFormData.notes}
@@ -524,7 +524,7 @@ export default function FamilyShares() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="period_quarter">{t("famShares.quarterOptional")}</Label>
+                        <Label htmlFor="period_quarter">Quarter (optional)</Label>
                         <Select
                           value={dividendFormData.period_quarter}
                           onValueChange={(value) => setDividendFormData({ ...dividendFormData, period_quarter: value })}
@@ -566,7 +566,7 @@ export default function FamilyShares() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="dividend_notes">{t("famShares.notesOptional")}</Label>
+                      <Label htmlFor="dividend_notes">Notes (optional)</Label>
                       <Textarea
                         id="dividend_notes"
                         value={dividendFormData.notes}

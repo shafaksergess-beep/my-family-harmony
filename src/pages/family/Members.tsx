@@ -505,7 +505,7 @@ const Members = () => {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>{t("famMembers.houseNameOptional")}</Label>
+              <Label>House Name (optional)</Label>
               <Input
                 value={addForm.house_name}
                 onChange={e => setAddForm(f => ({ ...f, house_name: e.target.value }))}

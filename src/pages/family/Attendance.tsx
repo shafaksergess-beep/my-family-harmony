@@ -373,7 +373,7 @@ export default function Attendance() {
                             <Label>{t("famAttendance.markAsExcused")}</Label>
                             <Textarea
                               id={`excuse-${member.id}`}
-                              placeholder={t("famAttendance.reasonForExcuseSicknessTravel")}
+                              placeholder=Reason for excuse (sickness, travel, etc.)
                             />
                             <Button
                               onClick={() => {

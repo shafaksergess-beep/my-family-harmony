@@ -361,7 +361,7 @@ export default function FamilyNjangi() {
             <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-3xl font-bold">{t("famNjangi.njangiRotatingSavings")}</h1>
+            <h1 className="text-3xl font-bold">Njangi (Rotating Savings)</h1>
           </div>
           <div className="flex gap-2 items-center">
             <LanguageSwitcher />
@@ -428,7 +428,7 @@ export default function FamilyNjangi() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="notes">{t("famNjangi.notesOptional")}</Label>
+                    <Label htmlFor="notes">Notes (optional)</Label>
                     <Textarea
                       id="notes"
                       value={cycleFormData.notes}

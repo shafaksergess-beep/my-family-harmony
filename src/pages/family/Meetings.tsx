@@ -91,7 +91,7 @@ const FamilyMeetings = () => {
   // Separate upcoming and past meetings
   const today = new Date().toISOString().split('T')[0];
   const upcomingMeetings = meetings.filter(m => m.meeting_date >= today);
-  const pastMeetings = meetings.filter(m => {t("famMeetings.mMeetingDate")} < today).slice(0, 10);
+  const pastMeetings = meetings.filter(m => m.meeting_date < today).slice(0, 10);
 
   // Meeting Card component
   const MeetingCard = ({ meeting, isPast = false }: { meeting: Meeting; isPast?: boolean }) => (
@@ -427,7 +427,7 @@ const FamilyMeetings = () => {
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="bulk-location">{t("famMeetings.locationOptional")}</Label>
+                        <Label htmlFor="bulk-location">Location (optional)</Label>
                         <Input
                           id="bulk-location"
                           value={bulkFormData.location}
@@ -519,7 +519,7 @@ const FamilyMeetings = () => {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="location">{t("famMeetings.locationOptional")}</Label>
+                    <Label htmlFor="location">Location (optional)</Label>
                     <Input
                       id="location"
                       value={formData.location}
@@ -536,7 +536,7 @@ const FamilyMeetings = () => {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="host">{t("famMeetings.hostHouseOptional")}</Label>
+                    <Label htmlFor="host">Host House (optional)</Label>
                     <Input
                       id="host"
                       value={formData.host_house}
@@ -553,7 +553,7 @@ const FamilyMeetings = () => {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="agenda">{t("famMeetings.agendaOptional")}</Label>
+                    <Label htmlFor="agenda">Agenda (optional)</Label>
                     <Textarea
                       id="agenda"
                       value={formData.agenda}
@@ -593,11 +593,11 @@ const FamilyMeetings = () => {
             description={t("famMeetings.bringYourFamilyTogetherSchedule")}
             primary={canScheduleMeetings ? {
               label: t("famMeetings.scheduleFirstMeeting"),
-              onClick: () => {t("famMeetings.setisdialogopenTrueIcon")} <Plus className="w-4 h-4 mr-2" />,
+              onClick: () => setIsDialogOpen(true), icon: <Plus className="w-4 h-4 mr-2" />,
             } : undefined}
             secondary={canScheduleMeetings ? {
               label: t("famMeetings.scheduleAFullYear"),
-              onClick: () => {t("famMeetings.setisbulkdialogopenTrueIcon")} <CalendarRange className="w-4 h-4 mr-2" />,
+              onClick: () => setIsBulkDialogOpen(true), icon: <CalendarRange className="w-4 h-4 mr-2" />,
             } : undefined}
           />
         ) : (
