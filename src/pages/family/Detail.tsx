@@ -306,6 +306,7 @@ const FamilyDetail = () => {
         {family && canManageInvitations && (
           <>
             <FamilyHealthWidget familyId={family.id} />
+            <FamilyLanguageCard familyId={family.id} current={family.primary_language} />
             <div className="flex justify-end">
               <Button
                 variant={pendingApprovalsCount > 0 ? "default" : "outline"}

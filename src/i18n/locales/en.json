@@ -94,7 +94,31 @@
     "saveFailed": "Failed to save",
     "deleteFailed": "Failed to delete",
     "addMemberFailed": "Failed to add member",
-    "removeMemberFailed": "Failed to remove member"
+    "removeMemberFailed": "Failed to remove member",
+    "languages": {
+      "title": "Languages",
+      "subtitle": "Add languages and translate the app. Missing text shows in English.",
+      "add": "Add language",
+      "code": "Code",
+      "codeHint": "Short code, e.g. dua, ewo, ff, pcm",
+      "name": "Name",
+      "nativeName": "Name in that language",
+      "active": "Active",
+      "builtin": "Built-in",
+      "translate": "Translate",
+      "progress": "{{done}} of {{total}} translated",
+      "search": "Search text…",
+      "export": "Export file",
+      "import": "Import file",
+      "saved": "Saved",
+      "added": "Language added",
+      "deleted": "Language removed",
+      "confirmDelete": "Remove this language and its translations?",
+      "english": "English",
+      "translation": "Translation",
+      "imported": "{{count}} translations imported",
+      "onlyMissing": "Only untranslated"
+    }
   },
   "roles": {
     "member": "Member",
@@ -127,7 +151,10 @@
     "assistance": "Assistance",
     "assistanceDesc": "Track birth, death, and sickness events",
     "shares": "Shares & Dividends",
-    "sharesDesc": "Manage shares and dividend distributions"
+    "sharesDesc": "Manage shares and dividend distributions",
+    "languageTitle": "Family language",
+    "languageDesc": "The default language members see. Each person can still choose their own.",
+    "languageSaved": "Family language updated"
   },
   "contributions": {
     "title": "Contributions",

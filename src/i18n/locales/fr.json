@@ -94,7 +94,31 @@
     "saveFailed": "Échec de l'enregistrement",
     "deleteFailed": "Échec de la suppression",
     "addMemberFailed": "Échec de l'ajout du membre",
-    "removeMemberFailed": "Échec de la suppression du membre"
+    "removeMemberFailed": "Échec de la suppression du membre",
+    "languages": {
+      "title": "Langues",
+      "subtitle": "Ajoutez des langues et traduisez l’application. Les textes manquants s’affichent en anglais.",
+      "add": "Ajouter une langue",
+      "code": "Code",
+      "codeHint": "Code court, ex. dua, ewo, ff, pcm",
+      "name": "Nom",
+      "nativeName": "Nom dans cette langue",
+      "active": "Active",
+      "builtin": "Intégrée",
+      "translate": "Traduire",
+      "progress": "{{done}} sur {{total}} traduits",
+      "search": "Rechercher un texte…",
+      "export": "Exporter le fichier",
+      "import": "Importer un fichier",
+      "saved": "Enregistré",
+      "added": "Langue ajoutée",
+      "deleted": "Langue supprimée",
+      "confirmDelete": "Supprimer cette langue et ses traductions ?",
+      "english": "Anglais",
+      "translation": "Traduction",
+      "imported": "{{count}} traductions importées",
+      "onlyMissing": "Non traduits uniquement"
+    }
   },
   "roles": {
     "member": "Membre",
@@ -127,7 +151,10 @@
     "assistance": "Assistance",
     "assistanceDesc": "Suivre les naissances, décès et maladies",
     "shares": "Actions & Dividendes",
-    "sharesDesc": "Gérer les actions et distributions de dividendes"
+    "sharesDesc": "Gérer les actions et distributions de dividendes",
+    "languageTitle": "Langue de la famille",
+    "languageDesc": "La langue par défaut des membres. Chacun peut toujours choisir la sienne.",
+    "languageSaved": "Langue de la famille mise à jour"
   },
   "contributions": {
     "title": "Contributions",
