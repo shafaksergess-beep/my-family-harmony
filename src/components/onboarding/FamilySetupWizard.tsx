@@ -58,6 +58,7 @@ interface FamilySetupWizardProps {
 }
 
 export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWizardProps) {
+  const languages = useLanguages();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
