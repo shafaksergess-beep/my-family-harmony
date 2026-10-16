@@ -115,7 +115,8 @@ interface BuiltMessage {
   body: string;
   link: string;
   prefField: keyof PrefRow; // which user preference to check
-  recipients: "family" | "leaders" | "member"; // who gets it
+  recipients: "family" | "leaders" | "member" | "finance"; // who gets it
+  email?: boolean;
   critical: boolean; // SMS fallback eligible
 }
 
@@ -224,6 +225,46 @@ async function build(payload: Payload, admin: ReturnType<typeof createClient>): 
         recipients: "leaders",
         critical: false,
       };
+    case "payment_proof_submitted":
+      return {
+        title: `🧾 Payment proof to review — ${familyName}`,
+        body: `${String(payload.provider ?? "").toUpperCase()} payment of ${payload.amount ?? ""} FCFA (${payload.category ?? ""}) awaits verification.`,
+        link: `${familyBase}/payment-proofs`,
+        prefField: "payment_reminders",
+        recipients: "finance",
+        critical: false,
+        email: true,
+      };
+    case "payment_proof_partially_approved":
+      return {
+        title: `🔐 Second approval needed`,
+        body: `A ${payload.amount ?? ""} FCFA payment received its first approval and needs a second reviewer.`,
+        link: `${familyBase}/payment-proofs`,
+        prefField: "payment_reminders",
+        recipients: "finance",
+        critical: false,
+        email: true,
+      };
+    case "payment_proof_approved":
+      return {
+        title: `✅ Payment confirmed`,
+        body: `Your payment of ${payload.amount ?? ""} FCFA has been verified and recorded.`,
+        link: `${familyBase}/payment-proofs`,
+        prefField: "payment_reminders",
+        recipients: "member",
+        critical: false,
+        email: true,
+      };
+    case "payment_proof_rejected":
+      return {
+        title: `❌ Payment proof rejected`,
+        body: `Your payment proof of ${payload.amount ?? ""} FCFA was rejected: ${payload.reason ?? ""}`,
+        link: `${familyBase}/payment-proofs`,
+        prefField: "payment_reminders",
+        recipients: "member",
+        critical: true,
+        email: true,
+      };
     default:
       return null;
   }
@@ -243,6 +284,25 @@ async function recipientUserIds(
       .eq("id", payload.member_id)
       .maybeSingle();
     return data?.user_id ? [String(data.user_id)] : [];
+  }
+  if (scope === "finance") {
+    const { data } = await admin
+      .from("family_members")
+      .select("id, user_id, role")
+      .eq("family_id", payload.family_id);
+    const ids = new Set<string>();
+    const all = data ?? [];
+    for (const r of all) if (["family_head", "family_admin", "treasurer"].includes(String(r.role))) ids.add(String(r.user_id));
+    const { data: extra } = await admin
+      .from("member_roles")
+      .select("member_id, role")
+      .in("member_id", all.map((r) => r.id))
+      .in("role", ["family_head", "family_admin", "treasurer"]);
+    for (const e of extra ?? []) {
+      const m = all.find((r) => r.id === e.member_id);
+      if (m) ids.add(String(m.user_id));
+    }
+    return [...ids];
   }
   if (scope === "leaders") {
     const { data } = await admin
@@ -292,7 +352,7 @@ Deno.serve(async (req) => {
     }
 
     const [{ data: profiles }, { data: prefs }] = await Promise.all([
-      admin.from("profiles").select("id, push_token, phone").in("id", userIds),
+      admin.from("profiles").select("id, push_token, phone, email").in("id", userIds),
       admin
         .from("notification_preferences")
         .select("user_id, push_enabled, sms_enabled, email_enabled, loan_updates, assistance_notifications, fines, meeting_reminders, attendance_deadlines, announcements, payment_reminders")
