@@ -367,6 +367,30 @@ Deno.serve(async (req) => {
       (profiles ?? []).map((p) => [String(p.id), { push_token: p.push_token, phone: p.phone }])
     );
 
+    // 0) Email (payment proof events)
+    const resendKey = Deno.env.get("RESEND_API_KEY");
+    if (msg.email && resendKey) {
+      const appUrl = "https://kinsroot.softserge.com";
+      for (const p of profiles ?? []) {
+        const pref = prefMap.get(String(p.id));
+        if (!p.email || pref?.email_enabled === false) continue;
+        try {
+          await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+              from: "Kinsroot <onboarding@resend.dev>",
+              to: [p.email],
+              subject: msg.title,
+              html: `<div style="font-family:sans-serif"><h2 style="color:#1f4d2b">${msg.title}</h2><p>${msg.body}</p><p><a href="${appUrl}${msg.link}" style="background:#1f4d2b;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none">Open Kinsroot</a></p></div>`,
+            }),
+          });
+        } catch (e) {
+          console.warn("[email] failed", e);
+        }
+      }
+    }
+
     // 1) Inbox rows for everyone (always) — capture inserted ids for delivery tracking
     const inboxRows = userIds.map((uid) => ({
       user_id: uid,
