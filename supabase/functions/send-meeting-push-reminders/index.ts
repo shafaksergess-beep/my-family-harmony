@@ -329,7 +329,7 @@ Deno.serve(async (req) => {
             fcm_status: status,
           });
           if (delivered) {
-            if (job.type === "meeting_reminder_1d") pushedReminder++;
+            if (job.type.startsWith("meeting_reminder")) pushedReminder++;
             else pushedDeadline++;
           } else {
             failed++;
