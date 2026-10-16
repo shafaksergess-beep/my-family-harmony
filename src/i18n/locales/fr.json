@@ -2603,6 +2603,7 @@
     "You_gave_the_first_approval_another_reviewer_must_": "Vous avez donné la première validation ; un autre vérificateur doit confirmer.",
     "Your_approval_will_finalize_this_payment": "Votre validation finalisera ce paiement.",
     "Notes_required_to_reject": "Notes (obligatoires pour rejeter)",
-    "Rejected": "Rejeté :"
+    "Rejected": "Rejeté :",
+    "Requires_2_approvals_yours_will_be_the_first": "Nécessite 2 validations — la vôtre sera la première."
   }
 }

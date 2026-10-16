@@ -265,7 +265,7 @@ const PaymentProofs = () => {
                 <p className="text-xs text-muted-foreground">{t("famPaymentProofs.aiReadsTheScreenshotOnly")}</p>
                 {isReviewer && open.submitted_by !== userId && ["pending", "partially_approved"].includes(open.status) && (
                   <div className="space-y-2 border-t pt-3">
-                    {open.requires_dual_review && <p className="text-muted-foreground">{open.status === "pending" ? "Requires 2 approvals — yours will be the first." : open.first_reviewer === userId ? t("mtgUi.You_gave_the_first_approval_another_reviewer_must_") : t("mtgUi.Your_approval_will_finalize_this_payment")}</p>}
+                    {open.requires_dual_review && <p className="text-muted-foreground">{open.status === "pending" ? t("mtgUi.Requires_2_approvals_yours_will_be_the_first") : open.first_reviewer === userId ? t("mtgUi.You_gave_the_first_approval_another_reviewer_must_") : t("mtgUi.Your_approval_will_finalize_this_payment")}</p>}
                     <Textarea placeholder={t("mtgUi.Notes_required_to_reject")} value={notes} onChange={(e) => setNotes(e.target.value)} />
                     <div className="flex flex-wrap gap-2">
                       <Button disabled={busy || open.first_reviewer === userId} onClick={() => review("approve")}>{t("famPaymentProofs.approve")}</Button>

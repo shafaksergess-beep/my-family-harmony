@@ -2603,6 +2603,7 @@
     "You_gave_the_first_approval_another_reviewer_must_": "You gave the first approval; another reviewer must confirm.",
     "Your_approval_will_finalize_this_payment": "Your approval will finalize this payment.",
     "Notes_required_to_reject": "Notes (required to reject)",
-    "Rejected": "Rejected:"
+    "Rejected": "Rejected:",
+    "Requires_2_approvals_yours_will_be_the_first": "Requires 2 approvals — yours will be the first."
   }
 }
