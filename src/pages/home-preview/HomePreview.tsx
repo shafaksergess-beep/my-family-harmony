@@ -118,6 +118,7 @@ export default function HomePreview() {
   return (
     <div className="hp-root min-h-screen scroll-smooth">
       <SEO title="Kinsroot — Bring the family together (preview)" description="Design preview of the Kinsroot landing page." />
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Instrument+Sans:wght@400;500;600&display=swap" />
       <style>{`html{scroll-behavior:smooth}@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}`}</style>
 
       {/* Nav */}
