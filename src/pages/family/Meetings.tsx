@@ -220,7 +220,7 @@ const FamilyMeetings = () => {
               type: 'meeting_scheduled',
               title: 'New Meeting Scheduled',
               message: `A ${validationResult.data.meetingType} meeting has been scheduled for ${new Date(validationResult.data.meetingDate).toLocaleDateString()}`,
-              data: { meetingId: newMeeting.id }
+              data: { meetingId: newMeeting.id, meetingType: validationResult.data.meetingType, meetingDate: validationResult.data.meetingDate }
             }
           });
         } catch (notifError) {

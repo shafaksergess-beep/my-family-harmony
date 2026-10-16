@@ -2605,5 +2605,16 @@
     "Notes_required_to_reject": "Notes (obligatoires pour rejeter)",
     "Rejected": "Rejeté :",
     "Requires_2_approvals_yours_will_be_the_first": "Nécessite 2 validations — la vôtre sera la première."
+  },
+  "notifRt": {
+    "newContribution": "Nouvelle cotisation",
+    "newContributionBody": "Une nouvelle cotisation a été enregistrée",
+    "newLoan": "Nouvelle demande de prêt",
+    "newLoanBody": "Une nouvelle demande de prêt a été soumise",
+    "newMeeting": "Nouvelle réunion programmée",
+    "newMeetingBody": "Une nouvelle réunion de famille a été programmée",
+    "reminder": "Rappel de réunion",
+    "newAssistance": "Nouvel événement d'assistance",
+    "newAssistanceBody": "Un nouvel événement d'assistance a été créé"
   }
 }

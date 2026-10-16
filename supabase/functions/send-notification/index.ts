@@ -126,63 +126,51 @@ const handler = async (req: Request): Promise<Response> => {
         throw new Error("Failed to fetch family details");
       }
 
-      // Fetch all family members with their profiles (including phone)
+      const { data: famLang } = await supabaseClient.from("families").select("primary_language").eq("id", familyId).maybeSingle();
       const { data: members, error: membersError } = await supabaseClient
         .from("family_members")
-        .select("*, profiles:user_id(email, full_name, phone)")
+        .select("*, profiles:user_id(email, full_name, phone, preferred_language)")
         .eq("family_id", familyId);
+      if (membersError) throw new Error("Failed to fetch family members");
 
-      if (membersError) {
-        console.error("Error fetching members:", membersError);
-        throw new Error("Failed to fetch family members");
-      }
+      const TYPE_FR: Record<string, string> = { regular: "ordinaire", annual: "annuelle", emergency: "d'urgence", special: "spéciale" };
+      const mType = String((data as any)?.meetingType ?? "");
+      const mDate = (data as any)?.meetingDate ? new Date((data as any).meetingDate) : null;
+      const text = (lang: string) => {
+        const fr = lang.startsWith("fr");
+        const d = mDate ? mDate.toLocaleDateString(fr ? "fr-FR" : "en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" }) : "";
+        return fr
+          ? { title: "Nouvelle réunion programmée", msg: mDate ? `Une réunion ${TYPE_FR[mType] ?? mType} a été programmée pour le ${d}.` : "Une nouvelle réunion a été programmée pour votre famille.", hello: "Bonjour", check: "Consultez l'application Kinsroot pour tous les détails.", rights: "Tous droits réservés.", member: "Membre de la famille" }
+          : { title: title || "New Meeting Scheduled", msg: mDate ? `A ${mType} meeting has been scheduled for ${d}.` : (message || "A new meeting has been scheduled for your family."), hello: "Hello", check: "Please check the Kinsroot app for full meeting details.", rights: "All rights reserved.", member: "Family Member" };
+      };
 
       const emailRecipients = members
         .filter((m: any) => m.profiles?.email)
         .map((m: any) => ({
           email: m.profiles.email,
-          name: m.profiles.full_name || "Family Member",
+          name: m.profiles.full_name || "",
           phone: m.profiles.phone || null,
+          lang: String(m.profiles.preferred_language || famLang?.primary_language || "en"),
         }));
 
-      // Send emails
-      const emailPromises = emailRecipients.map((recipient: any) =>
-        resend.emails.send({
-          from: "Family Together <onboarding@resend.dev>",
-          to: [recipient.email],
-          subject: title || "New Meeting Scheduled",
-          html: `
-            <!DOCTYPE html>
-            <html>
-              <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-              <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-                  <img src="https://31382291-0546-4a70-a015-b86eb65a55a3.lovableproject.com/logo.jpg" alt="Family Together" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 16px; border: 3px solid rgba(255,255,255,0.3);" />
-                  <h1 style="margin: 0;">New Meeting Scheduled</h1>
-                  <p style="margin: 10px 0 0 0; opacity: 0.9;">${family.name}</p>
-                </div>
-                <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
-                  <p>Hello ${recipient.name},</p>
-                  <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea;">
-                    <p style="margin: 0;">${message || "A new meeting has been scheduled for your family."}</p>
-                  </div>
-                  <p style="color: #666; font-size: 14px; margin-top: 20px;">Please check the app for full meeting details.</p>
-                </div>
-                <div style="text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
-                  <p>© ${new Date().getFullYear()} Family Together. All rights reserved.</p>
-                </div>
-              </body>
-            </html>
-          `,
-        })
-      );
+      const emailPromises = emailRecipients.map((r: any) => {
+        const tx = text(r.lang);
+        return resend.emails.send({
+          from: "Kinsroot <onboarding@resend.dev>",
+          to: [r.email],
+          subject: tx.title,
+          html: `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+            <div style="background:#1f4d2b;color:#fff;padding:30px;border-radius:10px 10px 0 0;text-align:center;"><h1 style="margin:0;">${tx.title}</h1><p style="margin:10px 0 0;opacity:.9;">${family.name}</p></div>
+            <div style="background:#f9f6ef;padding:30px;border-radius:0 0 10px 10px;"><p>${tx.hello} ${r.name || tx.member},</p>
+            <div style="background:#fff;padding:20px;border-radius:8px;margin:20px 0;border-left:4px solid #b5653c;"><p style="margin:0;">${tx.msg}</p></div>
+            <p style="color:#666;font-size:14px;">${tx.check}</p></div>
+            <p style="text-align:center;color:#666;font-size:12px;">© ${new Date().getFullYear()} Kinsroot. ${tx.rights}</p></body></html>`,
+        });
+      });
 
-      // Send WhatsApp messages to members with phone numbers
-      const whatsappMessage = `📅 *${family.name} - New Meeting Scheduled*\n\n${message || "A new meeting has been scheduled."}\n\nPlease check the Family Together app for details.`;
-      
       const whatsappPromises = emailRecipients
         .filter((r: any) => r.phone)
-        .map((r: any) => sendWhatsAppMessage(r.phone, whatsappMessage));
+        .map((r: any) => { const tx = text(r.lang); return sendWhatsAppMessage(r.phone, `📅 *${family.name} - ${tx.title}*\n\n${tx.msg}\n\n${tx.check}`); });
 
       const [emailResults, whatsappResults] = await Promise.all([
         Promise.allSettled(emailPromises),
