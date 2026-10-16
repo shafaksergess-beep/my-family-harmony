@@ -8,5 +8,5 @@
 - [x] Translate batch 1 rest: sign-in, sign-up, password reset, onboarding, install
 - [x] Translate batch 2: dashboard, profile, navigation, notifications
 - [x] Translate batch 3: family money & meetings pages
-- [ ] Translate batch 4: reports, analytics, settings, calendar, chat
+- [x] Translate batch 4: reports, analytics, settings, calendar, chat
 - [ ] Translate batch 5: super admin panel

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,6 +39,7 @@ interface Member {
 }
 
 export default function PaymentPlans() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -126,7 +128,7 @@ export default function PaymentPlans() {
       }
     } catch (error) {
       console.error("Error loading data:", error);
-      toast.error("Failed to load payment plans");
+      toast.error(t("famPaymentPlans.failedToLoadPaymentPlans"));
     } finally {
       setLoading(false);
     }
@@ -161,7 +163,7 @@ export default function PaymentPlans() {
 
       if (error) throw error;
 
-      toast.success("Payment plan created successfully");
+      toast.success(t("famPaymentPlans.paymentPlanCreatedSuccessfully"));
       setDialogOpen(false);
       setFormData({
         member_id: "",
@@ -174,7 +176,7 @@ export default function PaymentPlans() {
       loadData();
     } catch (error) {
       console.error("Error creating plan:", error);
-      toast.error("Failed to create payment plan");
+      toast.error(t("famPaymentPlans.failedToCreatePaymentPlan"));
     }
   };
 
@@ -194,11 +196,11 @@ export default function PaymentPlans() {
 
       if (error) throw error;
 
-      toast.success("Payment recorded successfully");
+      toast.success(t("famPaymentPlans.paymentRecordedSuccessfully"));
       loadData();
     } catch (error) {
       console.error("Error recording payment:", error);
-      toast.error("Failed to record payment");
+      toast.error(t("famPaymentPlans.failedToRecordPayment"));
     }
   };
 
@@ -230,8 +232,8 @@ export default function PaymentPlans() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Payment Plans</h1>
-            <p className="text-muted-foreground">Manage installment payment schedules</p>
+            <h1 className="text-3xl font-bold">{t("famPaymentPlans.paymentPlans")}</h1>
+            <p className="text-muted-foreground">{t("famPaymentPlans.manageInstallmentPaymentSchedules")}</p>
           </div>
         </div>
 
@@ -239,21 +241,21 @@ export default function PaymentPlans() {
           <DialogTrigger asChild>
             <Button>
               <Plus className="h-4 w-4 mr-2" />
-              Create Plan
+              {t("famPaymentPlans.createPlan")}
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <form onSubmit={handleCreatePlan}>
               <DialogHeader>
-                <DialogTitle>Create Payment Plan</DialogTitle>
-                <DialogDescription>Set up an installment payment schedule for a member</DialogDescription>
+                <DialogTitle>{t("famPaymentPlans.createPaymentPlan")}</DialogTitle>
+                <DialogDescription>{t("famPaymentPlans.setUpAnInstallmentPayment")}</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="member">Member</Label>
+                  <Label htmlFor="member">{t("famPaymentPlans.member")}</Label>
                   <Select value={formData.member_id} onValueChange={(value) => setFormData({ ...formData, member_id: value })} required>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select member" />
+                      <SelectValue placeholder={t("famPaymentPlans.selectMember")} />
                     </SelectTrigger>
                     <SelectContent>
                       {members.map((member) => (
@@ -288,21 +290,21 @@ export default function PaymentPlans() {
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="frequency">Payment Frequency</Label>
+                  <Label htmlFor="frequency">{t("famPaymentPlans.paymentFrequency")}</Label>
                   <Select value={formData.frequency} onValueChange={(value) => setFormData({ ...formData, frequency: value })}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="weekly">Weekly</SelectItem>
-                      <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
-                      <SelectItem value="monthly">Monthly</SelectItem>
+                      <SelectItem value="weekly">{t("famPaymentPlans.weekly")}</SelectItem>
+                      <SelectItem value="bi-weekly">{t("famPaymentPlans.biWeekly")}</SelectItem>
+                      <SelectItem value="monthly">{t("famPaymentPlans.monthly")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="start_date">Start Date</Label>
+                  <Label htmlFor="start_date">{t("famPaymentPlans.startDate")}</Label>
                   <Input
                     id="start_date"
                     type="date"
@@ -318,12 +320,12 @@ export default function PaymentPlans() {
                     id="notes"
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    placeholder="Additional information..."
+                    placeholder={t("famPaymentPlans.additionalInformation")}
                   />
                 </div>
               </div>
               <DialogFooter>
-                <Button type="submit">Create Payment Plan</Button>
+                <Button type="submit">{t("famPaymentPlans.createPaymentPlan")}</Button>
               </DialogFooter>
             </form>
           </DialogContent>
@@ -336,7 +338,7 @@ export default function PaymentPlans() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-10">
               <DollarSign className="h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No payment plans yet</p>
+              <p className="text-muted-foreground">{t("famPaymentPlans.noPaymentPlansYet")}</p>
             </CardContent>
           </Card>
         ) : (
@@ -379,20 +381,20 @@ export default function PaymentPlans() {
                   {/* Details */}
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-muted-foreground">Installment Amount</p>
+                      <p className="text-muted-foreground">{t("famPaymentPlans.installmentAmount")}</p>
                       <p className="font-semibold">{formatCurrency(Number(plan.installment_amount))}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Remaining</p>
+                      <p className="text-muted-foreground">{t("famPaymentPlans.remaining")}</p>
                       <p className="font-semibold">{formatCurrency(remaining)}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Installments Left</p>
+                      <p className="text-muted-foreground">{t("famPaymentPlans.installmentsLeft")}</p>
                       <p className="font-semibold">{installmentsRemaining}</p>
                     </div>
                     {plan.end_date && (
                       <div>
-                        <p className="text-muted-foreground">Completed On</p>
+                        <p className="text-muted-foreground">{t("famPaymentPlans.completedOn")}</p>
                         <p className="font-semibold">{new Date(plan.end_date).toLocaleDateString()}</p>
                       </div>
                     )}
@@ -400,7 +402,7 @@ export default function PaymentPlans() {
 
                   {plan.notes && (
                     <div>
-                      <p className="text-sm text-muted-foreground">Notes:</p>
+                      <p className="text-sm text-muted-foreground">{t("famPaymentPlans.notes")}</p>
                       <p className="text-sm mt-1">{plan.notes}</p>
                     </div>
                   )}

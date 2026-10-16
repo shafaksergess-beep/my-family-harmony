@@ -95,8 +95,8 @@ const MemberDetail = () => {
     } catch (error) {
       console.error("Error loading data:", error);
       toast({
-        title: "Error",
-        description: "Failed to load member details",
+        title: t("famMemberDetail.error"),
+        description: t("famMemberDetail.failedToLoadMemberDetails"),
         variant: "destructive",
       });
     } finally {
@@ -115,8 +115,8 @@ const MemberDetail = () => {
     });
 
     toast({
-      title: "Success",
-      description: "Member report exported successfully",
+      title: t("famMemberDetail.success"),
+      description: t("famMemberDetail.memberReportExportedSuccessfully"),
     });
   };
 
@@ -199,7 +199,7 @@ const MemberDetail = () => {
             <div className="flex items-center gap-2">
               <Button variant="outline" onClick={handleExportPDF}>
                 <Download className="w-4 h-4 mr-2" />
-                Export PDF
+                {t("famMemberDetail.exportPdf")}
               </Button>
               <LanguageSwitcher />
             </div>
@@ -212,7 +212,7 @@ const MemberDetail = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Contributions</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famMemberDetail.totalContributions")}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -223,7 +223,7 @@ const MemberDetail = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Loans Outstanding</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famMemberDetail.loansOutstanding")}</CardTitle>
               <CreditCard className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -234,7 +234,7 @@ const MemberDetail = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Savings</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famMemberDetail.totalSavings")}</CardTitle>
               <PiggyBank className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -245,7 +245,7 @@ const MemberDetail = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Attendance Rate</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famMemberDetail.attendanceRate")}</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -258,18 +258,18 @@ const MemberDetail = () => {
         {/* Detailed Tabs */}
         <Tabs defaultValue="contributions">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="contributions">Contributions</TabsTrigger>
-            <TabsTrigger value="loans">Loans</TabsTrigger>
-            <TabsTrigger value="savings">Savings</TabsTrigger>
-            <TabsTrigger value="attendance">Attendance</TabsTrigger>
+            <TabsTrigger value="contributions">{t("famMemberDetail.contributions")}</TabsTrigger>
+            <TabsTrigger value="loans">{t("famMemberDetail.loans")}</TabsTrigger>
+            <TabsTrigger value="savings">{t("famMemberDetail.savings")}</TabsTrigger>
+            <TabsTrigger value="attendance">{t("famMemberDetail.attendance")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="contributions" className="space-y-4">
             {contributions.length === 0 ? (
               <Card className="p-12 text-center">
                 <DollarSign className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-xl font-semibold mb-2">No contributions yet</h3>
-                <p className="text-muted-foreground">This member hasn't made any contributions</p>
+                <h3 className="text-xl font-semibold mb-2">{t("famMemberDetail.noContributionsYet")}</h3>
+                <p className="text-muted-foreground">{t("famMemberDetail.thisMemberHasnTMade")}</p>
               </Card>
             ) : (
               contributions.map((contribution) => (
@@ -301,8 +301,8 @@ const MemberDetail = () => {
             {loans.length === 0 ? (
               <Card className="p-12 text-center">
                 <CreditCard className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-xl font-semibold mb-2">No loans</h3>
-                <p className="text-muted-foreground">This member hasn't taken any loans</p>
+                <h3 className="text-xl font-semibold mb-2">{t("famMemberDetail.noLoans")}</h3>
+                <p className="text-muted-foreground">{t("famMemberDetail.thisMemberHasnTTaken")}</p>
               </Card>
             ) : (
               loans.map((loan) => (
@@ -334,8 +334,8 @@ const MemberDetail = () => {
             {savings.length === 0 ? (
               <Card className="p-12 text-center">
                 <PiggyBank className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-xl font-semibold mb-2">No savings</h3>
-                <p className="text-muted-foreground">This member hasn't made any savings deposits</p>
+                <h3 className="text-xl font-semibold mb-2">{t("famMemberDetail.noSavings")}</h3>
+                <p className="text-muted-foreground">{t("famMemberDetail.thisMemberHasnTMade")}</p>
               </Card>
             ) : (
               savings.map((saving) => (
@@ -359,8 +359,8 @@ const MemberDetail = () => {
             {attendance.length === 0 ? (
               <Card className="p-12 text-center">
                 <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-xl font-semibold mb-2">No attendance records</h3>
-                <p className="text-muted-foreground">No meeting attendance recorded yet</p>
+                <h3 className="text-xl font-semibold mb-2">{t("famMemberDetail.noAttendanceRecords")}</h3>
+                <p className="text-muted-foreground">{t("famMemberDetail.noMeetingAttendanceRecordedYet")}</p>
               </Card>
             ) : (
               attendance.map((record) => (

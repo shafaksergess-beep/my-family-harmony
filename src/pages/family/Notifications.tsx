@@ -140,8 +140,8 @@ const Notifications = () => {
     } catch (error) {
       console.error("Error loading data:", error);
       toast({
-        title: "Error",
-        description: "Failed to load notifications",
+        title: t("famNotifications.error"),
+        description: t("famNotifications.failedToLoadNotifications"),
         variant: "destructive",
       });
     } finally {
@@ -213,7 +213,7 @@ const Notifications = () => {
       .eq("user_id", session.user.id)
       .is("read_at", null);
     setNotifications(notifications.map(n => ({ ...n, read: true })));
-    toast({ title: "Success", description: "All notifications marked as read" });
+    toast({ title: t("famNotifications.success"), description: t("famNotifications.allNotificationsMarkedAsRead") });
   };
 
   const handleDeleteNotification = async (id: string) => {
@@ -228,8 +228,8 @@ const Notifications = () => {
   const handleSaveSettings = () => {
     localStorage.setItem(`notification-settings-${family?.id}`, JSON.stringify(settings));
     toast({
-      title: "Success",
-      description: "Notification settings saved",
+      title: t("famNotifications.success"),
+      description: t("famNotifications.notificationSettingsSaved"),
     });
   };
 
@@ -300,7 +300,7 @@ const Notifications = () => {
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="all">All ({notifications.length})</TabsTrigger>
             <TabsTrigger value="unread">Unread ({unreadCount})</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
+            <TabsTrigger value="settings">{t("famNotifications.settings")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="all" className="space-y-4">
@@ -308,7 +308,7 @@ const Notifications = () => {
               <div className="flex justify-end">
                 <Button variant="outline" size="sm" onClick={handleMarkAllAsRead}>
                   <Check className="w-4 h-4 mr-2" />
-                  Mark All as Read
+                  {t("famNotifications.markAllAsRead")}
                 </Button>
               </div>
             )}
@@ -316,8 +316,8 @@ const Notifications = () => {
             {notifications.length === 0 ? (
               <Card className="p-12 text-center">
                 <Bell className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-xl font-semibold mb-2">No notifications</h3>
-                <p className="text-muted-foreground">You're all caught up!</p>
+                <h3 className="text-xl font-semibold mb-2">{t("famNotifications.noNotifications")}</h3>
+                <p className="text-muted-foreground">{t("famNotifications.youReAllCaughtUp")}</p>
               </Card>
             ) : (
               notifications.map((notification) => (
@@ -329,7 +329,7 @@ const Notifications = () => {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <h3 className="font-semibold">{notification.title}</h3>
-                            {!notification.read && <Badge variant="default">New</Badge>}
+                            {!notification.read && <Badge variant="default">{t("famNotifications.new")}</Badge>}
                             <Badge variant="outline" className={getPriorityColor(notification.priority)}>
                               {notification.priority}
                             </Badge>
@@ -371,8 +371,8 @@ const Notifications = () => {
             {notifications.filter(n => !n.read).length === 0 ? (
               <Card className="p-12 text-center">
                 <Check className="w-16 h-16 mx-auto mb-4 text-green-500" />
-                <h3 className="text-xl font-semibold mb-2">All caught up!</h3>
-                <p className="text-muted-foreground">No unread notifications</p>
+                <h3 className="text-xl font-semibold mb-2">{t("famNotifications.allCaughtUp")}</h3>
+                <p className="text-muted-foreground">{t("famNotifications.noUnreadNotifications")}</p>
               </Card>
             ) : (
               notifications.filter(n => !n.read).map((notification) => (
@@ -384,7 +384,7 @@ const Notifications = () => {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <h3 className="font-semibold">{notification.title}</h3>
-                            <Badge variant="default">New</Badge>
+                            <Badge variant="default">{t("famNotifications.new")}</Badge>
                             <Badge variant="outline" className={getPriorityColor(notification.priority)}>
                               {notification.priority}
                             </Badge>
@@ -423,14 +423,14 @@ const Notifications = () => {
           <TabsContent value="settings">
             <Card>
               <CardHeader>
-                <CardTitle>Notification Preferences</CardTitle>
-                <CardDescription>Choose what notifications you want to receive</CardDescription>
+                <CardTitle>{t("famNotifications.notificationPreferences")}</CardTitle>
+                <CardDescription>{t("famNotifications.chooseWhatNotificationsYouWant")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Contribution Notifications</Label>
-                    <p className="text-sm text-muted-foreground">Get notified about contributions</p>
+                    <Label>{t("famNotifications.contributionNotifications")}</Label>
+                    <p className="text-sm text-muted-foreground">{t("famNotifications.getNotifiedAboutContributions")}</p>
                   </div>
                   <Switch
                     checked={settings.contributions}
@@ -440,8 +440,8 @@ const Notifications = () => {
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Loan Notifications</Label>
-                    <p className="text-sm text-muted-foreground">Get notified about loan activities</p>
+                    <Label>{t("famNotifications.loanNotifications")}</Label>
+                    <p className="text-sm text-muted-foreground">{t("famNotifications.getNotifiedAboutLoanActivities")}</p>
                   </div>
                   <Switch
                     checked={settings.loans}
@@ -451,8 +451,8 @@ const Notifications = () => {
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Meeting Notifications</Label>
-                    <p className="text-sm text-muted-foreground">Get notified about upcoming meetings</p>
+                    <Label>{t("famNotifications.meetingNotifications")}</Label>
+                    <p className="text-sm text-muted-foreground">{t("famNotifications.getNotifiedAboutUpcomingMeetings")}</p>
                   </div>
                   <Switch
                     checked={settings.meetings}
@@ -462,8 +462,8 @@ const Notifications = () => {
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Assistance Notifications</Label>
-                    <p className="text-sm text-muted-foreground">Get notified about assistance events</p>
+                    <Label>{t("famNotifications.assistanceNotifications")}</Label>
+                    <p className="text-sm text-muted-foreground">{t("famNotifications.getNotifiedAboutAssistanceEvents")}</p>
                   </div>
                   <Switch
                     checked={settings.assistance}
@@ -473,8 +473,8 @@ const Notifications = () => {
 
                 <div className="flex items-center justify-between pt-4 border-t">
                   <div className="space-y-0.5">
-                    <Label>Email Notifications</Label>
-                    <p className="text-sm text-muted-foreground">Receive notifications via email</p>
+                    <Label>{t("famNotifications.emailNotifications")}</Label>
+                    <p className="text-sm text-muted-foreground">{t("famNotifications.receiveNotificationsViaEmail")}</p>
                   </div>
                   <Switch
                     checked={settings.email}
@@ -484,7 +484,7 @@ const Notifications = () => {
 
                 <div className="flex justify-end pt-4">
                   <Button onClick={handleSaveSettings}>
-                    Save Preferences
+                    {t("famNotifications.savePreferences")}
                   </Button>
                 </div>
               </CardContent>

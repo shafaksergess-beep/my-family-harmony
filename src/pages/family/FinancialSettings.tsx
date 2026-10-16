@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +12,7 @@ import { ArrowLeft, DollarSign, Save } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default function FinancialSettings() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -84,12 +86,12 @@ export default function FinancialSettings() {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Financial settings updated successfully",
+        title: t("famFinancialSettings.success"),
+        description: t("famFinancialSettings.financialSettingsUpdatedSuccessfully"),
       });
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: t("famFinancialSettings.error"),
         description: error.message,
         variant: "destructive",
       });
@@ -99,7 +101,7 @@ export default function FinancialSettings() {
   };
 
   if (authLoading || loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return <div className="flex items-center justify-center min-h-screen">{t("famFinancialSettings.loading")}</div>;
   }
 
   if (!isFamilyHead) {
@@ -107,12 +109,12 @@ export default function FinancialSettings() {
       <div className="min-h-screen bg-background p-6">
         <div className="max-w-2xl mx-auto">
           <Card className="p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4">Access Denied</h2>
+            <h2 className="text-2xl font-bold mb-4">{t("famFinancialSettings.accessDenied")}</h2>
             <p className="text-muted-foreground mb-6">
-              Only the family head can configure financial settings.
+              {t("famFinancialSettings.onlyTheFamilyHeadCan")}
             </p>
             <Button onClick={() => navigate(`/family/${familySlug}`)}>
-              Back to Dashboard
+              {t("famFinancialSettings.backToDashboard")}
             </Button>
           </Card>
         </div>
@@ -129,8 +131,8 @@ export default function FinancialSettings() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-3xl font-bold">Financial Settings</h1>
-              <p className="text-muted-foreground">Configure financial empowerment parameters</p>
+              <h1 className="text-3xl font-bold">{t("famFinancialSettings.financialSettings")}</h1>
+              <p className="text-muted-foreground">{t("famFinancialSettings.configureFinancialEmpowermentParameters")}</p>
             </div>
           </div>
           <LanguageSwitcher />
@@ -141,9 +143,9 @@ export default function FinancialSettings() {
             <div className="flex items-center gap-3 pb-4 border-b">
               <DollarSign className="h-6 w-6 text-primary" />
               <div>
-                <h2 className="text-xl font-semibold">Savings Configuration</h2>
+                <h2 className="text-xl font-semibold">{t("famFinancialSettings.savingsConfiguration")}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Savings are optional but encouraged
+                  {t("famFinancialSettings.savingsAreOptionalButEncouraged")}
                 </p>
               </div>
             </div>
@@ -173,9 +175,9 @@ export default function FinancialSettings() {
             <div className="flex items-center gap-3 pb-4 border-b">
               <DollarSign className="h-6 w-6 text-primary" />
               <div>
-                <h2 className="text-xl font-semibold">Njangi Configuration</h2>
+                <h2 className="text-xl font-semibold">{t("famFinancialSettings.njangiConfiguration")}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Rotating savings scheme settings
+                  {t("famFinancialSettings.rotatingSavingsSchemeSettings")}
                 </p>
               </div>
             </div>
@@ -194,7 +196,7 @@ export default function FinancialSettings() {
                 required
               />
               <p className="text-sm text-muted-foreground">
-                Amount agreed upon by family in general meeting
+                {t("famFinancialSettings.amountAgreedUponByFamily")}
               </p>
             </div>
           </Card>
@@ -203,9 +205,9 @@ export default function FinancialSettings() {
             <div className="flex items-center gap-3 pb-4 border-b">
               <DollarSign className="h-6 w-6 text-primary" />
               <div>
-                <h2 className="text-xl font-semibold">Loan Configuration</h2>
+                <h2 className="text-xl font-semibold">{t("famFinancialSettings.loanConfiguration")}</h2>
                 <p className="text-sm text-muted-foreground">
-                  All loans must be cleared by November
+                  {t("famFinancialSettings.allLoansMustBeCleared")}
                 </p>
               </div>
             </div>
@@ -241,7 +243,7 @@ export default function FinancialSettings() {
                   required
                 />
                 <p className="text-sm text-muted-foreground">
-                  Interest rate applied per month on all loans
+                  {t("famFinancialSettings.interestRateAppliedPerMonth")}
                 </p>
               </div>
             </div>
@@ -251,7 +253,7 @@ export default function FinancialSettings() {
             <div className="flex items-center gap-3 pb-4 border-b">
               <DollarSign className="h-6 w-6 text-primary" />
               <div>
-                <h2 className="text-xl font-semibold">Shares Configuration</h2>
+                <h2 className="text-xl font-semibold">{t("famFinancialSettings.sharesConfiguration")}</h2>
                 <p className="text-sm text-muted-foreground">
                   Issued once yearly (January-March)
                 </p>
@@ -281,9 +283,9 @@ export default function FinancialSettings() {
             <div className="flex items-center gap-3 pb-4 border-b">
               <DollarSign className="h-6 w-6 text-primary" />
               <div>
-                <h2 className="text-xl font-semibold">Assistance Budget Configuration</h2>
+                <h2 className="text-xl font-semibold">{t("famFinancialSettings.assistanceBudgetConfiguration")}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Set default assistance amounts per event type
+                  {t("famFinancialSettings.setDefaultAssistanceAmountsPer")}
                 </p>
               </div>
             </div>
@@ -300,7 +302,7 @@ export default function FinancialSettings() {
                   onChange={(e) => setSettings({ ...settings, birth_assistance_amount: e.target.value })}
                   required
                 />
-                <p className="text-sm text-muted-foreground">Per member contribution</p>
+                <p className="text-sm text-muted-foreground">{t("famFinancialSettings.perMemberContribution")}</p>
               </div>
 
               <div className="space-y-2">
@@ -314,7 +316,7 @@ export default function FinancialSettings() {
                   onChange={(e) => setSettings({ ...settings, sickness_assistance_amount: e.target.value })}
                   required
                 />
-                <p className="text-sm text-muted-foreground">Once per year</p>
+                <p className="text-sm text-muted-foreground">{t("famFinancialSettings.oncePerYear")}</p>
               </div>
 
               <div className="space-y-2">
@@ -381,7 +383,7 @@ export default function FinancialSettings() {
                   onChange={(e) => setSettings({ ...settings, external_wonya_amount: e.target.value })}
                   required
                 />
-                <p className="text-sm text-muted-foreground">Up to max amount</p>
+                <p className="text-sm text-muted-foreground">{t("famFinancialSettings.upToMaxAmount")}</p>
               </div>
 
               <div className="space-y-2">
@@ -395,7 +397,7 @@ export default function FinancialSettings() {
                   onChange={(e) => setSettings({ ...settings, external_other_amount: e.target.value })}
                   required
                 />
-                <p className="text-sm text-muted-foreground">Up to max amount</p>
+                <p className="text-sm text-muted-foreground">{t("famFinancialSettings.upToMaxAmount")}</p>
               </div>
 
               <div className="space-y-2">
@@ -409,7 +411,7 @@ export default function FinancialSettings() {
                   onChange={(e) => setSettings({ ...settings, ceremony_invitation_amount: e.target.value })}
                   required
                 />
-                <p className="text-sm text-muted-foreground">Per member contribution</p>
+                <p className="text-sm text-muted-foreground">{t("famFinancialSettings.perMemberContribution")}</p>
               </div>
             </div>
           </Card>
@@ -421,15 +423,15 @@ export default function FinancialSettings() {
               onClick={() => navigate(`/family/${familySlug}`)}
               className="flex-1"
             >
-              Cancel
+              {t("famFinancialSettings.cancel")}
             </Button>
             <Button type="submit" disabled={saving} className="flex-1">
               {saving ? (
-                <>Saving...</>
+                <>{t("famFinancialSettings.saving")}</>
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-2" />
-                  Save Settings
+                  {t("famFinancialSettings.saveSettings")}
                 </>
               )}
             </Button>

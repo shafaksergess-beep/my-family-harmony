@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,6 +44,7 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
 };
 
 export default function AssistanceReports() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -104,7 +106,7 @@ export default function AssistanceReports() {
 
       setMembers(uniqueMembers);
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("famAssistanceReports.error"), description: error.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -168,13 +170,13 @@ export default function AssistanceReports() {
     a.click();
     URL.revokeObjectURL(url);
 
-    toast({ title: "Success", description: "Report exported to CSV" });
+    toast({ title: t("famAssistanceReports.success"), description: t("famAssistanceReports.reportExportedToCsv") });
   };
 
   const summary = calculateSummary();
 
   if (authLoading || loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return <div className="flex items-center justify-center min-h-screen">{t("famAssistanceReports.loading")}</div>;
   }
 
   if (!canManageFinances) {
@@ -182,12 +184,12 @@ export default function AssistanceReports() {
       <div className="min-h-screen bg-background p-6">
         <div className="max-w-2xl mx-auto">
           <Card className="p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4">Access Denied</h2>
+            <h2 className="text-2xl font-bold mb-4">{t("famAssistanceReports.accessDenied")}</h2>
             <p className="text-muted-foreground mb-6">
-              Only authorized members can view assistance reports.
+              {t("famAssistanceReports.onlyAuthorizedMembersCanView")}
             </p>
             <Button onClick={() => navigate(`/family/${familySlug}`)}>
-              Back to Dashboard
+              {t("famAssistanceReports.backToDashboard")}
             </Button>
           </Card>
         </div>
@@ -204,8 +206,8 @@ export default function AssistanceReports() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-3xl font-bold">Assistance Payout Reports</h1>
-              <p className="text-muted-foreground">Detailed assistance event reports and analysis</p>
+              <h1 className="text-3xl font-bold">{t("famAssistanceReports.assistancePayoutReports")}</h1>
+              <p className="text-muted-foreground">{t("famAssistanceReports.detailedAssistanceEventReportsAnd")}</p>
             </div>
           </div>
           <LanguageSwitcher />
@@ -214,15 +216,15 @@ export default function AssistanceReports() {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="p-6">
-            <div className="text-sm text-muted-foreground">Total Assistance</div>
+            <div className="text-sm text-muted-foreground">{t("famAssistanceReports.totalAssistance")}</div>
             <div className="text-2xl font-bold">{summary.total.toLocaleString()} FCFA</div>
           </Card>
           <Card className="p-6">
-            <div className="text-sm text-muted-foreground">Paid Out</div>
+            <div className="text-sm text-muted-foreground">{t("famAssistanceReports.paidOut")}</div>
             <div className="text-2xl font-bold text-green-600">{summary.paid.toLocaleString()} FCFA</div>
           </Card>
           <Card className="p-6">
-            <div className="text-sm text-muted-foreground">Pending</div>
+            <div className="text-sm text-muted-foreground">{t("famAssistanceReports.pending")}</div>
             <div className="text-2xl font-bold text-amber-600">{summary.pending.toLocaleString()} FCFA</div>
           </Card>
         </div>
@@ -231,13 +233,13 @@ export default function AssistanceReports() {
         <Card className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
             <div className="space-y-2">
-              <Label>Event Type</Label>
+              <Label>{t("famAssistanceReports.eventType")}</Label>
               <Select value={filters.eventType} onValueChange={(value) => setFilters({ ...filters, eventType: value })}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="all">{t("famAssistanceReports.allTypes")}</SelectItem>
                   {Object.entries(EVENT_TYPE_LABELS).map(([key, label]) => (
                     <SelectItem key={key} value={key}>{label}</SelectItem>
                   ))}
@@ -246,27 +248,27 @@ export default function AssistanceReports() {
             </div>
 
             <div className="space-y-2">
-              <Label>Payment Status</Label>
+              <Label>{t("famAssistanceReports.paymentStatus")}</Label>
               <Select value={filters.paymentStatus} onValueChange={(value) => setFilters({ ...filters, paymentStatus: value })}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="paid">Paid</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="all">{t("famAssistanceReports.allStatus")}</SelectItem>
+                  <SelectItem value="paid">{t("famAssistanceReports.paid")}</SelectItem>
+                  <SelectItem value="pending">{t("famAssistanceReports.pending")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label>Member</Label>
+              <Label>{t("famAssistanceReports.member")}</Label>
               <Select value={filters.memberId} onValueChange={(value) => setFilters({ ...filters, memberId: value })}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Members</SelectItem>
+                  <SelectItem value="all">{t("famAssistanceReports.allMembers")}</SelectItem>
                   {members.map(member => (
                     <SelectItem key={member.id} value={member.id}>{member.name}</SelectItem>
                   ))}
@@ -275,7 +277,7 @@ export default function AssistanceReports() {
             </div>
 
             <div className="space-y-2">
-              <Label>Start Date</Label>
+              <Label>{t("famAssistanceReports.startDate")}</Label>
               <Input
                 type="date"
                 value={filters.startDate}
@@ -284,7 +286,7 @@ export default function AssistanceReports() {
             </div>
 
             <div className="space-y-2">
-              <Label>End Date</Label>
+              <Label>{t("famAssistanceReports.endDate")}</Label>
               <Input
                 type="date"
                 value={filters.endDate}
@@ -298,7 +300,7 @@ export default function AssistanceReports() {
         <div className="flex justify-end">
           <Button onClick={exportToCSV} disabled={filteredEvents.length === 0}>
             <Download className="h-4 w-4 mr-2" />
-            Export to CSV
+            {t("famAssistanceReports.exportToCsv")}
           </Button>
         </div>
 
@@ -308,21 +310,21 @@ export default function AssistanceReports() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Member</TableHead>
-                  <TableHead>Event Type</TableHead>
-                  <TableHead>Beneficiary</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Payment Date</TableHead>
-                  <TableHead>Notes</TableHead>
+                  <TableHead>{t("famAssistanceReports.date")}</TableHead>
+                  <TableHead>{t("famAssistanceReports.member")}</TableHead>
+                  <TableHead>{t("famAssistanceReports.eventType")}</TableHead>
+                  <TableHead>{t("famAssistanceReports.beneficiary")}</TableHead>
+                  <TableHead className="text-right">{t("famAssistanceReports.amount")}</TableHead>
+                  <TableHead>{t("famAssistanceReports.status")}</TableHead>
+                  <TableHead>{t("famAssistanceReports.paymentDate")}</TableHead>
+                  <TableHead>{t("famAssistanceReports.notes")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredEvents.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
-                      No assistance events found
+                      {t("famAssistanceReports.noAssistanceEventsFound")}
                     </TableCell>
                   </TableRow>
                 ) : (

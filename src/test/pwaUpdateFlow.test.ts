@@ -99,12 +99,12 @@ describe("'New version ready' reload preserves state", () => {
     expect(reloadTarget).toBe(currentHref);
   });
 
-  it("clientsClaim + skipWaiting are enabled in vite.config", async () => {
+  it("update waits for the user: no automatic skipWaiting/clientsClaim", async () => {
     const fs: any = await import("node:fs/promises" as any);
     const cfg = await fs.readFile("vite.config.ts", "utf8");
-    expect(cfg).toMatch(/skipWaiting:\s*true/);
-    expect(cfg).toMatch(/clientsClaim:\s*true/);
-    expect(cfg).toMatch(/registerType:\s*"autoUpdate"/);
+    expect(cfg).toMatch(/skipWaiting:\s*false/);
+    expect(cfg).toMatch(/clientsClaim:\s*false/);
+    expect(cfg).toMatch(/registerType:\s*"prompt"/);
   });
 
   it("changelog.json exposes a version + highlights for the update dialog", async () => {

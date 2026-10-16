@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -46,6 +47,7 @@ interface MemberData {
 }
 
 const MemberProfile = () => {
+  const { t } = useTranslation();
   const { familySlug, memberId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -184,8 +186,8 @@ const MemberProfile = () => {
     } catch (error: any) {
       console.error("Error loading member data:", error);
       toast({
-        title: "Error",
-        description: "Failed to load member profile",
+        title: t("famMemberProfile.error"),
+        description: t("famMemberProfile.failedToLoadMemberProfile"),
         variant: "destructive",
       });
     } finally {
@@ -205,7 +207,7 @@ const MemberProfile = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="p-8">
-          <p className="text-muted-foreground">Member not found</p>
+          <p className="text-muted-foreground">{t("famMemberProfile.memberNotFound")}</p>
         </Card>
       </div>
     );
@@ -218,11 +220,11 @@ const MemberProfile = () => {
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+              {t("famMemberProfile.back")}
             </Button>
             <div>
               <h1 className="text-2xl font-bold text-foreground">{memberData.profile.full_name}</h1>
-              <p className="text-sm text-muted-foreground">Member Profile</p>
+              <p className="text-sm text-muted-foreground">{t("famMemberProfile.memberProfile")}</p>
             </div>
           </div>
         </div>
@@ -234,27 +236,27 @@ const MemberProfile = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="w-5 h-5" />
-              Member Information
+              {t("famMemberProfile.memberInformation")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Name:</span>
+              <span className="text-muted-foreground">{t("famMemberProfile.name")}</span>
               <span className="font-medium">{memberData.profile.full_name}</span>
             </div>
             {memberData.profile.email && (
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Email:</span>
+                <span className="text-muted-foreground">{t("famMemberProfile.email")}</span>
                 <span className="font-medium">{memberData.profile.email}</span>
               </div>
             )}
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Role:</span>
+              <span className="text-muted-foreground">{t("famMemberProfile.role")}</span>
               <Badge variant="secondary">{memberData.role.replace("_", " ").toUpperCase()}</Badge>
             </div>
             {memberData.house_name && (
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">House:</span>
+                <span className="text-muted-foreground">{t("famMemberProfile.house")}</span>
                 <span className="font-medium">{memberData.house_name}</span>
               </div>
             )}
@@ -269,7 +271,7 @@ const MemberProfile = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-primary" />
-                  Credit Score
+                  {t("famMemberProfile.creditScore")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -287,11 +289,11 @@ const MemberProfile = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                     <div className="text-center">
-                      <p className="text-sm text-muted-foreground">Attendance</p>
+                      <p className="text-sm text-muted-foreground">{t("famMemberProfile.attendance")}</p>
                       <p className="text-lg font-semibold">{memberData.attendance_rate?.toFixed(0)}%</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm text-muted-foreground">On-Time Payments</p>
+                      <p className="text-sm text-muted-foreground">{t("famMemberProfile.onTimePayments")}</p>
                       <p className="text-lg font-semibold">
                         {((memberData.contributions_summary.paid / memberData.contributions_summary.total) * 100 || 0).toFixed(0)}%
                       </p>
@@ -307,20 +309,20 @@ const MemberProfile = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <DollarSign className="w-5 h-5 text-primary" />
-                Contributions
+                {t("famMemberProfile.contributions")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Total Contributed:</span>
+                <span className="text-muted-foreground">{t("famMemberProfile.totalContributed")}</span>
                 <span className="font-bold text-lg">{memberData.contributions_summary.total.toLocaleString()} FCFA</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Paid:</span>
+                <span className="text-muted-foreground">{t("famMemberProfile.paid")}</span>
                 <span className="text-green-600 font-medium">{memberData.contributions_summary.paid.toLocaleString()} FCFA</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Pending:</span>
+                <span className="text-muted-foreground">{t("famMemberProfile.pending")}</span>
                 <span className="text-orange-600 font-medium">{memberData.contributions_summary.pending.toLocaleString()} FCFA</span>
               </div>
             </CardContent>
@@ -331,20 +333,20 @@ const MemberProfile = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CreditCard className="w-5 h-5 text-primary" />
-                Loans
+                {t("famMemberProfile.loans")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Total Loans:</span>
+                <span className="text-muted-foreground">{t("famMemberProfile.totalLoans")}</span>
                 <span className="font-medium">{memberData.loans_summary.count}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Total Amount:</span>
+                <span className="text-muted-foreground">{t("famMemberProfile.totalAmount")}</span>
                 <span className="font-bold text-lg">{memberData.loans_summary.total.toLocaleString()} FCFA</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Outstanding:</span>
+                <span className="text-muted-foreground">{t("famMemberProfile.outstanding")}</span>
                 <span className="text-red-600 font-medium">{memberData.loans_summary.outstanding.toLocaleString()} FCFA</span>
               </div>
             </CardContent>
@@ -355,16 +357,16 @@ const MemberProfile = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <PiggyBank className="w-5 h-5 text-primary" />
-                Individual Savings
+                {t("famMemberProfile.individualSavings")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Total Savings:</span>
+                <span className="text-muted-foreground">{t("famMemberProfile.totalSavings")}</span>
                 <span className="font-bold text-lg">{memberData.savings_summary.total.toLocaleString()} FCFA</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Months Contributed:</span>
+                <span className="text-muted-foreground">{t("famMemberProfile.monthsContributed")}</span>
                 <span className="font-medium">{memberData.savings_summary.months}</span>
               </div>
             </CardContent>
@@ -375,16 +377,16 @@ const MemberProfile = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Award className="w-5 h-5 text-primary" />
-                Shares & Dividends
+                {t("famMemberProfile.sharesDividends")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Shares Owned:</span>
+                <span className="text-muted-foreground">{t("famMemberProfile.sharesOwned")}</span>
                 <span className="font-medium">{memberData.shares_summary.count}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Total Value:</span>
+                <span className="text-muted-foreground">{t("famMemberProfile.totalValue")}</span>
                 <span className="font-bold text-lg">{memberData.shares_summary.value.toLocaleString()} FCFA</span>
               </div>
             </CardContent>

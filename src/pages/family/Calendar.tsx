@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { CalendarDays, Loader2 } from 'lucide-react';
@@ -7,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import SEO from "@/components/SEO";
 
 export default function Calendar() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
 
   // Get current user
@@ -90,7 +92,7 @@ export default function Calendar() {
     return (
       <Card>
         <CardContent className="py-12 text-center text-muted-foreground">
-          Unable to load calendar. Please try again.
+          {t("famCalendar.unableToLoadCalendarPlease")}
         </CardContent>
       </Card>
     );
@@ -98,14 +100,14 @@ export default function Calendar() {
 
   return (
     <>
-      <SEO title="Family Calendar" description="Birthdays, anniversaries, meetings and recurring events for your family." />
+      <SEO title={t("famCalendar.familyCalendar")} description={t("famCalendar.birthdaysAnniversariesMeetingsAndRecurring")} />
       <div className="container max-w-6xl mx-auto py-6 px-4">
       <div className="flex items-center gap-3 mb-6">
         <CalendarDays className="h-8 w-8 text-primary" />
         <div>
-          <h1 className="text-2xl font-bold">Family Calendar</h1>
+          <h1 className="text-2xl font-bold">{t("famCalendar.familyCalendar")}</h1>
           <p className="text-muted-foreground">
-            Track birthdays, anniversaries, meetings, and family events
+            {t("famCalendar.trackBirthdaysAnniversariesMeetingsAnd")}
           </p>
         </div>
       </div>

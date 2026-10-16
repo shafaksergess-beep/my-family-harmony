@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,6 +32,7 @@ interface LoanHistory {
 }
 
 export default function LoanHistory() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -95,7 +97,7 @@ export default function LoanHistory() {
 
       setLoans(enrichedLoans as any);
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("famLoanHistory.error"), description: error.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -149,21 +151,21 @@ export default function LoanHistory() {
     });
 
     exportToCSV(exportData, `loan-history-${family?.slug}-${format(new Date(), 'yyyy-MM-dd')}.csv`);
-    toast({ title: "Success", description: "Loan history exported successfully" });
+    toast({ title: t("famLoanHistory.success"), description: t("famLoanHistory.loanHistoryExportedSuccessfully") });
   };
 
   const uniqueMembers = [...new Set(loans.map(l => ({ id: l.member_id, name: l.member_name })))];
 
   if (authLoading || loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return <div className="flex items-center justify-center min-h-screen">{t("famLoanHistory.loading")}</div>;
   }
 
   if (!canManageLoans) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Access Denied</h2>
-          <p className="text-muted-foreground">You don't have permission to view loan history.</p>
+          <h2 className="text-2xl font-bold mb-2">{t("famLoanHistory.accessDenied")}</h2>
+          <p className="text-muted-foreground">{t("famLoanHistory.youDonTHavePermission")}</p>
         </div>
       </div>
     );
@@ -177,7 +179,7 @@ export default function LoanHistory() {
             <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}/loans`)}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-3xl font-bold">Loan History & Transactions</h1>
+            <h1 className="text-3xl font-bold">{t("famLoanHistory.loanHistoryTransactions")}</h1>
           </div>
           <LanguageSwitcher />
         </div>
@@ -187,29 +189,29 @@ export default function LoanHistory() {
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Filters:</span>
+              <span className="text-sm font-medium">{t("famLoanHistory.filters")}</span>
             </div>
             
             <Select value={filterStatus} onValueChange={setFilterStatus}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="All Statuses" />
+                <SelectValue placeholder={t("famLoanHistory.allStatuses")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="disbursed">Disbursed</SelectItem>
-                <SelectItem value="repaid">Repaid</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
+                <SelectItem value="all">{t("famLoanHistory.allStatuses")}</SelectItem>
+                <SelectItem value="pending">{t("famLoanHistory.pending")}</SelectItem>
+                <SelectItem value="approved">{t("famLoanHistory.approved")}</SelectItem>
+                <SelectItem value="disbursed">{t("famLoanHistory.disbursed")}</SelectItem>
+                <SelectItem value="repaid">{t("famLoanHistory.repaid")}</SelectItem>
+                <SelectItem value="rejected">{t("famLoanHistory.rejected")}</SelectItem>
               </SelectContent>
             </Select>
 
             <Select value={filterMember} onValueChange={setFilterMember}>
               <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="All Members" />
+                <SelectValue placeholder={t("famLoanHistory.allMembers")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Members</SelectItem>
+                <SelectItem value="all">{t("famLoanHistory.allMembers")}</SelectItem>
                 {uniqueMembers.map(member => (
                   <SelectItem key={member.id} value={member.id}>
                     {member.name}
@@ -221,7 +223,7 @@ export default function LoanHistory() {
             <div className="ml-auto">
               <Button onClick={handleExport} variant="outline">
                 <Download className="h-4 w-4 mr-2" />
-                Export CSV
+                {t("famLoanHistory.exportCsv")}
               </Button>
             </div>
           </div>
@@ -230,24 +232,24 @@ export default function LoanHistory() {
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="p-4">
-            <div className="text-sm text-muted-foreground">Total Loans</div>
+            <div className="text-sm text-muted-foreground">{t("famLoanHistory.totalLoans")}</div>
             <div className="text-2xl font-bold">{filteredLoans.length}</div>
           </Card>
           <Card className="p-4">
-            <div className="text-sm text-muted-foreground">Total Disbursed</div>
+            <div className="text-sm text-muted-foreground">{t("famLoanHistory.totalDisbursed")}</div>
             <div className="text-2xl font-bold">
               {filteredLoans.filter(l => ['disbursed', 'repaid'].includes(l.status))
                 .reduce((sum, l) => sum + l.amount, 0).toLocaleString()} FCFA
             </div>
           </Card>
           <Card className="p-4">
-            <div className="text-sm text-muted-foreground">Total Collected</div>
+            <div className="text-sm text-muted-foreground">{t("famLoanHistory.totalCollected")}</div>
             <div className="text-2xl font-bold text-green-600">
               {filteredLoans.reduce((sum, l) => sum + (l.amount_paid || 0) + (l.interest_paid || 0), 0).toLocaleString()} FCFA
             </div>
           </Card>
           <Card className="p-4">
-            <div className="text-sm text-muted-foreground">Outstanding</div>
+            <div className="text-sm text-muted-foreground">{t("famLoanHistory.outstanding")}</div>
             <div className="text-2xl font-bold text-orange-600">
               {filteredLoans.filter(l => l.status === 'disbursed')
                 .reduce((sum, l) => {
@@ -261,7 +263,7 @@ export default function LoanHistory() {
         {/* Loan History Table */}
         <Card>
           <div className="p-4 border-b">
-            <h2 className="text-xl font-semibold">Detailed Loan Records</h2>
+            <h2 className="text-xl font-semibold">{t("famLoanHistory.detailedLoanRecords")}</h2>
             <p className="text-sm text-muted-foreground mt-1">
               Showing {filteredLoans.length} of {loans.length} total loans
             </p>
@@ -270,21 +272,21 @@ export default function LoanHistory() {
             <table className="w-full">
               <thead>
                 <tr className="border-b bg-muted/50">
-                  <th className="text-left p-4 font-medium">Date</th>
-                  <th className="text-left p-4 font-medium">Member</th>
-                  <th className="text-left p-4 font-medium">Purpose</th>
-                  <th className="text-right p-4 font-medium">Amount</th>
-                  <th className="text-right p-4 font-medium">Owed</th>
-                  <th className="text-right p-4 font-medium">Paid</th>
-                  <th className="text-right p-4 font-medium">Outstanding</th>
-                  <th className="text-center p-4 font-medium">Status</th>
+                  <th className="text-left p-4 font-medium">{t("famLoanHistory.date")}</th>
+                  <th className="text-left p-4 font-medium">{t("famLoanHistory.member")}</th>
+                  <th className="text-left p-4 font-medium">{t("famLoanHistory.purpose")}</th>
+                  <th className="text-right p-4 font-medium">{t("famLoanHistory.amount")}</th>
+                  <th className="text-right p-4 font-medium">{t("famLoanHistory.owed")}</th>
+                  <th className="text-right p-4 font-medium">{t("famLoanHistory.paid")}</th>
+                  <th className="text-right p-4 font-medium">{t("famLoanHistory.outstanding")}</th>
+                  <th className="text-center p-4 font-medium">{t("famLoanHistory.status")}</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredLoans.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="text-center p-8 text-muted-foreground">
-                      No loans found matching the filters
+                      {t("famLoanHistory.noLoansFoundMatchingThe")}
                     </td>
                   </tr>
                 ) : (

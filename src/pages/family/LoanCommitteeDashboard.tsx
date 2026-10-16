@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,6 +30,7 @@ interface LoanRequest {
 }
 
 export default function LoanCommitteeDashboard() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -63,7 +65,7 @@ export default function LoanCommitteeDashboard() {
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Error loading loan requests",
+        title: t("famLoanCommitteeDashboard.errorLoadingLoanRequests"),
         description: error.message,
       });
     } finally {
@@ -89,8 +91,8 @@ export default function LoanCommitteeDashboard() {
       if (error) throw error;
 
       toast({
-        title: "Loan Recommended for Approval",
-        description: "The loan has been forwarded to the family head for final approval.",
+        title: t("famLoanCommitteeDashboard.loanRecommendedForApproval"),
+        description: t("famLoanCommitteeDashboard.theLoanHasBeenForwarded"),
       });
 
       setSelectedLoan(null);
@@ -99,7 +101,7 @@ export default function LoanCommitteeDashboard() {
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Error",
+        title: t("famLoanCommitteeDashboard.error"),
         description: error.message,
       });
     }
@@ -118,8 +120,8 @@ export default function LoanCommitteeDashboard() {
       if (error) throw error;
 
       toast({
-        title: "Loan Rejected",
-        description: "The loan request has been rejected.",
+        title: t("famLoanCommitteeDashboard.loanRejected"),
+        description: t("famLoanCommitteeDashboard.theLoanRequestHasBeen"),
       });
 
       setSelectedLoan(null);
@@ -128,7 +130,7 @@ export default function LoanCommitteeDashboard() {
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Error",
+        title: t("famLoanCommitteeDashboard.error"),
         description: error.message,
       });
     }
@@ -140,7 +142,7 @@ export default function LoanCommitteeDashboard() {
   };
 
   if (authLoading || loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return <div className="flex items-center justify-center min-h-screen">{t("famLoanCommitteeDashboard.loading")}</div>;
   }
 
   if (!canManageLoans) {
@@ -148,12 +150,12 @@ export default function LoanCommitteeDashboard() {
       <div className="min-h-screen bg-background p-6">
         <div className="max-w-2xl mx-auto">
           <Card className="p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4">Access Denied</h2>
+            <h2 className="text-2xl font-bold mb-4">{t("famLoanCommitteeDashboard.accessDenied")}</h2>
             <p className="text-muted-foreground mb-6">
-              Only loan committee members can access this dashboard.
+              {t("famLoanCommitteeDashboard.onlyLoanCommitteeMembersCan")}
             </p>
             <Button onClick={() => navigate(`/family/${familySlug}`)}>
-              Back to Dashboard
+              {t("famLoanCommitteeDashboard.backToDashboard")}
             </Button>
           </Card>
         </div>
@@ -170,8 +172,8 @@ export default function LoanCommitteeDashboard() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-3xl font-bold">Loan Committee Dashboard</h1>
-              <p className="text-muted-foreground">Review and evaluate loan requests</p>
+              <h1 className="text-3xl font-bold">{t("famLoanCommitteeDashboard.loanCommitteeDashboard")}</h1>
+              <p className="text-muted-foreground">{t("famLoanCommitteeDashboard.reviewAndEvaluateLoanRequests")}</p>
             </div>
           </div>
         </div>
@@ -179,12 +181,12 @@ export default function LoanCommitteeDashboard() {
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending Requests</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famLoanCommitteeDashboard.pendingRequests")}</CardTitle>
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{loans.length}</div>
-              <p className="text-xs text-muted-foreground">Awaiting review</p>
+              <p className="text-xs text-muted-foreground">{t("famLoanCommitteeDashboard.awaitingReview")}</p>
             </CardContent>
           </Card>
         </div>
@@ -193,7 +195,7 @@ export default function LoanCommitteeDashboard() {
           <Card className="p-12">
             <div className="text-center text-muted-foreground">
               <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No pending loan requests at this time.</p>
+              <p>{t("famLoanCommitteeDashboard.noPendingLoanRequestsAt")}</p>
             </div>
           </Card>
         ) : (
@@ -210,30 +212,30 @@ export default function LoanCommitteeDashboard() {
                         Requested: {format(new Date(loan.created_at), "PPP")}
                       </p>
                     </div>
-                    <Badge variant="outline">Pending</Badge>
+                    <Badge variant="outline">{t("famLoanCommitteeDashboard.pending")}</Badge>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
                     <div>
-                      <p className="text-sm text-muted-foreground">Loan Amount</p>
+                      <p className="text-sm text-muted-foreground">{t("famLoanCommitteeDashboard.loanAmount")}</p>
                       <p className="text-lg font-bold">{loan.amount.toLocaleString()} FCFA</p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Total Repayment</p>
+                      <p className="text-sm text-muted-foreground">{t("famLoanCommitteeDashboard.totalRepayment")}</p>
                       <p className="text-lg font-bold">{calculateTotalRepayment(loan).toLocaleString()} FCFA</p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Interest Rate</p>
+                      <p className="text-sm text-muted-foreground">{t("famLoanCommitteeDashboard.interestRate")}</p>
                       <p className="font-medium">{loan.interest_rate}% per month</p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Term</p>
+                      <p className="text-sm text-muted-foreground">{t("famLoanCommitteeDashboard.term")}</p>
                       <p className="font-medium">{loan.term_months} months</p>
                     </div>
                   </div>
 
                   <div>
-                    <p className="text-sm font-medium mb-2">Purpose:</p>
+                    <p className="text-sm font-medium mb-2">{t("famLoanCommitteeDashboard.purpose")}</p>
                     <p className="text-sm text-muted-foreground p-3 bg-muted rounded">
                       {loan.purpose}
                     </p>
@@ -241,7 +243,7 @@ export default function LoanCommitteeDashboard() {
 
                   {loan.notes && (
                     <div>
-                      <p className="text-sm font-medium mb-2">Additional Notes:</p>
+                      <p className="text-sm font-medium mb-2">{t("famLoanCommitteeDashboard.additionalNotes")}</p>
                       <p className="text-sm text-muted-foreground p-3 bg-muted rounded">
                         {loan.notes}
                       </p>
@@ -256,23 +258,23 @@ export default function LoanCommitteeDashboard() {
                           className="flex-1"
                         >
                           <CheckCircle className="h-4 w-4 mr-2" />
-                          Recommend Approval
+                          {t("famLoanCommitteeDashboard.recommendApproval")}
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
-                          <DialogTitle>Recommend Loan for Approval</DialogTitle>
+                          <DialogTitle>{t("famLoanCommitteeDashboard.recommendLoanForApproval")}</DialogTitle>
                         </DialogHeader>
                         <div className="space-y-4">
                           <div className="p-4 bg-muted rounded">
                             <p className="text-sm">
-                              <strong>Member:</strong> {loan.family_members?.profiles?.full_name}
+                              <strong>{t("famLoanCommitteeDashboard.member")}</strong> {loan.family_members?.profiles?.full_name}
                             </p>
                             <p className="text-sm">
-                              <strong>Amount:</strong> {loan.amount.toLocaleString()} FCFA
+                              <strong>{t("famLoanCommitteeDashboard.amount")}</strong> {loan.amount.toLocaleString()} FCFA
                             </p>
                             <p className="text-sm">
-                              <strong>Purpose:</strong> {loan.purpose}
+                              <strong>{t("famLoanCommitteeDashboard.purpose")}</strong> {loan.purpose}
                             </p>
                           </div>
                           <div>
@@ -280,7 +282,7 @@ export default function LoanCommitteeDashboard() {
                             <Textarea
                               value={recommendation}
                               onChange={(e) => setRecommendation(e.target.value)}
-                              placeholder="Add your committee's recommendation or assessment notes..."
+                              placeholder={t("famLoanCommitteeDashboard.addYourCommitteeSRecommendation")}
                               className="mt-2"
                               rows={4}
                             />
@@ -289,7 +291,7 @@ export default function LoanCommitteeDashboard() {
                             onClick={() => handleRecommendApproval(loan.id)}
                             className="w-full"
                           >
-                            Submit Recommendation
+                            {t("famLoanCommitteeDashboard.submitRecommendation")}
                           </Button>
                         </div>
                       </DialogContent>
@@ -303,28 +305,28 @@ export default function LoanCommitteeDashboard() {
                           className="flex-1"
                         >
                           <XCircle className="h-4 w-4 mr-2" />
-                          Reject
+                          {t("famLoanCommitteeDashboard.reject")}
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
-                          <DialogTitle>Reject Loan Request</DialogTitle>
+                          <DialogTitle>{t("famLoanCommitteeDashboard.rejectLoanRequest")}</DialogTitle>
                         </DialogHeader>
                         <div className="space-y-4">
                           <div className="p-4 bg-muted rounded">
                             <p className="text-sm">
-                              <strong>Member:</strong> {loan.family_members?.profiles?.full_name}
+                              <strong>{t("famLoanCommitteeDashboard.member")}</strong> {loan.family_members?.profiles?.full_name}
                             </p>
                             <p className="text-sm">
-                              <strong>Amount:</strong> {loan.amount.toLocaleString()} FCFA
+                              <strong>{t("famLoanCommitteeDashboard.amount")}</strong> {loan.amount.toLocaleString()} FCFA
                             </p>
                           </div>
                           <div>
-                            <Label>Reason for Rejection</Label>
+                            <Label>{t("famLoanCommitteeDashboard.reasonForRejection")}</Label>
                             <Textarea
                               value={recommendation}
                               onChange={(e) => setRecommendation(e.target.value)}
-                              placeholder="Explain why this loan request is being rejected..."
+                              placeholder={t("famLoanCommitteeDashboard.explainWhyThisLoanRequest")}
                               className="mt-2"
                               rows={4}
                               required
@@ -336,7 +338,7 @@ export default function LoanCommitteeDashboard() {
                             className="w-full"
                             disabled={!recommendation}
                           >
-                            Confirm Rejection
+                            {t("famLoanCommitteeDashboard.confirmRejection")}
                           </Button>
                         </div>
                       </DialogContent>

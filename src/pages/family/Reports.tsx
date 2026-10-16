@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -44,6 +45,7 @@ const MONTHS = Array.from({ length: 12 }, (_, i) => {
 });
 
 const FamilyReports = () => {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { family, isLoading: authLoading } = useFamilyAuth(familySlug);
@@ -219,11 +221,11 @@ const FamilyReports = () => {
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+              {t("famReports.back")}
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Financial Reports</h1>
-              <p className="text-sm text-muted-foreground">Accounting-grade monthly report</p>
+              <h1 className="text-2xl font-bold text-foreground">{t("famReports.financialReports")}</h1>
+              <p className="text-sm text-muted-foreground">{t("famReports.accountingGradeMonthlyReport")}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -239,7 +241,7 @@ const FamilyReports = () => {
             </Select>
             <Button variant="outline" onClick={() => window.print()}>
               <Download className="w-4 h-4 mr-2" />
-              Print / PDF
+              {t("famReports.printPdf")}
             </Button>
           </div>
         </div>
@@ -255,7 +257,7 @@ const FamilyReports = () => {
                 <div className="w-10 h-10 rounded-lg bg-[#c9a84c]/20 flex items-center justify-center">
                   <FileText className="w-5 h-5 text-[#c9a84c]" />
                 </div>
-                <p className="text-xs uppercase tracking-[0.2em] text-[#c9a84c] font-semibold">Monthly Financial Report</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-[#c9a84c] font-semibold">{t("famReports.monthlyFinancialReport")}</p>
               </div>
               <h2 className="text-3xl font-bold tracking-tight">{family?.name}</h2>
               <p className="text-white/60 mt-1 text-sm">{monthLabel}</p>
@@ -271,13 +273,13 @@ const FamilyReports = () => {
         <div className="bg-white dark:bg-card border border-t-0 border-border p-8">
           <h3 className="text-xs uppercase tracking-[0.15em] text-[#1a2332] dark:text-foreground font-bold mb-6 flex items-center gap-2">
             <span className="w-8 h-[2px] bg-[#c9a84c]" />
-            Executive Summary
+            {t("famReports.executiveSummary")}
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
-            <SummaryCard icon={TrendingUp} label="Total Contributions" value={formatAmount(totalContributions)} accent="text-emerald-600" />
-            <SummaryCard icon={CreditCard} label="Loans Issued" value={formatAmount(totalLoansIssued)} accent="text-blue-600" />
-            <SummaryCard icon={TrendingDown} label="Outstanding Loans" value={formatAmount(totalOutstanding)} accent="text-orange-600" />
-            <SummaryCard icon={PiggyBank} label="Total Savings" value={formatAmount(totalSavings)} accent="text-purple-600" />
+            <SummaryCard icon={TrendingUp} label={t("famReports.totalContributions")} value={formatAmount(totalContributions)} accent="text-emerald-600" />
+            <SummaryCard icon={CreditCard} label={t("famReports.loansIssued")} value={formatAmount(totalLoansIssued)} accent="text-blue-600" />
+            <SummaryCard icon={TrendingDown} label={t("famReports.outstandingLoans")} value={formatAmount(totalOutstanding)} accent="text-orange-600" />
+            <SummaryCard icon={PiggyBank} label={t("famReports.totalSavings")} value={formatAmount(totalSavings)} accent="text-purple-600" />
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed border-l-2 border-[#c9a84c] pl-4">
             For {monthLabel}, the family recorded{" "}
@@ -294,7 +296,7 @@ const FamilyReports = () => {
         <div className="bg-white dark:bg-card border border-t-0 border-border p-8">
           <h3 className="text-xs uppercase tracking-[0.15em] text-[#1a2332] dark:text-foreground font-bold mb-4 flex items-center gap-2">
             <span className="w-8 h-[2px] bg-[#c9a84c]" />
-            Contribution & Savings Trends
+            {t("famReports.contributionSavingsTrends")}
           </h3>
           <div className="h-[220px] print:h-[180px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -325,7 +327,7 @@ const FamilyReports = () => {
         <div className="bg-white dark:bg-card border border-t-0 border-border p-8">
           <h3 className="text-xs uppercase tracking-[0.15em] text-[#1a2332] dark:text-foreground font-bold mb-4 flex items-center gap-2">
             <span className="w-8 h-[2px] bg-[#c9a84c]" />
-            Contributions Ledger
+            {t("famReports.contributionsLedger")}
           </h3>
           {contributions.length === 0 ? (
             <p className="text-sm text-muted-foreground italic py-6 text-center">No contributions recorded for {monthLabel}.</p>
@@ -334,11 +336,11 @@ const FamilyReports = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b-2 border-[#1a2332] dark:border-foreground">
-                    <th className="text-left py-2 font-semibold text-[#1a2332] dark:text-foreground">Member</th>
-                    <th className="text-left py-2 font-semibold text-[#1a2332] dark:text-foreground">Type</th>
-                    <th className="text-right py-2 font-semibold text-[#1a2332] dark:text-foreground">Amount</th>
-                    <th className="text-center py-2 font-semibold text-[#1a2332] dark:text-foreground">Status</th>
-                    <th className="text-right py-2 font-semibold text-[#1a2332] dark:text-foreground">Date</th>
+                    <th className="text-left py-2 font-semibold text-[#1a2332] dark:text-foreground">{t("famReports.member")}</th>
+                    <th className="text-left py-2 font-semibold text-[#1a2332] dark:text-foreground">{t("famReports.type")}</th>
+                    <th className="text-right py-2 font-semibold text-[#1a2332] dark:text-foreground">{t("famReports.amount")}</th>
+                    <th className="text-center py-2 font-semibold text-[#1a2332] dark:text-foreground">{t("famReports.status")}</th>
+                    <th className="text-right py-2 font-semibold text-[#1a2332] dark:text-foreground">{t("famReports.date")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -361,7 +363,7 @@ const FamilyReports = () => {
                 </tbody>
                 <tfoot>
                   <tr className="border-t-2 border-[#1a2332] dark:border-foreground font-bold">
-                    <td colSpan={2} className="py-2">Total</td>
+                    <td colSpan={2} className="py-2">{t("famReports.total")}</td>
                     <td className="py-2 text-right font-mono">{formatAmount(totalContributions)}</td>
                     <td colSpan={2} />
                   </tr>
@@ -375,20 +377,20 @@ const FamilyReports = () => {
         <div className="bg-white dark:bg-card border border-t-0 border-border p-8">
           <h3 className="text-xs uppercase tracking-[0.15em] text-[#1a2332] dark:text-foreground font-bold mb-4 flex items-center gap-2">
             <span className="w-8 h-[2px] bg-[#c9a84c]" />
-            Loan Ledger
+            {t("famReports.loanLedger")}
           </h3>
           {loans.length === 0 ? (
-            <p className="text-sm text-muted-foreground italic py-6 text-center">No active loans.</p>
+            <p className="text-sm text-muted-foreground italic py-6 text-center">{t("famReports.noActiveLoans")}</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b-2 border-[#1a2332] dark:border-foreground">
-                    <th className="text-left py-2 font-semibold text-[#1a2332] dark:text-foreground">Member</th>
-                    <th className="text-right py-2 font-semibold text-[#1a2332] dark:text-foreground">Principal</th>
-                    <th className="text-right py-2 font-semibold text-[#1a2332] dark:text-foreground">Paid</th>
-                    <th className="text-right py-2 font-semibold text-[#1a2332] dark:text-foreground">Outstanding</th>
-                    <th className="text-center py-2 font-semibold text-[#1a2332] dark:text-foreground">Status</th>
+                    <th className="text-left py-2 font-semibold text-[#1a2332] dark:text-foreground">{t("famReports.member")}</th>
+                    <th className="text-right py-2 font-semibold text-[#1a2332] dark:text-foreground">{t("famReports.principal")}</th>
+                    <th className="text-right py-2 font-semibold text-[#1a2332] dark:text-foreground">{t("famReports.paid")}</th>
+                    <th className="text-right py-2 font-semibold text-[#1a2332] dark:text-foreground">{t("famReports.outstanding")}</th>
+                    <th className="text-center py-2 font-semibold text-[#1a2332] dark:text-foreground">{t("famReports.status")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -408,7 +410,7 @@ const FamilyReports = () => {
                 </tbody>
                 <tfoot>
                   <tr className="border-t-2 border-[#1a2332] dark:border-foreground font-bold">
-                    <td className="py-2">Totals</td>
+                    <td className="py-2">{t("famReports.totals")}</td>
                     <td className="py-2 text-right font-mono">{formatAmount(totalLoansIssued)}</td>
                     <td className="py-2 text-right font-mono text-emerald-600">{formatAmount(loans.reduce((s, l) => s + l.amount_paid, 0))}</td>
                     <td className="py-2 text-right font-mono text-orange-600">{formatAmount(totalOutstanding)}</td>
@@ -424,7 +426,7 @@ const FamilyReports = () => {
         <div className="bg-white dark:bg-card border border-t-0 border-border p-8">
           <h3 className="text-xs uppercase tracking-[0.15em] text-[#1a2332] dark:text-foreground font-bold mb-4 flex items-center gap-2">
             <span className="w-8 h-[2px] bg-[#c9a84c]" />
-            Savings Ledger
+            {t("famReports.savingsLedger")}
           </h3>
           {savings.length === 0 ? (
             <p className="text-sm text-muted-foreground italic py-6 text-center">No savings recorded for {monthLabel}.</p>
@@ -433,8 +435,8 @@ const FamilyReports = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b-2 border-[#1a2332] dark:border-foreground">
-                    <th className="text-left py-2 font-semibold text-[#1a2332] dark:text-foreground">Member</th>
-                    <th className="text-right py-2 font-semibold text-[#1a2332] dark:text-foreground">Amount Saved</th>
+                    <th className="text-left py-2 font-semibold text-[#1a2332] dark:text-foreground">{t("famReports.member")}</th>
+                    <th className="text-right py-2 font-semibold text-[#1a2332] dark:text-foreground">{t("famReports.amountSaved")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -447,7 +449,7 @@ const FamilyReports = () => {
                 </tbody>
                 <tfoot>
                   <tr className="border-t-2 border-[#1a2332] dark:border-foreground font-bold">
-                    <td className="py-2">Total</td>
+                    <td className="py-2">{t("famReports.total")}</td>
                     <td className="py-2 text-right font-mono">{formatAmount(totalSavings)}</td>
                   </tr>
                 </tfoot>
@@ -460,23 +462,23 @@ const FamilyReports = () => {
         <div className="bg-white dark:bg-card border border-t-0 border-border p-8">
           <h3 className="text-xs uppercase tracking-[0.15em] text-[#1a2332] dark:text-foreground font-bold mb-4 flex items-center gap-2">
             <span className="w-8 h-[2px] bg-[#c9a84c]" />
-            Notes & Observations
+            {t("famReports.notesObservations")}
           </h3>
           <ul className="space-y-2 text-sm text-muted-foreground list-disc pl-5">
             {pendingContributions > 0 && (
               <li><strong>{pendingContributions}</strong> contribution{pendingContributions > 1 ? "s" : ""} remain pending for this period.</li>
             )}
             {totalOutstanding > 0 && (
-              <li>Outstanding loan balance of <strong>{formatAmount(totalOutstanding)}</strong> requires monitoring.</li>
+              <li>{t("famReports.outstandingLoanBalanceOf")} <strong>{formatAmount(totalOutstanding)}</strong> {t("famReports.requiresMonitoring")}</li>
             )}
             {contributions.length === 0 && savings.length === 0 && (
-              <li>No financial activity recorded for this period. Consider following up with members.</li>
+              <li>{t("famReports.noFinancialActivityRecordedFor")}</li>
             )}
             {repaymentProgress > 0 && repaymentProgress < 50 && (
               <li>Loan repayment progress is at {repaymentProgress}%. Consider reviewing repayment schedules.</li>
             )}
             {pendingContributions === 0 && contributions.length > 0 && (
-              <li>All contributions for this period have been settled. Excellent compliance.</li>
+              <li>{t("famReports.allContributionsForThisPeriod")}</li>
             )}
           </ul>
         </div>
@@ -484,7 +486,7 @@ const FamilyReports = () => {
         {/* ═══ Footer ═══ */}
         <div className="bg-[#1a2332] dark:bg-[#0f1729] text-white/50 rounded-b-xl p-6 text-xs flex items-center justify-between print:rounded-none">
           <div>
-            <p>Prepared by: <span className="text-white/70">{family?.name} Financial System</span></p>
+            <p>{t("famReports.preparedBy")} <span className="text-white/70">{family?.name} Financial System</span></p>
             <p className="mt-1">This report is auto-generated and reflects data as of {generatedAt}.</p>
           </div>
           <div className="text-right">

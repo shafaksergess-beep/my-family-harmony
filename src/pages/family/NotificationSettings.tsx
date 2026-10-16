@@ -1,15 +1,17 @@
+import { useTranslation } from "react-i18next";
 import { NotificationPreferences } from '@/components/settings/NotificationPreferences';
 import { ThemeToggle } from '@/components/settings/ThemeToggle';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Palette } from 'lucide-react';
 
 export default function NotificationSettings() {
+  const { t } = useTranslation();
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Settings & Preferences</h1>
+        <h1 className="text-3xl font-bold mb-2">{t("famNotificationSettings.settingsPreferences")}</h1>
         <p className="text-muted-foreground">
-          Manage your app appearance and notification preferences
+          {t("famNotificationSettings.manageYourAppAppearanceAnd")}
         </p>
       </div>
 
@@ -17,7 +19,7 @@ export default function NotificationSettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Palette className="h-5 w-5" />
-            Appearance
+            {t("famNotificationSettings.appearance")}
           </CardTitle>
         </CardHeader>
         <CardContent>

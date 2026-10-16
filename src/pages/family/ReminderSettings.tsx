@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
@@ -10,6 +11,7 @@ import { Loader2, ArrowLeft, Save, AlertTriangle, Mail, MessageSquare, Phone } f
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const ReminderSettings = () => {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { family, isFamilyHead, isLoading } = useFamilyAuth(familySlug);
@@ -34,8 +36,8 @@ const ReminderSettings = () => {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="max-w-md">
           <CardHeader>
-            <CardTitle>Access Denied</CardTitle>
-            <CardDescription>Only family heads can configure reminder settings</CardDescription>
+            <CardTitle>{t("famReminderSettings.accessDenied")}</CardTitle>
+            <CardDescription>{t("famReminderSettings.onlyFamilyHeadsCanConfigure")}</CardDescription>
           </CardHeader>
         </Card>
       </div>
@@ -48,8 +50,8 @@ const ReminderSettings = () => {
 
     try {
       toast({
-        title: "Settings Saved",
-        description: "Late payment reminder settings have been updated",
+        title: t("famReminderSettings.settingsSaved"),
+        description: t("famReminderSettings.latePaymentReminderSettingsHave"),
       });
 
       setTimeout(() => {
@@ -58,8 +60,8 @@ const ReminderSettings = () => {
     } catch (error) {
       console.error("Error saving settings:", error);
       toast({
-        title: "Error",
-        description: "Failed to save reminder settings",
+        title: t("famReminderSettings.error"),
+        description: t("famReminderSettings.failedToSaveReminderSettings"),
         variant: "destructive",
       });
     } finally {
@@ -74,11 +76,11 @@ const ReminderSettings = () => {
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+              {t("famReminderSettings.back")}
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Reminder Settings</h1>
-              <p className="text-sm text-muted-foreground">Configure late payment reminder escalation</p>
+              <h1 className="text-2xl font-bold text-foreground">{t("famReminderSettings.reminderSettings")}</h1>
+              <p className="text-sm text-muted-foreground">{t("famReminderSettings.configureLatePaymentReminderEscalation")}</p>
             </div>
           </div>
         </div>
@@ -88,15 +90,15 @@ const ReminderSettings = () => {
         <Alert className="mb-6">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            The system automatically checks for late payments daily at 8 AM and sends reminders based on these settings.
+            {t("famReminderSettings.theSystemAutomaticallyChecksFor")}
           </AlertDescription>
         </Alert>
 
         <Card>
           <CardHeader>
-            <CardTitle>Escalation Schedule</CardTitle>
+            <CardTitle>{t("famReminderSettings.escalationSchedule")}</CardTitle>
             <CardDescription>
-              Configure when each type of reminder should be sent for overdue contributions
+              {t("famReminderSettings.configureWhenEachTypeOf")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -105,7 +107,7 @@ const ReminderSettings = () => {
                 <div className="flex items-start gap-4">
                   <Mail className="w-5 h-5 text-blue-500 mt-2" />
                   <div className="flex-1 space-y-2">
-                    <Label htmlFor="email">Email Reminder</Label>
+                    <Label htmlFor="email">{t("famReminderSettings.emailReminder")}</Label>
                     <div className="flex items-center gap-2">
                       <Input
                         id="email"
@@ -115,10 +117,10 @@ const ReminderSettings = () => {
                         onChange={(e) => setSettings({ ...settings, daysForEmail: parseInt(e.target.value) })}
                         className="w-24"
                       />
-                      <span className="text-sm text-muted-foreground">days after due date</span>
+                      <span className="text-sm text-muted-foreground">{t("famReminderSettings.daysAfterDueDate")}</span>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      First reminder sent via email when payment is overdue
+                      {t("famReminderSettings.firstReminderSentViaEmail")}
                     </p>
                   </div>
                 </div>
@@ -126,7 +128,7 @@ const ReminderSettings = () => {
                 <div className="flex items-start gap-4">
                   <MessageSquare className="w-5 h-5 text-green-500 mt-2" />
                   <div className="flex-1 space-y-2">
-                    <Label htmlFor="sms">SMS Reminder</Label>
+                    <Label htmlFor="sms">{t("famReminderSettings.smsReminder")}</Label>
                     <div className="flex items-center gap-2">
                       <Input
                         id="sms"
@@ -136,10 +138,10 @@ const ReminderSettings = () => {
                         onChange={(e) => setSettings({ ...settings, daysForSms: parseInt(e.target.value) })}
                         className="w-24"
                       />
-                      <span className="text-sm text-muted-foreground">days after due date</span>
+                      <span className="text-sm text-muted-foreground">{t("famReminderSettings.daysAfterDueDate")}</span>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Escalated to SMS if payment still not received
+                      {t("famReminderSettings.escalatedToSmsIfPayment")}
                     </p>
                   </div>
                 </div>
@@ -147,7 +149,7 @@ const ReminderSettings = () => {
                 <div className="flex items-start gap-4">
                   <Phone className="w-5 h-5 text-purple-500 mt-2" />
                   <div className="flex-1 space-y-2">
-                    <Label htmlFor="whatsapp">WhatsApp Reminder</Label>
+                    <Label htmlFor="whatsapp">{t("famReminderSettings.whatsappReminder")}</Label>
                     <div className="flex items-center gap-2">
                       <Input
                         id="whatsapp"
@@ -157,10 +159,10 @@ const ReminderSettings = () => {
                         onChange={(e) => setSettings({ ...settings, daysForWhatsapp: parseInt(e.target.value) })}
                         className="w-24"
                       />
-                      <span className="text-sm text-muted-foreground">days after due date</span>
+                      <span className="text-sm text-muted-foreground">{t("famReminderSettings.daysAfterDueDate")}</span>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Final escalation via WhatsApp for urgent follow-up
+                      {t("famReminderSettings.finalEscalationViaWhatsappFor")}
                     </p>
                   </div>
                 </div>
@@ -171,12 +173,12 @@ const ReminderSettings = () => {
                   {saving ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Saving...
+                      {t("famReminderSettings.saving")}
                     </>
                   ) : (
                     <>
                       <Save className="w-4 h-4 mr-2" />
-                      Save Settings
+                      {t("famReminderSettings.saveSettings")}
                     </>
                   )}
                 </Button>
@@ -187,7 +189,7 @@ const ReminderSettings = () => {
 
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>How It Works</CardTitle>
+            <CardTitle>{t("famReminderSettings.howItWorks")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p>

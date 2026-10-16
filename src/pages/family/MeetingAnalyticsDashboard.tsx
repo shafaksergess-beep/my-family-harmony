@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +24,7 @@ interface MeetingTypeStats {
 }
 
 const MeetingAnalyticsDashboard = () => {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -139,8 +141,8 @@ const MeetingAnalyticsDashboard = () => {
     } catch (error: any) {
       console.error("Error loading analytics:", error);
       toast({
-        title: "Error",
-        description: "Failed to load meeting analytics",
+        title: t("famMeetingAnalyticsDashboard.error"),
+        description: t("famMeetingAnalyticsDashboard.failedToLoadMeetingAnalytics"),
         variant: "destructive",
       });
     } finally {
@@ -165,10 +167,10 @@ const MeetingAnalyticsDashboard = () => {
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+              {t("famMeetingAnalyticsDashboard.back")}
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Meeting Analytics</h1>
+              <h1 className="text-2xl font-bold text-foreground">{t("famMeetingAnalyticsDashboard.meetingAnalytics")}</h1>
               <p className="text-sm text-muted-foreground">{family?.name}</p>
             </div>
           </div>
@@ -181,7 +183,7 @@ const MeetingAnalyticsDashboard = () => {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Meetings
+                {t("famMeetingAnalyticsDashboard.totalMeetings")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -189,14 +191,14 @@ const MeetingAnalyticsDashboard = () => {
                 <Calendar className="w-5 h-5 text-primary" />
                 <div className="text-3xl font-bold">{overallStats.totalMeetings}</div>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Last 12 months</p>
+              <p className="text-xs text-muted-foreground mt-1">{t("famMeetingAnalyticsDashboard.last12Months")}</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Avg Attendance Rate
+                {t("famMeetingAnalyticsDashboard.avgAttendanceRate")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -204,14 +206,14 @@ const MeetingAnalyticsDashboard = () => {
                 <TrendingUp className="w-5 h-5 text-green-500" />
                 <div className="text-3xl font-bold">{overallStats.avgAttendanceRate}%</div>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Across all meetings</p>
+              <p className="text-xs text-muted-foreground mt-1">{t("famMeetingAnalyticsDashboard.acrossAllMeetings")}</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Members
+                {t("famMeetingAnalyticsDashboard.totalMembers")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -219,14 +221,14 @@ const MeetingAnalyticsDashboard = () => {
                 <Users className="w-5 h-5 text-blue-500" />
                 <div className="text-3xl font-bold">{overallStats.totalMembers}</div>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Active family members</p>
+              <p className="text-xs text-muted-foreground mt-1">{t("famMeetingAnalyticsDashboard.activeFamilyMembers")}</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Completion Rate
+                {t("famMeetingAnalyticsDashboard.completionRate")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -234,7 +236,7 @@ const MeetingAnalyticsDashboard = () => {
                 <Clock className="w-5 h-5 text-purple-500" />
                 <div className="text-3xl font-bold">{overallStats.completionRate}%</div>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Meetings completed</p>
+              <p className="text-xs text-muted-foreground mt-1">{t("famMeetingAnalyticsDashboard.meetingsCompleted")}</p>
             </CardContent>
           </Card>
         </div>
@@ -242,8 +244,8 @@ const MeetingAnalyticsDashboard = () => {
         {/* Monthly Trends */}
         <Card>
           <CardHeader>
-            <CardTitle>Meeting Frequency & Attendance Trends</CardTitle>
-            <CardDescription>Monthly meeting count and attendance rates over time</CardDescription>
+            <CardTitle>{t("famMeetingAnalyticsDashboard.meetingFrequencyAttendanceTrends")}</CardTitle>
+            <CardDescription>{t("famMeetingAnalyticsDashboard.monthlyMeetingCountAndAttendance")}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -279,8 +281,8 @@ const MeetingAnalyticsDashboard = () => {
           {/* Meeting Type Distribution */}
           <Card>
             <CardHeader>
-              <CardTitle>Meeting Type Distribution</CardTitle>
-              <CardDescription>Breakdown of meetings by type</CardDescription>
+              <CardTitle>{t("famMeetingAnalyticsDashboard.meetingTypeDistribution")}</CardTitle>
+              <CardDescription>{t("famMeetingAnalyticsDashboard.breakdownOfMeetingsByType")}</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -307,8 +309,8 @@ const MeetingAnalyticsDashboard = () => {
           {/* Monthly Meeting Count */}
           <Card>
             <CardHeader>
-              <CardTitle>Monthly Meeting Count</CardTitle>
-              <CardDescription>Number of meetings held each month</CardDescription>
+              <CardTitle>{t("famMeetingAnalyticsDashboard.monthlyMeetingCount")}</CardTitle>
+              <CardDescription>{t("famMeetingAnalyticsDashboard.numberOfMeetingsHeldEach")}</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>

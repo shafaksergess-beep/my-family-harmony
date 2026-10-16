@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
@@ -27,6 +28,7 @@ interface ExportSchedule {
 }
 
 export default function ExportScheduler() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { family, canManageFinances } = useFamilyAuth(familySlug);
@@ -64,7 +66,7 @@ export default function ExportScheduler() {
       setSchedules(data || []);
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: t("famExportScheduler.error"),
         description: error.message,
         variant: "destructive",
       });
@@ -78,8 +80,8 @@ export default function ExportScheduler() {
 
     if (!newSchedule.name || !newSchedule.recipients) {
       toast({
-        title: "Missing information",
-        description: "Please fill in all required fields",
+        title: t("famExportScheduler.missingInformation"),
+        description: t("famExportScheduler.pleaseFillInAllRequired"),
         variant: "destructive",
       });
       return;
@@ -104,8 +106,8 @@ export default function ExportScheduler() {
       if (error) throw error;
 
       toast({
-        title: "Schedule created",
-        description: "Export schedule has been created successfully",
+        title: t("famExportScheduler.scheduleCreated"),
+        description: t("famExportScheduler.exportScheduleHasBeenCreated"),
       });
 
       setIsDialogOpen(false);
@@ -120,7 +122,7 @@ export default function ExportScheduler() {
       loadSchedules();
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: t("famExportScheduler.error"),
         description: error.message,
         variant: "destructive",
       });
@@ -137,14 +139,14 @@ export default function ExportScheduler() {
       if (error) throw error;
 
       toast({
-        title: "Schedule updated",
+        title: t("famExportScheduler.scheduleUpdated"),
         description: `Schedule ${!currentState ? 'enabled' : 'disabled'}`,
       });
 
       loadSchedules();
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: t("famExportScheduler.error"),
         description: error.message,
         variant: "destructive",
       });
@@ -161,14 +163,14 @@ export default function ExportScheduler() {
       if (error) throw error;
 
       toast({
-        title: "Schedule deleted",
-        description: "Export schedule has been deleted",
+        title: t("famExportScheduler.scheduleDeleted"),
+        description: t("famExportScheduler.exportScheduleHasBeenDeleted"),
       });
 
       loadSchedules();
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: t("famExportScheduler.error"),
         description: error.message,
         variant: "destructive",
       });
@@ -180,7 +182,7 @@ export default function ExportScheduler() {
       <div className="container mx-auto p-6">
         <Card>
           <CardContent className="p-6">
-            <p className="text-muted-foreground">You don't have permission to manage export schedules.</p>
+            <p className="text-muted-foreground">{t("famExportScheduler.youDonTHavePermission")}</p>
           </CardContent>
         </Card>
       </div>
@@ -192,7 +194,7 @@ export default function ExportScheduler() {
       <div className="container mx-auto p-6">
         <Card>
           <CardContent className="p-6">
-            <p className="text-muted-foreground">Loading...</p>
+            <p className="text-muted-foreground">{t("famExportScheduler.loading")}</p>
           </CardContent>
         </Card>
       </div>
@@ -207,33 +209,33 @@ export default function ExportScheduler() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Export Scheduler</h1>
-            <p className="text-muted-foreground">Automate financial report exports via email</p>
+            <h1 className="text-3xl font-bold">{t("famExportScheduler.exportScheduler")}</h1>
+            <p className="text-muted-foreground">{t("famExportScheduler.automateFinancialReportExportsVia")}</p>
           </div>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              New Schedule
+              {t("famExportScheduler.newSchedule")}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create Export Schedule</DialogTitle>
+              <DialogTitle>{t("famExportScheduler.createExportSchedule")}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label>Schedule Name</Label>
+                <Label>{t("famExportScheduler.scheduleName")}</Label>
                 <Input
-                  placeholder="Weekly Financial Summary"
+                  placeholder={t("famExportScheduler.weeklyFinancialSummary")}
                   value={newSchedule.name}
                   onChange={(e) => setNewSchedule({ ...newSchedule, name: e.target.value })}
                 />
               </div>
 
               <div>
-                <Label>Frequency</Label>
+                <Label>{t("famExportScheduler.frequency")}</Label>
                 <Select
                   value={newSchedule.frequency}
                   onValueChange={(value) => setNewSchedule({ ...newSchedule, frequency: value })}
@@ -242,7 +244,7 @@ export default function ExportScheduler() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="daily">{t("famExportScheduler.daily")}</SelectItem>
                     <SelectItem value="weekly">Weekly (Monday)</SelectItem>
                     <SelectItem value="monthly">Monthly (1st)</SelectItem>
                   </SelectContent>
@@ -250,7 +252,7 @@ export default function ExportScheduler() {
               </div>
 
               <div>
-                <Label>Report Type</Label>
+                <Label>{t("famExportScheduler.reportType")}</Label>
                 <Select
                   value={newSchedule.report_type}
                   onValueChange={(value) => setNewSchedule({ ...newSchedule, report_type: value })}
@@ -259,18 +261,18 @@ export default function ExportScheduler() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="contributions">Contributions</SelectItem>
-                    <SelectItem value="loans">Loans</SelectItem>
-                    <SelectItem value="savings">Savings</SelectItem>
-                    <SelectItem value="attendance">Attendance</SelectItem>
-                    <SelectItem value="financial_summary">Financial Summary</SelectItem>
-                    <SelectItem value="all">All Reports</SelectItem>
+                    <SelectItem value="contributions">{t("famExportScheduler.contributions")}</SelectItem>
+                    <SelectItem value="loans">{t("famExportScheduler.loans")}</SelectItem>
+                    <SelectItem value="savings">{t("famExportScheduler.savings")}</SelectItem>
+                    <SelectItem value="attendance">{t("famExportScheduler.attendance")}</SelectItem>
+                    <SelectItem value="financial_summary">{t("famExportScheduler.financialSummary")}</SelectItem>
+                    <SelectItem value="all">{t("famExportScheduler.allReports")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <Label>Format</Label>
+                <Label>{t("famExportScheduler.format")}</Label>
                 <Select
                   value={newSchedule.format}
                   onValueChange={(value) => setNewSchedule({ ...newSchedule, format: value })}
@@ -280,7 +282,7 @@ export default function ExportScheduler() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="csv">CSV</SelectItem>
-                    <SelectItem value="excel">Excel</SelectItem>
+                    <SelectItem value="excel">{t("famExportScheduler.excel")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -295,7 +297,7 @@ export default function ExportScheduler() {
               </div>
 
               <div className="flex items-center justify-between">
-                <Label>Active</Label>
+                <Label>{t("famExportScheduler.active")}</Label>
                 <Switch
                   checked={newSchedule.is_active}
                   onCheckedChange={(checked) => setNewSchedule({ ...newSchedule, is_active: checked })}
@@ -304,10 +306,10 @@ export default function ExportScheduler() {
 
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  Cancel
+                  {t("famExportScheduler.cancel")}
                 </Button>
                 <Button onClick={handleCreateSchedule}>
-                  Create Schedule
+                  {t("famExportScheduler.createSchedule")}
                 </Button>
               </div>
             </div>
@@ -320,9 +322,9 @@ export default function ExportScheduler() {
           <Card>
             <CardContent className="p-12 text-center">
               <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-xl font-semibold mb-2">No schedules yet</h3>
+              <h3 className="text-xl font-semibold mb-2">{t("famExportScheduler.noSchedulesYet")}</h3>
               <p className="text-muted-foreground mb-6">
-                Create your first export schedule to automate report delivery
+                {t("famExportScheduler.createYourFirstExportSchedule")}
               </p>
             </CardContent>
           </Card>
@@ -359,13 +361,13 @@ export default function ExportScheduler() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-sm">
                     <Mail className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">Recipients:</span>
+                    <span className="text-muted-foreground">{t("famExportScheduler.recipients")}</span>
                     <span>{schedule.recipients.join(', ')}</span>
                   </div>
                   {schedule.last_sent_at && (
                     <div className="flex items-center gap-2 text-sm">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Last sent:</span>
+                      <span className="text-muted-foreground">{t("famExportScheduler.lastSent")}</span>
                       <span>{format(new Date(schedule.last_sent_at), 'PPp')}</span>
                     </div>
                   )}
@@ -376,7 +378,7 @@ export default function ExportScheduler() {
                       onClick={() => handleDeleteSchedule(schedule.id)}
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
-                      Delete
+                      {t("famExportScheduler.delete")}
                     </Button>
                   </div>
                 </div>

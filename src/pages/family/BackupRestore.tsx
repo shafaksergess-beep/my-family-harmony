@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +14,7 @@ import {
 } from '@/components/ui/alert';
 
 export default function BackupRestore() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const { family } = useFamilyAuth(familySlug);
   const [isExporting, setIsExporting] = useState(false);
@@ -20,7 +22,7 @@ export default function BackupRestore() {
   const handleExport = async () => {
     if (!familySlug || !family?.id) {
       if (!family?.id && familySlug) {
-        toast.error("Family data not loaded. Please try again.");
+        toast.error(t("famBackupRestore.familyDataNotLoadedPlease"));
       }
       return;
     }
@@ -55,18 +57,17 @@ export default function BackupRestore() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Backup & Restore</h1>
+        <h1 className="text-3xl font-bold mb-2">{t("famBackupRestore.backupRestore")}</h1>
         <p className="text-muted-foreground">
-          Export and restore your family data
+          {t("famBackupRestore.exportAndRestoreYourFamily")}
         </p>
       </div>
 
       <Alert>
         <AlertTriangle className="h-4 w-4" />
-        <AlertTitle>Important</AlertTitle>
+        <AlertTitle>{t("famBackupRestore.important")}</AlertTitle>
         <AlertDescription>
-          Always keep a recent backup of your family data. Backups include all contributions,
-          loans, meetings, and member information.
+          {t("famBackupRestore.alwaysKeepARecentBackup")}
         </AlertDescription>
       </Alert>
 
@@ -75,24 +76,24 @@ export default function BackupRestore() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Download className="h-5 w-5" />
-              Export Data
+              {t("famBackupRestore.exportData")}
             </CardTitle>
             <CardDescription>
-              Download a complete backup of your family data
+              {t("famBackupRestore.downloadACompleteBackupOf")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Export includes:
+              {t("famBackupRestore.exportIncludes")}
             </p>
             <ul className="text-sm space-y-1 list-disc list-inside text-muted-foreground">
-              <li>Family settings and configuration</li>
-              <li>All member profiles</li>
-              <li>Contribution records</li>
-              <li>Loan history and payments</li>
-              <li>Meeting records and attendance</li>
-              <li>Assistance events</li>
-              <li>Savings and shares</li>
+              <li>{t("famBackupRestore.familySettingsAndConfiguration")}</li>
+              <li>{t("famBackupRestore.allMemberProfiles")}</li>
+              <li>{t("famBackupRestore.contributionRecords")}</li>
+              <li>{t("famBackupRestore.loanHistoryAndPayments")}</li>
+              <li>{t("famBackupRestore.meetingRecordsAndAttendance")}</li>
+              <li>{t("famBackupRestore.assistanceEvents")}</li>
+              <li>{t("famBackupRestore.savingsAndShares")}</li>
             </ul>
             <Button 
               onClick={handleExport} 
@@ -109,18 +110,18 @@ export default function BackupRestore() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Upload className="h-5 w-5" />
-              Restore Data
+              {t("famBackupRestore.restoreData")}
             </CardTitle>
             <CardDescription>
-              Restore from a previous backup file
+              {t("famBackupRestore.restoreFromAPreviousBackup")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Alert variant="destructive">
               <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Warning</AlertTitle>
+              <AlertTitle>{t("famBackupRestore.warning")}</AlertTitle>
               <AlertDescription>
-                Restoring will overwrite current data. Make sure to export current data first.
+                {t("famBackupRestore.restoringWillOverwriteCurrentData")}
               </AlertDescription>
             </Alert>
             <Button 
@@ -129,7 +130,7 @@ export default function BackupRestore() {
               className="w-full"
             >
               <Upload className="mr-2 h-4 w-4" />
-              Select Backup File
+              {t("famBackupRestore.selectBackupFile")}
             </Button>
           </CardContent>
         </Card>
@@ -138,20 +139,19 @@ export default function BackupRestore() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5" />
-              Automated Backups
+              {t("famBackupRestore.automatedBackups")}
             </CardTitle>
             <CardDescription>
-              Schedule automatic monthly backups
+              {t("famBackupRestore.scheduleAutomaticMonthlyBackups")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Enable automated monthly backups to ensure your data is always protected.
-              Backups will be stored securely and can be downloaded at any time.
+              {t("famBackupRestore.enableAutomatedMonthlyBackupsTo")}
             </p>
             <Button variant="outline">
               <Clock className="mr-2 h-4 w-4" />
-              Schedule Monthly Backup
+              {t("famBackupRestore.scheduleMonthlyBackup")}
             </Button>
           </CardContent>
         </Card>

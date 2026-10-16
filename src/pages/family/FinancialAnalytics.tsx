@@ -173,8 +173,8 @@ const FinancialAnalytics = () => {
     } catch (error) {
       console.error("Error loading data:", error);
       toast({
-        title: "Error",
-        description: "Failed to load financial analytics",
+        title: t("famFinancialAnalytics.error"),
+        description: t("famFinancialAnalytics.failedToLoadFinancialAnalytics"),
         variant: "destructive",
       });
     } finally {
@@ -211,7 +211,7 @@ const FinancialAnalytics = () => {
               <div>
                 <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                   <TrendingUp className="w-6 h-6" />
-                  Financial Analytics
+                  {t("famFinancialAnalytics.financialAnalytics")}
                 </h1>
                 <p className="text-sm text-muted-foreground">{family?.name}</p>
               </div>
@@ -226,7 +226,7 @@ const FinancialAnalytics = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Contributions</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famFinancialAnalytics.totalContributions")}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -236,7 +236,7 @@ const FinancialAnalytics = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Loans</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famFinancialAnalytics.totalLoans")}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -246,7 +246,7 @@ const FinancialAnalytics = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Loans Outstanding</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famFinancialAnalytics.loansOutstanding")}</CardTitle>
               <DollarSign className="h-4 w-4 text-red-500" />
             </CardHeader>
             <CardContent>
@@ -256,7 +256,7 @@ const FinancialAnalytics = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Savings</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famFinancialAnalytics.totalSavings")}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -266,7 +266,7 @@ const FinancialAnalytics = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Shares</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famFinancialAnalytics.totalShares")}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -282,16 +282,16 @@ const FinancialAnalytics = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="w-5 h-5" />
-                Monthly Financial Trend
+                {t("famFinancialAnalytics.monthlyFinancialTrend")}
               </CardTitle>
-              <CardDescription>Last 6 months overview</CardDescription>
+              <CardDescription>{t("famFinancialAnalytics.last6MonthsOverview")}</CardDescription>
             </CardHeader>
             <CardContent>
               <ChartContainer
                 config={{
-                  contributions: { label: "Contributions", color: "hsl(var(--primary))" },
-                  loans: { label: "Loans", color: "#3b82f6" },
-                  savings: { label: "Savings", color: "#10b981" },
+                  contributions: { label: t("famFinancialAnalytics.contributions"), color: "hsl(var(--primary))" },
+                  loans: { label: t("famFinancialAnalytics.loans"), color: "#3b82f6" },
+                  savings: { label: t("famFinancialAnalytics.savings"), color: "#10b981" },
                 }}
                 className="h-[300px]"
               >
@@ -316,9 +316,9 @@ const FinancialAnalytics = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <PieChart className="w-5 h-5" />
-                Contribution Status
+                {t("famFinancialAnalytics.contributionStatus")}
               </CardTitle>
-              <CardDescription>Distribution by status</CardDescription>
+              <CardDescription>{t("famFinancialAnalytics.distributionByStatus")}</CardDescription>
             </CardHeader>
             <CardContent>
               <ChartContainer
@@ -355,9 +355,9 @@ const FinancialAnalytics = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="w-5 h-5" />
-                Loan Status Distribution
+                {t("famFinancialAnalytics.loanStatusDistribution")}
               </CardTitle>
-              <CardDescription>Outstanding amounts by status</CardDescription>
+              <CardDescription>{t("famFinancialAnalytics.outstandingAmountsByStatus")}</CardDescription>
             </CardHeader>
             <CardContent>
               <ChartContainer

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +12,7 @@ import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { Loader2, ArrowLeft, Save, Settings } from "lucide-react";
 
 const MeetingSettings = () => {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -59,13 +61,13 @@ const MeetingSettings = () => {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Meeting settings updated successfully",
+        title: t("famMeetingSettings.success"),
+        description: t("famMeetingSettings.meetingSettingsUpdatedSuccessfully"),
       });
     } catch (error: any) {
       console.error("Error updating settings:", error);
       toast({
-        title: "Error",
+        title: t("famMeetingSettings.error"),
         description: error.message || "Failed to update settings",
         variant: "destructive",
       });
@@ -87,11 +89,11 @@ const MeetingSettings = () => {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="max-w-md">
           <CardHeader>
-            <CardTitle>Access Denied</CardTitle>
-            <CardDescription>Only family heads can access meeting settings</CardDescription>
+            <CardTitle>{t("famMeetingSettings.accessDenied")}</CardTitle>
+            <CardDescription>{t("famMeetingSettings.onlyFamilyHeadsCanAccess")}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => navigate(`/family/${familySlug}`)}>Go Back</Button>
+            <Button onClick={() => navigate(`/family/${familySlug}`)}>{t("famMeetingSettings.goBack")}</Button>
           </CardContent>
         </Card>
       </div>
@@ -105,14 +107,14 @@ const MeetingSettings = () => {
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+              {t("famMeetingSettings.back")}
             </Button>
             <div>
               <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                 <Settings className="w-6 h-6" />
-                Meeting Settings
+                {t("famMeetingSettings.meetingSettings")}
               </h1>
-              <p className="text-sm text-muted-foreground">Configure meeting schedules and fines</p>
+              <p className="text-sm text-muted-foreground">{t("famMeetingSettings.configureMeetingSchedulesAndFines")}</p>
             </div>
           </div>
         </div>
@@ -122,14 +124,14 @@ const MeetingSettings = () => {
         <form onSubmit={handleSubmit}>
           <Card>
             <CardHeader>
-              <CardTitle>Meeting Configuration</CardTitle>
+              <CardTitle>{t("famMeetingSettings.meetingConfiguration")}</CardTitle>
               <CardDescription>
-                Set meeting frequency, time, and lateness fine policies
+                {t("famMeetingSettings.setMeetingFrequencyTimeAnd")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="frequency">Meeting Frequency</Label>
+                <Label htmlFor="frequency">{t("famMeetingSettings.meetingFrequency")}</Label>
                 <Select
                   value={formData.meeting_frequency}
                   onValueChange={(value) =>
@@ -140,15 +142,15 @@ const MeetingSettings = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="weekly">Weekly</SelectItem>
-                    <SelectItem value="biweekly">Bi-weekly</SelectItem>
-                    <SelectItem value="monthly">Monthly</SelectItem>
+                    <SelectItem value="weekly">{t("famMeetingSettings.weekly")}</SelectItem>
+                    <SelectItem value="biweekly">{t("famMeetingSettings.biWeekly")}</SelectItem>
+                    <SelectItem value="monthly">{t("famMeetingSettings.monthly")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="day">Meeting Day</Label>
+                <Label htmlFor="day">{t("famMeetingSettings.meetingDay")}</Label>
                 <Select
                   value={formData.meeting_day}
                   onValueChange={(value) =>
@@ -159,16 +161,16 @@ const MeetingSettings = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="last_saturday">Last Saturday of Month</SelectItem>
-                    <SelectItem value="first_saturday">First Saturday of Month</SelectItem>
-                    <SelectItem value="saturday">Every Saturday</SelectItem>
-                    <SelectItem value="sunday">Every Sunday</SelectItem>
+                    <SelectItem value="last_saturday">{t("famMeetingSettings.lastSaturdayOfMonth")}</SelectItem>
+                    <SelectItem value="first_saturday">{t("famMeetingSettings.firstSaturdayOfMonth")}</SelectItem>
+                    <SelectItem value="saturday">{t("famMeetingSettings.everySaturday")}</SelectItem>
+                    <SelectItem value="sunday">{t("famMeetingSettings.everySunday")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="time">Meeting Time</Label>
+                <Label htmlFor="time">{t("famMeetingSettings.meetingTime")}</Label>
                 <Input
                   id="time"
                   type="time"
@@ -184,7 +186,7 @@ const MeetingSettings = () => {
               </div>
 
               <div className="border-t pt-4 space-y-4">
-                <h3 className="font-semibold">Lateness Fine Policy</h3>
+                <h3 className="font-semibold">{t("famMeetingSettings.latenessFinePolicy")}</h3>
                 
                 <div className="space-y-2">
                   <Label htmlFor="tolerance">Tolerance Period (minutes)</Label>
@@ -202,7 +204,7 @@ const MeetingSettings = () => {
                     required
                   />
                   <p className="text-sm text-muted-foreground">
-                    No fine applied within this time period
+                    {t("famMeetingSettings.noFineAppliedWithinThis")}
                   </p>
                 </div>
 
@@ -222,7 +224,7 @@ const MeetingSettings = () => {
                     required
                   />
                   <p className="text-sm text-muted-foreground">
-                    Applied for 30-60 minutes lateness
+                    {t("famMeetingSettings.appliedFor3060Minutes")}
                   </p>
                 </div>
 
@@ -242,7 +244,7 @@ const MeetingSettings = () => {
                     required
                   />
                   <p className="text-sm text-muted-foreground">
-                    Applied for over 60 minutes lateness
+                    {t("famMeetingSettings.appliedForOver60Minutes")}
                   </p>
                 </div>
               </div>
@@ -251,12 +253,12 @@ const MeetingSettings = () => {
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Saving...
+                    {t("famMeetingSettings.saving")}
                   </>
                 ) : (
                   <>
                     <Save className="w-4 h-4 mr-2" />
-                    Save Settings
+                    {t("famMeetingSettings.saveSettings")}
                   </>
                 )}
               </Button>
