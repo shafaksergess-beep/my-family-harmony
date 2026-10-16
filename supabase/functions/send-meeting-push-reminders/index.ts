@@ -146,9 +146,11 @@ Deno.serve(async (req) => {
 
     // 1) Meetings happening in the next ~25h (reminder_1d window)
     //    and the next ~75min (attendance deadline window).
-    const in25h = new Date(now.getTime() + 25 * 3600 * 1000);
+    const in8d = new Date(now.getTime() + 8 * 24 * 3600 * 1000);
     const fromDate = now.toISOString().slice(0, 10);
-    const toDate = in25h.toISOString().slice(0, 10);
+    const toDate = in8d.toISOString().slice(0, 10);
+    const todayStr = fromDate;
+    const utcHour = now.getUTCHours();
 
     const { data: meetings, error: mErr } = await admin
       .from("meetings")
@@ -171,10 +173,13 @@ Deno.serve(async (req) => {
       const msUntil = start.getTime() - now.getTime();
       const hoursUntil = msUntil / 3600_000;
 
-      // Determine which notifications apply right now
+      // Determine which notifications apply right now (dedup log guarantees once each)
+      const send7d = hoursUntil > 165 && hoursUntil <= 169; // week-of
       const send24h = hoursUntil > 22 && hoursUntil <= 25; // reminder_1d
-      const send1h = hoursUntil > 0 && hoursUntil <= 1.25; // attendance deadline
-      if (!send24h && !send1h) {
+      const sendMorning = m.meeting_date === todayStr && utcHour >= 6 && utcHour < 10 && hoursUntil > 1.5; // morning-of
+      const send1h = hoursUntil > 0.3 && hoursUntil <= 1.25; // attendance deadline
+      const send15m = hoursUntil > 0 && hoursUntil <= 0.3; // final check-in call
+      if (!send7d && !send24h && !sendMorning && !send1h && !send15m) {
         skipped++;
         continue;
       }
@@ -219,7 +224,7 @@ Deno.serve(async (req) => {
         token: string | null;
         phone: string | null;
         smsEnabled: boolean;
-        type: "meeting_reminder_1d" | "attendance_deadline";
+        type: "meeting_reminder_1d" | "meeting_reminder_7d" | "meeting_reminder_morning" | "attendance_deadline" | "attendance_deadline_15m";
         title: string;
         body: string;
         critical: boolean;
@@ -257,6 +262,17 @@ Deno.serve(async (req) => {
             body: `Meeting starts in under an hour. Check in to be marked present.`,
             critical: true,
           });
+        }
+        const where = `${m.meeting_date} at ${meetingTimeStr}${m.location ? ` — ${m.location}` : ""}`;
+        const base = { userId: p.id, token: pushOn ? p.push_token : null, phone: p.phone, smsEnabled: smsOn };
+        if (send7d && (pref?.meeting_reminders ?? true)) {
+          jobs.push({ ...base, type: "meeting_reminder_7d", title: `🗓️ ${familyName} meeting next week`, body: where, critical: false });
+        }
+        if (sendMorning && (pref?.meeting_reminders ?? true)) {
+          jobs.push({ ...base, type: "meeting_reminder_morning", title: `☀️ ${familyName} meeting today`, body: `Today at ${meetingTimeStr}${m.location ? ` — ${m.location}` : ""}`, critical: false });
+        }
+        if (send15m && (pref?.attendance_deadlines ?? true)) {
+          jobs.push({ ...base, type: "attendance_deadline_15m", title: `🚨 15 minutes to check in — ${familyName}`, body: `The meeting starts in about 15 minutes. Check in now to avoid a lateness fine.`, critical: true });
         }
       }
 
@@ -313,7 +329,7 @@ Deno.serve(async (req) => {
             fcm_status: status,
           });
           if (delivered) {
-            if (job.type === "meeting_reminder_1d") pushedReminder++;
+            if (job.type.startsWith("meeting_reminder")) pushedReminder++;
             else pushedDeadline++;
           } else {
             failed++;
