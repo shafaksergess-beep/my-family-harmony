@@ -1,3 +1,4 @@
+import i18n from "@/i18n/config";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -23,38 +24,38 @@ interface MemberWithRoles {
 
 const ROLE_INFO: Record<string, { label: string; description: string; color: string }> = {
   family_head: {
-    label: t("admRoleManagement.familyHead"),
-    description: t("admRoleManagement.fullAdministrativeControlOverThe"),
+    get label() { return i18n.t("admRoleManagement.familyHead"); },
+    get description() { return i18n.t("admRoleManagement.fullAdministrativeControlOverThe"); },
     color: "bg-purple-500",
   },
   family_admin: {
-    label: t("admRoleManagement.familyAdmin"),
-    description: t("admRoleManagement.allAdminRightsForThis"),
+    get label() { return i18n.t("admRoleManagement.familyAdmin"); },
+    get description() { return i18n.t("admRoleManagement.allAdminRightsForThis"); },
     color: "bg-blue-500",
   },
   secretary: {
-    label: t("admRoleManagement.secretary"),
-    description: t("admRoleManagement.canManageMinutesReportsAnd"),
+    get label() { return i18n.t("admRoleManagement.secretary"); },
+    get description() { return i18n.t("admRoleManagement.canManageMinutesReportsAnd"); },
     color: "bg-green-500",
   },
   treasurer: {
-    label: t("admRoleManagement.treasurer"),
-    description: t("admRoleManagement.managesFinancialRecordsAndTransactions"),
+    get label() { return i18n.t("admRoleManagement.treasurer"); },
+    get description() { return i18n.t("admRoleManagement.managesFinancialRecordsAndTransactions"); },
     color: "bg-yellow-500",
   },
   loan_committee: {
-    label: t("admRoleManagement.loanCommittee"),
-    description: t("admRoleManagement.reviewsAndApprovesLoanRequests"),
+    get label() { return i18n.t("admRoleManagement.loanCommittee"); },
+    get description() { return i18n.t("admRoleManagement.reviewsAndApprovesLoanRequests"); },
     color: "bg-orange-500",
   },
   member: {
-    label: t("admRoleManagement.member"),
-    description: t("admRoleManagement.standardFamilyMemberAccess"),
+    get label() { return i18n.t("admRoleManagement.member"); },
+    get description() { return i18n.t("admRoleManagement.standardFamilyMemberAccess"); },
     color: "bg-gray-500",
   },
   guest: {
-    label: t("admRoleManagement.guest"),
-    description: t("admRoleManagement.limitedReadOnlyAccess"),
+    get label() { return i18n.t("admRoleManagement.guest"); },
+    get description() { return i18n.t("admRoleManagement.limitedReadOnlyAccess"); },
     color: "bg-slate-500",
   },
 };

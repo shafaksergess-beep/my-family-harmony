@@ -403,6 +403,7 @@ function CategoryForm({ category, onSave, onCancel }: {
   onSave: (data: Partial<ModuleCategory>) => void;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: category?.name || "",
     slug: category?.slug || "",
@@ -479,6 +480,7 @@ function ModuleForm({ module, categories, onSave, onCancel }: {
   onSave: (data: Partial<Module>) => void;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: module?.name || "",
     slug: module?.slug || "",
