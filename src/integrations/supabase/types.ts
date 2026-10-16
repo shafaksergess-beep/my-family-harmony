@@ -339,6 +339,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "balloting_assignments_balloted_by_fkey"
+            columns: ["balloted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "balloting_assignments_family_id_fkey"
             columns: ["family_id"]
             isOneToOne: false
@@ -1363,6 +1370,13 @@ export type Database = {
             referencedRelation: "invitations"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "join_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       languages: {
@@ -1701,6 +1715,13 @@ export type Database = {
             referencedRelation: "meetings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "meeting_minutes_recorded_by_fkey"
+            columns: ["recorded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       meeting_reminders: {
@@ -1780,6 +1801,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "meeting_templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "meeting_templates_family_id_fkey"
             columns: ["family_id"]
@@ -3099,6 +3127,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      anonymize_deleted_account: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       check_is_family_admin: {
         Args: { _family_id: string; _user_id: string }
         Returns: boolean

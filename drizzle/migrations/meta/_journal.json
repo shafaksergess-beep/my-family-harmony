@@ -22,6 +22,13 @@
       "when": 1792142917711,
       "tag": "0002_languages_and_translations",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792145667732,
+      "tag": "0003_secure_account_deletion",
+      "breakpoints": true
     }
   ]
 }
