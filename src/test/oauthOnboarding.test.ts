@@ -95,7 +95,7 @@ describe("syncUserProfile — profile upsert after OAuth", () => {
     });
     await syncUserProfile(googleUser);
     const payload = upsert.mock.calls[0][0][0];
-    expect(payload.full_name).toBeUndefined();
+    expect(payload.full_name).toBe("Custom Name");
     expect(payload.avatar_url).toBeUndefined();
     expect(payload.email).toBe("jane@example.com");
   });
