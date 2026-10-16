@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,6 +44,7 @@ interface FamilyMember {
 }
 
 export default function FamilySavings() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -128,7 +130,7 @@ export default function FamilySavings() {
       setMembers(allEnrichedMembers as FamilyMember[]);
     } catch (error) {
       const err = error as Error;
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("famSavings.error"), description: err.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -178,7 +180,7 @@ export default function FamilySavings() {
       const selectedMemberId = canManageFinances ? formData.member_id : memberId;
       
       if (!selectedMemberId) {
-        toast({ title: "Error", description: "Member not found", variant: "destructive" });
+        toast({ title: t("famSavings.error"), description: t("famSavings.memberNotFound"), variant: "destructive" });
         return;
       }
 
@@ -198,13 +200,13 @@ export default function FamilySavings() {
         await notifyLeadership(data.id, memberProfile?.profiles.full_name || "A member", parseFloat(formData.amount), formData.month);
       }
 
-      toast({ title: "Success", description: canManageFinances ? "Savings record added" : "Savings submitted for approval" });
+      toast({ title: t("famSavings.success"), description: canManageFinances ? "Savings record added" : "Savings submitted for approval" });
       setIsDialogOpen(false);
       setFormData({ member_id: "", month: new Date().toISOString().slice(0, 7), amount: family?.min_savings_amount?.toString() || "5000", notes: "" });
       loadData();
     } catch (error) {
       const err = error as Error;
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("famSavings.error"), description: err.message, variant: "destructive" });
     }
   };
 
@@ -213,10 +215,10 @@ export default function FamilySavings() {
       const { error } = await supabase.from("savings").update({ status: "approved", approved_at: new Date().toISOString() }).eq("id", saving.id);
       if (error) throw error;
       await notifyMember(saving.id, saving.member_id, "approved", `Your savings of ${formatAmount(saving.amount)} has been approved.`);
-      toast({ title: "Approved", description: "Savings record approved" });
+      toast({ title: t("famSavings.approved"), description: t("famSavings.savingsRecordApproved") });
       loadData();
     } catch (error) {
-      toast({ title: "Error", description: (error as Error).message, variant: "destructive" });
+      toast({ title: t("famSavings.error"), description: (error as Error).message, variant: "destructive" });
     }
   };
 
@@ -229,13 +231,13 @@ export default function FamilySavings() {
       if (saving) {
         await notifyMember(saving.id, saving.member_id, "rejected", `Your savings of ${formatAmount(saving.amount)} was rejected. Reason: ${rejectionReason}`);
       }
-      toast({ title: "Rejected", description: "Savings record rejected" });
+      toast({ title: t("famSavings.rejected"), description: t("famSavings.savingsRecordRejected") });
       setRejectDialogOpen(false);
       setRejectingSavingId(null);
       setRejectionReason("");
       loadData();
     } catch (error) {
-      toast({ title: "Error", description: (error as Error).message, variant: "destructive" });
+      toast({ title: t("famSavings.error"), description: (error as Error).message, variant: "destructive" });
     }
   };
 
@@ -252,12 +254,12 @@ export default function FamilySavings() {
       }).eq("id", editingSaving.id);
       if (error) throw error;
       await notifyMember(editingSaving.id, editingSaving.member_id, "modified", `Your savings record has been modified to ${formatAmount(parseFloat(formData.amount))}.`);
-      toast({ title: "Updated", description: "Savings record updated" });
+      toast({ title: t("famSavings.updated"), description: t("famSavings.savingsRecordUpdated") });
       setEditingSaving(null);
       setIsDialogOpen(false);
       loadData();
     } catch (error) {
-      toast({ title: "Error", description: (error as Error).message, variant: "destructive" });
+      toast({ title: t("famSavings.error"), description: (error as Error).message, variant: "destructive" });
     }
   };
 
@@ -267,10 +269,10 @@ export default function FamilySavings() {
       await notifyMember(saving.id, saving.member_id, "deleted", `Your savings record of ${formatAmount(saving.amount)} has been deleted.`);
       const { error } = await supabase.from("savings").delete().eq("id", saving.id);
       if (error) throw error;
-      toast({ title: "Deleted", description: "Savings record deleted" });
+      toast({ title: t("famSavings.deleted"), description: t("famSavings.savingsRecordDeleted") });
       loadData();
     } catch (error) {
-      toast({ title: "Error", description: (error as Error).message, variant: "destructive" });
+      toast({ title: t("famSavings.error"), description: (error as Error).message, variant: "destructive" });
     }
   };
 
@@ -288,7 +290,7 @@ export default function FamilySavings() {
   const handleExport = () => {
     const exportData = formatSavingsForExport(savings);
     exportToCSV(exportData, `savings_${new Date().toISOString().split('T')[0]}`);
-    toast({ title: "Success", description: "Savings exported to CSV" });
+    toast({ title: t("famSavings.success"), description: t("famSavings.savingsExportedToCsv") });
   };
 
   const stats = (() => {
@@ -311,12 +313,12 @@ export default function FamilySavings() {
   };
 
   if (authLoading || loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return <div className="flex items-center justify-center min-h-screen">{t("famSavings.loading")}</div>;
   }
 
   return (
     <>
-      <SEO title="Family Savings" description="Record and review monthly savings with the family approval workflow." />
+      <SEO title={t("famSavings.familySavings")} description={t("famSavings.recordAndReviewMonthlySavings")} />
       <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
@@ -324,7 +326,7 @@ export default function FamilySavings() {
             <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-3xl font-bold">Individual Savings</h1>
+            <h1 className="text-3xl font-bold">{t("famSavings.individualSavings")}</h1>
           </div>
           <LanguageSwitcher />
         </div>
@@ -337,7 +339,7 @@ export default function FamilySavings() {
             </div>
             <DollarSign className="h-8 w-8 text-primary opacity-50" />
           </div>
-          <p className="text-xs text-muted-foreground mt-2">Savings are encouraged but not mandatory</p>
+          <p className="text-xs text-muted-foreground mt-2">{t("famSavings.savingsAreEncouragedButNot")}</p>
         </Card>
 
         <div className="flex justify-between items-center">
@@ -347,20 +349,20 @@ export default function FamilySavings() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-full">
             <Card className="p-6">
-              <div className="text-sm text-muted-foreground">Total Savings</div>
+              <div className="text-sm text-muted-foreground">{t("famSavings.totalSavings")}</div>
               <div className="text-2xl font-bold">{formatAmount(stats.totalSavings)}</div>
             </Card>
             <Card className="p-6">
-              <div className="text-sm text-muted-foreground">Active Savers</div>
+              <div className="text-sm text-muted-foreground">{t("famSavings.activeSavers")}</div>
               <div className="text-2xl font-bold">{stats.uniqueMembers}</div>
             </Card>
             <Card className="p-6">
-              <div className="text-sm text-muted-foreground">This Month</div>
+              <div className="text-sm text-muted-foreground">{t("famSavings.thisMonth")}</div>
               <div className="text-2xl font-bold">{formatAmount(stats.thisMonthTotal)}</div>
             </Card>
             {canManageFinances && stats.pendingCount > 0 && (
               <Card className="p-6 border-yellow-500/50 bg-yellow-500/5">
-                <div className="text-sm text-muted-foreground">Pending Approval</div>
+                <div className="text-sm text-muted-foreground">{t("famSavings.pendingApproval")}</div>
                 <div className="text-2xl font-bold text-yellow-600">{stats.pendingCount}</div>
               </Card>
             )}
@@ -368,11 +370,11 @@ export default function FamilySavings() {
         </div>
 
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Savings History</h2>
+          <h2 className="text-xl font-semibold">{t("famSavings.savingsHistory")}</h2>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={handleExport}>
               <Download className="h-4 w-4 mr-2" />
-              Export
+              {t("famSavings.export")}
             </Button>
             <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setEditingSaving(null); }}>
               <DialogTrigger asChild>
@@ -391,9 +393,9 @@ export default function FamilySavings() {
                 <form onSubmit={editingSaving ? handleEditSave : handleSubmit} className="space-y-4">
                   {canManageFinances && (
                     <div>
-                      <Label htmlFor="member">Member</Label>
+                      <Label htmlFor="member">{t("famSavings.member")}</Label>
                       <Select value={formData.member_id} onValueChange={(value) => setFormData({ ...formData, member_id: value })}>
-                        <SelectTrigger><SelectValue placeholder="Select member" /></SelectTrigger>
+                        <SelectTrigger><SelectValue placeholder={t("famSavings.selectMember")} /></SelectTrigger>
                         <SelectContent>
                           {members.map((member) => (
                             <SelectItem key={member.id} value={member.id}>{member.profiles.full_name}</SelectItem>
@@ -403,10 +405,10 @@ export default function FamilySavings() {
                     </div>
                   )}
                   {!canManageFinances && (
-                    <p className="text-sm text-muted-foreground">Your savings will be submitted for approval by leadership.</p>
+                    <p className="text-sm text-muted-foreground">{t("famSavings.yourSavingsWillBeSubmitted")}</p>
                   )}
                   <div>
-                    <Label htmlFor="month">Month</Label>
+                    <Label htmlFor="month">{t("famSavings.month")}</Label>
                     <Input id="month" type="month" value={formData.month} onChange={(e) => setFormData({ ...formData, month: e.target.value })} required />
                   </div>
                   <div>
@@ -428,13 +430,13 @@ export default function FamilySavings() {
         {/* Reject Dialog */}
         <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
           <DialogContent>
-            <DialogHeader><DialogTitle>Reject Savings</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle>{t("famSavings.rejectSavings")}</DialogTitle></DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label>Reason for rejection</Label>
-                <Textarea value={rejectionReason} onChange={(e) => setRejectionReason(e.target.value)} placeholder="Provide a reason..." required />
+                <Label>{t("famSavings.reasonForRejection")}</Label>
+                <Textarea value={rejectionReason} onChange={(e) => setRejectionReason(e.target.value)} placeholder={t("famSavings.provideAReason")} required />
               </div>
-              <Button variant="destructive" onClick={handleReject} className="w-full" disabled={!rejectionReason.trim()}>Reject</Button>
+              <Button variant="destructive" onClick={handleReject} className="w-full" disabled={!rejectionReason.trim()}>{t("famSavings.reject")}</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -442,8 +444,8 @@ export default function FamilySavings() {
         {savings.length === 0 ? (
           <EmptyState
             icon={DollarSign}
-            title="No savings recorded yet"
-            description="Members can record monthly savings — leadership reviews and approves each entry. Encourage your first deposit today."
+            title={t("famSavings.noSavingsRecordedYet")}
+            description={t("famSavings.membersCanRecordMonthlySavings")}
             primary={{
               label: canManageFinances ? "Add first savings entry" : "Record my savings",
               onClick: () => {
@@ -460,18 +462,18 @@ export default function FamilySavings() {
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left p-4">Member</th>
-                  <th className="text-left p-4">Month</th>
-                  <th className="text-right p-4">Amount</th>
-                  <th className="text-left p-4">Status</th>
-                  <th className="text-left p-4">Notes</th>
-                  {canManageFinances && <th className="text-right p-4">Actions</th>}
+                  <th className="text-left p-4">{t("famSavings.member")}</th>
+                  <th className="text-left p-4">{t("famSavings.month")}</th>
+                  <th className="text-right p-4">{t("famSavings.amount")}</th>
+                  <th className="text-left p-4">{t("famSavings.status")}</th>
+                  <th className="text-left p-4">{t("famSavings.notes")}</th>
+                  {canManageFinances && <th className="text-right p-4">{t("famSavings.actions")}</th>}
                 </tr>
               </thead>
               <tbody>
                 {savings.length === 0 ? (
                   <tr>
-                    <td colSpan={canManageFinances ? 6 : 5} className="text-center p-8 text-muted-foreground">No savings records yet</td>
+                    <td colSpan={canManageFinances ? 6 : 5} className="text-center p-8 text-muted-foreground">{t("famSavings.noSavingsRecordsYet")}</td>
                   </tr>
                 ) : (
                   savings.map((saving) => (
@@ -491,18 +493,18 @@ export default function FamilySavings() {
                           <div className="flex justify-end gap-1">
                             {saving.status === "pending" && (
                               <>
-                                <Button size="icon" variant="ghost" className="text-green-600 h-8 w-8" onClick={() => handleApprove(saving)} title="Approve">
+                                <Button size="icon" variant="ghost" className="text-green-600 h-8 w-8" onClick={() => handleApprove(saving)} title={t("famSavings.approve")}>
                                   <Check className="h-4 w-4" />
                                 </Button>
-                                <Button size="icon" variant="ghost" className="text-red-600 h-8 w-8" onClick={() => { setRejectingSavingId(saving.id); setRejectDialogOpen(true); }} title="Reject">
+                                <Button size="icon" variant="ghost" className="text-red-600 h-8 w-8" onClick={() => { setRejectingSavingId(saving.id); setRejectDialogOpen(true); }} title={t("famSavings.reject")}>
                                   <X className="h-4 w-4" />
                                 </Button>
                               </>
                             )}
-                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => openEditDialog(saving)} title="Edit">
+                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => openEditDialog(saving)} title={t("famSavings.edit")}>
                               <Pencil className="h-4 w-4" />
                             </Button>
-                            <Button size="icon" variant="ghost" className="text-destructive h-8 w-8" onClick={() => handleDelete(saving)} title="Delete">
+                            <Button size="icon" variant="ghost" className="text-destructive h-8 w-8" onClick={() => handleDelete(saving)} title={t("famSavings.delete")}>
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>

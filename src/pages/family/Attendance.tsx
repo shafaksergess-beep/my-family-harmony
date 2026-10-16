@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,6 +48,7 @@ interface Meeting {
 }
 
 export default function Attendance() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const [searchParams] = useSearchParams();
   const meetingId = searchParams.get("meeting");
@@ -81,7 +83,7 @@ export default function Attendance() {
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Error fetching meeting",
+        title: t("famAttendance.errorFetchingMeeting"),
         description: error.message,
       });
     }
@@ -104,7 +106,7 @@ export default function Attendance() {
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Error fetching attendance",
+        title: t("famAttendance.errorFetchingAttendance"),
         description: error.message,
       });
     } finally {
@@ -126,7 +128,7 @@ export default function Attendance() {
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Error fetching members",
+        title: t("famAttendance.errorFetchingMembers"),
         description: error.message,
       });
     }
@@ -175,7 +177,7 @@ export default function Attendance() {
       }
 
       toast({
-        title: "Check-in recorded",
+        title: t("famAttendance.checkInRecorded"),
         description: fineAmount > 0 ? `Late by ${latenessMinutes} minutes. Fine: ${fineAmount} FCFA` : "On time!",
       });
 
@@ -183,7 +185,7 @@ export default function Attendance() {
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Error recording check-in",
+        title: t("famAttendance.errorRecordingCheckIn"),
         description: error.message,
       });
     }
@@ -215,7 +217,7 @@ export default function Attendance() {
       }
 
       toast({
-        title: "Attendance updated",
+        title: t("famAttendance.attendanceUpdated"),
         description: `Marked as ${status}`,
       });
 
@@ -224,7 +226,7 @@ export default function Attendance() {
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Error updating attendance",
+        title: t("famAttendance.errorUpdatingAttendance"),
         description: error.message,
       });
     }
@@ -242,7 +244,7 @@ export default function Attendance() {
   };
 
   if (authLoading || loading || !meeting) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return <div className="flex items-center justify-center h-screen">{t("famAttendance.loading")}</div>;
   }
 
   return (
@@ -253,7 +255,7 @@ export default function Attendance() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Attendance Tracking</h1>
+            <h1 className="text-3xl font-bold">{t("famAttendance.attendanceTracking")}</h1>
             <p className="text-muted-foreground">
               {format(new Date(meeting.meeting_date), "PPP")} at {meeting.meeting_time}
             </p>
@@ -265,7 +267,7 @@ export default function Attendance() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Present</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("famAttendance.present")}</CardTitle>
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
@@ -274,7 +276,7 @@ export default function Attendance() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Absent</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("famAttendance.absent")}</CardTitle>
             <XCircle className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
@@ -283,7 +285,7 @@ export default function Attendance() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Excused</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("famAttendance.excused")}</CardTitle>
             <Clock className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
@@ -292,7 +294,7 @@ export default function Attendance() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Fines</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("famAttendance.totalFines")}</CardTitle>
             <Clock className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
@@ -303,7 +305,7 @@ export default function Attendance() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Member Attendance</CardTitle>
+          <CardTitle>{t("famAttendance.memberAttendance")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -342,11 +344,11 @@ export default function Attendance() {
                         {memberAttendance.status}
                       </Badge>
                     ) : (
-                      <Badge variant="outline">Not marked</Badge>
+                      <Badge variant="outline">{t("famAttendance.notMarked")}</Badge>
                     )}
                     {!memberAttendance || memberAttendance.status !== "present" ? (
                       <Button size="sm" onClick={() => handleCheckIn(member.id)}>
-                        Check In
+                        {t("famAttendance.checkIn")}
                       </Button>
                     ) : null}
                     {isFamilyHead && (
@@ -356,7 +358,7 @@ export default function Attendance() {
                       }}>
                         <DialogTrigger asChild>
                           <Button size="sm" variant="outline">
-                            Mark
+                            {t("famAttendance.mark")}
                           </Button>
                         </DialogTrigger>
                       <DialogContent>
@@ -365,10 +367,10 @@ export default function Attendance() {
                         </DialogHeader>
                         <div className="space-y-4">
                           <Button onClick={() => handleMarkStatus(member.id, "absent")} className="w-full" variant="destructive">
-                            Mark Absent
+                            {t("famAttendance.markAbsent")}
                           </Button>
                           <div className="space-y-2">
-                            <Label>Mark as Excused</Label>
+                            <Label>{t("famAttendance.markAsExcused")}</Label>
                             <Textarea
                               id={`excuse-${member.id}`}
                               placeholder="Reason for excuse (sickness, travel, etc.)"
@@ -381,7 +383,7 @@ export default function Attendance() {
                               className="w-full"
                               variant="secondary"
                             >
-                              Mark Excused
+                              {t("famAttendance.markExcused")}
                             </Button>
                           </div>
                         </div>

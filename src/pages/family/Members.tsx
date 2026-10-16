@@ -1,3 +1,5 @@
+import i18n from "@/i18n/config";
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -45,19 +47,20 @@ interface Member {
 }
 
 const ROLE_INFO: Record<string, { label: string; color: string }> = {
-  family_head: { label: "Family Head", color: "bg-purple-500" },
-  family_admin: { label: "Family Admin", color: "bg-blue-500" },
-  secretary: { label: "Secretary", color: "bg-green-500" },
-  treasurer: { label: "Treasurer", color: "bg-yellow-500" },
-  loan_committee: { label: "Loan Committee", color: "bg-orange-500" },
-  member: { label: "Member", color: "bg-gray-500" },
-  guest: { label: "Guest", color: "bg-slate-500" },
+  family_head: { get label() { return i18n.t("famMembers.familyHead"); }, color: "bg-purple-500" },
+  family_admin: { get label() { return i18n.t("famMembers.familyAdmin"); }, color: "bg-blue-500" },
+  secretary: { get label() { return i18n.t("famMembers.secretary"); }, color: "bg-green-500" },
+  treasurer: { get label() { return i18n.t("famMembers.treasurer"); }, color: "bg-yellow-500" },
+  loan_committee: { get label() { return i18n.t("famMembers.loanCommittee"); }, color: "bg-orange-500" },
+  member: { get label() { return i18n.t("famMembers.member"); }, color: "bg-gray-500" },
+  guest: { get label() { return i18n.t("famMembers.guest"); }, color: "bg-slate-500" },
 };
 
 const getRoleLabel = (role: string) =>
   ROLE_INFO[role]?.label || role.split("_").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 
 const Members = () => {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -138,7 +141,7 @@ const Members = () => {
       setMembers(merged);
     } catch (error: any) {
       console.error("Error loading members:", error);
-      toast({ title: "Error", description: "Failed to load members", variant: "destructive" });
+      toast({ title: t("famMembers.error"), description: t("famMembers.failedToLoadMembers"), variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -188,12 +191,12 @@ const Members = () => {
         });
       }
 
-      toast({ title: "Success", description: "Member added successfully" });
+      toast({ title: t("famMembers.success"), description: t("famMembers.memberAddedSuccessfully") });
       setIsAddOpen(false);
       setAddForm({ user_id: "", role: "member", house_name: "" });
       loadMembers();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message || "Failed to add member", variant: "destructive" });
+      toast({ title: t("famMembers.error"), description: error.message || "Failed to add member", variant: "destructive" });
     } finally {
       setAdding(false);
     }
@@ -205,7 +208,7 @@ const Members = () => {
       const hasRole = currentRoles.includes(role);
       if (hasRole) {
         if (currentRoles.length <= 1) {
-          toast({ title: "Cannot remove", description: "A member must have at least one role", variant: "destructive" });
+          toast({ title: t("famMembers.cannotRemove"), description: t("famMembers.aMemberMustHaveAt"), variant: "destructive" });
           setUpdatingRole(false);
           return;
         }
@@ -224,7 +227,7 @@ const Members = () => {
           await supabase.from("family_members").update({ role: role as any }).eq("id", memberId);
         }
       }
-      toast({ title: "Success", description: hasRole ? "Role removed" : "Role assigned" });
+      toast({ title: t("famMembers.success"), description: hasRole ? "Role removed" : "Role assigned" });
       loadMembers();
       // Refresh selected member
       if (selectedMember?.id === memberId) {
@@ -237,7 +240,7 @@ const Members = () => {
         }
       }
     } catch (error: any) {
-      toast({ title: "Error", description: error.message || "Failed to update role", variant: "destructive" });
+      toast({ title: t("famMembers.error"), description: error.message || "Failed to update role", variant: "destructive" });
     } finally {
       setUpdatingRole(false);
     }
@@ -255,11 +258,11 @@ const Members = () => {
         .eq("id", selectedMember.id);
 
       if (error) throw error;
-      toast({ title: "Success", description: "Member updated" });
+      toast({ title: t("famMembers.success"), description: t("famMembers.memberUpdated") });
       setIsEditOpen(false);
       loadMembers();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("famMembers.error"), description: error.message, variant: "destructive" });
     }
   };
 
@@ -270,11 +273,11 @@ const Members = () => {
       await supabase.from("member_roles").delete().eq("member_id", removeTarget.id);
       const { error } = await supabase.from("family_members").delete().eq("id", removeTarget.id);
       if (error) throw error;
-      toast({ title: "Success", description: `${removeTarget.profiles.full_name} has been removed` });
+      toast({ title: t("famMembers.success"), description: `${removeTarget.profiles.full_name} has been removed` });
       setRemoveTarget(null);
       loadMembers();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("famMembers.error"), description: error.message, variant: "destructive" });
     }
   };
 
@@ -301,7 +304,7 @@ const Members = () => {
 
   return (
     <>
-      <SEO title="Family Members" description="Manage family members, roles and permissions for your Kinsroot family." />
+      <SEO title={t("famMembers.familyMembers")} description={t("famMembers.manageFamilyMembersRolesAnd")} />
       <div className="min-h-screen bg-background p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
@@ -320,17 +323,17 @@ const Members = () => {
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => exportMembersToCSV(filteredMembers)} disabled={filteredMembers.length === 0}>
               <Download className="h-4 w-4 mr-2" />
-              Export
+              {t("famMembers.export")}
             </Button>
             {canManageMembers && (
               <>
                 <Button variant="outline" onClick={() => navigate(`/family/${familySlug}/role-management`)}>
                   <Shield className="h-4 w-4 mr-2" />
-                  Role Management
+                  {t("famMembers.roleManagement")}
                 </Button>
                 <Button onClick={() => { setIsAddOpen(true); loadAvailableUsers(); }}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Member
+                  {t("famMembers.addMember")}
                 </Button>
               </>
             )}
@@ -342,7 +345,7 @@ const Members = () => {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
-              placeholder="Search by name, email, or house..."
+              placeholder={t("famMembers.searchByNameEmailOr")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -350,10 +353,10 @@ const Members = () => {
           </div>
           <Select value={roleFilter} onValueChange={setRoleFilter}>
             <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filter by role" />
+              <SelectValue placeholder={t("famMembers.filterByRole")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Roles</SelectItem>
+              <SelectItem value="all">{t("famMembers.allRoles")}</SelectItem>
               {Object.entries(ROLE_INFO).map(([key, info]) => (
                 <SelectItem key={key} value={key}>{info.label}</SelectItem>
               ))}
@@ -373,7 +376,7 @@ const Members = () => {
                   </Avatar>
                   <div className="flex gap-1">
                     {member.is_house_representative && (
-                      <Badge variant="secondary" className="text-xs">House Rep</Badge>
+                      <Badge variant="secondary" className="text-xs">{t("famMembers.houseRep")}</Badge>
                     )}
                   </div>
                 </div>
@@ -423,7 +426,7 @@ const Members = () => {
                       }}
                     >
                       <Shield className="h-3 w-3 mr-1" />
-                      Roles
+                      {t("famMembers.roles")}
                     </Button>
                     <Button
                       variant="ghost"
@@ -438,7 +441,7 @@ const Members = () => {
                       }}
                     >
                       <Edit className="h-3 w-3 mr-1" />
-                      Edit
+                      {t("famMembers.edit")}
                     </Button>
                     <Button
                       variant="ghost"
@@ -447,7 +450,7 @@ const Members = () => {
                       onClick={() => setRemoveTarget(member)}
                     >
                       <Trash2 className="h-3 w-3 mr-1" />
-                      Remove
+                      {t("famMembers.remove")}
                     </Button>
                   </div>
                 )}
@@ -460,7 +463,7 @@ const Members = () => {
           <Card className="p-12">
             <div className="text-center text-muted-foreground">
               <User className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No members found.</p>
+              <p>{t("famMembers.noMembersFound")}</p>
             </div>
           </Card>
         )}
@@ -470,17 +473,17 @@ const Members = () => {
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Family Member</DialogTitle>
-            <DialogDescription>Add an existing user to this family.</DialogDescription>
+            <DialogTitle>{t("famMembers.addFamilyMember")}</DialogTitle>
+            <DialogDescription>{t("famMembers.addAnExistingUserTo")}</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleAddMember} className="space-y-4">
             <div className="space-y-2">
-              <Label>Select User</Label>
+              <Label>{t("famMembers.selectUser")}</Label>
               <Select value={addForm.user_id} onValueChange={v => setAddForm(f => ({ ...f, user_id: v }))}>
-                <SelectTrigger><SelectValue placeholder="Choose a user..." /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={t("famMembers.chooseAUser")} /></SelectTrigger>
                 <SelectContent>
                   {availableUsers.length === 0 ? (
-                    <div className="p-4 text-sm text-muted-foreground text-center">No available users</div>
+                    <div className="p-4 text-sm text-muted-foreground text-center">{t("famMembers.noAvailableUsers")}</div>
                   ) : (
                     availableUsers.map(u => (
                       <SelectItem key={u.id} value={u.id}>
@@ -492,7 +495,7 @@ const Members = () => {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Initial Role</Label>
+              <Label>{t("famMembers.initialRole")}</Label>
               <Select value={addForm.role} onValueChange={v => setAddForm(f => ({ ...f, role: v }))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -511,7 +514,7 @@ const Members = () => {
               />
             </div>
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>{t("famMembers.cancel")}</Button>
               <Button type="submit" disabled={!addForm.user_id || adding}>
                 {adding && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Add Member
@@ -525,7 +528,7 @@ const Members = () => {
       <Dialog open={isRoleOpen} onOpenChange={setIsRoleOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Manage Roles</DialogTitle>
+            <DialogTitle>{t("famMembers.manageRoles")}</DialogTitle>
             <DialogDescription>
               {selectedMember?.profiles.full_name} — assign or remove roles
             </DialogDescription>
@@ -560,16 +563,16 @@ const Members = () => {
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Member</DialogTitle>
+            <DialogTitle>{t("famMembers.editMember")}</DialogTitle>
             <DialogDescription>Update {selectedMember?.profiles.full_name}'s details</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>House Name</Label>
+              <Label>{t("famMembers.houseName")}</Label>
               <Input
                 value={editForm.house_name}
                 onChange={e => setEditForm(f => ({ ...f, house_name: e.target.value }))}
-                placeholder="House name"
+                placeholder={t("famMembers.houseName")}
               />
             </div>
             <div className="flex items-center gap-2">
@@ -577,11 +580,11 @@ const Members = () => {
                 checked={editForm.is_house_representative}
                 onCheckedChange={v => setEditForm(f => ({ ...f, is_house_representative: !!v }))}
               />
-              <Label>House Representative</Label>
+              <Label>{t("famMembers.houseRepresentative")}</Label>
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsEditOpen(false)}>Cancel</Button>
-              <Button onClick={handleEditMember}>Save Changes</Button>
+              <Button variant="outline" onClick={() => setIsEditOpen(false)}>{t("famMembers.cancel")}</Button>
+              <Button onClick={handleEditMember}>{t("famMembers.saveChanges")}</Button>
             </div>
           </div>
         </DialogContent>
@@ -591,16 +594,15 @@ const Members = () => {
       <AlertDialog open={!!removeTarget} onOpenChange={open => !open && setRemoveTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove Member</AlertDialogTitle>
+            <AlertDialogTitle>{t("famMembers.removeMember")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to remove <strong>{removeTarget?.profiles.full_name}</strong> from this family?
-              This will remove all their roles and data associations.
+              {t("famMembers.areYouSureYouWant")} <strong>{removeTarget?.profiles.full_name}</strong> {t("famMembers.fromThisFamilyThisWill")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("famMembers.cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleRemoveMember} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Remove
+              {t("famMembers.remove")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

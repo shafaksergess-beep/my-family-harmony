@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,6 +31,7 @@ interface Meeting {
 }
 
 const FamilyMeetings = () => {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -77,8 +79,8 @@ const FamilyMeetings = () => {
     } catch (error) {
       console.error("Error loading data:", error);
       toast({
-        title: "Error",
-        description: "Failed to load data",
+        title: t("famMeetings.error"),
+        description: t("famMeetings.failedToLoadData"),
         variant: "destructive",
       });
     } finally {
@@ -131,12 +133,12 @@ const FamilyMeetings = () => {
       <CardContent>
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-sm">
-            <span className="font-medium">Type:</span>
+            <span className="font-medium">{t("famMeetings.type")}</span>
             <span className="capitalize">{meeting.meeting_type}</span>
           </div>
           {meeting.host_house && (
             <div className="flex items-center gap-2 text-sm">
-              <span className="font-medium">Host:</span>
+              <span className="font-medium">{t("famMeetings.host")}</span>
               <span>{meeting.host_house}</span>
             </div>
           )}
@@ -146,7 +148,7 @@ const FamilyMeetings = () => {
               className="flex-1"
               onClick={() => navigate(`/family/${familySlug}/meetings/${meeting.id}`)}
             >
-              View Details
+              {t("famMeetings.viewDetails")}
             </Button>
             {!isPast && !meeting.is_completed && (
               <Button 
@@ -154,7 +156,7 @@ const FamilyMeetings = () => {
                 onClick={() => navigate(`/family/${familySlug}/meetings/${meeting.id}/checkin`)}
               >
                 <QrCode className="w-4 h-4 mr-2" />
-                Check In
+                {t("famMeetings.checkIn")}
               </Button>
             )}
           </div>
@@ -185,8 +187,8 @@ const FamilyMeetings = () => {
       });
       setValidationErrors(errors);
       toast({
-        title: "Validation Error",
-        description: "Please check the form for errors",
+        title: t("famMeetings.validationError"),
+        description: t("famMeetings.pleaseCheckTheFormFor"),
         variant: "destructive",
       });
       return;
@@ -228,8 +230,8 @@ const FamilyMeetings = () => {
       }
       
       toast({
-        title: "Success",
-        description: "Meeting created successfully. Notifications sent to family members.",
+        title: t("famMeetings.success"),
+        description: t("famMeetings.meetingCreatedSuccessfullyNotificationsSent"),
       });
 
       setIsDialogOpen(false);
@@ -246,7 +248,7 @@ const FamilyMeetings = () => {
     } catch (error: any) {
       console.error("Error creating meeting:", error);
       toast({
-        title: "Error",
+        title: t("famMeetings.error"),
         description: error.message || "Failed to create meeting",
         variant: "destructive",
       });
@@ -258,8 +260,8 @@ const FamilyMeetings = () => {
     
     if (!bulkFormData.start_date) {
       toast({
-        title: "Validation Error",
-        description: "Please select a start date",
+        title: t("famMeetings.validationError"),
+        description: t("famMeetings.pleaseSelectAStartDate"),
         variant: "destructive",
       });
       return;
@@ -268,8 +270,8 @@ const FamilyMeetings = () => {
     const months = parseInt(bulkFormData.months);
     if (months < 1 || months > 12) {
       toast({
-        title: "Validation Error",
-        description: "Please select between 1 and 12 months",
+        title: t("famMeetings.validationError"),
+        description: t("famMeetings.pleaseSelectBetween1And"),
         variant: "destructive",
       });
       return;
@@ -315,7 +317,7 @@ const FamilyMeetings = () => {
       }
       
       toast({
-        title: "Success",
+        title: t("famMeetings.success"),
         description: `${months} meetings scheduled successfully. Notifications sent.`,
       });
 
@@ -331,7 +333,7 @@ const FamilyMeetings = () => {
     } catch (error: any) {
       console.error("Error bulk scheduling meetings:", error);
       toast({
-        title: "Error",
+        title: t("famMeetings.error"),
         description: error.message || "Failed to schedule meetings",
         variant: "destructive",
       });
@@ -353,7 +355,7 @@ const FamilyMeetings = () => {
 
   return (
     <>
-      <SEO title="Family Meetings" description="Schedule, view and manage your family's meetings, agendas and minutes." />
+      <SEO title={t("famMeetings.familyMeetings")} description={t("famMeetings.scheduleViewAndManageYour")} />
       <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
@@ -361,11 +363,11 @@ const FamilyMeetings = () => {
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t("famMeetings.back")}
               </Button>
               <div>
                 <h1 className="text-2xl font-bold text-foreground">{family?.name} - Meetings</h1>
-                <p className="text-sm text-muted-foreground">Schedule and track family meetings</p>
+                <p className="text-sm text-muted-foreground">{t("famMeetings.scheduleAndTrackFamilyMeetings")}</p>
               </div>
             </div>
             
@@ -375,19 +377,19 @@ const FamilyMeetings = () => {
                   <DialogTrigger asChild>
                     <Button variant="outline">
                       <CalendarRange className="w-4 h-4 mr-2" />
-                      Schedule Year
+                      {t("famMeetings.scheduleYear")}
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Bulk Schedule Meetings</DialogTitle>
+                      <DialogTitle>{t("famMeetings.bulkScheduleMeetings")}</DialogTitle>
                       <DialogDescription>
-                        Schedule monthly meetings for the year
+                        {t("famMeetings.scheduleMonthlyMeetingsForThe")}
                       </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleBulkSchedule} className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="bulk-start-date">Start Date</Label>
+                        <Label htmlFor="bulk-start-date">{t("famMeetings.startDate")}</Label>
                         <Input
                           id="bulk-start-date"
                           type="date"
@@ -397,7 +399,7 @@ const FamilyMeetings = () => {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="bulk-time">Meeting Time</Label>
+                        <Label htmlFor="bulk-time">{t("famMeetings.meetingTime")}</Label>
                         <Input
                           id="bulk-time"
                           type="time"
@@ -407,7 +409,7 @@ const FamilyMeetings = () => {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="bulk-months">Number of Months</Label>
+                        <Label htmlFor="bulk-months">{t("famMeetings.numberOfMonths")}</Label>
                         <Select 
                           value={bulkFormData.months} 
                           onValueChange={(value) => setBulkFormData({ ...bulkFormData, months: value })}
@@ -430,14 +432,14 @@ const FamilyMeetings = () => {
                           id="bulk-location"
                           value={bulkFormData.location}
                           onChange={(e) => setBulkFormData({ ...bulkFormData, location: e.target.value })}
-                          placeholder="Meeting location"
+                          placeholder={t("famMeetings.meetingLocation")}
                         />
                       </div>
                       <div className="flex justify-end gap-2">
                         <Button type="button" variant="outline" onClick={() => setIsBulkDialogOpen(false)}>
-                          Cancel
+                          {t("famMeetings.cancel")}
                         </Button>
-                        <Button type="submit">Schedule Meetings</Button>
+                        <Button type="submit">{t("famMeetings.scheduleMeetings")}</Button>
                       </div>
                     </form>
                   </DialogContent>
@@ -447,20 +449,20 @@ const FamilyMeetings = () => {
                   <DialogTrigger asChild>
                     <Button>
                       <Plus className="w-4 h-4 mr-2" />
-                      Create Meeting
+                      {t("famMeetings.createMeeting")}
                     </Button>
                   </DialogTrigger>
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
-                  <DialogTitle>Schedule New Meeting</DialogTitle>
+                  <DialogTitle>{t("famMeetings.scheduleNewMeeting")}</DialogTitle>
                   <DialogDescription>
-                    Create a new family meeting
+                    {t("famMeetings.createANewFamilyMeeting")}
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="date">Meeting Date</Label>
+                      <Label htmlFor="date">{t("famMeetings.meetingDate")}</Label>
                       <Input
                         id="date"
                         type="date"
@@ -477,7 +479,7 @@ const FamilyMeetings = () => {
                       )}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="time">Meeting Time</Label>
+                      <Label htmlFor="time">{t("famMeetings.meetingTime")}</Label>
                       <Input
                         id="time"
                         type="time"
@@ -495,7 +497,7 @@ const FamilyMeetings = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="type">Meeting Type</Label>
+                    <Label htmlFor="type">{t("famMeetings.meetingType")}</Label>
                     <Select 
                       value={formData.meeting_type} 
                       onValueChange={(value) => {
@@ -507,9 +509,9 @@ const FamilyMeetings = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="regular">Regular</SelectItem>
-                        <SelectItem value="emergency">Emergency</SelectItem>
-                        <SelectItem value="special">Special</SelectItem>
+                        <SelectItem value="regular">{t("famMeetings.regular")}</SelectItem>
+                        <SelectItem value="emergency">{t("famMeetings.emergency")}</SelectItem>
+                        <SelectItem value="special">{t("famMeetings.special")}</SelectItem>
                       </SelectContent>
                     </Select>
                     {validationErrors.meetingType && (
@@ -525,7 +527,7 @@ const FamilyMeetings = () => {
                         setFormData({ ...formData, location: e.target.value });
                         setValidationErrors({ ...validationErrors, location: "" });
                       }}
-                      placeholder="Meeting location"
+                      placeholder={t("famMeetings.meetingLocation")}
                       maxLength={200}
                       className={validationErrors.location ? "border-red-500" : ""}
                     />
@@ -542,7 +544,7 @@ const FamilyMeetings = () => {
                         setFormData({ ...formData, host_house: e.target.value });
                         setValidationErrors({ ...validationErrors, hostHouse: "" });
                       }}
-                      placeholder="Host house name"
+                      placeholder={t("famMeetings.hostHouseName")}
                       maxLength={100}
                       className={validationErrors.hostHouse ? "border-red-500" : ""}
                     />
@@ -559,7 +561,7 @@ const FamilyMeetings = () => {
                         setFormData({ ...formData, agenda: e.target.value });
                         setValidationErrors({ ...validationErrors, agenda: "" });
                       }}
-                      placeholder="Meeting agenda"
+                      placeholder={t("famMeetings.meetingAgenda")}
                       rows={3}
                       maxLength={1000}
                       className={validationErrors.agenda ? "border-red-500" : ""}
@@ -570,9 +572,9 @@ const FamilyMeetings = () => {
                   </div>
                   <div className="flex justify-end gap-2">
                     <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                      Cancel
+                      {t("famMeetings.cancel")}
                     </Button>
-                    <Button type="submit">Create Meeting</Button>
+                    <Button type="submit">{t("famMeetings.createMeeting")}</Button>
                   </div>
                 </form>
               </DialogContent>
@@ -587,17 +589,15 @@ const FamilyMeetings = () => {
         {meetings.length === 0 ? (
           <EmptyState
             icon={Calendar}
-            title="No meetings scheduled"
-            description="Bring your family together. Schedule monthly gatherings, send automatic reminders and track attendance with QR check-in."
+            title={t("famMeetings.noMeetingsScheduled")}
+            description={t("famMeetings.bringYourFamilyTogetherSchedule")}
             primary={canScheduleMeetings ? {
-              label: "Schedule first meeting",
-              onClick: () => setIsDialogOpen(true),
-              icon: <Plus className="w-4 h-4 mr-2" />,
+              label: t("famMeetings.scheduleFirstMeeting"),
+              onClick: () => setIsDialogOpen(true), icon: <Plus className="w-4 h-4 mr-2" />,
             } : undefined}
             secondary={canScheduleMeetings ? {
-              label: "Schedule a full year",
-              onClick: () => setIsBulkDialogOpen(true),
-              icon: <CalendarRange className="w-4 h-4 mr-2" />,
+              label: t("famMeetings.scheduleAFullYear"),
+              onClick: () => setIsBulkDialogOpen(true), icon: <CalendarRange className="w-4 h-4 mr-2" />,
             } : undefined}
           />
         ) : (
@@ -605,19 +605,19 @@ const FamilyMeetings = () => {
             <TabsList>
               <TabsTrigger value="upcoming">Upcoming ({upcomingMeetings.length})</TabsTrigger>
               <TabsTrigger value="past">Past ({pastMeetings.length})</TabsTrigger>
-              <TabsTrigger value="calendar">Calendar View</TabsTrigger>
+              <TabsTrigger value="calendar">{t("famMeetings.calendarView")}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="upcoming">
               {upcomingMeetings.length === 0 ? (
                 <Card className="p-8 text-center">
                   <Calendar className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
-                  <h3 className="text-lg font-semibold mb-2">No upcoming meetings</h3>
-                  <p className="text-muted-foreground mb-4">Schedule a meeting to get started</p>
+                  <h3 className="text-lg font-semibold mb-2">{t("famMeetings.noUpcomingMeetings")}</h3>
+                  <p className="text-muted-foreground mb-4">{t("famMeetings.scheduleAMeetingToGet")}</p>
                   {canScheduleMeetings && (
                     <Button onClick={() => setIsDialogOpen(true)}>
                       <Plus className="w-4 h-4 mr-2" />
-                      Schedule Meeting
+                      {t("famMeetings.scheduleMeeting")}
                     </Button>
                   )}
                 </Card>
@@ -634,8 +634,8 @@ const FamilyMeetings = () => {
               {pastMeetings.length === 0 ? (
                 <Card className="p-8 text-center">
                   <Calendar className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
-                  <h3 className="text-lg font-semibold mb-2">No past meetings</h3>
-                  <p className="text-muted-foreground">Past meetings will appear here</p>
+                  <h3 className="text-lg font-semibold mb-2">{t("famMeetings.noPastMeetings")}</h3>
+                  <p className="text-muted-foreground">{t("famMeetings.pastMeetingsWillAppearHere")}</p>
                 </Card>
               ) : (
                 <div className="grid gap-4">

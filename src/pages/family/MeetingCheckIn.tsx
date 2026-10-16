@@ -97,8 +97,8 @@ const MeetingCheckIn = () => {
     } catch (error) {
       console.error("Error loading data:", error);
       toast({
-        title: "Error",
-        description: "Failed to load meeting details",
+        title: t("famMeetingCheckIn.error"),
+        description: t("famMeetingCheckIn.failedToLoadMeetingDetails"),
         variant: "destructive",
       });
     } finally {
@@ -133,8 +133,8 @@ const MeetingCheckIn = () => {
     try {
       if (!userMember) {
         toast({
-          title: "Error",
-          description: "You are not a member of this family",
+          title: t("famMeetingCheckIn.error"),
+          description: t("famMeetingCheckIn.youAreNotAMember"),
           variant: "destructive",
         });
         return;
@@ -207,7 +207,7 @@ const MeetingCheckIn = () => {
       await loadAttendance();
 
       toast({
-        title: "Success",
+        title: t("famMeetingCheckIn.success"),
         description: latenessMinutes > toleranceMinutes
           ? `Checked in (${latenessMinutes} min late). Fine: ${fineAmount} FCFA`
           : "Checked in successfully!",
@@ -215,7 +215,7 @@ const MeetingCheckIn = () => {
     } catch (error: any) {
       console.error("Error checking in:", error);
       toast({
-        title: "Error",
+        title: t("famMeetingCheckIn.error"),
         description: error.message || "Failed to check in",
         variant: "destructive",
       });
@@ -245,15 +245,15 @@ const MeetingCheckIn = () => {
               await handleCheckIn();
             } else {
               toast({
-                title: "Invalid QR Code",
-                description: "This QR code is not for this meeting",
+                title: t("famMeetingCheckIn.invalidQrCode"),
+                description: t("famMeetingCheckIn.thisQrCodeIsNot"),
                 variant: "destructive",
               });
             }
           } catch (error) {
             toast({
-              title: "Error",
-              description: "Invalid QR code format",
+              title: t("famMeetingCheckIn.error"),
+              description: t("famMeetingCheckIn.invalidQrCodeFormat"),
               variant: "destructive",
             });
           }
@@ -266,8 +266,8 @@ const MeetingCheckIn = () => {
       console.error("Error starting scanner:", error);
       setScanning(false);
       toast({
-        title: "Error",
-        description: "Failed to start camera",
+        title: t("famMeetingCheckIn.error"),
+        description: t("famMeetingCheckIn.failedToStartCamera"),
         variant: "destructive",
       });
     }
@@ -294,7 +294,7 @@ const MeetingCheckIn = () => {
               <div>
                 <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                   <QrCode className="w-6 h-6" />
-                  Meeting Check-In
+                  {t("famMeetingCheckIn.meetingCheckIn")}
                 </h1>
                 <p className="text-sm text-muted-foreground">
                   {family?.name} • {new Date(meeting?.meeting_date).toLocaleDateString()}
@@ -309,41 +309,41 @@ const MeetingCheckIn = () => {
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <Tabs defaultValue="checkin">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="checkin">Check In</TabsTrigger>
-            <TabsTrigger value="qr">QR Code</TabsTrigger>
+            <TabsTrigger value="checkin">{t("famMeetingCheckIn.checkIn")}</TabsTrigger>
+            <TabsTrigger value="qr">{t("famMeetingCheckIn.qrCode")}</TabsTrigger>
             <TabsTrigger value="attendance">Attendance ({attendance.length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="checkin" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Quick Check-In</CardTitle>
+                <CardTitle>{t("famMeetingCheckIn.quickCheckIn")}</CardTitle>
                 <CardDescription>
-                  Mark your attendance for this meeting
+                  {t("famMeetingCheckIn.markYourAttendanceForThis")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {hasCheckedIn ? (
                   <div className="text-center py-8">
                     <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-500" />
-                    <h3 className="text-xl font-semibold mb-2">Already Checked In</h3>
-                    <p className="text-muted-foreground">You have already checked in for this meeting</p>
+                    <h3 className="text-xl font-semibold mb-2">{t("famMeetingCheckIn.alreadyCheckedIn")}</h3>
+                    <p className="text-muted-foreground">{t("famMeetingCheckIn.youHaveAlreadyCheckedIn")}</p>
                   </div>
                 ) : (
                   <>
                     <div className="bg-muted p-4 rounded-lg">
-                      <h3 className="font-semibold mb-2">Meeting Details:</h3>
+                      <h3 className="font-semibold mb-2">{t("famMeetingCheckIn.meetingDetails")}</h3>
                       <p className="text-sm">Date: {new Date(meeting.meeting_date).toLocaleDateString()}</p>
                       <p className="text-sm">Time: {meeting.meeting_time}</p>
                       <p className="text-sm">Type: {meeting.meeting_type}</p>
                     </div>
 
                     <Button onClick={handleCheckIn} className="w-full" size="lg">
-                      Check In Now
+                      {t("famMeetingCheckIn.checkInNow")}
                     </Button>
 
                     <div className="text-center">
-                      <p className="text-sm text-muted-foreground">Or scan the QR code</p>
+                      <p className="text-sm text-muted-foreground">{t("famMeetingCheckIn.orScanTheQrCode")}</p>
                       <Button 
                         variant="outline" 
                         onClick={startQRScanner}
@@ -353,12 +353,12 @@ const MeetingCheckIn = () => {
                         {scanning ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Scanning...
+                            {t("famMeetingCheckIn.scanning")}
                           </>
                         ) : (
                           <>
                             <Camera className="w-4 h-4 mr-2" />
-                            Scan QR Code
+                            {t("famMeetingCheckIn.scanQrCode")}
                           </>
                         )}
                       </Button>
@@ -376,9 +376,9 @@ const MeetingCheckIn = () => {
           <TabsContent value="qr">
             <Card>
               <CardHeader>
-                <CardTitle>Meeting QR Code</CardTitle>
+                <CardTitle>{t("famMeetingCheckIn.meetingQrCode")}</CardTitle>
                 <CardDescription>
-                  Members can scan this code to check in
+                  {t("famMeetingCheckIn.membersCanScanThisCode")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -392,7 +392,7 @@ const MeetingCheckIn = () => {
                     />
                   </div>
                   <p className="text-sm text-muted-foreground mt-4 text-center">
-                    Display this QR code for members to scan and check in
+                    {t("famMeetingCheckIn.displayThisQrCodeFor")}
                   </p>
                 </div>
               </CardContent>
@@ -403,8 +403,8 @@ const MeetingCheckIn = () => {
             {attendance.length === 0 ? (
               <Card className="p-12 text-center">
                 <CheckCircle className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-xl font-semibold mb-2">No attendees yet</h3>
-                <p className="text-muted-foreground">Be the first to check in!</p>
+                <h3 className="text-xl font-semibold mb-2">{t("famMeetingCheckIn.noAttendeesYet")}</h3>
+                <p className="text-muted-foreground">{t("famMeetingCheckIn.beTheFirstToCheck")}</p>
               </Card>
             ) : (
               attendance.map((record) => (

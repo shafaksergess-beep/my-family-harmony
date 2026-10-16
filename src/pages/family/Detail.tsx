@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
@@ -41,6 +42,7 @@ interface Module {
 }
 
 const FamilyDetail = () => {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { family, userRole, userRoles, userId, isLoading, isFamilyHead, isFamilyAdmin, isSuperAdmin } = useFamilyAuth(familySlug);
@@ -161,7 +163,7 @@ const FamilyDetail = () => {
       <div className="min-h-screen flex items-center justify-center bg-background p-6">
         <div className="max-w-md text-center space-y-4">
           <h1 className="text-xl font-semibold text-foreground">
-            We couldn't load this family
+            {t("famDetail.weCouldnTLoadThis")}
           </h1>
           <p className="text-sm text-muted-foreground">
             {modulesError ||
@@ -169,9 +171,9 @@ const FamilyDetail = () => {
           </p>
           <div className="flex justify-center gap-2">
             <Button variant="outline" onClick={() => navigate("/dashboard")}>
-              Back to dashboard
+              {t("famDetail.backToDashboard")}
             </Button>
-            <Button onClick={() => loadModulesAndCategories()}>Try again</Button>
+            <Button onClick={() => loadModulesAndCategories()}>{t("famDetail.tryAgain")}</Button>
           </div>
         </div>
       </div>
@@ -200,7 +202,7 @@ const FamilyDetail = () => {
               size="lg"
             >
               <UserPlus className="w-5 h-5 mr-2" />
-              Invite Members
+              {t("famDetail.inviteMembers")}
             </Button>
           )}
           
@@ -257,7 +259,7 @@ const FamilyDetail = () => {
                   {categoryModules.length === 0 && (
                     <div className="text-center py-12 text-muted-foreground">
                       <LucideIcons.Circle className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                      <p className="text-sm">No modules in this category</p>
+                      <p className="text-sm">{t("famDetail.noModulesInThisCategory")}</p>
                     </div>
                   )}
                 </TabsContent>
@@ -272,7 +274,7 @@ const FamilyDetail = () => {
   // Desktop layout
   return (
     <>
-      <SEO title="Family Workspace" description="Your family workspace — meetings, contributions, savings, loans and more." />
+      <SEO title={t("famDetail.familyWorkspace")} description={t("famDetail.yourFamilyWorkspaceMeetingsContributions")} />
       <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
@@ -280,7 +282,7 @@ const FamilyDetail = () => {
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate("/dashboard")}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
+                {t("famDetail.backToDashboard")}
               </Button>
               <div>
                 <h1 className="text-2xl font-bold text-foreground">{family?.name}</h1>
@@ -295,7 +297,7 @@ const FamilyDetail = () => {
             {canManageInvitations && (
               <Button onClick={() => navigate(`/family/${familySlug}/invitations`)}>
                 <UserPlus className="w-4 h-4 mr-2" />
-                Invite Members
+                {t("famDetail.inviteMembers")}
               </Button>
             )}
           </div>
@@ -378,7 +380,7 @@ const FamilyDetail = () => {
                         <CardContent>
                           <CardDescription>{module.description}</CardDescription>
                           <Button className="w-full mt-4" variant="outline">
-                            Open Module
+                            {t("famDetail.openModule")}
                           </Button>
                         </CardContent>
                       </Card>
@@ -386,7 +388,7 @@ const FamilyDetail = () => {
                   })}
                   {categoryModules.length === 0 && (
                     <div className="col-span-full text-center py-12 text-muted-foreground">
-                      No modules in this category yet
+                      {t("famDetail.noModulesInThisCategory")}
                     </div>
                   )}
                 </div>

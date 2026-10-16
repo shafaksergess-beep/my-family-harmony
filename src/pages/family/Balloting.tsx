@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,6 +32,7 @@ interface BallotingRecord {
 }
 
 const Balloting = () => {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -62,7 +64,7 @@ const Balloting = () => {
       setNjangiRecord(njangiRes.data as any);
     } catch (error) {
       console.error("Error loading data:", error);
-      toast({ title: "Error", description: "Failed to load data", variant: "destructive" });
+      toast({ title: t("famBalloting.error"), description: t("famBalloting.failedToLoadData"), variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -111,11 +113,11 @@ const Balloting = () => {
 
       if (assignmentType === "hosting") await syncHostAssignments(assignments);
       if (assignmentType === "njangi") await syncNjangiCycle(assignments);
-      toast({ title: "Success", description: `${assignmentType === "hosting" ? "Hosting" : "Njangi"} schedule created` });
+      toast({ title: t("famBalloting.success"), description: `${assignmentType === "hosting" ? "Hosting" : "Njangi"} schedule created` });
       setIsDialogOpen(false);
       loadData();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message || "Failed to create balloting", variant: "destructive" });
+      toast({ title: t("famBalloting.error"), description: error.message || "Failed to create balloting", variant: "destructive" });
     }
   };
 
@@ -130,10 +132,10 @@ const Balloting = () => {
       if (error) throw error;
       if (type === "hosting") await syncHostAssignments(assignments);
       if (type === "njangi") await syncNjangiCycle(assignments);
-      toast({ title: "Success", description: "Schedule updated successfully" });
+      toast({ title: t("famBalloting.success"), description: t("famBalloting.scheduleUpdatedSuccessfully") });
       loadData();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message || "Failed to update", variant: "destructive" });
+      toast({ title: t("famBalloting.error"), description: error.message || "Failed to update", variant: "destructive" });
     }
   };
 
@@ -143,10 +145,10 @@ const Balloting = () => {
     try {
       const { error } = await supabase.from("balloting_assignments").delete().eq("id", record.id);
       if (error) throw error;
-      toast({ title: "Success", description: "Schedule deleted" });
+      toast({ title: t("famBalloting.success"), description: t("famBalloting.scheduleDeleted") });
       loadData();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message || "Failed to delete", variant: "destructive" });
+      toast({ title: t("famBalloting.error"), description: error.message || "Failed to delete", variant: "destructive" });
     }
   };
 
@@ -240,7 +242,7 @@ const Balloting = () => {
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
-                <ArrowLeft className="w-4 h-4 mr-2" /> Back
+                <ArrowLeft className="w-4 h-4 mr-2" /> {t("famBalloting.back")}
               </Button>
               <div>
                 <h1 className="text-2xl font-bold text-foreground">{family?.name} - Balloting</h1>
@@ -262,7 +264,7 @@ const Balloting = () => {
               {canManage && (
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button><Shuffle className="w-4 h-4 mr-2" /> Run Balloting</Button>
+                    <Button><Shuffle className="w-4 h-4 mr-2" /> {t("famBalloting.runBalloting")}</Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
@@ -270,21 +272,21 @@ const Balloting = () => {
                     </DialogHeader>
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label>Assignment Type</Label>
+                        <Label>{t("famBalloting.assignmentType")}</Label>
                         <Select value={assignmentType} onValueChange={(v: any) => setAssignmentType(v)}>
                           <SelectTrigger><SelectValue /></SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="hosting">Hosting Schedule</SelectItem>
-                            <SelectItem value="njangi">Njangi Schedule</SelectItem>
+                            <SelectItem value="hosting">{t("famBalloting.hostingSchedule")}</SelectItem>
+                            <SelectItem value="njangi">{t("famBalloting.njangiSchedule")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        Randomly assigns members to months. Members can appear more than once if there are fewer members than months.
+                        {t("famBalloting.randomlyAssignsMembersToMonths")}
                       </p>
                       <div className="flex justify-end gap-2">
-                        <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                        <Button onClick={handleBalloting}><Shuffle className="w-4 h-4 mr-2" /> Run Balloting</Button>
+                        <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t("famBalloting.cancel")}</Button>
+                        <Button onClick={handleBalloting}><Shuffle className="w-4 h-4 mr-2" /> {t("famBalloting.runBalloting")}</Button>
                       </div>
                     </div>
                   </DialogContent>
@@ -298,7 +300,7 @@ const Balloting = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="grid md:grid-cols-2 gap-6">
           <BallotingScheduleCard
-            title="Hosting Schedule"
+            title={t("famBalloting.hostingSchedule")}
             year={selectedYear}
             assignments={hostingRecord?.assignments || null}
             ballotedAt={hostingRecord?.balloted_at || null}
@@ -309,7 +311,7 @@ const Balloting = () => {
             onRunBalloting={() => { setAssignmentType("hosting"); setIsDialogOpen(true); }}
           />
           <BallotingScheduleCard
-            title="Njangi Schedule"
+            title={t("famBalloting.njangiSchedule")}
             year={selectedYear}
             assignments={njangiRecord?.assignments || null}
             ballotedAt={njangiRecord?.balloted_at || null}

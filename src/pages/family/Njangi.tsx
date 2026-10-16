@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -53,6 +54,7 @@ interface FamilyMember {
 }
 
 export default function FamilyNjangi() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -134,7 +136,7 @@ export default function FamilyNjangi() {
       setMembers((enrichedMembers as unknown as FamilyMember[]) || []);
     } catch (error) {
       const err = error as Error;
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("famNjangi.error"), description: err.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -184,7 +186,7 @@ export default function FamilyNjangi() {
       setParticipants((enrichedParticipants as unknown as NjangiParticipant[]) || []);
     } catch (error) {
       const err = error as Error;
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("famNjangi.error"), description: err.message, variant: "destructive" });
     }
   };
 
@@ -203,7 +205,7 @@ export default function FamilyNjangi() {
 
       if (error) throw error;
 
-      toast({ title: "Success", description: "Njangi cycle created" });
+      toast({ title: t("famNjangi.success"), description: t("famNjangi.njangiCycleCreated") });
       setIsCycleDialogOpen(false);
       setCycleFormData({
         name: "",
@@ -214,7 +216,7 @@ export default function FamilyNjangi() {
       loadData();
     } catch (error) {
       const err = error as Error;
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("famNjangi.error"), description: err.message, variant: "destructive" });
     }
   };
 
@@ -232,13 +234,13 @@ export default function FamilyNjangi() {
       });
       if (error) throw error;
       
-      toast({ title: "Success", description: "Participant added" });
+      toast({ title: t("famNjangi.success"), description: t("famNjangi.participantAdded") });
       setIsParticipantDialogOpen(false);
       setSelectedMemberToAdd("");
       loadParticipants(selectedCycle.id);
     } catch (error) {
       const err = error as Error;
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("famNjangi.error"), description: err.message, variant: "destructive" });
     }
   };
 
@@ -247,11 +249,11 @@ export default function FamilyNjangi() {
     try {
       const { error } = await supabase.from("njangi_participants").delete().eq("id", participantId);
       if (error) throw error;
-      toast({ title: "Success", description: "Participant removed" });
+      toast({ title: t("famNjangi.success"), description: t("famNjangi.participantRemoved") });
       loadParticipants(selectedCycle.id);
     } catch (error) {
       const err = error as Error;
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("famNjangi.error"), description: err.message, variant: "destructive" });
     }
   };
 
@@ -331,7 +333,7 @@ export default function FamilyNjangi() {
       }
 
       toast({ 
-        title: "Success", 
+        title: t("famNjangi.success"), 
         description: deductionAmount > 0 
           ? `Payout processed: ${formatAmount(remainingPayout)} paid, ${formatAmount(deductionAmount)} applied to loans`
           : "Payout marked as paid"
@@ -341,17 +343,17 @@ export default function FamilyNjangi() {
       setSelectedParticipantForPayout(null);
     } catch (error) {
       const err = error as Error;
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("famNjangi.error"), description: err.message, variant: "destructive" });
     }
   };
 
   if (authLoading || loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return <div className="flex items-center justify-center min-h-screen">{t("famNjangi.loading")}</div>;
   }
 
   return (
     <>
-      <SEO title="Njangi Cycles" description="Manage Njangi rotating savings cycles, participants and payouts." />
+      <SEO title={t("famNjangi.njangiCycles")} description={t("famNjangi.manageNjangiRotatingSavingsCycles")} />
       <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
@@ -385,16 +387,16 @@ export default function FamilyNjangi() {
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
-                  New Cycle
+                  {t("famNjangi.newCycle")}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Create Njangi Cycle</DialogTitle>
+                  <DialogTitle>{t("famNjangi.createNjangiCycle")}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleCreateCycle} className="space-y-4">
                   <div>
-                    <Label htmlFor="name">Cycle Name</Label>
+                    <Label htmlFor="name">{t("famNjangi.cycleName")}</Label>
                     <Input
                       id="name"
                       value={cycleFormData.name}
@@ -404,7 +406,7 @@ export default function FamilyNjangi() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="start_date">Start Date</Label>
+                    <Label htmlFor="start_date">{t("famNjangi.startDate")}</Label>
                     <Input
                       id="start_date"
                       type="date"
@@ -414,7 +416,7 @@ export default function FamilyNjangi() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="amount">Amount Per Person</Label>
+                    <Label htmlFor="amount">{t("famNjangi.amountPerPerson")}</Label>
                     <Input
                       id="amount"
                       type="number"
@@ -433,7 +435,7 @@ export default function FamilyNjangi() {
                       onChange={(e) => setCycleFormData({ ...cycleFormData, notes: e.target.value })}
                     />
                   </div>
-                  <Button type="submit" className="w-full">Create Cycle</Button>
+                  <Button type="submit" className="w-full">{t("famNjangi.createCycle")}</Button>
                 </form>
               </DialogContent>
             </Dialog>
@@ -445,19 +447,19 @@ export default function FamilyNjangi() {
             <Card className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                  <div className="text-sm text-muted-foreground">Cycle Name</div>
+                  <div className="text-sm text-muted-foreground">{t("famNjangi.cycleName")}</div>
                   <div className="text-xl font-bold">{selectedCycle.name}</div>
                 </div>
                 <div>
-                  <div className="text-sm text-muted-foreground">Amount Per Person</div>
+                  <div className="text-sm text-muted-foreground">{t("famNjangi.amountPerPerson")}</div>
                   <div className="text-xl font-bold">{formatAmount(selectedCycle.amount_per_person)}</div>
                 </div>
                 <div>
-                  <div className="text-sm text-muted-foreground">Participants</div>
+                  <div className="text-sm text-muted-foreground">{t("famNjangi.participants")}</div>
                   <div className="text-xl font-bold">{participants.length}</div>
                 </div>
                 <div>
-                  <div className="text-sm text-muted-foreground">Status</div>
+                  <div className="text-sm text-muted-foreground">{t("famNjangi.status")}</div>
                   <Badge className="text-base">{selectedCycle.status}</Badge>
                 </div>
               </div>
@@ -465,24 +467,24 @@ export default function FamilyNjangi() {
 
             <Card>
               <div className="p-4 border-b flex justify-between items-center">
-                <h2 className="text-xl font-semibold">Payout Order</h2>
+                <h2 className="text-xl font-semibold">{t("famNjangi.payoutOrder")}</h2>
                 {canManageFinances && (
                   <Dialog open={isParticipantDialogOpen} onOpenChange={setIsParticipantDialogOpen}>
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm">
                         <UserPlus className="h-4 w-4 mr-2" />
-                        Add Participant
+                        {t("famNjangi.addParticipant")}
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Add Participant</DialogTitle>
+                        <DialogTitle>{t("famNjangi.addParticipant")}</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4">
                         <div>
-                          <Label>Select Member</Label>
+                          <Label>{t("famNjangi.selectMember")}</Label>
                           <Select value={selectedMemberToAdd} onValueChange={setSelectedMemberToAdd}>
-                            <SelectTrigger><SelectValue placeholder="Choose a member" /></SelectTrigger>
+                            <SelectTrigger><SelectValue placeholder={t("famNjangi.chooseAMember")} /></SelectTrigger>
                             <SelectContent>
                               {members
                                 .filter(m => !participants.some(p => p.family_members.id === m.id))
@@ -495,7 +497,7 @@ export default function FamilyNjangi() {
                           </Select>
                         </div>
                         <Button onClick={handleAddParticipant} disabled={!selectedMemberToAdd} className="w-full">
-                          Add Participant
+                          {t("famNjangi.addParticipant")}
                         </Button>
                       </div>
                     </DialogContent>
@@ -506,19 +508,19 @@ export default function FamilyNjangi() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left p-4">Order</th>
-                      <th className="text-left p-4">Member</th>
-                      <th className="text-right p-4">Amount</th>
-                      <th className="text-left p-4">Payout Date</th>
-                      <th className="text-center p-4">Status</th>
-                      <th className="text-center p-4">Actions</th>
+                      <th className="text-left p-4">{t("famNjangi.order")}</th>
+                      <th className="text-left p-4">{t("famNjangi.member")}</th>
+                      <th className="text-right p-4">{t("famNjangi.amount")}</th>
+                      <th className="text-left p-4">{t("famNjangi.payoutDate")}</th>
+                      <th className="text-center p-4">{t("famNjangi.status")}</th>
+                      <th className="text-center p-4">{t("famNjangi.actions")}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {participants.length === 0 ? (
                       <tr>
                         <td colSpan={6} className="text-center p-8 text-muted-foreground">
-                          No participants added yet
+                          {t("famNjangi.noParticipantsAddedYet")}
                         </td>
                       </tr>
                     ) : (
@@ -540,9 +542,9 @@ export default function FamilyNjangi() {
                           </td>
                           <td className="p-4 text-center">
                             {participant.is_paid ? (
-                              <Badge variant="default">Paid</Badge>
+                              <Badge variant="default">{t("famNjangi.paid")}</Badge>
                             ) : (
-                              <Badge variant="secondary">Pending</Badge>
+                              <Badge variant="secondary">{t("famNjangi.pending")}</Badge>
                             )}
                           </td>
                           <td className="p-4 text-center">
@@ -554,7 +556,7 @@ export default function FamilyNjangi() {
                                     onClick={() => handleMarkPaid(participant.id, participant.family_members.id)}
                                   >
                                     <CheckCircle2 className="h-4 w-4 mr-1" />
-                                    Mark Paid
+                                    {t("famNjangi.markPaid")}
                                   </Button>
                                   <Button
                                     size="sm"

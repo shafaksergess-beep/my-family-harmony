@@ -1,3 +1,5 @@
+import i18n from "@/i18n/config";
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -45,18 +47,19 @@ interface FamilyMember {
 }
 
 const EVENT_TYPES = {
-  birth: { label: "Birth", amount: 5000, description: "5,000 FCFA per member" },
-  member_death: { label: "Member Death", amount: 1000000, description: "1,000,000 FCFA total" },
-  spouse_death: { label: "Spouse Death", amount: 500000, description: "500,000 FCFA total" },
-  child_death: { label: "Child Death", amount: 500000, description: "500,000 FCFA total" },
-  external_wonya: { label: "External Wonya Kotto", amount: 150000, description: "Up to 150,000 FCFA" },
-  external_other: { label: "External Other", amount: 100000, description: "Up to 100,000 FCFA" },
-  sickness: { label: "Sickness (5+ days)", amount: 50000, description: "50,000 FCFA" },
-  wedding: { label: "Wedding", amount: 100000, description: "100,000 FCFA" },
-  ceremony_invitation: { label: "Other Ceremony", amount: 2500, description: "2,500 FCFA per member" },
+  birth: { get label() { return i18n.t("famAssistance.birth"); }, amount: 5000, description: "5,000 FCFA per member" },
+  member_death: { get label() { return i18n.t("famAssistance.memberDeath"); }, amount: 1000000, description: "1,000,000 FCFA total" },
+  spouse_death: { get label() { return i18n.t("famAssistance.spouseDeath"); }, amount: 500000, description: "500,000 FCFA total" },
+  child_death: { get label() { return i18n.t("famAssistance.childDeath"); }, amount: 500000, description: "500,000 FCFA total" },
+  external_wonya: { get label() { return i18n.t("famAssistance.externalWonyaKotto"); }, amount: 150000, get description() { return i18n.t("famAssistance.upTo150000Fcfa"); } },
+  external_other: { get label() { return i18n.t("famAssistance.externalOther"); }, amount: 100000, get description() { return i18n.t("famAssistance.upTo100000Fcfa"); } },
+  sickness: { get label() { return i18n.t("famAssistance.sickness5Days"); }, amount: 50000, description: "50,000 FCFA" },
+  wedding: { get label() { return i18n.t("famAssistance.wedding"); }, amount: 100000, description: "100,000 FCFA" },
+  ceremony_invitation: { get label() { return i18n.t("famAssistance.otherCeremony"); }, amount: 2500, description: "2,500 FCFA per member" },
 };
 
 export default function FamilyAssistance() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -156,7 +159,7 @@ export default function FamilyAssistance() {
 
       setMembers(allEnrichedMembers as any);
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("famAssistance.error"), description: error.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -191,14 +194,14 @@ export default function FamilyAssistance() {
         .lte("event_date", `${currentYear}-12-31`);
 
       if (checkError) {
-        toast({ title: "Error", description: checkError.message, variant: "destructive" });
+        toast({ title: t("famAssistance.error"), description: checkError.message, variant: "destructive" });
         return;
       }
 
       if (existingSickness && existingSickness.length > 0) {
         toast({ 
-          title: "Limit Exceeded", 
-          description: "Member can only receive sickness assistance once per year",
+          title: t("famAssistance.limitExceeded"), 
+          description: t("famAssistance.memberCanOnlyReceiveSickness"),
           variant: "destructive" 
         });
         return;
@@ -237,8 +240,8 @@ export default function FamilyAssistance() {
       });
       setValidationErrors(errors);
       toast({
-        title: "Validation Error",
-        description: "Please check the form for errors",
+        title: t("famAssistance.validationError"),
+        description: t("famAssistance.pleaseCheckTheFormFor"),
         variant: "destructive",
       });
       return;
@@ -259,7 +262,7 @@ export default function FamilyAssistance() {
 
       if (error) throw error;
 
-      toast({ title: "Success", description: "Assistance event recorded" });
+      toast({ title: t("famAssistance.success"), description: t("famAssistance.assistanceEventRecorded") });
       setIsDialogOpen(false);
       setFormData({
         member_id: "",
@@ -274,7 +277,7 @@ export default function FamilyAssistance() {
       setValidationErrors({});
       loadData();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("famAssistance.error"), description: error.message, variant: "destructive" });
     }
   };
 
@@ -353,7 +356,7 @@ export default function FamilyAssistance() {
       }
 
       toast({ 
-        title: "Success", 
+        title: t("famAssistance.success"), 
         description: deductionAmount > 0 
           ? `Payment processed: ${Math.max(0, remainingPayout).toLocaleString()} FCFA paid, ${deductionAmount.toLocaleString()} FCFA applied to loans`
           : "Event marked as paid"
@@ -362,7 +365,7 @@ export default function FamilyAssistance() {
       loadData();
       setSelectedEventForPayout(null);
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("famAssistance.error"), description: error.message, variant: "destructive" });
     }
   };
 
@@ -377,7 +380,7 @@ export default function FamilyAssistance() {
   const stats = calculateStats();
 
   if (authLoading || loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return <div className="flex items-center justify-center min-h-screen">{t("famAssistance.loading")}</div>;
   }
 
   return (
@@ -388,44 +391,44 @@ export default function FamilyAssistance() {
             <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-3xl font-bold">Assistance Events</h1>
+            <h1 className="text-3xl font-bold">{t("famAssistance.assistanceEvents")}</h1>
           </div>
           <LanguageSwitcher />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="p-6">
-            <div className="text-sm text-muted-foreground">Total Assistance</div>
+            <div className="text-sm text-muted-foreground">{t("famAssistance.totalAssistance")}</div>
             <div className="text-2xl font-bold">{stats.totalAmount.toLocaleString()} FCFA</div>
           </Card>
           <Card className="p-6">
-            <div className="text-sm text-muted-foreground">Pending</div>
+            <div className="text-sm text-muted-foreground">{t("famAssistance.pending")}</div>
             <div className="text-2xl font-bold">{stats.pendingAmount.toLocaleString()} FCFA</div>
           </Card>
           <Card className="p-6">
-            <div className="text-sm text-muted-foreground">Paid</div>
+            <div className="text-sm text-muted-foreground">{t("famAssistance.paid")}</div>
             <div className="text-2xl font-bold">{stats.paidAmount.toLocaleString()} FCFA</div>
           </Card>
         </div>
 
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Events History</h2>
+          <h2 className="text-xl font-semibold">{t("famAssistance.eventsHistory")}</h2>
           {canManageFinances && (
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
-                  Record Event
+                  {t("famAssistance.recordEvent")}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
-                  <DialogTitle>Record Assistance Event</DialogTitle>
+                  <DialogTitle>{t("famAssistance.recordAssistanceEvent")}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="member">Member</Label>
+                      <Label htmlFor="member">{t("famAssistance.member")}</Label>
                       <Select
                         value={formData.member_id}
                         onValueChange={(value) => {
@@ -434,7 +437,7 @@ export default function FamilyAssistance() {
                         }}
                       >
                         <SelectTrigger className={validationErrors.memberId ? "border-red-500" : ""}>
-                          <SelectValue placeholder="Select member" />
+                          <SelectValue placeholder={t("famAssistance.selectMember")} />
                         </SelectTrigger>
                         <SelectContent>
                           {members.map((member) => (
@@ -449,7 +452,7 @@ export default function FamilyAssistance() {
                       )}
                     </div>
                     <div>
-                      <Label htmlFor="event_type">Event Type</Label>
+                      <Label htmlFor="event_type">{t("famAssistance.eventType")}</Label>
                       <Select
                         value={formData.event_type}
                         onValueChange={(value) => {
@@ -458,7 +461,7 @@ export default function FamilyAssistance() {
                         }}
                       >
                         <SelectTrigger className={validationErrors.eventType ? "border-red-500" : ""}>
-                          <SelectValue placeholder="Select event type" />
+                          <SelectValue placeholder={t("famAssistance.selectEventType")} />
                         </SelectTrigger>
                         <SelectContent>
                           {Object.entries(EVENT_TYPES).map(([key, value]) => (
@@ -475,7 +478,7 @@ export default function FamilyAssistance() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="event_date">Event Date</Label>
+                      <Label htmlFor="event_date">{t("famAssistance.eventDate")}</Label>
                       <Input
                         id="event_date"
                         type="date"
@@ -577,7 +580,7 @@ export default function FamilyAssistance() {
                       <p className="text-sm text-red-500 mt-1">{validationErrors.notes}</p>
                     )}
                   </div>
-                  <Button type="submit" className="w-full">Record Event</Button>
+                  <Button type="submit" className="w-full">{t("famAssistance.recordEvent")}</Button>
                 </form>
               </DialogContent>
             </Dialog>
@@ -589,19 +592,19 @@ export default function FamilyAssistance() {
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left p-4">Date</th>
-                  <th className="text-left p-4">Member</th>
-                  <th className="text-left p-4">Event Type</th>
-                  <th className="text-right p-4">Amount</th>
-                  <th className="text-center p-4">Status</th>
-                  <th className="text-center p-4">Actions</th>
+                  <th className="text-left p-4">{t("famAssistance.date")}</th>
+                  <th className="text-left p-4">{t("famAssistance.member")}</th>
+                  <th className="text-left p-4">{t("famAssistance.eventType")}</th>
+                  <th className="text-right p-4">{t("famAssistance.amount")}</th>
+                  <th className="text-center p-4">{t("famAssistance.status")}</th>
+                  <th className="text-center p-4">{t("famAssistance.actions")}</th>
                 </tr>
               </thead>
               <tbody>
                 {events.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="text-center p-8 text-muted-foreground">
-                      No assistance events recorded yet
+                      {t("famAssistance.noAssistanceEventsRecordedYet")}
                     </td>
                   </tr>
                 ) : (
@@ -648,9 +651,9 @@ export default function FamilyAssistance() {
                         </td>
                         <td className="p-4 text-center">
                           {event.is_paid ? (
-                            <Badge variant="default">Paid</Badge>
+                            <Badge variant="default">{t("famAssistance.paid")}</Badge>
                           ) : (
-                            <Badge variant="secondary">Pending</Badge>
+                            <Badge variant="secondary">{t("famAssistance.pending")}</Badge>
                           )}
                         </td>
                         <td className="p-4 text-center">
@@ -660,7 +663,7 @@ export default function FamilyAssistance() {
                               onClick={() => handleMarkPaid(event.id)}
                             >
                               <CheckCircle2 className="h-4 w-4 mr-1" />
-                              Mark Paid
+                              {t("famAssistance.markPaid")}
                             </Button>
                           )}
                         </td>
