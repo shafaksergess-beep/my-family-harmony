@@ -15,6 +15,7 @@ import { haptics } from "@/lib/haptics";
 import { FamilyChatbot } from "@/components/chat/FamilyChatbot";
 import SEO from "@/components/SEO";
 import { FamilyHealthWidget } from "@/components/family/FamilyHealthWidget";
+import { FamilyLanguageCard } from "@/components/family/FamilyLanguageCard";
 
 interface ModuleCategory {
   id: string;
@@ -305,6 +306,7 @@ const FamilyDetail = () => {
         {family && canManageInvitations && (
           <>
             <FamilyHealthWidget familyId={family.id} />
+            <FamilyLanguageCard familyId={family.id} current={family.primary_language} />
             <div className="flex justify-end">
               <Button
                 variant={pendingApprovalsCount > 0 ? "default" : "outline"}
