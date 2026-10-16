@@ -266,7 +266,7 @@ const PaymentProofs = () => {
                 {isReviewer && open.submitted_by !== userId && ["pending", "partially_approved"].includes(open.status) && (
                   <div className="space-y-2 border-t pt-3">
                     {open.requires_dual_review && <p className="text-muted-foreground">{open.status === "pending" ? "Requires 2 approvals — yours will be the first." : open.first_reviewer === userId ? "You gave the first approval; another reviewer must confirm." : "Your approval will finalize this payment."}</p>}
-                    <Textarea placeholder=Notes (required to reject) value={notes} onChange={(e) => setNotes(e.target.value)} />
+                    <Textarea placeholder="Notes (required to reject)" value={notes} onChange={(e) => setNotes(e.target.value)} />
                     <div className="flex flex-wrap gap-2">
                       <Button disabled={busy || open.first_reviewer === userId} onClick={() => review("approve")}>{t("famPaymentProofs.approve")}</Button>
                       <Button variant="destructive" disabled={busy} onClick={() => review("reject")}>{t("famPaymentProofs.reject")}</Button>
