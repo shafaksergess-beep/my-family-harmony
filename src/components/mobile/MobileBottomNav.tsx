@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Home, Users, Calendar, Wallet, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -18,30 +19,31 @@ interface MobileBottomNavProps {
 export function MobileBottomNav({ familySlug, className }: MobileBottomNavProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const navItems: NavItem[] = [
     {
-      label: 'Home',
+      label: t("nav.home"),
       icon: Home,
       path: familySlug ? `/family/${familySlug}` : '/dashboard',
     },
     {
-      label: 'Members',
+      label: t("nav.members"),
       icon: Users,
       path: familySlug ? `/family/${familySlug}/members` : '/dashboard',
     },
     {
-      label: 'Meetings',
+      label: t("nav.meetings"),
       icon: Calendar,
       path: familySlug ? `/family/${familySlug}/meetings` : '/dashboard',
     },
     {
-      label: 'Finance',
+      label: t("nav.finance"),
       icon: Wallet,
       path: familySlug ? `/family/${familySlug}/contributions` : '/dashboard',
     },
     {
-      label: 'More',
+      label: t("nav.more"),
       icon: MoreHorizontal,
       path: familySlug ? `/family/${familySlug}/more` : '/dashboard',
     },

@@ -533,5 +533,62 @@
     "desc": "Ajoutez à l'écran d'accueil pour un accès rapide et hors ligne.",
     "installApp": "Installer l'app",
     "installed": "App installée"
+  },
+  "dash": {
+    "active": "Actif",
+    "activityLogs": "Journal d'activité",
+    "clickToViewFamilyDetails": "Cliquez pour voir les détails et la gestion de la famille",
+    "contactYourFamilyAdministratorTo": "Contactez l'administrateur de votre famille pour être ajouté",
+    "createFamily": "Créer une famille",
+    "dashboard": "Tableau de bord",
+    "families": "Familles",
+    "leadership": "Direction",
+    "loggedOut": "Déconnecté",
+    "logout": "Déconnexion",
+    "manageFamilies": "Gérer les familles",
+    "manageAllFamiliesAndSystem": "Gérer toutes les familles et les paramètres du système",
+    "member": "Membre",
+    "myFamilyDashboard": "Tableau de bord familial",
+    "myFamilyTree": "Mon arbre généalogique",
+    "noFamiliesYet": "Aucune famille pour l'instant",
+    "openFamily": "Ouvrir la famille",
+    "permissionsOverview": "Aperçu des permissions",
+    "profile": "Profil",
+    "superAdminPanel": "Panneau super admin",
+    "superAdministrator": "Super administrateur",
+    "youVeBeenSuccessfullyLogged": "Vous avez été déconnecté.",
+    "yourFamilies": "Vos familles",
+    "yourKinsrootDashboardViewYour": "Votre tableau de bord Kinsroot — familles, cotisations, réunions et activité récente en un coup d'œil."
+  },
+  "profile": {
+    "activeSessionsDevices": "Sessions et appareils actifs",
+    "currentlyWorkingEligibleForNjangi": "Actuellement en activité (éligible au Njangi)",
+    "failedToLoadProfile": "Échec du chargement du profil",
+    "familyMemberships": "Familles",
+    "joinAFamily": "Rejoindre une famille",
+    "manageLinkedAccounts": "Gérer les comptes liés",
+    "manageYourKinsrootProfileLanguage": "Gérez votre profil Kinsroot, votre langue et vos familles.",
+    "manageYourPersonalInformation": "Gérez vos informations personnelles",
+    "myProfile": "Mon profil",
+    "personalInformation": "Informations personnelles",
+    "preferredLanguage": "Langue préférée",
+    "profileUpdatedSuccessfully": "Profil mis à jour",
+    "reviewTheGoogleAppleOr": "Consultez les comptes Google, Apple ou e-mail liés à votre profil.",
+    "saving": "Enregistrement...",
+    "signInMethods": "Méthodes de connexion",
+    "userProfile": "Profil utilisateur"
+  },
+  "notif": {
+    "markAllRead": "Tout marquer comme lu",
+    "notifications": "Notifications",
+    "viewAll": "Tout voir",
+    "youReAllCaughtUp": "Vous êtes à jour"
+  },
+  "nav": {
+    "home": "Accueil",
+    "members": "Membres",
+    "meetings": "Réunions",
+    "finance": "Finances",
+    "more": "Plus"
   }
 }

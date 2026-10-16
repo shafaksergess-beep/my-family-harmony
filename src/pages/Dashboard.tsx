@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,6 +29,7 @@ interface UserFamily {
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const { isMobile } = usePlatform();
   const [loading, setLoading] = useState(true);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
@@ -108,8 +110,8 @@ const Dashboard = () => {
       console.warn("signOut error (ignored):", err);
     }
     toast({
-      title: "Logged out",
-      description: "You've been successfully logged out.",
+      title: t("dash.loggedOut"),
+      description: t("dash.youVeBeenSuccessfullyLogged"),
     });
     navigate("/auth", { replace: true });
   };
@@ -129,7 +131,7 @@ const Dashboard = () => {
 
   return (
     <>
-    <SEO title="My Family Tree" description="Your Kinsroot dashboard — view your families, contributions, meetings and recent activity at a glance." />
+    <SEO title={t("dash.myFamilyTree")} description={t("dash.yourKinsrootDashboardViewYour")} />
     <NewUserOnboarding
       open={showOnboarding}
       onComplete={() => setShowOnboarding(false)}
@@ -149,27 +151,27 @@ const Dashboard = () => {
               />
               <div>
                 <h1 className="text-2xl font-bold text-foreground">
-                  My Family Dashboard
+                  {t("dash.myFamilyDashboard")}
                 </h1>
                 <p className="text-sm text-muted-foreground">
                   Welcome, {profile?.full_name || "User"}!
                 </p>
                 {isSuperAdmin && (
-                  <p className="text-sm text-secondary font-medium">Super Administrator</p>
+                  <p className="text-sm text-secondary font-medium">{t("dash.superAdministrator")}</p>
                 )}
               </div>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" onClick={() => navigate("/profile")}>
                 <UserIcon className="w-4 h-4 mr-2" />
-                Profile
+                {t("dash.profile")}
               </Button>
               <NotificationInbox familySlug={userFamilies[0]?.family_slug} />
               <LanguageSwitcher />
               <CurrencySelector />
               <Button variant="ghost" onClick={handleLogout}>
                 <LogOut className="w-4 h-4 mr-2" />
-                Logout
+                {t("dash.logout")}
               </Button>
             </div>
           </div>
@@ -187,7 +189,7 @@ const Dashboard = () => {
                   <Users className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Families</p>
+                  <p className="text-sm text-muted-foreground">{t("dash.families")}</p>
                   <p className="text-2xl font-bold">{userFamilies.length}</p>
                 </div>
               </div>
@@ -198,7 +200,7 @@ const Dashboard = () => {
                   <Activity className="w-5 h-5 text-green-600 dark:text-green-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Active</p>
+                  <p className="text-sm text-muted-foreground">{t("dash.active")}</p>
                   <p className="text-2xl font-bold">{userFamilies.filter(f => f.user_role !== 'guest').length}</p>
                 </div>
               </div>
@@ -209,7 +211,7 @@ const Dashboard = () => {
                   <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Leadership</p>
+                  <p className="text-sm text-muted-foreground">{t("dash.leadership")}</p>
                   <p className="text-2xl font-bold">
                     {userFamilies.filter(f => ['family_head', 'treasurer', 'loan_committee'].includes(f.user_role)).length}
                   </p>
@@ -222,7 +224,7 @@ const Dashboard = () => {
                   <Building2 className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Member</p>
+                  <p className="text-sm text-muted-foreground">{t("dash.member")}</p>
                   <p className="text-2xl font-bold">
                     {userFamilies.filter(f => f.user_role === 'member').length}
                   </p>
@@ -238,10 +240,10 @@ const Dashboard = () => {
               <div>
                 <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
                   <Building2 className="w-5 h-5 text-secondary" />
-                  Super Admin Panel
+                  {t("dash.superAdminPanel")}
                 </h2>
                 <p className="text-muted-foreground">
-                  Manage all families and system-wide settings
+                  {t("dash.manageAllFamiliesAndSystem")}
                 </p>
               </div>
             </div>
@@ -252,7 +254,7 @@ const Dashboard = () => {
                 onClick={() => navigate("/admin/dashboard")}
               >
                 <Activity className="w-4 h-4 mr-2" />
-                Dashboard
+                {t("dash.dashboard")}
               </Button>
               <Button
                 variant="outline"
@@ -260,7 +262,7 @@ const Dashboard = () => {
                 onClick={() => navigate("/admin/families")}
               >
                 <Building2 className="w-4 h-4 mr-2" />
-                Manage Families
+                {t("dash.manageFamilies")}
               </Button>
               <Button
                 variant="outline"
@@ -268,7 +270,7 @@ const Dashboard = () => {
                 onClick={() => navigate("/admin/permissions")}
               >
                 <Shield className="w-4 h-4 mr-2" />
-                Permissions Overview
+                {t("dash.permissionsOverview")}
               </Button>
               <Button
                 variant="outline"
@@ -276,7 +278,7 @@ const Dashboard = () => {
                 onClick={() => navigate("/admin/activity-logs")}
               >
                 <FileText className="w-4 h-4 mr-2" />
-                Activity Logs
+                {t("dash.activityLogs")}
               </Button>
             </div>
           </Card>
@@ -285,10 +287,10 @@ const Dashboard = () => {
         {/* User's Families */}
         <div>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-foreground">Your Families</h2>
+            <h2 className="text-2xl font-bold text-foreground">{t("dash.yourFamilies")}</h2>
             {!isSuperAdmin && userFamilies.length === 0 && (
               <p className="text-muted-foreground">
-                Contact your family administrator to be added to a family
+                {t("dash.contactYourFamilyAdministratorTo")}
               </p>
             )}
           </div>
@@ -298,7 +300,7 @@ const Dashboard = () => {
               <Card className="p-12 text-center">
                 <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
                 <h3 className="text-xl font-semibold mb-2 text-foreground">
-                  No families yet
+                  {t("dash.noFamiliesYet")}
                 </h3>
                 <p className="text-muted-foreground mb-6">
                   You haven't been added to any family yet.
@@ -307,7 +309,7 @@ const Dashboard = () => {
                 {isSuperAdmin && (
                   <Button onClick={() => navigate("/admin/families")}>
                     <Plus className="w-4 h-4 mr-2" />
-                    Create Family
+                    {t("dash.createFamily")}
                   </Button>
                 )}
               </Card>
@@ -332,10 +334,10 @@ const Dashboard = () => {
                     {family.family_name}
                   </h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Click to view family details and management
+                    {t("dash.clickToViewFamilyDetails")}
                   </p>
                   <Button className="w-full" variant="outline">
-                    Open Family
+                    {t("dash.openFamily")}
                   </Button>
                 </Card>
               ))}
