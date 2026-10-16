@@ -15,6 +15,13 @@
       "when": 1792140137617,
       "tag": "0001_payment_proofs_storage",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792142917711,
+      "tag": "0002_languages_and_translations",
+      "breakpoints": true
     }
   ]
 }
