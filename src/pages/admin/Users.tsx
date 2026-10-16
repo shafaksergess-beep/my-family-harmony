@@ -116,8 +116,8 @@ export default function Users() {
 
     // No admin permissions
     toast({
-      title: "Access Denied",
-      description: "You must be a super admin, family head, or family admin to access this page",
+      title: t("admUsers.accessDenied"),
+      description: t("admUsers.youMustBeASuper"),
       variant: "destructive",
     });
     navigate("/dashboard");
@@ -205,8 +205,8 @@ export default function Users() {
     } catch (error) {
       console.error("Error fetching users:", error);
       toast({
-        title: "Error",
-        description: "Failed to fetch users",
+        title: t("admUsers.error"),
+        description: t("admUsers.failedToFetchUsers"),
         variant: "destructive",
       });
     } finally {
@@ -217,8 +217,8 @@ export default function Users() {
   const handleCreateUser = async () => {
     if (!newUser.email || !newUser.password || !newUser.full_name) {
       toast({
-        title: "Validation Error",
-        description: "Email, password, and full name are required",
+        title: t("admUsers.validationError"),
+        description: t("admUsers.emailPasswordAndFullName"),
         variant: "destructive",
       });
       return;
@@ -227,8 +227,8 @@ export default function Users() {
     // Family heads and admins must assign to a family
     if (userRole !== "super_admin" && !newUser.family_id) {
       toast({
-        title: "Validation Error",
-        description: "You must assign the user to a family",
+        title: t("admUsers.validationError"),
+        description: t("admUsers.youMustAssignTheUser"),
         variant: "destructive",
       });
       return;
@@ -237,8 +237,8 @@ export default function Users() {
     // Validate family access
     if (newUser.family_id && userRole !== "super_admin" && !managedFamilies.includes(newUser.family_id)) {
       toast({
-        title: "Access Denied",
-        description: "You can only create users for families you manage",
+        title: t("admUsers.accessDenied"),
+        description: t("admUsers.youCanOnlyCreateUsers"),
         variant: "destructive",
       });
       return;
@@ -279,8 +279,8 @@ export default function Users() {
         }
 
         toast({
-          title: "Success",
-          description: "User created successfully",
+          title: t("admUsers.success"),
+          description: t("admUsers.userCreatedSuccessfully"),
         });
 
         setIsAddUserOpen(false);
@@ -297,7 +297,7 @@ export default function Users() {
     } catch (error: any) {
       console.error("Error creating user:", error);
       toast({
-        title: "Error",
+        title: t("admUsers.error"),
         description: error.message || "Failed to create user",
         variant: "destructive",
       });
@@ -385,21 +385,21 @@ export default function Users() {
       
       if (results.success > 0) {
         toast({
-          title: "Import Complete",
+          title: t("admUsers.importComplete"),
           description: `Successfully imported ${results.success} users. ${results.failed} failed.`,
         });
         fetchUsers();
       } else {
         toast({
-          title: "Import Failed",
-          description: "No users were imported successfully",
+          title: t("admUsers.importFailed"),
+          description: t("admUsers.noUsersWereImportedSuccessfully"),
           variant: "destructive",
         });
       }
     } catch (error: any) {
       console.error("Error importing users:", error);
       toast({
-        title: "Error",
+        title: t("admUsers.error"),
         description: error.message || "Failed to import users",
         variant: "destructive",
       });
@@ -448,18 +448,18 @@ export default function Users() {
 
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleExportCSV} disabled={!filteredUsers.length}>
-              <Download className="mr-2 h-4 w-4" /> Export CSV
+              <Download className="mr-2 h-4 w-4" /> {t("admUsers.exportCsv")}
             </Button>
             <Dialog open={isBulkImportOpen} onOpenChange={setIsBulkImportOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline">
                   <Plus className="mr-2 h-4 w-4" />
-                  Bulk Import
+                  {t("admUsers.bulkImport")}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Bulk Import Users</DialogTitle>
+                  <DialogTitle>{t("admUsers.bulkImportUsers")}</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div className="space-y-2">
@@ -483,24 +483,24 @@ export default function Users() {
                           URL.revokeObjectURL(url);
                         }}
                       >
-                        <Download className="w-3 h-3 mr-1" /> Download template
+                        <Download className="w-3 h-3 mr-1" /> {t("admUsers.downloadTemplate")}
                       </Button>
                     </div>
                     <div className="text-xs text-muted-foreground bg-muted p-2 rounded font-mono">
-                      email,password,full_name,phone,family_name,role
+                      {t("admUsers.emailPasswordFullNamePhone")}
                       <br />
-                      user1@example.com,password123,John Doe,+1234567890,Smith Family,member
+                      {t("admUsers.user1ExampleComPassword123John")}
                       <br />
-                      user2@example.com,password456,Jane Smith,,Jones Family,treasurer
+                      {t("admUsers.user2ExampleComPassword456Jane")}
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="bulk_data">CSV Data</Label>
+                    <Label htmlFor="bulk_data">{t("admUsers.csvData")}</Label>
                     <textarea
                       id="bulk_data"
                       value={bulkImportData}
                       onChange={(e) => setBulkImportData(e.target.value)}
-                      placeholder="Paste CSV data here..."
+                      placeholder={t("admUsers.pasteCsvDataHere")}
                       className="w-full h-64 p-2 border rounded font-mono text-sm"
                     />
                   </div>
@@ -533,9 +533,9 @@ export default function Users() {
                       setImportResults(null);
                     }}
                   >
-                    Cancel
+                    {t("admUsers.cancel")}
                   </Button>
-                  <Button onClick={handleBulkImport}>Import Users</Button>
+                  <Button onClick={handleBulkImport}>{t("admUsers.importUsers")}</Button>
                 </div>
               </DialogContent>
             </Dialog>
@@ -544,12 +544,12 @@ export default function Users() {
               <DialogTrigger asChild>
                 <Button>
                   <UserPlus className="mr-2 h-4 w-4" />
-                  Add User
+                  {t("admUsers.addUser")}
                 </Button>
               </DialogTrigger>
             <DialogContent className="max-w-md">
               <DialogHeader>
-                <DialogTitle>Create New User</DialogTitle>
+                <DialogTitle>{t("admUsers.createNewUser")}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
@@ -578,11 +578,11 @@ export default function Users() {
                     type="password"
                     value={newUser.password}
                     onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                    placeholder="Minimum 6 characters"
+                    placeholder={t("admUsers.minimum6Characters")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
+                  <Label htmlFor="phone">{t("admUsers.phone")}</Label>
                   <Input
                     id="phone"
                     value={newUser.phone}
@@ -599,10 +599,10 @@ export default function Users() {
                     onValueChange={(value) => setNewUser({ ...newUser, family_id: value })}
                   >
                     <SelectTrigger id="family">
-                      <SelectValue placeholder="Select a family" />
+                      <SelectValue placeholder={t("admUsers.selectAFamily")} />
                     </SelectTrigger>
                     <SelectContent>
-                      {userRole === "super_admin" && <SelectItem value="">No Family</SelectItem>}
+                      {userRole === "super_admin" && <SelectItem value="">{t("admUsers.noFamily")}</SelectItem>}
                       {families.map((family) => (
                         <SelectItem key={family.id} value={family.id}>
                           {family.name}
@@ -613,7 +613,7 @@ export default function Users() {
                 </div>
                 {newUser.family_id && (
                   <div className="space-y-2">
-                    <Label htmlFor="role">Role</Label>
+                    <Label htmlFor="role">{t("admUsers.role")}</Label>
                     <Select
                       value={newUser.role}
                       onValueChange={(value: any) => setNewUser({ ...newUser, role: value })}
@@ -622,10 +622,10 @@ export default function Users() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="member">Member</SelectItem>
-                        <SelectItem value="treasurer">Treasurer</SelectItem>
-                        <SelectItem value="loan_committee">Loan Committee</SelectItem>
-                        <SelectItem value="family_head">Family Head</SelectItem>
+                        <SelectItem value="member">{t("admUsers.member")}</SelectItem>
+                        <SelectItem value="treasurer">{t("admUsers.treasurer")}</SelectItem>
+                        <SelectItem value="loan_committee">{t("admUsers.loanCommittee")}</SelectItem>
+                        <SelectItem value="family_head">{t("admUsers.familyHead")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -633,10 +633,10 @@ export default function Users() {
               </div>
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setIsAddUserOpen(false)}>
-                  Cancel
+                  {t("admUsers.cancel")}
                 </Button>
                 <Button onClick={handleCreateUser}>
-                  Create User
+                  {t("admUsers.createUser")}
                 </Button>
               </div>
             </DialogContent>
@@ -650,7 +650,7 @@ export default function Users() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
-                  placeholder="Search users..."
+                  placeholder={t("admUsers.searchUsers")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -663,9 +663,9 @@ export default function Users() {
           </CardHeader>
           <CardContent>
             {loading ? (
-              <div className="text-center py-8 text-muted-foreground">Loading users...</div>
+              <div className="text-center py-8 text-muted-foreground">{t("admUsers.loadingUsers")}</div>
             ) : filteredUsers.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">No users found</div>
+              <div className="text-center py-8 text-muted-foreground">{t("admUsers.noUsersFound")}</div>
             ) : (
               <div className="space-y-4">
                 {filteredUsers.map((user) => (
@@ -676,7 +676,7 @@ export default function Users() {
                           <div className="flex items-center gap-2 mb-2">
                             <h3 className="font-semibold text-lg">{user.full_name}</h3>
                             {user.is_super_admin && (
-                              <Badge variant="destructive">Super Admin</Badge>
+                              <Badge variant="destructive">{t("admUsers.superAdmin")}</Badge>
                             )}
                           </div>
                           <div className="space-y-1 text-sm text-muted-foreground">
@@ -684,7 +684,7 @@ export default function Users() {
                             {user.phone && <p>{user.phone}</p>}
                             <div className="flex flex-wrap gap-2 mt-2">
                               {user.families.length === 0 ? (
-                                <Badge variant="outline">No family assigned</Badge>
+                                <Badge variant="outline">{t("admUsers.noFamilyAssigned")}</Badge>
                               ) : (
                                 user.families.map((fm) => (
                                   <Badge key={fm.family_id} variant="secondary">

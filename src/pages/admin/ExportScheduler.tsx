@@ -64,8 +64,8 @@ const ExportScheduler = () => {
 
       if (!superAdminData) {
         toast({
-          title: "Access Denied",
-          description: "You don't have permission to access this page",
+          title: t("admExportScheduler.accessDenied"),
+          description: t("admExportScheduler.youDonTHavePermission"),
           variant: "destructive",
         });
         navigate("/dashboard");
@@ -108,8 +108,8 @@ const ExportScheduler = () => {
     });
 
     toast({
-      title: "Success",
-      description: "Export schedule created successfully",
+      title: t("admExportScheduler.success"),
+      description: t("admExportScheduler.exportScheduleCreatedSuccessfully"),
     });
   };
 
@@ -119,8 +119,8 @@ const ExportScheduler = () => {
     localStorage.setItem('export-schedules', JSON.stringify(updated));
     
     toast({
-      title: "Success",
-      description: "Export schedule deleted",
+      title: t("admExportScheduler.success"),
+      description: t("admExportScheduler.exportScheduleDeleted"),
     });
   };
 
@@ -153,16 +153,16 @@ const ExportScheduler = () => {
               <div>
                 <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                   <Download className="w-6 h-6" />
-                  Export Scheduler
+                  {t("admExportScheduler.exportScheduler")}
                 </h1>
-                <p className="text-sm text-muted-foreground">Schedule automatic data exports</p>
+                <p className="text-sm text-muted-foreground">{t("admExportScheduler.scheduleAutomaticDataExports")}</p>
               </div>
             </div>
             
             <div className="flex items-center gap-2">
               <Button onClick={() => setIsAdding(true)}>
                 <Plus className="w-4 h-4 mr-2" />
-                Add Schedule
+                {t("admExportScheduler.addSchedule")}
               </Button>
               <LanguageSwitcher />
             </div>
@@ -174,21 +174,21 @@ const ExportScheduler = () => {
         {isAdding && (
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>New Export Schedule</CardTitle>
-              <CardDescription>Configure a new automatic export schedule</CardDescription>
+              <CardTitle>{t("admExportScheduler.newExportSchedule")}</CardTitle>
+              <CardDescription>{t("admExportScheduler.configureANewAutomaticExport")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Schedule Name</Label>
+                <Label>{t("admExportScheduler.scheduleName")}</Label>
                 <Input
-                  placeholder="Weekly Activity Report"
+                  placeholder={t("admExportScheduler.weeklyActivityReport")}
                   value={newSchedule.name}
                   onChange={(e) => setNewSchedule({ ...newSchedule, name: e.target.value })}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>Data Type</Label>
+                <Label>{t("admExportScheduler.dataType")}</Label>
                 <Select
                   value={newSchedule.entity_type}
                   onValueChange={(entity_type) => setNewSchedule({ ...newSchedule, entity_type })}
@@ -197,19 +197,19 @@ const ExportScheduler = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="activity_logs">Activity Logs</SelectItem>
-                    <SelectItem value="families">Families</SelectItem>
-                    <SelectItem value="members">Members</SelectItem>
-                    <SelectItem value="contributions">Contributions</SelectItem>
-                    <SelectItem value="loans">Loans</SelectItem>
-                    <SelectItem value="savings">Savings</SelectItem>
+                    <SelectItem value="activity_logs">{t("admExportScheduler.activityLogs")}</SelectItem>
+                    <SelectItem value="families">{t("admExportScheduler.families")}</SelectItem>
+                    <SelectItem value="members">{t("admExportScheduler.members")}</SelectItem>
+                    <SelectItem value="contributions">{t("admExportScheduler.contributions")}</SelectItem>
+                    <SelectItem value="loans">{t("admExportScheduler.loans")}</SelectItem>
+                    <SelectItem value="savings">{t("admExportScheduler.savings")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Frequency</Label>
+                  <Label>{t("admExportScheduler.frequency")}</Label>
                   <Select
                     value={newSchedule.frequency}
                     onValueChange={(frequency) => setNewSchedule({ ...newSchedule, frequency })}
@@ -218,15 +218,15 @@ const ExportScheduler = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="daily">Daily</SelectItem>
-                      <SelectItem value="weekly">Weekly</SelectItem>
-                      <SelectItem value="monthly">Monthly</SelectItem>
+                      <SelectItem value="daily">{t("admExportScheduler.daily")}</SelectItem>
+                      <SelectItem value="weekly">{t("admExportScheduler.weekly")}</SelectItem>
+                      <SelectItem value="monthly">{t("admExportScheduler.monthly")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Time</Label>
+                  <Label>{t("admExportScheduler.time")}</Label>
                   <Input
                     type="time"
                     value={newSchedule.time}
@@ -237,7 +237,7 @@ const ExportScheduler = () => {
 
               {newSchedule.frequency === 'weekly' && (
                 <div className="space-y-2">
-                  <Label>Day of Week</Label>
+                  <Label>{t("admExportScheduler.dayOfWeek")}</Label>
                   <Select
                     value={newSchedule.day_of_week}
                     onValueChange={(day_of_week) => setNewSchedule({ ...newSchedule, day_of_week })}
@@ -246,13 +246,13 @@ const ExportScheduler = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1">Monday</SelectItem>
-                      <SelectItem value="2">Tuesday</SelectItem>
-                      <SelectItem value="3">Wednesday</SelectItem>
-                      <SelectItem value="4">Thursday</SelectItem>
-                      <SelectItem value="5">Friday</SelectItem>
-                      <SelectItem value="6">Saturday</SelectItem>
-                      <SelectItem value="0">Sunday</SelectItem>
+                      <SelectItem value="1">{t("admExportScheduler.monday")}</SelectItem>
+                      <SelectItem value="2">{t("admExportScheduler.tuesday")}</SelectItem>
+                      <SelectItem value="3">{t("admExportScheduler.wednesday")}</SelectItem>
+                      <SelectItem value="4">{t("admExportScheduler.thursday")}</SelectItem>
+                      <SelectItem value="5">{t("admExportScheduler.friday")}</SelectItem>
+                      <SelectItem value="6">{t("admExportScheduler.saturday")}</SelectItem>
+                      <SelectItem value="0">{t("admExportScheduler.sunday")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -260,7 +260,7 @@ const ExportScheduler = () => {
 
               {newSchedule.frequency === 'monthly' && (
                 <div className="space-y-2">
-                  <Label>Day of Month</Label>
+                  <Label>{t("admExportScheduler.dayOfMonth")}</Label>
                   <Input
                     type="number"
                     min="1"
@@ -272,21 +272,21 @@ const ExportScheduler = () => {
               )}
 
               <div className="space-y-2">
-                <Label>Email Recipients</Label>
+                <Label>{t("admExportScheduler.emailRecipients")}</Label>
                 <Input
                   placeholder="admin@example.com, manager@example.com"
                   value={newSchedule.recipients}
                   onChange={(e) => setNewSchedule({ ...newSchedule, recipients: e.target.value })}
                 />
-                <p className="text-xs text-muted-foreground">Comma-separated email addresses</p>
+                <p className="text-xs text-muted-foreground">{t("admExportScheduler.commaSeparatedEmailAddresses")}</p>
               </div>
 
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setIsAdding(false)}>
-                  Cancel
+                  {t("admExportScheduler.cancel")}
                 </Button>
                 <Button onClick={handleAddSchedule} disabled={!newSchedule.name}>
-                  Create Schedule
+                  {t("admExportScheduler.createSchedule")}
                 </Button>
               </div>
             </CardContent>
@@ -297,11 +297,11 @@ const ExportScheduler = () => {
           {schedules.length === 0 ? (
             <Card className="p-12 text-center">
               <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-xl font-semibold mb-2 text-foreground">No export schedules</h3>
-              <p className="text-muted-foreground mb-4">Create your first automatic export schedule</p>
+              <h3 className="text-xl font-semibold mb-2 text-foreground">{t("admExportScheduler.noExportSchedules")}</h3>
+              <p className="text-muted-foreground mb-4">{t("admExportScheduler.createYourFirstAutomaticExport")}</p>
               <Button onClick={() => setIsAdding(true)}>
                 <Plus className="w-4 h-4 mr-2" />
-                Add Schedule
+                {t("admExportScheduler.addSchedule")}
               </Button>
             </Card>
           ) : (
@@ -313,9 +313,9 @@ const ExportScheduler = () => {
                       <CardTitle className="flex items-center gap-2">
                         {schedule.name}
                         {schedule.enabled ? (
-                          <Badge variant="default">Active</Badge>
+                          <Badge variant="default">{t("admExportScheduler.active")}</Badge>
                         ) : (
-                          <Badge variant="secondary">Disabled</Badge>
+                          <Badge variant="secondary">{t("admExportScheduler.disabled")}</Badge>
                         )}
                       </CardTitle>
                       <CardDescription className="mt-1">

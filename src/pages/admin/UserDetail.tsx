@@ -61,8 +61,8 @@ export default function UserDetail() {
 
     if (!isSuperAdmin) {
       toast({
-        title: "Access Denied",
-        description: "You must be a super admin to access this page",
+        title: t("admUserDetail.accessDenied"),
+        description: t("admUserDetail.youMustBeASuper"),
         variant: "destructive",
       });
       navigate("/dashboard");
@@ -125,8 +125,8 @@ export default function UserDetail() {
     } catch (error) {
       console.error("Error fetching user details:", error);
       toast({
-        title: "Error",
-        description: "Failed to fetch user details",
+        title: t("admUserDetail.error"),
+        description: t("admUserDetail.failedToFetchUserDetails"),
         variant: "destructive",
       });
     } finally {
@@ -151,13 +151,13 @@ export default function UserDetail() {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Profile updated successfully",
+        title: t("admUserDetail.success"),
+        description: t("admUserDetail.profileUpdatedSuccessfully"),
       });
     } catch (error: any) {
       console.error("Error saving profile:", error);
       toast({
-        title: "Error",
+        title: t("admUserDetail.error"),
         description: error.message || "Failed to update profile",
         variant: "destructive",
       });
@@ -169,8 +169,8 @@ export default function UserDetail() {
   const handleAddMembership = async () => {
     if (!userId || !newMembership.family_id) {
       toast({
-        title: "Validation Error",
-        description: "Please select a family",
+        title: t("admUserDetail.validationError"),
+        description: t("admUserDetail.pleaseSelectAFamily"),
         variant: "destructive",
       });
       return;
@@ -188,8 +188,8 @@ export default function UserDetail() {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "User added to family successfully",
+        title: t("admUserDetail.success"),
+        description: t("admUserDetail.userAddedToFamilySuccessfully"),
       });
 
       setNewMembership({ family_id: "", role: "member" });
@@ -197,7 +197,7 @@ export default function UserDetail() {
     } catch (error: any) {
       console.error("Error adding membership:", error);
       toast({
-        title: "Error",
+        title: t("admUserDetail.error"),
         description: error.message || "Failed to add user to family",
         variant: "destructive",
       });
@@ -214,15 +214,15 @@ export default function UserDetail() {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "User removed from family",
+        title: t("admUserDetail.success"),
+        description: t("admUserDetail.userRemovedFromFamily"),
       });
 
       fetchUserDetails();
     } catch (error: any) {
       console.error("Error removing membership:", error);
       toast({
-        title: "Error",
+        title: t("admUserDetail.error"),
         description: error.message || "Failed to remove user from family",
         variant: "destructive",
       });
@@ -239,15 +239,15 @@ export default function UserDetail() {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Role updated successfully",
+        title: t("admUserDetail.success"),
+        description: t("admUserDetail.roleUpdatedSuccessfully"),
       });
 
       fetchUserDetails();
     } catch (error: any) {
       console.error("Error updating role:", error);
       toast({
-        title: "Error",
+        title: t("admUserDetail.error"),
         description: error.message || "Failed to update role",
         variant: "destructive",
       });
@@ -261,7 +261,7 @@ export default function UserDetail() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+        <p className="text-muted-foreground">{t("admUserDetail.loading")}</p>
       </div>
     );
   }
@@ -269,7 +269,7 @@ export default function UserDetail() {
   if (!user) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">User not found</p>
+        <p className="text-muted-foreground">{t("admUserDetail.userNotFound")}</p>
       </div>
     );
   }
@@ -286,18 +286,18 @@ export default function UserDetail() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">User Details</h1>
-            <p className="text-muted-foreground">Manage user profile and family memberships</p>
+            <h1 className="text-3xl font-bold">{t("admUserDetail.userDetails")}</h1>
+            <p className="text-muted-foreground">{t("admUserDetail.manageUserProfileAndFamily")}</p>
           </div>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
+            <CardTitle>{t("admUserDetail.profileInformation")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="full_name">Full Name</Label>
+              <Label htmlFor="full_name">{t("admUserDetail.fullName")}</Label>
               <Input
                 id="full_name"
                 value={user.full_name}
@@ -312,10 +312,10 @@ export default function UserDetail() {
                 disabled
                 className="bg-muted"
               />
-              <p className="text-xs text-muted-foreground">Email cannot be changed</p>
+              <p className="text-xs text-muted-foreground">{t("admUserDetail.emailCannotBeChanged")}</p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">{t("admUserDetail.phone")}</Label>
               <Input
                 id="phone"
                 value={user.phone || ""}
@@ -330,7 +330,7 @@ export default function UserDetail() {
                 onChange={(e) => setUser({ ...user, is_working: e.target.checked })}
                 className="rounded"
               />
-              <Label htmlFor="is_working">Currently Working</Label>
+              <Label htmlFor="is_working">{t("admUserDetail.currentlyWorking")}</Label>
             </div>
             <Button onClick={handleSaveProfile} disabled={saving}>
               <Save className="mr-2 h-4 w-4" />
@@ -341,11 +341,11 @@ export default function UserDetail() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Family Memberships</CardTitle>
+            <CardTitle>{t("admUserDetail.familyMemberships")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {memberships.length === 0 ? (
-              <p className="text-muted-foreground text-center py-4">Not a member of any family</p>
+              <p className="text-muted-foreground text-center py-4">{t("admUserDetail.notAMemberOfAny")}</p>
             ) : (
               <div className="space-y-3">
                 {memberships.map((membership) => (
@@ -360,10 +360,10 @@ export default function UserDetail() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="member">Member</SelectItem>
-                          <SelectItem value="treasurer">Treasurer</SelectItem>
-                          <SelectItem value="loan_committee">Loan Committee</SelectItem>
-                          <SelectItem value="family_head">Family Head</SelectItem>
+                          <SelectItem value="member">{t("admUserDetail.member")}</SelectItem>
+                          <SelectItem value="treasurer">{t("admUserDetail.treasurer")}</SelectItem>
+                          <SelectItem value="loan_committee">{t("admUserDetail.loanCommittee")}</SelectItem>
+                          <SelectItem value="family_head">{t("admUserDetail.familyHead")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -375,15 +375,15 @@ export default function UserDetail() {
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Remove from Family</AlertDialogTitle>
+                          <AlertDialogTitle>{t("admUserDetail.removeFromFamily")}</AlertDialogTitle>
                           <AlertDialogDescription>
                             Are you sure you want to remove this user from {membership.family.name}?
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogCancel>{t("admUserDetail.cancel")}</AlertDialogCancel>
                           <AlertDialogAction onClick={() => handleRemoveMembership(membership.id)}>
-                            Remove
+                            {t("admUserDetail.remove")}
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
@@ -395,14 +395,14 @@ export default function UserDetail() {
 
             {availableFamilies.length > 0 && (
               <div className="pt-4 border-t space-y-3">
-                <h4 className="font-medium">Add to Family</h4>
+                <h4 className="font-medium">{t("admUserDetail.addToFamily")}</h4>
                 <div className="flex gap-2">
                   <Select
                     value={newMembership.family_id}
                     onValueChange={(value) => setNewMembership({ ...newMembership, family_id: value })}
                   >
                     <SelectTrigger className="flex-1">
-                      <SelectValue placeholder="Select a family" />
+                      <SelectValue placeholder={t("admUserDetail.selectAFamily")} />
                     </SelectTrigger>
                     <SelectContent>
                       {availableFamilies.map((family) => (
@@ -420,10 +420,10 @@ export default function UserDetail() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="member">Member</SelectItem>
-                      <SelectItem value="treasurer">Treasurer</SelectItem>
-                      <SelectItem value="loan_committee">Loan Committee</SelectItem>
-                      <SelectItem value="family_head">Family Head</SelectItem>
+                      <SelectItem value="member">{t("admUserDetail.member")}</SelectItem>
+                      <SelectItem value="treasurer">{t("admUserDetail.treasurer")}</SelectItem>
+                      <SelectItem value="loan_committee">{t("admUserDetail.loanCommittee")}</SelectItem>
+                      <SelectItem value="family_head">{t("admUserDetail.familyHead")}</SelectItem>
                     </SelectContent>
                   </Select>
                   <Button onClick={handleAddMembership}>

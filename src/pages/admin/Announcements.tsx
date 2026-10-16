@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,6 +32,7 @@ interface Announcement {
 }
 
 export default function Announcements() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [items, setItems] = useState<Announcement[]>([]);
@@ -64,7 +66,7 @@ export default function Announcements() {
         .eq("user_id", session.user.id)
         .maybeSingle();
       if (!sa) {
-        toast({ title: "Access denied", variant: "destructive" });
+        toast({ title: t("admAnnouncements.accessDenied"), variant: "destructive" });
         return navigate("/dashboard");
       }
       load();
@@ -73,7 +75,7 @@ export default function Announcements() {
 
   const handleCreate = async () => {
     if (!form.title.trim() || !form.body.trim()) {
-      toast({ title: "Title and body are required", variant: "destructive" });
+      toast({ title: t("admAnnouncements.titleAndBodyAreRequired"), variant: "destructive" });
       return;
     }
     const { data: { user } } = await supabase.auth.getUser();
@@ -87,10 +89,10 @@ export default function Announcements() {
       created_by: user?.id,
     });
     if (error) {
-      toast({ title: "Failed to publish", description: error.message, variant: "destructive" });
+      toast({ title: t("admAnnouncements.failedToPublish"), description: error.message, variant: "destructive" });
       return;
     }
-    toast({ title: "Announcement published" });
+    toast({ title: t("admAnnouncements.announcementPublished") });
     setForm({ title: "", body: "", severity: "info", link_url: "", link_label: "", ends_at: "" });
     load();
   };
@@ -101,7 +103,7 @@ export default function Announcements() {
       .update({ active: !a.active })
       .eq("id", a.id);
     if (error) {
-      toast({ title: "Update failed", description: error.message, variant: "destructive" });
+      toast({ title: t("admAnnouncements.updateFailed"), description: error.message, variant: "destructive" });
       return;
     }
     load();
@@ -122,21 +124,21 @@ export default function Announcements() {
           </Button>
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
-              <Megaphone className="w-6 h-6" /> System Announcements
+              <Megaphone className="w-6 h-6" /> {t("admAnnouncements.systemAnnouncements")}
             </h1>
             <p className="text-sm text-muted-foreground">
-              Publish dismissible banners shown to all signed-in users.
+              {t("admAnnouncements.publishDismissibleBannersShownTo")}
             </p>
           </div>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">New announcement</CardTitle>
+            <CardTitle className="text-lg">{t("admAnnouncements.newAnnouncement")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div>
-              <Label>Title</Label>
+              <Label>{t("admAnnouncements.title")}</Label>
               <Input
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
@@ -144,7 +146,7 @@ export default function Announcements() {
               />
             </div>
             <div>
-              <Label>Message</Label>
+              <Label>{t("admAnnouncements.message")}</Label>
               <Textarea
                 value={form.body}
                 onChange={(e) => setForm({ ...form, body: e.target.value })}
@@ -154,13 +156,13 @@ export default function Announcements() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <Label>Severity</Label>
+                <Label>{t("admAnnouncements.severity")}</Label>
                 <Select value={form.severity} onValueChange={(v) => setForm({ ...form, severity: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="info">Info</SelectItem>
-                    <SelectItem value="warning">Warning</SelectItem>
-                    <SelectItem value="success">Success</SelectItem>
+                    <SelectItem value="info">{t("admAnnouncements.info")}</SelectItem>
+                    <SelectItem value="warning">{t("admAnnouncements.warning")}</SelectItem>
+                    <SelectItem value="success">{t("admAnnouncements.success")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -173,7 +175,7 @@ export default function Announcements() {
                 />
               </div>
               <div>
-                <Label>Link label</Label>
+                <Label>{t("admAnnouncements.linkLabel")}</Label>
                 <Input
                   value={form.link_label}
                   onChange={(e) => setForm({ ...form, link_label: e.target.value })}
@@ -188,13 +190,13 @@ export default function Announcements() {
                 placeholder="https://..."
               />
             </div>
-            <Button onClick={handleCreate}>Publish</Button>
+            <Button onClick={handleCreate}>{t("admAnnouncements.publish")}</Button>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">All announcements</CardTitle>
+            <CardTitle className="text-lg">{t("admAnnouncements.allAnnouncements")}</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
@@ -202,7 +204,7 @@ export default function Announcements() {
                 <Loader2 className="w-6 h-6 animate-spin" />
               </div>
             ) : items.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No announcements yet.</p>
+              <p className="text-sm text-muted-foreground">{t("admAnnouncements.noAnnouncementsYet")}</p>
             ) : (
               <div className="space-y-3">
                 {items.map((a) => (
@@ -212,7 +214,7 @@ export default function Announcements() {
                         <Badge variant={a.severity === "warning" ? "destructive" : "secondary"}>
                           {a.severity}
                         </Badge>
-                        {!a.active && <Badge variant="outline">inactive</Badge>}
+                        {!a.active && <Badge variant="outline">{t("admAnnouncements.inactive")}</Badge>}
                         <span className="font-medium">{a.title}</span>
                       </div>
                       <p className="text-sm text-muted-foreground mt-1">{a.body}</p>

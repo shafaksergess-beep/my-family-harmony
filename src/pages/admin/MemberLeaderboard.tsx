@@ -61,7 +61,7 @@ const MemberLeaderboard = () => {
       if (!isSuperAdmin) {
         toast({
           title: t("common.error"),
-          description: "You don't have permission to access this page",
+          description: t("admMemberLeaderboard.youDonTHavePermission"),
           variant: "destructive",
         });
         navigate("/admin/dashboard");
@@ -217,7 +217,7 @@ const MemberLeaderboard = () => {
       console.error("Error loading leaderboards:", error);
       toast({
         title: t("common.error"),
-        description: "Failed to load leaderboards",
+        description: t("admMemberLeaderboard.failedToLoadLeaderboards"),
         variant: "destructive",
       });
     } finally {
@@ -238,7 +238,7 @@ const MemberLeaderboard = () => {
       case 1:
         return <Crown className="w-5 h-5 text-yellow-500" />;
       case 2:
-        return <Medal className="w-5 h-5 text-muted-foreground" aria-label="Silver medal" />;
+        return <Medal className="w-5 h-5 text-muted-foreground" aria-label={t("admMemberLeaderboard.silverMedal")} />;
       case 3:
         return <Award className="w-5 h-5 text-amber-700" />;
       default:
@@ -250,10 +250,10 @@ const MemberLeaderboard = () => {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-16">Rank</TableHead>
-          <TableHead>Member</TableHead>
-          <TableHead>Role</TableHead>
-          <TableHead className="text-right">Score</TableHead>
+          <TableHead className="w-16">{t("admMemberLeaderboard.rank")}</TableHead>
+          <TableHead>{t("admMemberLeaderboard.member")}</TableHead>
+          <TableHead>{t("admMemberLeaderboard.role")}</TableHead>
+          <TableHead className="text-right">{t("admMemberLeaderboard.score")}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -310,10 +310,10 @@ const MemberLeaderboard = () => {
               <div>
                 <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                   <Trophy className="w-6 h-6 text-yellow-500" />
-                  Member Leaderboard
+                  {t("admMemberLeaderboard.memberLeaderboard")}
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Top performing members across all metrics
+                  {t("admMemberLeaderboard.topPerformingMembersAcrossAll")}
                 </p>
               </div>
             </div>
@@ -326,7 +326,7 @@ const MemberLeaderboard = () => {
         {/* Family Selector */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Select Family</CardTitle>
+            <CardTitle>{t("admMemberLeaderboard.selectFamily")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
@@ -380,32 +380,32 @@ const MemberLeaderboard = () => {
           <TabsList>
             <TabsTrigger value="overall">
               <Trophy className="w-4 h-4 mr-2" />
-              Overall
+              {t("admMemberLeaderboard.overall")}
             </TabsTrigger>
             <TabsTrigger value="contributions">
               <TrendingUp className="w-4 h-4 mr-2" />
-              Contributions
+              {t("admMemberLeaderboard.contributions")}
             </TabsTrigger>
             <TabsTrigger value="savings">
               <TrendingUp className="w-4 h-4 mr-2" />
-              Savings
+              {t("admMemberLeaderboard.savings")}
             </TabsTrigger>
             <TabsTrigger value="attendance">
               <TrendingUp className="w-4 h-4 mr-2" />
-              Attendance
+              {t("admMemberLeaderboard.attendance")}
             </TabsTrigger>
             <TabsTrigger value="chart">
               <TrendingUp className="w-4 h-4 mr-2" />
-              Chart View
+              {t("admMemberLeaderboard.chartView")}
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overall">
             <Card>
               <CardHeader>
-                <CardTitle>Overall Performance Rankings</CardTitle>
+                <CardTitle>{t("admMemberLeaderboard.overallPerformanceRankings")}</CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  Weighted score: 40% Contributions + 30% Savings + 30% Attendance
+                  {t("admMemberLeaderboard.weightedScore40Contributions30")}
                 </p>
               </CardHeader>
               <CardContent>
@@ -417,7 +417,7 @@ const MemberLeaderboard = () => {
           <TabsContent value="contributions">
             <Card>
               <CardHeader>
-                <CardTitle>Top Contributors</CardTitle>
+                <CardTitle>{t("admMemberLeaderboard.topContributors")}</CardTitle>
               </CardHeader>
               <CardContent>
                 {renderLeaderboardTable(contributionLeaders, formatCurrency)}
@@ -428,7 +428,7 @@ const MemberLeaderboard = () => {
           <TabsContent value="savings">
             <Card>
               <CardHeader>
-                <CardTitle>Top Savers</CardTitle>
+                <CardTitle>{t("admMemberLeaderboard.topSavers")}</CardTitle>
               </CardHeader>
               <CardContent>
                 {renderLeaderboardTable(savingsLeaders, formatCurrency)}
@@ -439,7 +439,7 @@ const MemberLeaderboard = () => {
           <TabsContent value="attendance">
             <Card>
               <CardHeader>
-                <CardTitle>Best Attendance</CardTitle>
+                <CardTitle>{t("admMemberLeaderboard.bestAttendance")}</CardTitle>
               </CardHeader>
               <CardContent>
                 {renderLeaderboardTable(attendanceLeaders, (value) => `${value.toFixed(1)}%`)}
@@ -450,7 +450,7 @@ const MemberLeaderboard = () => {
           <TabsContent value="chart">
             <Card>
               <CardHeader>
-                <CardTitle>Performance Comparison</CardTitle>
+                <CardTitle>{t("admMemberLeaderboard.performanceComparison")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={400}>

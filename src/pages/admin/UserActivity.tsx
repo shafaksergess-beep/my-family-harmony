@@ -56,8 +56,8 @@ export default function UserActivity() {
 
     if (!isSuperAdmin) {
       toast({
-        title: "Access Denied",
-        description: "You must be a super admin to access this page",
+        title: t("admUserActivity.accessDenied"),
+        description: t("admUserActivity.youMustBeASuper"),
         variant: "destructive",
       });
       navigate("/admin");
@@ -105,8 +105,8 @@ export default function UserActivity() {
     } catch (error) {
       console.error("Error fetching activities:", error);
       toast({
-        title: "Error",
-        description: "Failed to load activity logs",
+        title: t("admUserActivity.error"),
+        description: t("admUserActivity.failedToLoadActivityLogs"),
         variant: "destructive",
       });
     } finally {
@@ -181,16 +181,16 @@ export default function UserActivity() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-3xl font-bold">User Activity</h1>
+              <h1 className="text-3xl font-bold">{t("admUserActivity.userActivity")}</h1>
               <p className="text-muted-foreground">
-                Monitor all user actions across the system
+                {t("admUserActivity.monitorAllUserActionsAcross")}
               </p>
             </div>
           </div>
 
           <Button onClick={exportToCSV}>
             <Download className="mr-2 h-4 w-4" />
-            Export CSV
+            {t("admUserActivity.exportCsv")}
           </Button>
         </div>
 
@@ -200,7 +200,7 @@ export default function UserActivity() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
-                  placeholder="Search activities..."
+                  placeholder={t("admUserActivity.searchActivities")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -208,10 +208,10 @@ export default function UserActivity() {
               </div>
               <Select value={actionTypeFilter} onValueChange={setActionTypeFilter}>
                 <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Filter by action" />
+                  <SelectValue placeholder={t("admUserActivity.filterByAction")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Actions</SelectItem>
+                  <SelectItem value="all">{t("admUserActivity.allActions")}</SelectItem>
                   {actionTypes.map((type) => (
                     <SelectItem key={type} value={type}>
                       {type}
@@ -227,11 +227,11 @@ export default function UserActivity() {
           <CardContent>
             {loading ? (
               <div className="text-center py-8 text-muted-foreground">
-                Loading activities...
+                {t("admUserActivity.loadingActivities")}
               </div>
             ) : filteredActivities.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                No activities found
+                {t("admUserActivity.noActivitiesFound")}
               </div>
             ) : (
               <div className="space-y-4">

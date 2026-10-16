@@ -135,7 +135,7 @@ const ActivityLogs = () => {
       console.error("Error loading logs:", error);
       toast({
         title: t("common.error"),
-        description: "Failed to load activity logs",
+        description: t("admActivityLogs.failedToLoadActivityLogs"),
         variant: "destructive",
       });
     } finally {
@@ -218,7 +218,7 @@ const ActivityLogs = () => {
     exportToCSV(formatted, `activity-logs-${new Date().toISOString().split('T')[0]}`);
     toast({
       title: t("common.success"),
-      description: "Activity logs exported successfully",
+      description: t("admActivityLogs.activityLogsExportedSuccessfully"),
     });
   };
 
@@ -243,9 +243,9 @@ const ActivityLogs = () => {
               <div>
                 <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                   <FileText className="w-6 h-6" />
-                  Admin Activity Logs
+                  {t("admActivityLogs.adminActivityLogs")}
                 </h1>
-                <p className="text-sm text-muted-foreground">Track all administrative actions</p>
+                <p className="text-sm text-muted-foreground">{t("admActivityLogs.trackAllAdministrativeActions")}</p>
               </div>
             </div>
             
@@ -253,7 +253,7 @@ const ActivityLogs = () => {
               {filteredLogs.length > 0 && (
                 <Button variant="outline" size="sm" onClick={handleExport}>
                   <Download className="w-4 h-4 mr-2" />
-                  Export
+                  {t("admActivityLogs.export")}
                 </Button>
               )}
               <LanguageSwitcher />
@@ -268,7 +268,7 @@ const ActivityLogs = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Filter className="w-5 h-5" />
-              Filters
+              {t("admActivityLogs.filters")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -277,7 +277,7 @@ const ActivityLogs = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search by admin name, email, entity ID, or details..."
+                  placeholder={t("admActivityLogs.searchByAdminNameEmail")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
@@ -288,10 +288,10 @@ const ActivityLogs = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Select value={filterAction} onValueChange={setFilterAction}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Filter by action" />
+                    <SelectValue placeholder={t("admActivityLogs.filterByAction")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Actions</SelectItem>
+                    <SelectItem value="all">{t("admActivityLogs.allActions")}</SelectItem>
                     {uniqueActions.map((action) => (
                       <SelectItem key={action} value={action}>
                         {action}
@@ -302,10 +302,10 @@ const ActivityLogs = () => {
 
                 <Select value={filterEntity} onValueChange={setFilterEntity}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Filter by entity" />
+                    <SelectValue placeholder={t("admActivityLogs.filterByEntity")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Entities</SelectItem>
+                    <SelectItem value="all">{t("admActivityLogs.allEntities")}</SelectItem>
                     {uniqueEntities.map((entity) => (
                       <SelectItem key={entity} value={entity}>
                         {entity}
@@ -316,10 +316,10 @@ const ActivityLogs = () => {
 
                 <Select value={filterAdmin} onValueChange={setFilterAdmin}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Filter by admin" />
+                    <SelectValue placeholder={t("admActivityLogs.filterByAdmin")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Admins</SelectItem>
+                    <SelectItem value="all">{t("admActivityLogs.allAdmins")}</SelectItem>
                     {uniqueAdmins.map(([id, profile]) => (
                       <SelectItem key={id} value={id}>
                         {profile?.full_name || 'Unknown'}
@@ -381,7 +381,7 @@ const ActivityLogs = () => {
                   className="w-full"
                 >
                   <X className="w-4 h-4 mr-2" />
-                  Clear All Filters
+                  {t("admActivityLogs.clearAllFilters")}
                 </Button>
               )}
             </div>
@@ -393,8 +393,8 @@ const ActivityLogs = () => {
           {filteredLogs.length === 0 ? (
             <Card className="p-12 text-center">
               <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-xl font-semibold mb-2 text-foreground">No activity logs yet</h3>
-              <p className="text-muted-foreground">Admin actions will appear here</p>
+              <h3 className="text-xl font-semibold mb-2 text-foreground">{t("admActivityLogs.noActivityLogsYet")}</h3>
+              <p className="text-muted-foreground">{t("admActivityLogs.adminActionsWillAppearHere")}</p>
             </Card>
           ) : (
             filteredLogs.map((log) => (

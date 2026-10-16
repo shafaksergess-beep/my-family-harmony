@@ -227,7 +227,7 @@ const AdminDashboard = () => {
       console.error("Error loading stats:", error);
       toast({
         title: t("common.error"),
-        description: "Failed to load dashboard statistics",
+        description: t("admDashboard.failedToLoadDashboardStatistics"),
         variant: "destructive",
       });
     } finally {
@@ -272,9 +272,9 @@ const AdminDashboard = () => {
               <div>
                 <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                   <Activity className="w-6 h-6" />
-                  Admin Dashboard
+                  {t("admDashboard.adminDashboard")}
                 </h1>
-                <p className="text-sm text-muted-foreground">System-wide statistics and activity</p>
+                <p className="text-sm text-muted-foreground">{t("admDashboard.systemWideStatisticsAndActivity")}</p>
               </div>
             </div>
             
@@ -288,7 +288,7 @@ const AdminDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Families</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("admDashboard.totalFamilies")}</CardTitle>
               <Building2 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -301,59 +301,59 @@ const AdminDashboard = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Members</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("admDashboard.totalMembers")}</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalMembers}</div>
               <p className="text-xs text-muted-foreground">
-                Across all families
+                {t("admDashboard.acrossAllFamilies")}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Super Admins</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("admDashboard.superAdmins")}</CardTitle>
               <Shield className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalAdmins}</div>
               <p className="text-xs text-muted-foreground">
-                System administrators
+                {t("admDashboard.systemAdministrators")}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Recent Activity</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("admDashboard.recentActivity")}</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.recentActivity}</div>
               <p className="text-xs text-muted-foreground">
-                Last 7 days
+                {t("admDashboard.last7Days")}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Today's Activity</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("admDashboard.todaySActivity")}</CardTitle>
               <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.todayActivity}</div>
               <p className="text-xs text-muted-foreground">
-                Actions performed today
+                {t("admDashboard.actionsPerformedToday")}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg. Members/Family</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("admDashboard.avgMembersFamily")}</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -363,7 +363,7 @@ const AdminDashboard = () => {
                   : '0'}
               </div>
               <p className="text-xs text-muted-foreground">
-                Average family size
+                {t("admDashboard.averageFamilySize")}
               </p>
             </CardContent>
           </Card>
@@ -376,7 +376,7 @@ const AdminDashboard = () => {
             <CardContent>
               <div className="text-2xl font-bold">{stats.dau7d}</div>
               <p className="text-xs text-muted-foreground">
-                Distinct users with activity
+                {t("admDashboard.distinctUsersWithActivity")}
               </p>
             </CardContent>
           </Card>
@@ -397,13 +397,13 @@ const AdminDashboard = () => {
                 <BarChart3 className="w-5 h-5" />
                 Activity Trend (Last 7 Days)
               </CardTitle>
-              <CardDescription>Daily administrative actions</CardDescription>
+              <CardDescription>{t("admDashboard.dailyAdministrativeActions")}</CardDescription>
             </CardHeader>
             <CardContent>
               <ChartContainer
                 config={{
                   count: {
-                    label: "Actions",
+                    label: t("admDashboard.actions"),
                     color: "hsl(var(--primary))",
                   },
                 }}
@@ -440,9 +440,9 @@ const AdminDashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <PieChart className="w-5 h-5" />
-                Action Distribution
+                {t("admDashboard.actionDistribution")}
               </CardTitle>
-              <CardDescription>Breakdown by action type</CardDescription>
+              <CardDescription>{t("admDashboard.breakdownByActionType")}</CardDescription>
             </CardHeader>
             <CardContent>
               <ChartContainer
@@ -483,14 +483,14 @@ const AdminDashboard = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              Recent Admin Activity
+              {t("admDashboard.recentAdminActivity")}
             </CardTitle>
-            <CardDescription>Latest administrative actions in the system</CardDescription>
+            <CardDescription>{t("admDashboard.latestAdministrativeActionsInThe")}</CardDescription>
           </CardHeader>
           <CardContent>
             {recentLogs.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">
-                No recent activity
+                {t("admDashboard.noRecentActivity")}
               </p>
             ) : (
               <div className="space-y-3">
@@ -524,7 +524,7 @@ const AdminDashboard = () => {
                 variant="outline"
                 onClick={() => navigate("/admin/activity-logs")}
               >
-                View All Activity Logs
+                {t("admDashboard.viewAllActivityLogs")}
               </Button>
             </div>
           </CardContent>
@@ -539,7 +539,7 @@ const AdminDashboard = () => {
           >
             <div className="flex flex-col items-center gap-2">
               <Building2 className="w-8 h-8" />
-              <span>Manage Families</span>
+              <span>{t("admDashboard.manageFamilies")}</span>
             </div>
           </Button>
           <Button
@@ -549,7 +549,7 @@ const AdminDashboard = () => {
           >
             <div className="flex flex-col items-center gap-2">
               <Globe className="w-8 h-8" />
-              <span>Global Analytics</span>
+              <span>{t("admDashboard.globalAnalytics")}</span>
             </div>
           </Button>
           <Button
@@ -559,7 +559,7 @@ const AdminDashboard = () => {
           >
             <div className="flex flex-col items-center gap-2">
               <Users className="w-8 h-8" />
-              <span>User Management</span>
+              <span>{t("admDashboard.userManagement")}</span>
             </div>
           </Button>
             <Button
@@ -569,7 +569,7 @@ const AdminDashboard = () => {
             >
               <div className="flex flex-col items-center gap-2">
                 <Mail className="w-8 h-8" />
-                <span>Email Digests</span>
+                <span>{t("admDashboard.emailDigests")}</span>
               </div>
             </Button>
             <Button
@@ -579,7 +579,7 @@ const AdminDashboard = () => {
             >
               <div className="flex flex-col items-center gap-2">
                 <Layout className="w-8 h-8" />
-                <span>Customize Dashboard</span>
+                <span>{t("admDashboard.customizeDashboard")}</span>
               </div>
             </Button>
             <Button
@@ -589,7 +589,7 @@ const AdminDashboard = () => {
             >
               <div className="flex flex-col items-center gap-2">
                 <Shield className="w-8 h-8" />
-                <span>Role Permissions</span>
+                <span>{t("admDashboard.rolePermissions")}</span>
               </div>
             </Button>
             <Button
@@ -599,7 +599,7 @@ const AdminDashboard = () => {
             >
               <div className="flex flex-col items-center gap-2">
                 <Activity className="w-8 h-8" />
-                <span>User Activity</span>
+                <span>{t("admDashboard.userActivity")}</span>
               </div>
             </Button>
             <Button
@@ -609,7 +609,7 @@ const AdminDashboard = () => {
             >
               <div className="flex flex-col items-center gap-2">
                 <Trophy className="w-8 h-8 text-yellow-500" />
-                <span>Leaderboard</span>
+                <span>{t("admDashboard.leaderboard")}</span>
               </div>
             </Button>
             <Button
@@ -619,7 +619,7 @@ const AdminDashboard = () => {
             >
               <div className="flex flex-col items-center gap-2">
                 <FileText className="w-8 h-8" />
-                <span>Admin Logs</span>
+                <span>{t("admDashboard.adminLogs")}</span>
               </div>
             </Button>
           <Button
@@ -629,7 +629,7 @@ const AdminDashboard = () => {
           >
             <div className="flex flex-col items-center gap-2">
               <Mail className="w-8 h-8" />
-              <span>Email Reports</span>
+              <span>{t("admDashboard.emailReports")}</span>
             </div>
           </Button>
           <Button
@@ -639,7 +639,7 @@ const AdminDashboard = () => {
           >
             <div className="flex flex-col items-center gap-2">
               <Download className="w-8 h-8" />
-              <span>Export Scheduler</span>
+              <span>{t("admDashboard.exportScheduler")}</span>
             </div>
           </Button>
           <Button
@@ -649,7 +649,7 @@ const AdminDashboard = () => {
           >
             <div className="flex flex-col items-center gap-2">
               <Megaphone className="w-8 h-8" />
-              <span>Announcements</span>
+              <span>{t("admDashboard.announcements")}</span>
             </div>
           </Button>
           <Button
@@ -669,7 +669,7 @@ const AdminDashboard = () => {
           >
             <div className="flex flex-col items-center gap-2">
               <HeartPulse className="w-8 h-8 text-green-500" />
-              <span>System Health</span>
+              <span>{t("admDashboard.systemHealth")}</span>
             </div>
           </Button>
         </div>

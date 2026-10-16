@@ -233,7 +233,7 @@ const FamilyMembers = () => {
 
       toast({
         title: t("common.success"),
-        description: "Member role updated successfully",
+        description: t("admFamilyMembers.memberRoleUpdatedSuccessfully"),
       });
       
       setEditMemberId(null);
@@ -260,7 +260,7 @@ const FamilyMembers = () => {
     
     toast({
       title: t("common.success"),
-      description: "Members exported successfully",
+      description: t("admFamilyMembers.membersExportedSuccessfully"),
     });
   };
 
@@ -389,7 +389,7 @@ const FamilyMembers = () => {
               {members.length > 0 && (
                 <Button variant="outline" size="sm" onClick={handleExport}>
                   <Download className="w-4 h-4 mr-2" />
-                  Export All
+                  {t("admFamilyMembers.exportAll")}
                 </Button>
               )}
               <LanguageSwitcher />
@@ -471,7 +471,7 @@ const FamilyMembers = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search members by name or email..."
+                placeholder={t("admFamilyMembers.searchMembersByNameOr")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -480,26 +480,26 @@ const FamilyMembers = () => {
             <Select value={roleFilter} onValueChange={setRoleFilter}>
               <SelectTrigger className="w-full md:w-48">
                 <Filter className="w-4 h-4 mr-2" />
-                <SelectValue placeholder="Filter by role" />
+                <SelectValue placeholder={t("admFamilyMembers.filterByRole")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Roles</SelectItem>
-                <SelectItem value="family_head">Family Head</SelectItem>
-                <SelectItem value="family_admin">Family Admin</SelectItem>
-                <SelectItem value="treasurer">Treasurer</SelectItem>
-                <SelectItem value="secretary">Secretary</SelectItem>
-                <SelectItem value="loan_committee">Loan Committee</SelectItem>
-                <SelectItem value="member">Member</SelectItem>
-                <SelectItem value="guest">Guest</SelectItem>
+                <SelectItem value="all">{t("admFamilyMembers.allRoles")}</SelectItem>
+                <SelectItem value="family_head">{t("admFamilyMembers.familyHead")}</SelectItem>
+                <SelectItem value="family_admin">{t("admFamilyMembers.familyAdmin")}</SelectItem>
+                <SelectItem value="treasurer">{t("admFamilyMembers.treasurer")}</SelectItem>
+                <SelectItem value="secretary">{t("admFamilyMembers.secretary")}</SelectItem>
+                <SelectItem value="loan_committee">{t("admFamilyMembers.loanCommittee")}</SelectItem>
+                <SelectItem value="member">{t("admFamilyMembers.member")}</SelectItem>
+                <SelectItem value="guest">{t("admFamilyMembers.guest")}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={houseFilter} onValueChange={setHouseFilter}>
               <SelectTrigger className="w-full md:w-48">
                 <Home className="w-4 h-4 mr-2" />
-                <SelectValue placeholder="Filter by house" />
+                <SelectValue placeholder={t("admFamilyMembers.filterByHouse")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Houses</SelectItem>
+                <SelectItem value="all">{t("admFamilyMembers.allHouses")}</SelectItem>
                 {uniqueHouses.map(house => (
                   <SelectItem key={house} value={house!}>{house}</SelectItem>
                 ))}
@@ -522,33 +522,33 @@ const FamilyMembers = () => {
               <div className="flex items-center gap-2">
                 <Select value={bulkAction} onValueChange={setBulkAction}>
                   <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Bulk action" />
+                    <SelectValue placeholder={t("admFamilyMembers.bulkAction")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="role">Assign Role</SelectItem>
-                    <SelectItem value="house">Assign House</SelectItem>
-                    <SelectItem value="export">Export Selected</SelectItem>
+                    <SelectItem value="role">{t("admFamilyMembers.assignRole")}</SelectItem>
+                    <SelectItem value="house">{t("admFamilyMembers.assignHouse")}</SelectItem>
+                    <SelectItem value="export">{t("admFamilyMembers.exportSelected")}</SelectItem>
                   </SelectContent>
                 </Select>
                 
                 {bulkAction === "role" && (
                   <Select value={bulkRole} onValueChange={setBulkRole}>
                     <SelectTrigger className="w-40">
-                      <SelectValue placeholder="Select role" />
+                      <SelectValue placeholder={t("admFamilyMembers.selectRole")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="member">Member</SelectItem>
-                      <SelectItem value="family_head">Family Head</SelectItem>
-                      <SelectItem value="treasurer">Treasurer</SelectItem>
-                      <SelectItem value="loan_committee">Loan Committee</SelectItem>
-                      <SelectItem value="guest">Guest</SelectItem>
+                      <SelectItem value="member">{t("admFamilyMembers.member")}</SelectItem>
+                      <SelectItem value="family_head">{t("admFamilyMembers.familyHead")}</SelectItem>
+                      <SelectItem value="treasurer">{t("admFamilyMembers.treasurer")}</SelectItem>
+                      <SelectItem value="loan_committee">{t("admFamilyMembers.loanCommittee")}</SelectItem>
+                      <SelectItem value="guest">{t("admFamilyMembers.guest")}</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
                 
                 {bulkAction === "house" && (
                   <Input
-                    placeholder="House name"
+                    placeholder={t("admFamilyMembers.houseName")}
                     value={bulkHouse}
                     onChange={(e) => setBulkHouse(e.target.value)}
                     className="w-40"
@@ -556,7 +556,7 @@ const FamilyMembers = () => {
                 )}
                 
                 <Button onClick={handleBulkAction} disabled={!bulkAction || (bulkAction === "role" && !bulkRole) || (bulkAction === "house" && !bulkHouse)}>
-                  Apply
+                  {t("admFamilyMembers.apply")}
                 </Button>
               </div>
             )}
@@ -586,7 +586,7 @@ const FamilyMembers = () => {
                           {member.is_house_representative && (
                             <Badge variant="secondary" className="text-xs">
                               <Home className="w-3 h-3 mr-1" />
-                              House Rep
+                              {t("admFamilyMembers.houseRep")}
                             </Badge>
                           )}
                         </CardTitle>
@@ -598,7 +598,7 @@ const FamilyMembers = () => {
                         size="icon" 
                         variant="ghost" 
                         onClick={() => navigate(`/admin/families/${familyId}/members/${member.id}`)}
-                        title="View details"
+                        title={t("admFamilyMembers.viewDetails")}
                       >
                         <Eye className="w-4 h-4" />
                       </Button>
@@ -606,7 +606,7 @@ const FamilyMembers = () => {
                         size="icon" 
                         variant="ghost" 
                         onClick={() => setEditMemberId(member.id)}
-                        title="Change role"
+                        title={t("admFamilyMembers.changeRole")}
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
@@ -614,7 +614,7 @@ const FamilyMembers = () => {
                         size="icon" 
                         variant="ghost" 
                         onClick={() => handleRemoveMember(member.id)}
-                        title="Remove member"
+                        title={t("admFamilyMembers.removeMember")}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -625,7 +625,7 @@ const FamilyMembers = () => {
                 <div className="space-y-4">
                   {editMemberId === member.id ? (
                     <div className="space-y-2">
-                      <Label>Change Role</Label>
+                      <Label>{t("admFamilyMembers.changeRole")}</Label>
                       <Select
                         defaultValue={member.role}
                         onValueChange={(value) => handleUpdateMemberRole(member.id, value)}
@@ -634,13 +634,13 @@ const FamilyMembers = () => {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="member">Member</SelectItem>
-                          <SelectItem value="family_head">Family Head</SelectItem>
-                          <SelectItem value="family_admin">Family Admin</SelectItem>
-                          <SelectItem value="treasurer">Treasurer</SelectItem>
-                          <SelectItem value="secretary">Secretary</SelectItem>
-                          <SelectItem value="loan_committee">Loan Committee</SelectItem>
-                          <SelectItem value="guest">Guest</SelectItem>
+                          <SelectItem value="member">{t("admFamilyMembers.member")}</SelectItem>
+                          <SelectItem value="family_head">{t("admFamilyMembers.familyHead")}</SelectItem>
+                          <SelectItem value="family_admin">{t("admFamilyMembers.familyAdmin")}</SelectItem>
+                          <SelectItem value="treasurer">{t("admFamilyMembers.treasurer")}</SelectItem>
+                          <SelectItem value="secretary">{t("admFamilyMembers.secretary")}</SelectItem>
+                          <SelectItem value="loan_committee">{t("admFamilyMembers.loanCommittee")}</SelectItem>
+                          <SelectItem value="guest">{t("admFamilyMembers.guest")}</SelectItem>
                         </SelectContent>
                       </Select>
                       <Button 
@@ -648,7 +648,7 @@ const FamilyMembers = () => {
                         size="sm" 
                         onClick={() => setEditMemberId(null)}
                       >
-                        Cancel
+                        {t("admFamilyMembers.cancel")}
                       </Button>
                     </div>
                   ) : (

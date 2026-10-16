@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,6 +37,7 @@ interface Module {
 }
 
 export default function ModuleManagement() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -67,8 +69,8 @@ export default function ModuleManagement() {
 
     if (error || !data) {
       toast({
-        title: "Access Denied",
-        description: "Only super admins can manage modules",
+        title: t("admModuleManagement.accessDenied"),
+        description: t("admModuleManagement.onlySuperAdminsCanManage"),
         variant: "destructive",
       });
       navigate("/dashboard");
@@ -95,8 +97,8 @@ export default function ModuleManagement() {
     } catch (error) {
       console.error("Error loading data:", error);
       toast({
-        title: "Error",
-        description: "Failed to load module data",
+        title: t("admModuleManagement.error"),
+        description: t("admModuleManagement.failedToLoadModuleData"),
         variant: "destructive",
       });
     } finally {
@@ -113,7 +115,7 @@ export default function ModuleManagement() {
           .eq("id", editingCategory.id);
 
         if (error) throw error;
-        toast({ title: "Success", description: "Category updated successfully" });
+        toast({ title: t("admModuleManagement.success"), description: t("admModuleManagement.categoryUpdatedSuccessfully") });
       } else {
         const { error } = await supabase
           .from("module_categories")
@@ -127,7 +129,7 @@ export default function ModuleManagement() {
           }]);
 
         if (error) throw error;
-        toast({ title: "Success", description: "Category created successfully" });
+        toast({ title: t("admModuleManagement.success"), description: t("admModuleManagement.categoryCreatedSuccessfully") });
       }
 
       setIsCategoryDialogOpen(false);
@@ -136,8 +138,8 @@ export default function ModuleManagement() {
     } catch (error) {
       console.error("Error saving category:", error);
       toast({
-        title: "Error",
-        description: "Failed to save category",
+        title: t("admModuleManagement.error"),
+        description: t("admModuleManagement.failedToSaveCategory"),
         variant: "destructive",
       });
     }
@@ -152,7 +154,7 @@ export default function ModuleManagement() {
           .eq("id", editingModule.id);
 
         if (error) throw error;
-        toast({ title: "Success", description: "Module updated successfully" });
+        toast({ title: t("admModuleManagement.success"), description: t("admModuleManagement.moduleUpdatedSuccessfully") });
       } else {
         const { error } = await supabase
           .from("modules")
@@ -169,7 +171,7 @@ export default function ModuleManagement() {
           }]);
 
         if (error) throw error;
-        toast({ title: "Success", description: "Module created successfully" });
+        toast({ title: t("admModuleManagement.success"), description: t("admModuleManagement.moduleCreatedSuccessfully") });
       }
 
       setIsModuleDialogOpen(false);
@@ -178,8 +180,8 @@ export default function ModuleManagement() {
     } catch (error) {
       console.error("Error saving module:", error);
       toast({
-        title: "Error",
-        description: "Failed to save module",
+        title: t("admModuleManagement.error"),
+        description: t("admModuleManagement.failedToSaveModule"),
         variant: "destructive",
       });
     }
@@ -195,13 +197,13 @@ export default function ModuleManagement() {
         .eq("id", id);
 
       if (error) throw error;
-      toast({ title: "Success", description: "Category deleted successfully" });
+      toast({ title: t("admModuleManagement.success"), description: t("admModuleManagement.categoryDeletedSuccessfully") });
       loadData();
     } catch (error) {
       console.error("Error deleting category:", error);
       toast({
-        title: "Error",
-        description: "Failed to delete category",
+        title: t("admModuleManagement.error"),
+        description: t("admModuleManagement.failedToDeleteCategory"),
         variant: "destructive",
       });
     }
@@ -217,13 +219,13 @@ export default function ModuleManagement() {
         .eq("id", id);
 
       if (error) throw error;
-      toast({ title: "Success", description: "Module deleted successfully" });
+      toast({ title: t("admModuleManagement.success"), description: t("admModuleManagement.moduleDeletedSuccessfully") });
       loadData();
     } catch (error) {
       console.error("Error deleting module:", error);
       toast({
-        title: "Error",
-        description: "Failed to delete module",
+        title: t("admModuleManagement.error"),
+        description: t("admModuleManagement.failedToDeleteModule"),
         variant: "destructive",
       });
     }
@@ -244,11 +246,11 @@ export default function ModuleManagement() {
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate("/admin/dashboard")}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Admin
+              {t("admModuleManagement.backToAdmin")}
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Module Management</h1>
-              <p className="text-sm text-muted-foreground">Configure dashboard modules and categories</p>
+              <h1 className="text-2xl font-bold text-foreground">{t("admModuleManagement.moduleManagement")}</h1>
+              <p className="text-sm text-muted-foreground">{t("admModuleManagement.configureDashboardModulesAndCategories")}</p>
             </div>
           </div>
         </div>
@@ -257,18 +259,18 @@ export default function ModuleManagement() {
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="categories" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="categories">Categories</TabsTrigger>
-            <TabsTrigger value="modules">Modules</TabsTrigger>
+            <TabsTrigger value="categories">{t("admModuleManagement.categories")}</TabsTrigger>
+            <TabsTrigger value="modules">{t("admModuleManagement.modules")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="categories" className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Module Categories</h2>
+              <h2 className="text-xl font-semibold">{t("admModuleManagement.moduleCategories")}</h2>
               <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
                 <DialogTrigger asChild>
                   <Button onClick={() => setEditingCategory(null)}>
                     <Plus className="w-4 h-4 mr-2" />
-                    Add Category
+                    {t("admModuleManagement.addCategory")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
@@ -324,12 +326,12 @@ export default function ModuleManagement() {
 
           <TabsContent value="modules" className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Modules</h2>
+              <h2 className="text-xl font-semibold">{t("admModuleManagement.modules")}</h2>
               <Dialog open={isModuleDialogOpen} onOpenChange={setIsModuleDialogOpen}>
                 <DialogTrigger asChild>
                   <Button onClick={() => setEditingModule(null)}>
                     <Plus className="w-4 h-4 mr-2" />
-                    Add Module
+                    {t("admModuleManagement.addModule")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl">
@@ -413,7 +415,7 @@ function CategoryForm({ category, onSave, onCancel }: {
   return (
     <div className="space-y-4">
       <div>
-        <Label htmlFor="name">Name</Label>
+        <Label htmlFor="name">{t("admModuleManagement.name")}</Label>
         <Input
           id="name"
           value={formData.name}
@@ -421,7 +423,7 @@ function CategoryForm({ category, onSave, onCancel }: {
         />
       </div>
       <div>
-        <Label htmlFor="slug">Slug</Label>
+        <Label htmlFor="slug">{t("admModuleManagement.slug")}</Label>
         <Input
           id="slug"
           value={formData.slug}
@@ -429,7 +431,7 @@ function CategoryForm({ category, onSave, onCancel }: {
         />
       </div>
       <div>
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description">{t("admModuleManagement.description")}</Label>
         <Textarea
           id="description"
           value={formData.description}
@@ -442,11 +444,11 @@ function CategoryForm({ category, onSave, onCancel }: {
           id="icon"
           value={formData.icon}
           onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-          placeholder="Calendar, Users, Heart, etc."
+          placeholder={t("admModuleManagement.calendarUsersHeartEtc")}
         />
       </div>
       <div>
-        <Label htmlFor="color">Color Class</Label>
+        <Label htmlFor="color">{t("admModuleManagement.colorClass")}</Label>
         <Input
           id="color"
           value={formData.color}
@@ -455,7 +457,7 @@ function CategoryForm({ category, onSave, onCancel }: {
         />
       </div>
       <div>
-        <Label htmlFor="order">Order Index</Label>
+        <Label htmlFor="order">{t("admModuleManagement.orderIndex")}</Label>
         <Input
           id="order"
           type="number"
@@ -464,8 +466,8 @@ function CategoryForm({ category, onSave, onCancel }: {
         />
       </div>
       <div className="flex gap-2 justify-end">
-        <Button variant="outline" onClick={onCancel}>Cancel</Button>
-        <Button onClick={() => onSave(formData)}>Save</Button>
+        <Button variant="outline" onClick={onCancel}>{t("admModuleManagement.cancel")}</Button>
+        <Button onClick={() => onSave(formData)}>{t("admModuleManagement.save")}</Button>
       </div>
     </div>
   );
@@ -493,7 +495,7 @@ function ModuleForm({ module, categories, onSave, onCancel }: {
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="name">Name</Label>
+          <Label htmlFor="name">{t("admModuleManagement.name")}</Label>
           <Input
             id="name"
             value={formData.name}
@@ -501,7 +503,7 @@ function ModuleForm({ module, categories, onSave, onCancel }: {
           />
         </div>
         <div>
-          <Label htmlFor="slug">Slug</Label>
+          <Label htmlFor="slug">{t("admModuleManagement.slug")}</Label>
           <Input
             id="slug"
             value={formData.slug}
@@ -510,7 +512,7 @@ function ModuleForm({ module, categories, onSave, onCancel }: {
         </div>
       </div>
       <div>
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description">{t("admModuleManagement.description")}</Label>
         <Textarea
           id="description"
           value={formData.description}
@@ -518,7 +520,7 @@ function ModuleForm({ module, categories, onSave, onCancel }: {
         />
       </div>
       <div>
-        <Label htmlFor="route">Route Path</Label>
+        <Label htmlFor="route">{t("admModuleManagement.routePath")}</Label>
         <Input
           id="route"
           value={formData.route_path}
@@ -533,11 +535,11 @@ function ModuleForm({ module, categories, onSave, onCancel }: {
             id="icon"
             value={formData.icon}
             onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-            placeholder="Calendar, Users, Heart"
+            placeholder={t("admModuleManagement.calendarUsersHeart")}
           />
         </div>
         <div>
-          <Label htmlFor="color">Color Class</Label>
+          <Label htmlFor="color">{t("admModuleManagement.colorClass")}</Label>
           <Input
             id="color"
             value={formData.color}
@@ -548,13 +550,13 @@ function ModuleForm({ module, categories, onSave, onCancel }: {
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="category">Category</Label>
+          <Label htmlFor="category">{t("admModuleManagement.category")}</Label>
           <Select
             value={formData.category_id}
             onValueChange={(value) => setFormData({ ...formData, category_id: value })}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select category" />
+              <SelectValue placeholder={t("admModuleManagement.selectCategory")} />
             </SelectTrigger>
             <SelectContent>
               {categories.map((cat) => (
@@ -566,7 +568,7 @@ function ModuleForm({ module, categories, onSave, onCancel }: {
           </Select>
         </div>
         <div>
-          <Label htmlFor="order">Order Index</Label>
+          <Label htmlFor="order">{t("admModuleManagement.orderIndex")}</Label>
           <Input
             id="order"
             type="number"
@@ -576,8 +578,8 @@ function ModuleForm({ module, categories, onSave, onCancel }: {
         </div>
       </div>
       <div className="flex gap-2 justify-end">
-        <Button variant="outline" onClick={onCancel}>Cancel</Button>
-        <Button onClick={() => onSave(formData)}>Save</Button>
+        <Button variant="outline" onClick={onCancel}>{t("admModuleManagement.cancel")}</Button>
+        <Button onClick={() => onSave(formData)}>{t("admModuleManagement.save")}</Button>
       </div>
     </div>
   );

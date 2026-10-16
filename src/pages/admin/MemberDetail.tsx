@@ -116,7 +116,7 @@ const MemberDetail = () => {
       console.error("Error loading data:", error);
       toast({
         title: t("common.error"),
-        description: "Failed to load member details",
+        description: t("admMemberDetail.failedToLoadMemberDetails"),
         variant: "destructive",
       });
     } finally {
@@ -167,8 +167,8 @@ const MemberDetail = () => {
     });
 
     toast({
-      title: "Success",
-      description: "Member report downloaded successfully",
+      title: t("admMemberDetail.success"),
+      description: t("admMemberDetail.memberReportDownloadedSuccessfully"),
     });
   };
 
@@ -183,7 +183,7 @@ const MemberDetail = () => {
   if (!member) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <p>Member not found</p>
+        <p>{t("admMemberDetail.memberNotFound")}</p>
       </div>
     );
   }
@@ -196,13 +196,13 @@ const MemberDetail = () => {
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate(`/admin/families/${familyId}/members`)}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Members
+                {t("admMemberDetail.backToMembers")}
               </Button>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" onClick={handleExportPDF}>
                 <FileText className="w-4 h-4 mr-2" />
-                Export PDF
+                {t("admMemberDetail.exportPdf")}
               </Button>
               <LanguageSwitcher />
             </div>
@@ -229,7 +229,7 @@ const MemberDetail = () => {
                     {member.is_house_representative && (
                       <Badge variant="secondary">
                         <Home className="w-3 h-3 mr-1" />
-                        House Rep
+                        {t("admMemberDetail.houseRep")}
                       </Badge>
                     )}
                   </div>
@@ -278,7 +278,7 @@ const MemberDetail = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Contributions</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("admMemberDetail.totalContributions")}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -291,7 +291,7 @@ const MemberDetail = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Outstanding Loans</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("admMemberDetail.outstandingLoans")}</CardTitle>
               <CreditCard className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -304,7 +304,7 @@ const MemberDetail = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Savings</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("admMemberDetail.totalSavings")}</CardTitle>
               <PiggyBank className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -317,7 +317,7 @@ const MemberDetail = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Attendance Rate</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("admMemberDetail.attendanceRate")}</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -334,30 +334,30 @@ const MemberDetail = () => {
           <div className="lg:col-span-2">
             <Tabs defaultValue="contributions" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="contributions">Contributions</TabsTrigger>
-            <TabsTrigger value="loans">Loans</TabsTrigger>
-            <TabsTrigger value="savings">Savings</TabsTrigger>
-            <TabsTrigger value="attendance">Attendance</TabsTrigger>
-            <TabsTrigger value="trends">Trends</TabsTrigger>
+            <TabsTrigger value="contributions">{t("admMemberDetail.contributions")}</TabsTrigger>
+            <TabsTrigger value="loans">{t("admMemberDetail.loans")}</TabsTrigger>
+            <TabsTrigger value="savings">{t("admMemberDetail.savings")}</TabsTrigger>
+            <TabsTrigger value="attendance">{t("admMemberDetail.attendance")}</TabsTrigger>
+            <TabsTrigger value="trends">{t("admMemberDetail.trends")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="contributions">
             <Card>
               <CardHeader>
-                <CardTitle>Contribution History</CardTitle>
+                <CardTitle>{t("admMemberDetail.contributionHistory")}</CardTitle>
               </CardHeader>
               <CardContent>
                 {contributions.length === 0 ? (
-                  <p className="text-muted-foreground">No contributions recorded</p>
+                  <p className="text-muted-foreground">{t("admMemberDetail.noContributionsRecorded")}</p>
                 ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Amount</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Payment Date</TableHead>
+                        <TableHead>{t("admMemberDetail.date")}</TableHead>
+                        <TableHead>{t("admMemberDetail.type")}</TableHead>
+                        <TableHead>{t("admMemberDetail.amount")}</TableHead>
+                        <TableHead>{t("admMemberDetail.status")}</TableHead>
+                        <TableHead>{t("admMemberDetail.paymentDate")}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -388,21 +388,21 @@ const MemberDetail = () => {
           <TabsContent value="loans">
             <Card>
               <CardHeader>
-                <CardTitle>Loan History</CardTitle>
+                <CardTitle>{t("admMemberDetail.loanHistory")}</CardTitle>
               </CardHeader>
               <CardContent>
                 {loans.length === 0 ? (
-                  <p className="text-muted-foreground">No loans recorded</p>
+                  <p className="text-muted-foreground">{t("admMemberDetail.noLoansRecorded")}</p>
                 ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Amount</TableHead>
-                        <TableHead>Interest Rate</TableHead>
-                        <TableHead>Paid</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Due Date</TableHead>
+                        <TableHead>{t("admMemberDetail.date")}</TableHead>
+                        <TableHead>{t("admMemberDetail.amount")}</TableHead>
+                        <TableHead>{t("admMemberDetail.interestRate")}</TableHead>
+                        <TableHead>{t("admMemberDetail.paid")}</TableHead>
+                        <TableHead>{t("admMemberDetail.status")}</TableHead>
+                        <TableHead>{t("admMemberDetail.dueDate")}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -432,18 +432,18 @@ const MemberDetail = () => {
           <TabsContent value="savings">
             <Card>
               <CardHeader>
-                <CardTitle>Savings History</CardTitle>
+                <CardTitle>{t("admMemberDetail.savingsHistory")}</CardTitle>
               </CardHeader>
               <CardContent>
                 {savings.length === 0 ? (
-                  <p className="text-muted-foreground">No savings recorded</p>
+                  <p className="text-muted-foreground">{t("admMemberDetail.noSavingsRecorded")}</p>
                 ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Month</TableHead>
-                        <TableHead>Amount</TableHead>
-                        <TableHead>Notes</TableHead>
+                        <TableHead>{t("admMemberDetail.month")}</TableHead>
+                        <TableHead>{t("admMemberDetail.amount")}</TableHead>
+                        <TableHead>{t("admMemberDetail.notes")}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -464,20 +464,20 @@ const MemberDetail = () => {
           <TabsContent value="attendance">
             <Card>
               <CardHeader>
-                <CardTitle>Attendance History</CardTitle>
+                <CardTitle>{t("admMemberDetail.attendanceHistory")}</CardTitle>
               </CardHeader>
               <CardContent>
                 {attendance.length === 0 ? (
-                  <p className="text-muted-foreground">No attendance records</p>
+                  <p className="text-muted-foreground">{t("admMemberDetail.noAttendanceRecords")}</p>
                 ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Meeting Date</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Check-in Time</TableHead>
-                        <TableHead>Fine</TableHead>
+                        <TableHead>{t("admMemberDetail.meetingDate")}</TableHead>
+                        <TableHead>{t("admMemberDetail.type")}</TableHead>
+                        <TableHead>{t("admMemberDetail.status")}</TableHead>
+                        <TableHead>{t("admMemberDetail.checkInTime")}</TableHead>
+                        <TableHead>{t("admMemberDetail.fine")}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -511,7 +511,7 @@ const MemberDetail = () => {
               <div className="space-y-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Contribution Trends</CardTitle>
+                    <CardTitle>{t("admMemberDetail.contributionTrends")}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -533,7 +533,7 @@ const MemberDetail = () => {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Savings Growth</CardTitle>
+                    <CardTitle>{t("admMemberDetail.savingsGrowth")}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>

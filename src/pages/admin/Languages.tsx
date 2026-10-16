@@ -138,8 +138,8 @@ export default function AdminLanguages() {
           <CardHeader><CardTitle className="text-base">{t("admin.languages.add")}</CardTitle></CardHeader>
           <CardContent className="grid gap-3 sm:grid-cols-[1fr_1.5fr_1.5fr_auto] sm:items-end">
             <div className="space-y-1"><Label htmlFor="lc">{t("admin.languages.code")}</Label><Input id="lc" placeholder="dua" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} /><p className="text-xs text-muted-foreground">{t("admin.languages.codeHint")}</p></div>
-            <div className="space-y-1"><Label htmlFor="ln">{t("admin.languages.name")}</Label><Input id="ln" placeholder="Duala" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /><p className="text-xs">&nbsp;</p></div>
-            <div className="space-y-1"><Label htmlFor="lnn">{t("admin.languages.nativeName")}</Label><Input id="lnn" placeholder="Duálá" value={form.native_name} onChange={(e) => setForm({ ...form, native_name: e.target.value })} /><p className="text-xs">&nbsp;</p></div>
+            <div className="space-y-1"><Label htmlFor="ln">{t("admin.languages.name")}</Label><Input id="ln" placeholder={t("admLanguages.duala")} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /><p className="text-xs">&nbsp;</p></div>
+            <div className="space-y-1"><Label htmlFor="lnn">{t("admin.languages.nativeName")}</Label><Input id="lnn" placeholder={t("admLanguages.duL")} value={form.native_name} onChange={(e) => setForm({ ...form, native_name: e.target.value })} /><p className="text-xs">&nbsp;</p></div>
             <Button onClick={addLanguage} className="mb-5"><Plus className="mr-1 h-4 w-4" />{t("common.add")}</Button>
           </CardContent>
         </Card>

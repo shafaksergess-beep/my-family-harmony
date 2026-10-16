@@ -35,11 +35,11 @@ export default function RolePermissions() {
   const [saving, setSaving] = useState(false);
 
   const roles = [
-    { value: "family_head", label: "Family Head", color: "bg-purple-500" },
-    { value: "treasurer", label: "Treasurer", color: "bg-blue-500" },
-    { value: "loan_committee", label: "Loan Committee", color: "bg-green-500" },
-    { value: "member", label: "Member", color: "bg-gray-500" },
-    { value: "guest", label: "Guest", color: "bg-slate-400" },
+    { value: "family_head", label: t("admRolePermissions.familyHead"), color: "bg-purple-500" },
+    { value: "treasurer", label: t("admRolePermissions.treasurer"), color: "bg-blue-500" },
+    { value: "loan_committee", label: t("admRolePermissions.loanCommittee"), color: "bg-green-500" },
+    { value: "member", label: t("admRolePermissions.member"), color: "bg-gray-500" },
+    { value: "guest", label: t("admRolePermissions.guest"), color: "bg-slate-400" },
   ];
 
   useEffect(() => {
@@ -59,8 +59,8 @@ export default function RolePermissions() {
 
     if (!isSuperAdmin) {
       toast({
-        title: "Access Denied",
-        description: "You must be a super admin to access this page",
+        title: t("admRolePermissions.accessDenied"),
+        description: t("admRolePermissions.youMustBeASuper"),
         variant: "destructive",
       });
       navigate("/admin");
@@ -82,8 +82,8 @@ export default function RolePermissions() {
     } catch (error) {
       console.error("Error fetching data:", error);
       toast({
-        title: "Error",
-        description: "Failed to load permissions",
+        title: t("admRolePermissions.error"),
+        description: t("admRolePermissions.failedToLoadPermissions"),
         variant: "destructive",
       });
     } finally {
@@ -139,14 +139,14 @@ export default function RolePermissions() {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Role permissions updated successfully",
+        title: t("admRolePermissions.success"),
+        description: t("admRolePermissions.rolePermissionsUpdatedSuccessfully"),
       });
     } catch (error) {
       console.error("Error saving permissions:", error);
       toast({
-        title: "Error",
-        description: "Failed to save permissions",
+        title: t("admRolePermissions.error"),
+        description: t("admRolePermissions.failedToSavePermissions"),
         variant: "destructive",
       });
     } finally {
@@ -176,9 +176,9 @@ export default function RolePermissions() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-3xl font-bold">Role Permissions</h1>
+              <h1 className="text-3xl font-bold">{t("admRolePermissions.rolePermissions")}</h1>
               <p className="text-muted-foreground">
-                Customize what each role can access and modify
+                {t("admRolePermissions.customizeWhatEachRoleCan")}
               </p>
             </div>
           </div>
@@ -192,7 +192,7 @@ export default function RolePermissions() {
         {/* Legend */}
         <Card>
           <CardHeader>
-            <CardTitle>Roles</CardTitle>
+            <CardTitle>{t("admRolePermissions.roles")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-3">
@@ -207,7 +207,7 @@ export default function RolePermissions() {
 
         {loading ? (
           <div className="text-center py-8 text-muted-foreground">
-            Loading permissions...
+            {t("admRolePermissions.loadingPermissions")}
           </div>
         ) : (
           <div className="space-y-6">
@@ -221,9 +221,9 @@ export default function RolePermissions() {
                     <table className="w-full">
                       <thead>
                         <tr className="border-b">
-                          <th className="text-left p-2 font-medium">Action</th>
+                          <th className="text-left p-2 font-medium">{t("admRolePermissions.action")}</th>
                           <th className="text-left p-2 font-medium">
-                            Description
+                            {t("admRolePermissions.description")}
                           </th>
                           {roles.map((role) => (
                             <th key={role.value} className="text-center p-2">
