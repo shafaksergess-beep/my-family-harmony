@@ -21,6 +21,7 @@ const SessionManagementPage = lazy(() => import("./pages/SessionManagement"));
 // Lazy load core pages
 const Index = lazy(() => import("./pages/Index"));
 const WhatIsNjangi = lazy(() => import("./pages/blog/WhatIsNjangi"));
+const HomePreview = lazy(() => import("./pages/home-preview/HomePreview"));
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -147,6 +148,7 @@ const App = () => (
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/home-preview" element={<HomePreview />} />
             <Route path="/blog/what-is-njangi" element={<WhatIsNjangi />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />

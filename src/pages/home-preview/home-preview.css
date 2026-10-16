@@ -1,0 +1,38 @@
+
+/* Scoped tokens for the /home-preview design proposal only */
+.hp-root {
+  --hp-ivory: 40 45% 96%;
+  --hp-cream: 38 40% 91%;
+  --hp-paper: 40 60% 99%;
+  --hp-ink: 150 30% 12%;
+  --hp-ink-soft: 150 12% 34%;
+  --hp-forest: 152 42% 20%;
+  --hp-forest-deep: 154 45% 13%;
+  --hp-sage: 140 22% 84%;
+  --hp-terracotta: 16 52% 48%;
+  --hp-gold: 40 70% 52%;
+  --hp-line: 38 22% 82%;
+  --hp-shadow: 0 1px 2px hsl(150 30% 12% / 0.06), 0 12px 32px -12px hsl(150 30% 12% / 0.18);
+  --hp-shadow-lg: 0 2px 6px hsl(150 30% 12% / 0.06), 0 40px 80px -30px hsl(150 30% 12% / 0.35);
+  background: hsl(var(--hp-ivory));
+  color: hsl(var(--hp-ink));
+  font-family: "Instrument Sans", system-ui, sans-serif;
+}
+.hp-root .hp-serif { font-family: "Fraunces", Georgia, serif; font-optical-sizing: auto; letter-spacing: -0.02em; }
+.hp-grain {
+  background-image: radial-gradient(hsl(var(--hp-ink) / 0.05) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+.hp-reveal { opacity: 0; transform: translateY(18px); transition: opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1); }
+.hp-reveal.is-visible { opacity: 1; transform: none; }
+.hp-lift { transition: transform .35s ease, box-shadow .35s ease; }
+.hp-lift:hover { transform: translateY(-4px); box-shadow: var(--hp-shadow-lg); }
+.hp-bar { transform-origin: left; animation: hp-grow 1.6s cubic-bezier(.2,.7,.2,1) both .3s; }
+@keyframes hp-grow { from { transform: scaleX(0); } }
+.hp-root a:focus-visible, .hp-root button:focus-visible { outline: 2px solid hsl(var(--hp-terracotta)); outline-offset: 3px; border-radius: 6px; }
+@media (prefers-reduced-motion: reduce) {
+  .hp-reveal { opacity: 1; transform: none; transition: none; }
+  .hp-lift, .hp-lift:hover { transition: none; transform: none; }
+  .hp-bar { animation: none; }
+  .hp-root * { scroll-behavior: auto !important; }
+}
