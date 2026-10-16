@@ -18,6 +18,7 @@ import SEO from "@/components/SEO";
 const Profile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const { t, i18n } = useTranslation();
   const languages = useLanguages();
   const [loading, setLoading] = useState(true);
@@ -86,7 +87,7 @@ const Profile = () => {
       console.error("Error loading profile:", error);
       toast({
         title: t("common.error"),
-        description: "Failed to load profile",
+        description: t("profile.failedToLoadProfile"),
         variant: "destructive",
       });
     } finally {
@@ -124,7 +125,7 @@ const Profile = () => {
 
       toast({
         title: t("common.success"),
-        description: "Profile updated successfully",
+        description: t("profile.profileUpdatedSuccessfully"),
       });
 
       loadProfile();
@@ -150,7 +151,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title="My profile" description="Manage your Kinsroot profile, language and family memberships." />
+      <SEO title={t("profile.myProfile")} description={t("profile.manageYourKinsrootProfileLanguage")} />
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -162,9 +163,9 @@ const Profile = () => {
               <div>
                 <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                   <User className="w-6 h-6" />
-                  User Profile
+                  {t("profile.userProfile")}
                 </h1>
-                <p className="text-sm text-muted-foreground">Manage your personal information</p>
+                <p className="text-sm text-muted-foreground">{t("profile.manageYourPersonalInformation")}</p>
               </div>
             </div>
             
@@ -177,18 +178,18 @@ const Profile = () => {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2">
-              <User className="w-5 h-5" /> Sign-in methods
+              <User className="w-5 h-5" /> {t("profile.signInMethods")}
             </CardTitle>
             <CardDescription>
-              Review the Google, Apple, or email accounts linked to your profile.
+              {t("profile.reviewTheGoogleAppleOr")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             <Button variant="outline" className="w-full justify-between" onClick={() => navigate("/profile/linked-accounts")}>
-              Manage linked accounts <ArrowRight className="ml-2 h-4 w-4" />
+              {t("profile.manageLinkedAccounts")} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             <Button variant="outline" className="w-full justify-between" onClick={() => navigate("/profile/sessions")}>
-              Active sessions & devices <ArrowRight className="ml-2 h-4 w-4" />
+              {t("profile.activeSessionsDevices")} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </CardContent>
         </Card>
@@ -199,7 +200,7 @@ const Profile = () => {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2">
               <Users className="w-5 h-5" />
-              Family Memberships
+              {t("profile.familyMemberships")}
             </CardTitle>
             <CardDescription>
               {userFamilies.length > 0 
@@ -244,7 +245,7 @@ const Profile = () => {
               onClick={() => setShowJoinFamily(true)}
             >
               <Hash className="w-4 h-4" />
-              Join a Family
+              {t("profile.joinAFamily")}
             </Button>
 
             {/* Install as app */}
@@ -255,7 +256,7 @@ const Profile = () => {
         {/* Personal Information Card */}
         <Card>
           <CardHeader>
-            <CardTitle>Personal Information</CardTitle>
+            <CardTitle>{t("profile.personalInformation")}</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSave} className="space-y-4">
@@ -293,7 +294,7 @@ const Profile = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="language">Preferred Language</Label>
+                <Label htmlFor="language">{t("profile.preferredLanguage")}</Label>
                 <Select 
                   value={formData.preferred_language} 
                   onValueChange={(value) => setFormData({ ...formData, preferred_language: value })}
@@ -316,7 +317,7 @@ const Profile = () => {
                   className="w-4 h-4 rounded border-border"
                 />
                 <Label htmlFor="is_working" className="cursor-pointer">
-                  Currently working (eligible for Njangi)
+                  {t("profile.currentlyWorkingEligibleForNjangi")}
                 </Label>
               </div>
 
@@ -328,7 +329,7 @@ const Profile = () => {
                   {saving ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Saving...
+                      {t("profile.saving")}
                     </>
                   ) : (
                     <>

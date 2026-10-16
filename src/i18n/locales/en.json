@@ -533,5 +533,62 @@
     "desc": "Add to your home screen for faster access and offline use.",
     "installApp": "Install app",
     "installed": "App installed"
+  },
+  "dash": {
+    "active": "Active",
+    "activityLogs": "Activity Logs",
+    "clickToViewFamilyDetails": "Click to view family details and management",
+    "contactYourFamilyAdministratorTo": "Contact your family administrator to be added to a family",
+    "createFamily": "Create Family",
+    "dashboard": "Dashboard",
+    "families": "Families",
+    "leadership": "Leadership",
+    "loggedOut": "Logged out",
+    "logout": "Logout",
+    "manageFamilies": "Manage Families",
+    "manageAllFamiliesAndSystem": "Manage all families and system-wide settings",
+    "member": "Member",
+    "myFamilyDashboard": "My Family Dashboard",
+    "myFamilyTree": "My Family Tree",
+    "noFamiliesYet": "No families yet",
+    "openFamily": "Open Family",
+    "permissionsOverview": "Permissions Overview",
+    "profile": "Profile",
+    "superAdminPanel": "Super Admin Panel",
+    "superAdministrator": "Super Administrator",
+    "youVeBeenSuccessfullyLogged": "You've been successfully logged out.",
+    "yourFamilies": "Your Families",
+    "yourKinsrootDashboardViewYour": "Your Kinsroot dashboard — view your families, contributions, meetings and recent activity at a glance."
+  },
+  "profile": {
+    "activeSessionsDevices": "Active sessions & devices",
+    "currentlyWorkingEligibleForNjangi": "Currently working (eligible for Njangi)",
+    "failedToLoadProfile": "Failed to load profile",
+    "familyMemberships": "Family Memberships",
+    "joinAFamily": "Join a Family",
+    "manageLinkedAccounts": "Manage linked accounts",
+    "manageYourKinsrootProfileLanguage": "Manage your Kinsroot profile, language and family memberships.",
+    "manageYourPersonalInformation": "Manage your personal information",
+    "myProfile": "My profile",
+    "personalInformation": "Personal Information",
+    "preferredLanguage": "Preferred Language",
+    "profileUpdatedSuccessfully": "Profile updated successfully",
+    "reviewTheGoogleAppleOr": "Review the Google, Apple, or email accounts linked to your profile.",
+    "saving": "Saving...",
+    "signInMethods": "Sign-in methods",
+    "userProfile": "User Profile"
+  },
+  "notif": {
+    "markAllRead": "Mark all read",
+    "notifications": "Notifications",
+    "viewAll": "View all",
+    "youReAllCaughtUp": "You're all caught up"
+  },
+  "nav": {
+    "home": "Home",
+    "members": "Members",
+    "meetings": "Meetings",
+    "finance": "Finance",
+    "more": "More"
   }
 }

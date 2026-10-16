@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell } from "lucide-react";
@@ -60,6 +61,7 @@ interface InboxItem {
  */
 export function NotificationInbox({ familySlug }: { familySlug?: string }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [items, setItems] = useState<InboxItem[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -142,7 +144,7 @@ export function NotificationInbox({ familySlug }: { familySlug?: string }) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
+        <Button variant="ghost" size="icon" className="relative" aria-label={t("notif.notifications")}>
           <Bell className="h-5 w-5" />
           {unread > 0 && (
             <Badge
@@ -156,17 +158,17 @@ export function NotificationInbox({ familySlug }: { familySlug?: string }) {
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0" align="end">
         <div className="flex items-center justify-between px-4 py-3 border-b">
-          <h3 className="font-semibold text-sm">Notifications</h3>
+          <h3 className="font-semibold text-sm">{t("notif.notifications")}</h3>
           {unread > 0 && (
             <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={markAllRead}>
-              Mark all read
+              {t("notif.markAllRead")}
             </Button>
           )}
         </div>
         <ScrollArea className="h-80">
           {items.length === 0 ? (
             <div className="px-4 py-8 text-center text-sm text-muted-foreground">
-              You're all caught up
+              {t("notif.youReAllCaughtUp")}
             </div>
           ) : (
             <ul className="divide-y">
@@ -211,7 +213,7 @@ export function NotificationInbox({ familySlug }: { familySlug?: string }) {
               className="w-full text-xs"
               onClick={() => navigate(`/family/${familySlug}/notifications`)}
             >
-              View all
+              {t("notif.viewAll")}
             </Button>
           </div>
         )}
