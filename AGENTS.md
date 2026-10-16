@@ -2,3 +2,4 @@
 
 - Native wrapper features use the official Natively SDK through src/lib/natively.ts and NativelyContext; browser fallbacks never enqueue native calls. Why: keep wrapper-specific APIs isolated and avoid OneSignal identifiers being used as Firebase tokens.
 - Self-account deletion uses an authenticated edge endpoint and auth lifecycle cleanup; anonymized ledger identities survive removal of sign-in credentials. Why: preserve family accounting without retaining personal profile data.
+- Auth state listeners defer database requests until after the callback returns. Why: prevent auth storage-lock deadlocks during signed-in reloads.

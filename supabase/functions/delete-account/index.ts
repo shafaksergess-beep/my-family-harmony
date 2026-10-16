@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
     const policy = deletionPolicy(req.method, body, user.last_sign_in_at);
     if (policy) return reply(policy === "reauth" ? 403 : 400, { code: policy });
     // Remove objects via the Storage API, not raw SQL. Owned receipts contain personal data.
-    const { data: objects, error: objectsError } = await admin.schema("storage").from("objects").select("bucket_id,name").eq("owner_id", auth.userId);
+    const { data: objects, error: objectsError } = await admin.rpc("account_owned_files", { p_user_id: auth.userId });
     if (objectsError) throw objectsError;
     for (const bucket of new Set((objects ?? []).map(o => o.bucket_id))) {
       const paths = (objects ?? []).filter(o => o.bucket_id === bucket).map(o => o.name);

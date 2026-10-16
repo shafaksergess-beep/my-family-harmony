@@ -3127,6 +3127,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      account_owned_files: {
+        Args: { p_user_id: string }
+        Returns: {
+          bucket_id: string
+          name: string
+        }[]
+      }
       anonymize_deleted_account: {
         Args: { p_user_id: string }
         Returns: undefined
