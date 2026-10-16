@@ -161,6 +161,18 @@ const Privacy = () => {
             even after account deletion.
           </p>
 
+          <h3 id="delete-account" className="text-xl font-semibold mt-6 mb-2">9.1 How to delete your Kinsroot account</h3>
+          <ol className="list-decimal pl-6 space-y-2">
+            <li>In the Kinsroot app or website, sign in and open <strong>Profile</strong>.</li>
+            <li>Scroll to <strong>Delete account</strong>, type <code>DELETE</code> to confirm, and submit. For security you must have signed in within the last 15 minutes.</li>
+            <li>If you cannot sign in, email <a href="mailto:softserge.dev@gmail.com?subject=Kinsroot%20account%20deletion" className="text-primary underline">softserge.dev@gmail.com</a> from your account email with the subject "Kinsroot account deletion". We respond within 30 days.</li>
+          </ol>
+          <p>
+            <strong>What is deleted:</strong> your sign-in credentials, sessions, profile details (name, email, phone, photo), chat messages, notification records and uploaded files.
+            <strong> What is kept:</strong> anonymized family financial records (contributions, loans, savings, njangi, assistance) so the family's accounts stay correct. Deleting an account does not cancel outstanding debts.
+          </p>
+
+
           <h2 className="text-2xl font-bold mt-10 mb-4">10. Cookies and local storage</h2>
           <p>
             We use cookies, local storage and IndexedDB to keep you signed in, remember your language, cache
