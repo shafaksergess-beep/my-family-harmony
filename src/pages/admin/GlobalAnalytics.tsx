@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,6 +38,7 @@ interface FamilyStats {
 }
 
 const GlobalAnalytics = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -75,8 +77,8 @@ const GlobalAnalytics = () => {
 
       if (!adminData) {
         toast({
-          title: "Access Denied",
-          description: "You must be a super admin to view this page",
+          title: t("admGlobalAnalytics.accessDenied"),
+          description: t("admGlobalAnalytics.youMustBeASuper"),
           variant: "destructive",
         });
         navigate("/dashboard");
@@ -88,8 +90,8 @@ const GlobalAnalytics = () => {
     } catch (error: any) {
       console.error("Error checking admin status:", error);
       toast({
-        title: "Error",
-        description: "Failed to load analytics",
+        title: t("admGlobalAnalytics.error"),
+        description: t("admGlobalAnalytics.failedToLoadAnalytics"),
         variant: "destructive",
       });
     } finally {
@@ -217,9 +219,9 @@ const GlobalAnalytics = () => {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Global Analytics</h1>
+            <h1 className="text-3xl font-bold">{t("admGlobalAnalytics.globalAnalytics")}</h1>
             <p className="text-muted-foreground">
-              Overview of all families in the system
+              {t("admGlobalAnalytics.overviewOfAllFamiliesIn")}
             </p>
           </div>
         </div>
@@ -229,7 +231,7 @@ const GlobalAnalytics = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">
-                Total Families
+                {t("admGlobalAnalytics.totalFamilies")}
               </CardTitle>
               <Building2 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -241,7 +243,7 @@ const GlobalAnalytics = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">
-                Total Members
+                {t("admGlobalAnalytics.totalMembers")}
               </CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -253,7 +255,7 @@ const GlobalAnalytics = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">
-                Total Contributions
+                {t("admGlobalAnalytics.totalContributions")}
               </CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -266,7 +268,7 @@ const GlobalAnalytics = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Loans</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("admGlobalAnalytics.totalLoans")}</CardTitle>
               <CreditCard className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -279,7 +281,7 @@ const GlobalAnalytics = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">
-                Total Savings
+                {t("admGlobalAnalytics.totalSavings")}
               </CardTitle>
               <PiggyBank className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -293,7 +295,7 @@ const GlobalAnalytics = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">
-                Total Shares Value
+                {t("admGlobalAnalytics.totalSharesValue")}
               </CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -310,7 +312,7 @@ const GlobalAnalytics = () => {
           {/* Bar Chart - Family Contributions */}
           <Card>
             <CardHeader>
-              <CardTitle>Contributions by Family</CardTitle>
+              <CardTitle>{t("admGlobalAnalytics.contributionsByFamily")}</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -333,7 +335,7 @@ const GlobalAnalytics = () => {
           {/* Pie Chart - Member Distribution */}
           <Card>
             <CardHeader>
-              <CardTitle>Member Distribution</CardTitle>
+              <CardTitle>{t("admGlobalAnalytics.memberDistribution")}</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -365,20 +367,20 @@ const GlobalAnalytics = () => {
         {/* Family Details Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Family Details</CardTitle>
+            <CardTitle>{t("admGlobalAnalytics.familyDetails")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left p-3 font-medium">Family Name</th>
-                    <th className="text-right p-3 font-medium">Members</th>
+                    <th className="text-left p-3 font-medium">{t("admGlobalAnalytics.familyName")}</th>
+                    <th className="text-right p-3 font-medium">{t("admGlobalAnalytics.members")}</th>
                     <th className="text-right p-3 font-medium">
-                      Contributions
+                      {t("admGlobalAnalytics.contributions")}
                     </th>
-                    <th className="text-right p-3 font-medium">Loans</th>
-                    <th className="text-right p-3 font-medium">Savings</th>
+                    <th className="text-right p-3 font-medium">{t("admGlobalAnalytics.loans")}</th>
+                    <th className="text-right p-3 font-medium">{t("admGlobalAnalytics.savings")}</th>
                   </tr>
                 </thead>
                 <tbody>

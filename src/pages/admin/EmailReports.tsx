@@ -50,8 +50,8 @@ const EmailReports = () => {
 
       if (!superAdminData) {
         toast({
-          title: "Access Denied",
-          description: "You don't have permission to access this page",
+          title: t("admEmailReports.accessDenied"),
+          description: t("admEmailReports.youDonTHavePermission"),
           variant: "destructive",
         });
         navigate("/dashboard");
@@ -78,14 +78,14 @@ const EmailReports = () => {
       localStorage.setItem('email-report-config', JSON.stringify(config));
       
       toast({
-        title: "Success",
-        description: "Email report schedule saved successfully",
+        title: t("admEmailReports.success"),
+        description: t("admEmailReports.emailReportScheduleSavedSuccessfully"),
       });
     } catch (error) {
       console.error("Error saving config:", error);
       toast({
-        title: "Error",
-        description: "Failed to save email report schedule",
+        title: t("admEmailReports.error"),
+        description: t("admEmailReports.failedToSaveEmailReport"),
         variant: "destructive",
       });
     } finally {
@@ -114,9 +114,9 @@ const EmailReports = () => {
               <div>
                 <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                   <Mail className="w-6 h-6" />
-                  Scheduled Email Reports
+                  {t("admEmailReports.scheduledEmailReports")}
                 </h1>
-                <p className="text-sm text-muted-foreground">Configure automatic email reports for admin activities</p>
+                <p className="text-sm text-muted-foreground">{t("admEmailReports.configureAutomaticEmailReportsFor")}</p>
               </div>
             </div>
             <LanguageSwitcher />
@@ -127,14 +127,14 @@ const EmailReports = () => {
       <main className="container mx-auto px-4 py-8 max-w-3xl">
         <Card>
           <CardHeader>
-            <CardTitle>Email Report Configuration</CardTitle>
-            <CardDescription>Set up automatic email reports with admin activity summaries</CardDescription>
+            <CardTitle>{t("admEmailReports.emailReportConfiguration")}</CardTitle>
+            <CardDescription>{t("admEmailReports.setUpAutomaticEmailReports")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="enabled">Enable Email Reports</Label>
-                <p className="text-sm text-muted-foreground">Automatically send scheduled reports</p>
+                <Label htmlFor="enabled">{t("admEmailReports.enableEmailReports")}</Label>
+                <p className="text-sm text-muted-foreground">{t("admEmailReports.automaticallySendScheduledReports")}</p>
               </div>
               <Switch
                 id="enabled"
@@ -144,7 +144,7 @@ const EmailReports = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="frequency">Report Frequency</Label>
+              <Label htmlFor="frequency">{t("admEmailReports.reportFrequency")}</Label>
               <Select
                 value={config.frequency}
                 onValueChange={(frequency) => setConfig({ ...config, frequency })}
@@ -154,16 +154,16 @@ const EmailReports = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
+                  <SelectItem value="daily">{t("admEmailReports.daily")}</SelectItem>
+                  <SelectItem value="weekly">{t("admEmailReports.weekly")}</SelectItem>
+                  <SelectItem value="monthly">{t("admEmailReports.monthly")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             {config.frequency === 'weekly' && (
               <div className="space-y-2">
-                <Label htmlFor="day">Day of Week</Label>
+                <Label htmlFor="day">{t("admEmailReports.dayOfWeek")}</Label>
                 <Select
                   value={config.day_of_week}
                   onValueChange={(day_of_week) => setConfig({ ...config, day_of_week })}
@@ -173,13 +173,13 @@ const EmailReports = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">Monday</SelectItem>
-                    <SelectItem value="2">Tuesday</SelectItem>
-                    <SelectItem value="3">Wednesday</SelectItem>
-                    <SelectItem value="4">Thursday</SelectItem>
-                    <SelectItem value="5">Friday</SelectItem>
-                    <SelectItem value="6">Saturday</SelectItem>
-                    <SelectItem value="0">Sunday</SelectItem>
+                    <SelectItem value="1">{t("admEmailReports.monday")}</SelectItem>
+                    <SelectItem value="2">{t("admEmailReports.tuesday")}</SelectItem>
+                    <SelectItem value="3">{t("admEmailReports.wednesday")}</SelectItem>
+                    <SelectItem value="4">{t("admEmailReports.thursday")}</SelectItem>
+                    <SelectItem value="5">{t("admEmailReports.friday")}</SelectItem>
+                    <SelectItem value="6">{t("admEmailReports.saturday")}</SelectItem>
+                    <SelectItem value="0">{t("admEmailReports.sunday")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -187,7 +187,7 @@ const EmailReports = () => {
 
             {config.frequency === 'monthly' && (
               <div className="space-y-2">
-                <Label htmlFor="day">Day of Month</Label>
+                <Label htmlFor="day">{t("admEmailReports.dayOfMonth")}</Label>
                 <Input
                   id="day"
                   type="number"
@@ -201,7 +201,7 @@ const EmailReports = () => {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="time">Time</Label>
+              <Label htmlFor="time">{t("admEmailReports.time")}</Label>
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-muted-foreground" />
                 <Input
@@ -215,7 +215,7 @@ const EmailReports = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="recipients">Recipients</Label>
+              <Label htmlFor="recipients">{t("admEmailReports.recipients")}</Label>
               <Input
                 id="recipients"
                 placeholder="admin@example.com, manager@example.com"
@@ -223,16 +223,16 @@ const EmailReports = () => {
                 onChange={(e) => setConfig({ ...config, recipients: e.target.value })}
                 disabled={!config.enabled}
               />
-              <p className="text-xs text-muted-foreground">Comma-separated email addresses</p>
+              <p className="text-xs text-muted-foreground">{t("admEmailReports.commaSeparatedEmailAddresses")}</p>
             </div>
 
             <div className="space-y-4 pt-4 border-t">
-              <h3 className="font-medium">Report Contents</h3>
+              <h3 className="font-medium">{t("admEmailReports.reportContents")}</h3>
               
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="include_activity">Activity Logs</Label>
-                  <p className="text-sm text-muted-foreground">Include recent admin actions</p>
+                  <Label htmlFor="include_activity">{t("admEmailReports.activityLogs")}</Label>
+                  <p className="text-sm text-muted-foreground">{t("admEmailReports.includeRecentAdminActions")}</p>
                 </div>
                 <Switch
                   id="include_activity"
@@ -244,8 +244,8 @@ const EmailReports = () => {
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="include_statistics">Statistics</Label>
-                  <p className="text-sm text-muted-foreground">Include system statistics and metrics</p>
+                  <Label htmlFor="include_statistics">{t("admEmailReports.statistics")}</Label>
+                  <p className="text-sm text-muted-foreground">{t("admEmailReports.includeSystemStatisticsAndMetrics")}</p>
                 </div>
                 <Switch
                   id="include_statistics"
@@ -258,7 +258,7 @@ const EmailReports = () => {
 
             <div className="flex justify-end gap-2 pt-4">
               <Button variant="outline" onClick={() => navigate("/admin/dashboard")}>
-                Cancel
+                {t("admEmailReports.cancel")}
               </Button>
               <Button onClick={handleSave} disabled={saving}>
                 {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}

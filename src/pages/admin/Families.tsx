@@ -273,7 +273,7 @@ const AdminFamilies = () => {
     
     toast({
       title: t("common.success"),
-      description: "Families exported successfully",
+      description: t("admFamilies.familiesExportedSuccessfully"),
     });
   };
 
@@ -305,16 +305,16 @@ const AdminFamilies = () => {
               {families.length > 0 && (
                 <Button variant="outline" size="sm" onClick={handleExport}>
                   <Download className="w-4 h-4 mr-2" />
-                  Export
+                  {t("admFamilies.export")}
                 </Button>
               )}
               <Button variant="ghost" size="sm" onClick={() => navigate("/admin/permissions")}>
                 <Shield className="w-4 h-4 mr-2" />
-                Permissions
+                {t("admFamilies.permissions")}
               </Button>
               <Button variant="ghost" size="sm" onClick={() => navigate("/admin/activity-logs")}>
                 <FileText className="w-4 h-4 mr-2" />
-                Activity Logs
+                {t("admFamilies.activityLogs")}
               </Button>
               <LanguageSwitcher />
             

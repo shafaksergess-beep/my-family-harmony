@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +24,7 @@ interface DashboardWidget {
 }
 
 export default function CustomizeDashboard() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [layouts, setLayouts] = useState<any>({
@@ -54,8 +56,8 @@ export default function CustomizeDashboard() {
 
     if (!isSuperAdmin) {
       toast({
-        title: "Access Denied",
-        description: "You must be a super admin to access this page",
+        title: t("admCustomizeDashboard.accessDenied"),
+        description: t("admCustomizeDashboard.youMustBeASuper"),
         variant: "destructive",
       });
       navigate("/admin");
@@ -77,8 +79,8 @@ export default function CustomizeDashboard() {
     setSaving(true);
     localStorage.setItem("dashboard_layout", JSON.stringify(layouts));
     toast({
-      title: "Success",
-      description: "Dashboard layout saved successfully",
+      title: t("admCustomizeDashboard.success"),
+      description: t("admCustomizeDashboard.dashboardLayoutSavedSuccessfully"),
     });
     setSaving(false);
   };
@@ -97,8 +99,8 @@ export default function CustomizeDashboard() {
     setLayouts(defaultLayout);
     localStorage.removeItem("dashboard_layout");
     toast({
-      title: "Success",
-      description: "Dashboard layout reset to default",
+      title: t("admCustomizeDashboard.success"),
+      description: t("admCustomizeDashboard.dashboardLayoutResetToDefault"),
     });
   };
 
@@ -108,12 +110,12 @@ export default function CustomizeDashboard() {
         return (
           <Card className="h-full">
             <CardHeader>
-              <CardTitle>Financial Overview</CardTitle>
+              <CardTitle>{t("admCustomizeDashboard.financialOverview")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-center py-8">
                 <div className="text-3xl font-bold">FCFA 1,250,000</div>
-                <div className="text-sm text-muted-foreground mt-2">Total Balance</div>
+                <div className="text-sm text-muted-foreground mt-2">{t("admCustomizeDashboard.totalBalance")}</div>
               </div>
             </CardContent>
           </Card>
@@ -122,7 +124,7 @@ export default function CustomizeDashboard() {
         return (
           <Card className="h-full">
             <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
+              <CardTitle>{t("admCustomizeDashboard.recentActivity")}</CardTitle>
             </CardHeader>
             <CardContent>
               <ActivityWidget />
@@ -140,12 +142,12 @@ export default function CustomizeDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">125</div>
-              <div className="text-sm text-muted-foreground">Total Count</div>
+              <div className="text-sm text-muted-foreground">{t("admCustomizeDashboard.totalCount")}</div>
             </CardContent>
           </Card>
         );
       default:
-        return <div>Unknown Widget</div>;
+        return <div>{t("admCustomizeDashboard.unknownWidget")}</div>;
     }
   };
 
@@ -162,16 +164,16 @@ export default function CustomizeDashboard() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-3xl font-bold">Customize Dashboard</h1>
+              <h1 className="text-3xl font-bold">{t("admCustomizeDashboard.customizeDashboard")}</h1>
               <p className="text-muted-foreground">
-                Drag and resize widgets to customize your dashboard layout
+                {t("admCustomizeDashboard.dragAndResizeWidgetsTo")}
               </p>
             </div>
           </div>
 
           <div className="flex gap-2">
             <Button variant="outline" onClick={resetLayout}>
-              Reset
+              {t("admCustomizeDashboard.reset")}
             </Button>
             <Button onClick={saveLayout} disabled={saving}>
               <Save className="mr-2 h-4 w-4" />
@@ -185,7 +187,7 @@ export default function CustomizeDashboard() {
             <div className="flex items-start gap-3">
               <Layout className="h-5 w-5 text-muted-foreground mt-0.5" />
               <div>
-                <p className="font-semibold">How to customize:</p>
+                <p className="font-semibold">{t("admCustomizeDashboard.howToCustomize")}</p>
                 <ul className="text-sm text-muted-foreground space-y-1 mt-2">
                   <li>• Drag widgets to reposition them</li>
                   <li>• Drag the bottom-right corner to resize widgets</li>

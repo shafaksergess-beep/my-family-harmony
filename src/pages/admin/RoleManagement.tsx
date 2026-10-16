@@ -1,3 +1,5 @@
+import i18n from "@/i18n/config";
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,43 +24,44 @@ interface MemberWithRoles {
 
 const ROLE_INFO: Record<string, { label: string; description: string; color: string }> = {
   family_head: {
-    label: "Family Head",
-    description: "Full administrative control over the family",
+    get label() { return i18n.t("admRoleManagement.familyHead"); },
+    get description() { return i18n.t("admRoleManagement.fullAdministrativeControlOverThe"); },
     color: "bg-purple-500",
   },
   family_admin: {
-    label: "Family Admin",
-    description: "All admin rights for this specific family",
+    get label() { return i18n.t("admRoleManagement.familyAdmin"); },
+    get description() { return i18n.t("admRoleManagement.allAdminRightsForThis"); },
     color: "bg-blue-500",
   },
   secretary: {
-    label: "Secretary",
-    description: "Can manage minutes, reports, and member communications",
+    get label() { return i18n.t("admRoleManagement.secretary"); },
+    get description() { return i18n.t("admRoleManagement.canManageMinutesReportsAnd"); },
     color: "bg-green-500",
   },
   treasurer: {
-    label: "Treasurer",
-    description: "Manages financial records and transactions",
+    get label() { return i18n.t("admRoleManagement.treasurer"); },
+    get description() { return i18n.t("admRoleManagement.managesFinancialRecordsAndTransactions"); },
     color: "bg-yellow-500",
   },
   loan_committee: {
-    label: "Loan Committee",
-    description: "Reviews and approves loan requests",
+    get label() { return i18n.t("admRoleManagement.loanCommittee"); },
+    get description() { return i18n.t("admRoleManagement.reviewsAndApprovesLoanRequests"); },
     color: "bg-orange-500",
   },
   member: {
-    label: "Member",
-    description: "Standard family member access",
+    get label() { return i18n.t("admRoleManagement.member"); },
+    get description() { return i18n.t("admRoleManagement.standardFamilyMemberAccess"); },
     color: "bg-gray-500",
   },
   guest: {
-    label: "Guest",
-    description: "Limited read-only access",
+    get label() { return i18n.t("admRoleManagement.guest"); },
+    get description() { return i18n.t("admRoleManagement.limitedReadOnlyAccess"); },
     color: "bg-slate-500",
   },
 };
 
 export default function RoleManagement() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -70,8 +73,8 @@ export default function RoleManagement() {
   useEffect(() => {
     if (!authLoading && !canManageMembers) {
       toast({
-        title: "Access Denied",
-        description: "You don't have permission to manage roles",
+        title: t("admRoleManagement.accessDenied"),
+        description: t("admRoleManagement.youDonTHavePermission"),
         variant: "destructive",
       });
       navigate(`/family/${familySlug}`);
@@ -118,7 +121,7 @@ export default function RoleManagement() {
       setMembers(enriched);
     } catch (error) {
       console.error("Error fetching members:", error);
-      toast({ title: "Error", description: "Failed to load family members", variant: "destructive" });
+      toast({ title: t("admRoleManagement.error"), description: t("admRoleManagement.failedToLoadFamilyMembers"), variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -132,7 +135,7 @@ export default function RoleManagement() {
       if (hasRole) {
         // Don't allow removing the last role
         if (currentRoles.length <= 1) {
-          toast({ title: "Cannot remove", description: "A member must have at least one role", variant: "destructive" });
+          toast({ title: t("admRoleManagement.cannotRemove"), description: t("admRoleManagement.aMemberMustHaveAt"), variant: "destructive" });
           setUpdating(null);
           return;
         }
@@ -162,11 +165,11 @@ export default function RoleManagement() {
         }
       }
 
-      toast({ title: "Success", description: hasRole ? "Role removed" : "Role assigned" });
+      toast({ title: t("admRoleManagement.success"), description: hasRole ? "Role removed" : "Role assigned" });
       fetchMembers();
     } catch (error: any) {
       console.error("Error toggling role:", error);
-      toast({ title: "Error", description: error.message || "Failed to update role", variant: "destructive" });
+      toast({ title: t("admRoleManagement.error"), description: error.message || "Failed to update role", variant: "destructive" });
     } finally {
       setUpdating(null);
     }
@@ -192,10 +195,10 @@ export default function RoleManagement() {
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <Shield className="h-8 w-8" />
-            Role Management
+            {t("admRoleManagement.roleManagement")}
           </h1>
           <p className="text-muted-foreground">
-            Assign multiple roles to family members
+            {t("admRoleManagement.assignMultipleRolesToFamily")}
           </p>
         </div>
       </div>
@@ -204,9 +207,9 @@ export default function RoleManagement() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
-            Available Roles
+            {t("admRoleManagement.availableRoles")}
           </CardTitle>
-          <CardDescription>Each role grants specific permissions. Members can hold multiple roles.</CardDescription>
+          <CardDescription>{t("admRoleManagement.eachRoleGrantsSpecificPermissions")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 gap-4">
@@ -225,8 +228,8 @@ export default function RoleManagement() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Family Members</CardTitle>
-          <CardDescription>Check/uncheck roles for each member. A member must have at least one role.</CardDescription>
+          <CardTitle>{t("admRoleManagement.familyMembers")}</CardTitle>
+          <CardDescription>{t("admRoleManagement.checkUncheckRolesForEach")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">

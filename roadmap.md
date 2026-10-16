@@ -9,4 +9,4 @@
 - [x] Translate batch 2: dashboard, profile, navigation, notifications
 - [x] Translate batch 3: family money & meetings pages
 - [x] Translate batch 4: reports, analytics, settings, calendar, chat
-- [ ] Translate batch 5: super admin panel
+- [x] Translate batch 5: super admin panel

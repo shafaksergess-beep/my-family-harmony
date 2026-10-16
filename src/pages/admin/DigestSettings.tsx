@@ -40,8 +40,8 @@ export default function DigestSettings() {
 
     if (!isSuperAdmin) {
       toast({
-        title: "Access Denied",
-        description: "You must be a super admin to access this page",
+        title: t("admDigestSettings.accessDenied"),
+        description: t("admDigestSettings.youMustBeASuper"),
         variant: "destructive",
       });
       navigate("/admin");
@@ -58,8 +58,8 @@ export default function DigestSettings() {
   const saveSettings = () => {
     localStorage.setItem("digest_settings", JSON.stringify(settings));
     toast({
-      title: "Success",
-      description: "Digest settings saved successfully",
+      title: t("admDigestSettings.success"),
+      description: t("admDigestSettings.digestSettingsSavedSuccessfully"),
     });
   };
 
@@ -91,13 +91,13 @@ export default function DigestSettings() {
       const result = await response.json();
       
       toast({
-        title: "Test Digest Sent",
+        title: t("admDigestSettings.testDigestSent"),
         description: `Sent ${result.results?.length || 0} test emails`,
       });
     } catch (error: any) {
       console.error("Error sending test digest:", error);
       toast({
-        title: "Error",
+        title: t("admDigestSettings.error"),
         description: error.message || "Failed to send test digest",
         variant: "destructive",
       });
@@ -118,9 +118,9 @@ export default function DigestSettings() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Email Digest Settings</h1>
+            <h1 className="text-3xl font-bold">{t("admDigestSettings.emailDigestSettings")}</h1>
             <p className="text-muted-foreground">
-              Configure automated email summaries for families
+              {t("admDigestSettings.configureAutomatedEmailSummariesFor")}
             </p>
           </div>
         </div>
@@ -129,15 +129,15 @@ export default function DigestSettings() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Mail className="h-5 w-5" />
-              Weekly Digest
+              {t("admDigestSettings.weeklyDigest")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <Label htmlFor="weekly-enabled">Enable Weekly Digest</Label>
+                <Label htmlFor="weekly-enabled">{t("admDigestSettings.enableWeeklyDigest")}</Label>
                 <p className="text-sm text-muted-foreground">
-                  Send weekly summaries to family heads and treasurers
+                  {t("admDigestSettings.sendWeeklySummariesToFamily")}
                 </p>
               </div>
               <Switch
@@ -150,7 +150,7 @@ export default function DigestSettings() {
             </div>
 
             <div className="space-y-2">
-              <Label>Send on</Label>
+              <Label>{t("admDigestSettings.sendOn")}</Label>
               <Select
                 value={settings.weeklyDay}
                 onValueChange={(value) =>
@@ -161,13 +161,13 @@ export default function DigestSettings() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="monday">Monday</SelectItem>
-                  <SelectItem value="tuesday">Tuesday</SelectItem>
-                  <SelectItem value="wednesday">Wednesday</SelectItem>
-                  <SelectItem value="thursday">Thursday</SelectItem>
-                  <SelectItem value="friday">Friday</SelectItem>
-                  <SelectItem value="saturday">Saturday</SelectItem>
-                  <SelectItem value="sunday">Sunday</SelectItem>
+                  <SelectItem value="monday">{t("admDigestSettings.monday")}</SelectItem>
+                  <SelectItem value="tuesday">{t("admDigestSettings.tuesday")}</SelectItem>
+                  <SelectItem value="wednesday">{t("admDigestSettings.wednesday")}</SelectItem>
+                  <SelectItem value="thursday">{t("admDigestSettings.thursday")}</SelectItem>
+                  <SelectItem value="friday">{t("admDigestSettings.friday")}</SelectItem>
+                  <SelectItem value="saturday">{t("admDigestSettings.saturday")}</SelectItem>
+                  <SelectItem value="sunday">{t("admDigestSettings.sunday")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -179,7 +179,7 @@ export default function DigestSettings() {
               className="w-full"
             >
               <Send className="mr-2 h-4 w-4" />
-              Send Test Weekly Digest
+              {t("admDigestSettings.sendTestWeeklyDigest")}
             </Button>
           </CardContent>
         </Card>
@@ -188,15 +188,15 @@ export default function DigestSettings() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Mail className="h-5 w-5" />
-              Monthly Digest
+              {t("admDigestSettings.monthlyDigest")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <Label htmlFor="monthly-enabled">Enable Monthly Digest</Label>
+                <Label htmlFor="monthly-enabled">{t("admDigestSettings.enableMonthlyDigest")}</Label>
                 <p className="text-sm text-muted-foreground">
-                  Send monthly summaries to family heads and treasurers
+                  {t("admDigestSettings.sendMonthlySummariesToFamily")}
                 </p>
               </div>
               <Switch
@@ -209,7 +209,7 @@ export default function DigestSettings() {
             </div>
 
             <div className="space-y-2">
-              <Label>Send on day</Label>
+              <Label>{t("admDigestSettings.sendOnDay")}</Label>
               <Select
                 value={settings.monthlyDay}
                 onValueChange={(value) =>
@@ -236,25 +236,25 @@ export default function DigestSettings() {
               className="w-full"
             >
               <Send className="mr-2 h-4 w-4" />
-              Send Test Monthly Digest
+              {t("admDigestSettings.sendTestMonthlyDigest")}
             </Button>
           </CardContent>
         </Card>
 
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => navigate("/admin")}>
-            Cancel
+            {t("admDigestSettings.cancel")}
           </Button>
           <Button onClick={saveSettings}>
-            Save Settings
+            {t("admDigestSettings.saveSettings")}
           </Button>
         </div>
 
         <Card className="bg-muted">
           <CardContent className="pt-6">
-            <h3 className="font-semibold mb-2">Setup Instructions</h3>
+            <h3 className="font-semibold mb-2">{t("admDigestSettings.setupInstructions")}</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              To enable automated digest emails, you need to set up cron jobs in your Supabase project.
+              {t("admDigestSettings.toEnableAutomatedDigestEmails")}
             </p>
             <div className="bg-background p-4 rounded font-mono text-xs overflow-x-auto">
               {`-- Weekly digest (every Monday at 9 AM)

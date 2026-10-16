@@ -101,9 +101,9 @@ const Permissions = () => {
               <div>
                 <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                   <Shield className="w-6 h-6" />
-                  Permissions Overview
+                  {t("admPermissions.permissionsOverview")}
                 </h1>
-                <p className="text-sm text-muted-foreground">Role-based access control matrix</p>
+                <p className="text-sm text-muted-foreground">{t("admPermissions.roleBasedAccessControlMatrix")}</p>
               </div>
             </div>
             
@@ -116,7 +116,7 @@ const Permissions = () => {
         {/* Role Legend */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Roles</CardTitle>
+            <CardTitle>{t("admPermissions.roles")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-3">
@@ -142,7 +142,7 @@ const Permissions = () => {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-left py-3 px-4 font-medium">Action</th>
+                        <th className="text-left py-3 px-4 font-medium">{t("admPermissions.action")}</th>
                         {roles.map((role) => (
                           <th key={role.key} className="text-center py-3 px-4 font-medium">
                             <div className={`w-3 h-3 rounded-full ${role.color} mx-auto mb-1`} />

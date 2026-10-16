@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +23,7 @@ interface Health {
 }
 
 const SystemHealth = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -33,7 +35,7 @@ const SystemHealth = () => {
     if (!session) { navigate("/auth"); return; }
     const { data: h, error } = await supabase.rpc("get_system_health" as any);
     if (error) {
-      toast({ title: "Access denied", description: error.message, variant: "destructive" });
+      toast({ title: t("admSystemHealth.accessDenied"), description: error.message, variant: "destructive" });
       navigate("/admin/dashboard");
       return;
     }
@@ -58,14 +60,14 @@ const SystemHealth = () => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate("/admin/dashboard")}>
-              <ArrowLeft className="w-4 h-4 mr-2" />Back
+              <ArrowLeft className="w-4 h-4 mr-2" />{t("admSystemHealth.back")}
             </Button>
             <div>
-              <h1 className="text-2xl font-bold flex items-center gap-2"><Activity className="w-6 h-6" />System Health</h1>
-              <p className="text-sm text-muted-foreground">Cron jobs, activity, and queue status</p>
+              <h1 className="text-2xl font-bold flex items-center gap-2"><Activity className="w-6 h-6" />{t("admSystemHealth.systemHealth")}</h1>
+              <p className="text-sm text-muted-foreground">{t("admSystemHealth.cronJobsActivityAndQueue")}</p>
             </div>
           </div>
-          <Button variant="outline" onClick={load}><RefreshCw className="w-4 h-4 mr-2" />Refresh</Button>
+          <Button variant="outline" onClick={load}><RefreshCw className="w-4 h-4 mr-2" />{t("admSystemHealth.refresh")}</Button>
         </div>
       </header>
 
@@ -73,22 +75,22 @@ const SystemHealth = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard label="Activity (24h)" value={data.activity_24h} />
           <StatCard label="Activity (7d)" value={data.activity_7d} />
-          <StatCard label="Unread admin notifs" value={data.unread_admin_notifications} warn={data.unread_admin_notifications > 10} />
-          <StatCard label="Pending join requests" value={data.pending_join_requests} warn={data.pending_join_requests > 0} />
-          <StatCard label="Active families" value={data.active_families} />
-          <StatCard label="Total users" value={data.total_users} />
-          <StatCard label="Cron jobs" value={data.cron_jobs.length} />
+          <StatCard label={t("admSystemHealth.unreadAdminNotifs")} value={data.unread_admin_notifications} warn={data.unread_admin_notifications > 10} />
+          <StatCard label={t("admSystemHealth.pendingJoinRequests")} value={data.pending_join_requests} warn={data.pending_join_requests > 0} />
+          <StatCard label={t("admSystemHealth.activeFamilies")} value={data.active_families} />
+          <StatCard label={t("admSystemHealth.totalUsers")} value={data.total_users} />
+          <StatCard label={t("admSystemHealth.cronJobs")} value={data.cron_jobs.length} />
           <StatCard label="Failed runs (recent)" value={failed} warn={failed > 0} />
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Scheduled Jobs</CardTitle>
-            <CardDescription>Status of pg_cron jobs and their last run</CardDescription>
+            <CardTitle>{t("admSystemHealth.scheduledJobs")}</CardTitle>
+            <CardDescription>{t("admSystemHealth.statusOfPgCronJobs")}</CardDescription>
           </CardHeader>
           <CardContent>
             {data.cron_jobs.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No cron jobs visible.</p>
+              <p className="text-sm text-muted-foreground">{t("admSystemHealth.noCronJobsVisible")}</p>
             ) : (
               <div className="space-y-2">
                 {data.cron_jobs.map(j => {
@@ -121,12 +123,12 @@ const SystemHealth = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Recent Job Runs</CardTitle>
-            <CardDescription>Last 25 cron executions</CardDescription>
+            <CardTitle>{t("admSystemHealth.recentJobRuns")}</CardTitle>
+            <CardDescription>{t("admSystemHealth.last25CronExecutions")}</CardDescription>
           </CardHeader>
           <CardContent>
             {data.cron_runs.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No runs recorded yet.</p>
+              <p className="text-sm text-muted-foreground">{t("admSystemHealth.noRunsRecordedYet")}</p>
             ) : (
               <div className="space-y-1 text-sm">
                 {data.cron_runs.map((r, i) => (

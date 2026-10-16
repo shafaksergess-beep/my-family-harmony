@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +19,7 @@ interface AdminNotification {
 }
 
 export const AdminNotificationsList = () => {
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState<AdminNotification[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -107,12 +109,12 @@ export const AdminNotificationsList = () => {
               <Badge variant="destructive" className="ml-2">{unreadCount} new</Badge>
             )}
           </CardTitle>
-          <CardDescription>Recent system events and new user registrations</CardDescription>
+          <CardDescription>{t("admAdminNotificationsList.recentSystemEventsAndNew")}</CardDescription>
         </div>
         {unreadCount > 0 && (
           <Button variant="ghost" size="sm" onClick={markAllAsRead}>
             <Check className="w-4 h-4 mr-1" />
-            Mark all read
+            {t("admAdminNotificationsList.markAllRead")}
           </Button>
         )}
       </CardHeader>
@@ -120,7 +122,7 @@ export const AdminNotificationsList = () => {
         {notifications.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <Bell className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>No notifications yet</p>
+            <p>{t("admAdminNotificationsList.noNotificationsYet")}</p>
           </div>
         ) : (
           <ScrollArea className="h-[300px]">
@@ -146,7 +148,7 @@ export const AdminNotificationsList = () => {
                     <div className="flex items-center gap-2">
                       <p className="font-medium text-sm">{notification.title}</p>
                       {!notification.is_read && (
-                        <Badge variant="secondary" className="text-xs">New</Badge>
+                        <Badge variant="secondary" className="text-xs">{t("admAdminNotificationsList.new")}</Badge>
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground truncate">
