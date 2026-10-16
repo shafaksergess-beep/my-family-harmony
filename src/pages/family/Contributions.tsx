@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -50,6 +51,7 @@ interface Member {
 }
 
 export default function Contributions() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -152,7 +154,7 @@ export default function Contributions() {
       const err = error as Error;
       toast({
         variant: "destructive",
-        title: "Error fetching contributions",
+        title: t("famContributions.errorFetchingContributions"),
         description: err.message,
       });
     } finally {
@@ -193,7 +195,7 @@ export default function Contributions() {
       const err = error as Error;
       toast({
         variant: "destructive",
-        title: "Error fetching members",
+        title: t("famContributions.errorFetchingMembers"),
         description: err.message,
       });
     }
@@ -222,8 +224,8 @@ export default function Contributions() {
       if (!newContribution.house_id) {
         setValidationErrors({ houseId: "House is required" });
         toast({
-          title: "Validation Error",
-          description: "Please select a house",
+          title: t("famContributions.validationError"),
+          description: t("famContributions.pleaseSelectAHouse"),
           variant: "destructive",
         });
         return;
@@ -243,8 +245,8 @@ export default function Contributions() {
       setValidationErrors(errors);
       toast({
         variant: "destructive",
-        title: "Validation Error",
-        description: "Please check the form for errors",
+        title: t("famContributions.validationError"),
+        description: t("famContributions.pleaseCheckTheFormFor"),
       });
       return;
     }
@@ -253,12 +255,12 @@ export default function Contributions() {
       // For house contributions, member_id is the payer/representative
       if (dialogScope === "house" && !newContribution.member_id) {
         setValidationErrors({ memberId: "Please select a payer/representative" });
-        toast({ title: "Validation Error", description: "Please select a payer for the house contribution", variant: "destructive" });
+        toast({ title: t("famContributions.validationError"), description: t("famContributions.pleaseSelectAPayerFor"), variant: "destructive" });
         return;
       }
       if (dialogScope === "house" && !newContribution.house_id) {
         setValidationErrors({ houseId: "House is required" });
-        toast({ title: "Validation Error", description: "Please select a house", variant: "destructive" });
+        toast({ title: t("famContributions.validationError"), description: t("famContributions.pleaseSelectAHouse"), variant: "destructive" });
         return;
       }
 
@@ -278,8 +280,8 @@ export default function Contributions() {
       if (error) throw error;
 
       toast({
-        title: "Contribution added",
-        description: "The contribution has been recorded successfully.",
+        title: t("famContributions.contributionAdded"),
+        description: t("famContributions.theContributionHasBeenRecorded"),
       });
 
       setIsDialogOpen(false);
@@ -297,7 +299,7 @@ export default function Contributions() {
       const err = error as Error;
       toast({
         variant: "destructive",
-        title: "Error adding contribution",
+        title: t("famContributions.errorAddingContribution"),
         description: err.message,
       });
     }
@@ -316,8 +318,8 @@ export default function Contributions() {
       if (error) throw error;
 
       toast({
-        title: "Contribution updated",
-        description: "Marked as paid successfully.",
+        title: t("famContributions.contributionUpdated"),
+        description: t("famContributions.markedAsPaidSuccessfully"),
       });
 
       fetchContributions();
@@ -325,7 +327,7 @@ export default function Contributions() {
       const err = error as Error;
       toast({
         variant: "destructive",
-        title: "Error updating contribution",
+        title: t("famContributions.errorUpdatingContribution"),
         description: err.message,
       });
     }
@@ -356,7 +358,7 @@ export default function Contributions() {
       ),
     );
     if (unpaidMemberIds.length === 0) {
-      toast({ title: "No unpaid contributions to remind." });
+      toast({ title: t("famContributions.noUnpaidContributionsToRemind") });
       return;
     }
     if (!confirm(`Send a reminder to ${unpaidMemberIds.length} member(s)?`)) return;
@@ -370,14 +372,14 @@ export default function Contributions() {
         .map((r: { profiles: { email: string | null } | null }) => r.profiles?.email)
         .filter((e): e is string => !!e);
       if (emails.length === 0) {
-        toast({ title: "No member emails on file." });
+        toast({ title: t("famContributions.noMemberEmailsOnFile") });
         return;
       }
       const { error } = await supabase.functions.invoke("send-notification", {
         body: {
           to: emails,
           subject: `Contribution reminder — ${family.name}`,
-          message: "You have an unpaid contribution. Please settle it as soon as possible.",
+          message: t("famContributions.youHaveAnUnpaidContribution"),
           familyName: family.name,
           eventType: "contribution_reminder",
           actionUrl: `${window.location.origin}/family/${familySlug}/contributions`,
@@ -385,12 +387,12 @@ export default function Contributions() {
       });
       if (error) throw error;
       toast({
-        title: "Reminders sent",
+        title: t("famContributions.remindersSent"),
         description: `Notified ${emails.length} member(s).`,
       });
     } catch (e) {
       const err = e as Error;
-      toast({ title: "Failed to send reminders", description: err.message, variant: "destructive" });
+      toast({ title: t("famContributions.failedToSendReminders"), description: err.message, variant: "destructive" });
     } finally {
       setReminding(false);
     }
@@ -415,7 +417,7 @@ export default function Contributions() {
 
   return (
     <>
-      <SEO title="Contributions" description="Track member and house contributions, late fines and payment history." />
+      <SEO title={t("famContributions.contributions")} description={t("famContributions.trackMemberAndHouseContributions")} />
       <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
@@ -423,11 +425,11 @@ export default function Contributions() {
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t("famContributions.back")}
               </Button>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">Contributions</h1>
-                <p className="text-sm text-muted-foreground">Track monthly contributions and payments</p>
+                <h1 className="text-2xl font-bold text-foreground">{t("famContributions.contributions")}</h1>
+                <p className="text-sm text-muted-foreground">{t("famContributions.trackMonthlyContributionsAndPayments")}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -446,7 +448,7 @@ export default function Contributions() {
               )}
               <Button variant="outline" onClick={handleExport}>
                 <Download className="w-4 h-4 mr-2" />
-                Export CSV
+                {t("famContributions.exportCsv")}
               </Button>
               {canManageFinances && (
                 <Button variant="outline" onClick={handleRemindEveryone} disabled={reminding}>
@@ -462,30 +464,30 @@ export default function Contributions() {
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
                     <Button>
-                      <Plus className="mr-2 h-4 w-4" /> Add Contribution
+                      <Plus className="mr-2 h-4 w-4" /> {t("famContributions.addContribution")}
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Record New Contribution</DialogTitle>
+                      <DialogTitle>{t("famContributions.recordNewContribution")}</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4">
                       <div>
-                        <Label>Contribution For</Label>
+                        <Label>{t("famContributions.contributionFor")}</Label>
                         <Select value={dialogScope} onValueChange={(value) => setDialogScope(value as "member" | "house")}>
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="member">Individual Member</SelectItem>
-                            <SelectItem value="house">House</SelectItem>
+                            <SelectItem value="member">{t("famContributions.individualMember")}</SelectItem>
+                            <SelectItem value="house">{t("famContributions.house")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
 
                       {dialogScope === "house" && (
                         <div>
-                          <Label>House</Label>
+                          <Label>{t("famContributions.house")}</Label>
                           <Select 
                             value={newContribution.house_id} 
                             onValueChange={(value) => {
@@ -494,7 +496,7 @@ export default function Contributions() {
                             }}
                           >
                             <SelectTrigger className={validationErrors.houseId ? "border-red-500" : ""}>
-                              <SelectValue placeholder="Select house" />
+                              <SelectValue placeholder={t("famContributions.selectHouse")} />
                             </SelectTrigger>
                             <SelectContent>
                               {houses.map((house) => (
@@ -535,7 +537,7 @@ export default function Contributions() {
                         )}
                       </div>
                       <div>
-                        <Label>Amount</Label>
+                        <Label>{t("famContributions.amount")}</Label>
                         <Input
                           type="number"
                           min="0"
@@ -552,7 +554,7 @@ export default function Contributions() {
                         )}
                       </div>
                       <div>
-                        <Label>Date</Label>
+                        <Label>{t("famContributions.date")}</Label>
                         <Input
                           type="date"
                           value={newContribution.contribution_date}
@@ -567,7 +569,7 @@ export default function Contributions() {
                         )}
                       </div>
                       <div>
-                        <Label>Type</Label>
+                        <Label>{t("famContributions.type")}</Label>
                         <Select 
                           value={newContribution.type} 
                           onValueChange={(value) => {
@@ -579,10 +581,10 @@ export default function Contributions() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="monthly">Monthly</SelectItem>
-                            <SelectItem value="special">Special</SelectItem>
-                            <SelectItem value="fine">Fine</SelectItem>
-                            <SelectItem value="loan_repayment">Loan Repayment</SelectItem>
+                            <SelectItem value="monthly">{t("famContributions.monthly")}</SelectItem>
+                            <SelectItem value="special">{t("famContributions.special")}</SelectItem>
+                            <SelectItem value="fine">{t("famContributions.fine")}</SelectItem>
+                            <SelectItem value="loan_repayment">{t("famContributions.loanRepayment")}</SelectItem>
                           </SelectContent>
                         </Select>
                         {validationErrors.type && (
@@ -590,7 +592,7 @@ export default function Contributions() {
                         )}
                       </div>
                       <div>
-                        <Label>Notes (optional)</Label>
+                        <Label>{t("famContributions.notesOptional")}</Label>
                         <Textarea
                           maxLength={500}
                           value={newContribution.notes}
@@ -605,7 +607,7 @@ export default function Contributions() {
                         )}
                       </div>
                       <Button onClick={handleAddContribution} className="w-full">
-                        Add Contribution
+                        {t("famContributions.addContribution")}
                       </Button>
                     </div>
                   </DialogContent>
@@ -619,7 +621,7 @@ export default function Contributions() {
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Contributions</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famContributions.totalContributions")}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -628,7 +630,7 @@ export default function Contributions() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Paid</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famContributions.paid")}</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -637,7 +639,7 @@ export default function Contributions() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("famContributions.pending")}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -648,21 +650,20 @@ export default function Contributions() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Contribution History</CardTitle>
+            <CardTitle>{t("famContributions.contributionHistory")}</CardTitle>
           </CardHeader>
           <CardContent>
             {contributions.length === 0 ? (
               <EmptyState
                 icon={DollarSign}
-                title="No contributions recorded yet"
-                description="Start tracking your family's monthly contributions. Record the first one to see totals, generate receipts and watch trends grow."
+                title={t("famContributions.noContributionsRecordedYet")}
+                description={t("famContributions.startTrackingYourFamilyS")}
                 primary={canManageFinances ? {
-                  label: "Record first contribution",
-                  onClick: () => setIsDialogOpen(true),
-                  icon: <Plus className="w-4 h-4 mr-2" />,
+                  label: t("famContributions.recordFirstContribution"),
+                  onClick: () => {t("famContributions.setisdialogopenTrueIcon")} <Plus className="w-4 h-4 mr-2" />,
                 } : undefined}
                 secondary={{
-                  label: "Set monthly amount",
+                  label: t("famContributions.setMonthlyAmount"),
                   onClick: () => navigate(`/family/${familySlug}/contribution-settings`),
                 }}
               />
@@ -701,7 +702,7 @@ export default function Contributions() {
                       )}
                       {contribution.status === "pending" && canManageFinances ? (
                         <Button size="sm" onClick={() => handleMarkAsPaid(contribution.id)}>
-                          Mark Paid
+                          {t("famContributions.markPaid")}
                         </Button>
                       ) : (
                         <Badge variant={contribution.status === "paid" ? "default" : "secondary"}>

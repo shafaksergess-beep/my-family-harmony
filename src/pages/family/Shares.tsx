@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -50,6 +51,7 @@ interface FamilyMember {
 }
 
 export default function FamilyShares() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -157,7 +159,7 @@ export default function FamilyShares() {
 
       setMembers(allEnrichedMembers as FamilyMember[]);
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("famShares.error"), description: error.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -210,18 +212,18 @@ export default function FamilyShares() {
           .update(payload)
           .eq("id", editingShare.id);
         if (error) throw error;
-        toast({ title: "Success", description: "Share updated successfully" });
+        toast({ title: t("famShares.success"), description: t("famShares.shareUpdatedSuccessfully") });
       } else {
         const { error } = await supabase.from("shares").insert(payload);
         if (error) throw error;
-        toast({ title: "Success", description: "Share issued successfully" });
+        toast({ title: t("famShares.success"), description: t("famShares.shareIssuedSuccessfully") });
       }
 
       setIsShareDialogOpen(false);
       resetShareForm();
       loadData();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("famShares.error"), description: error.message, variant: "destructive" });
     }
   };
 
@@ -230,11 +232,11 @@ export default function FamilyShares() {
     try {
       const { error } = await supabase.from("shares").delete().eq("id", deletingShareId);
       if (error) throw error;
-      toast({ title: "Success", description: "Share deleted successfully" });
+      toast({ title: t("famShares.success"), description: t("famShares.shareDeletedSuccessfully") });
       setDeletingShareId(null);
       loadData();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("famShares.error"), description: error.message, variant: "destructive" });
     }
   };
 
@@ -260,7 +262,7 @@ export default function FamilyShares() {
 
       if (error) throw error;
 
-      toast({ title: "Success", description: "Dividend declared successfully" });
+      toast({ title: t("famShares.success"), description: t("famShares.dividendDeclaredSuccessfully") });
       setIsDividendDialogOpen(false);
       setDividendFormData({
         period_year: new Date().getFullYear().toString(),
@@ -271,7 +273,7 @@ export default function FamilyShares() {
       });
       loadData();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("famShares.error"), description: error.message, variant: "destructive" });
     }
   };
 
@@ -294,7 +296,7 @@ export default function FamilyShares() {
   const totalDividendsPaid = dividends.filter(d => d.is_paid).reduce((sum, d) => sum + parseFloat(d.total_amount.toString()), 0);
 
   if (authLoading || loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return <div className="flex items-center justify-center min-h-screen">{t("famShares.loading")}</div>;
   }
 
   return (
@@ -305,7 +307,7 @@ export default function FamilyShares() {
             <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-3xl font-bold">Shares & Dividends</h1>
+            <h1 className="text-3xl font-bold">{t("famShares.sharesDividends")}</h1>
           </div>
           <div className="flex items-center gap-3">
             <CurrencySelector />
@@ -315,35 +317,35 @@ export default function FamilyShares() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="p-6">
-            <div className="text-sm text-muted-foreground">Active Shares</div>
+            <div className="text-sm text-muted-foreground">{t("famShares.activeShares")}</div>
             <div className="text-2xl font-bold">{totalShareCount}</div>
           </Card>
           <Card className="p-6">
-            <div className="text-sm text-muted-foreground">Total Share Value</div>
+            <div className="text-sm text-muted-foreground">{t("famShares.totalShareValue")}</div>
             <div className="text-2xl font-bold">{formatAmount(totalValue)}</div>
           </Card>
           <Card className="p-6">
-            <div className="text-sm text-muted-foreground">Dividends Paid</div>
+            <div className="text-sm text-muted-foreground">{t("famShares.dividendsPaid")}</div>
             <div className="text-2xl font-bold">{formatAmount(totalDividendsPaid)}</div>
           </Card>
         </div>
 
         <Tabs defaultValue="shares" className="w-full">
           <TabsList>
-            <TabsTrigger value="shares">Shares</TabsTrigger>
-            <TabsTrigger value="dividends">Dividends</TabsTrigger>
-            <TabsTrigger value="summary">Member Summary</TabsTrigger>
+            <TabsTrigger value="shares">{t("famShares.shares")}</TabsTrigger>
+            <TabsTrigger value="dividends">{t("famShares.dividends")}</TabsTrigger>
+            <TabsTrigger value="summary">{t("famShares.memberSummary")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="shares">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Share Register</h2>
+              <h2 className="text-xl font-semibold">{t("famShares.shareRegister")}</h2>
               {canManageFinances && (
                 <Dialog open={isShareDialogOpen} onOpenChange={(open) => { setIsShareDialogOpen(open); if (!open) resetShareForm(); }}>
                   <DialogTrigger asChild>
                     <Button>
                       <Plus className="h-4 w-4 mr-2" />
-                      Issue Share
+                      {t("famShares.issueShare")}
                     </Button>
                   </DialogTrigger>
                 <DialogContent>
@@ -352,13 +354,13 @@ export default function FamilyShares() {
                   </DialogHeader>
                   <form onSubmit={handleCreateOrUpdateShare} className="space-y-4">
                     <div>
-                      <Label htmlFor="member">Member</Label>
+                      <Label htmlFor="member">{t("famShares.member")}</Label>
                       <Select
                         value={shareFormData.member_id}
                         onValueChange={(value) => setShareFormData({ ...shareFormData, member_id: value })}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select member" />
+                          <SelectValue placeholder={t("famShares.selectMember")} />
                         </SelectTrigger>
                         <SelectContent>
                           {members.map((member) => (
@@ -371,17 +373,17 @@ export default function FamilyShares() {
                     </div>
                     {editingShare && (
                     <div>
-                      <Label>Share Number</Label>
+                      <Label>{t("famShares.shareNumber")}</Label>
                       <Input
                         value={editingShare.share_number}
                         disabled
                         className="bg-muted"
                       />
-                      <p className="text-xs text-muted-foreground mt-1">Auto-generated</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t("famShares.autoGenerated")}</p>
                     </div>
                     )}
                     <div>
-                      <Label htmlFor="share_count">Number of Shares</Label>
+                      <Label htmlFor="share_count">{t("famShares.numberOfShares")}</Label>
                       <Input
                         id="share_count"
                         type="number"
@@ -395,7 +397,7 @@ export default function FamilyShares() {
                       </p>
                     </div>
                     <div>
-                      <Label htmlFor="purchase_date">Purchase Date</Label>
+                      <Label htmlFor="purchase_date">{t("famShares.purchaseDate")}</Label>
                       <Input
                         id="purchase_date"
                         type="date"
@@ -405,7 +407,7 @@ export default function FamilyShares() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="share_value">Share Value (per share)</Label>
+                      <Label htmlFor="share_value">{t("famShares.shareValuePerShare")}</Label>
                       <Input
                         id="share_value"
                         type="number"
@@ -417,7 +419,7 @@ export default function FamilyShares() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="notes">Notes (optional)</Label>
+                      <Label htmlFor="notes">{t("famShares.notesOptional")}</Label>
                       <Textarea
                         id="notes"
                         value={shareFormData.notes}
@@ -437,20 +439,20 @@ export default function FamilyShares() {
                   <thead>
                     <tr className="border-b">
                       <th className="text-left p-4">Share #</th>
-                      <th className="text-left p-4">Member</th>
-                      <th className="text-right p-4">Qty</th>
-                      <th className="text-left p-4">Purchase Date</th>
-                      <th className="text-right p-4">Unit Value</th>
-                      <th className="text-right p-4">Total Value</th>
-                      <th className="text-center p-4">Status</th>
-                      {canManageFinances && <th className="text-center p-4">Actions</th>}
+                      <th className="text-left p-4">{t("famShares.member")}</th>
+                      <th className="text-right p-4">{t("famShares.qty")}</th>
+                      <th className="text-left p-4">{t("famShares.purchaseDate")}</th>
+                      <th className="text-right p-4">{t("famShares.unitValue")}</th>
+                      <th className="text-right p-4">{t("famShares.totalValue")}</th>
+                      <th className="text-center p-4">{t("famShares.status")}</th>
+                      {canManageFinances && <th className="text-center p-4">{t("famShares.actions")}</th>}
                     </tr>
                   </thead>
                   <tbody>
                     {shares.length === 0 ? (
                       <tr>
                         <td colSpan={canManageFinances ? 8 : 7} className="text-center p-8 text-muted-foreground">
-                          No shares issued yet
+                          {t("famShares.noSharesIssuedYet")}
                         </td>
                       </tr>
                     ) : (
@@ -467,9 +469,9 @@ export default function FamilyShares() {
                             <td className="p-4 text-right font-mono font-semibold">{formatAmount(sc * unitVal)}</td>
                             <td className="p-4 text-center">
                               {share.is_active ? (
-                                <Badge variant="default">Active</Badge>
+                                <Badge variant="default">{t("famShares.active")}</Badge>
                               ) : (
-                                <Badge variant="secondary">Inactive</Badge>
+                                <Badge variant="secondary">{t("famShares.inactive")}</Badge>
                               )}
                             </td>
                             {canManageFinances && (
@@ -496,23 +498,23 @@ export default function FamilyShares() {
 
           <TabsContent value="dividends">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Dividend History</h2>
+              <h2 className="text-xl font-semibold">{t("famShares.dividendHistory")}</h2>
               {canManageFinances && (
                 <Dialog open={isDividendDialogOpen} onOpenChange={setIsDividendDialogOpen}>
                   <DialogTrigger asChild>
                     <Button>
                       <TrendingUp className="h-4 w-4 mr-2" />
-                      Declare Dividend
+                      {t("famShares.declareDividend")}
                     </Button>
                   </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Declare Dividend</DialogTitle>
+                    <DialogTitle>{t("famShares.declareDividend")}</DialogTitle>
                   </DialogHeader>
                   <form onSubmit={handleCreateDividend} className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="period_year">Year</Label>
+                        <Label htmlFor="period_year">{t("famShares.year")}</Label>
                         <Input
                           id="period_year"
                           type="number"
@@ -522,13 +524,13 @@ export default function FamilyShares() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="period_quarter">Quarter (optional)</Label>
+                        <Label htmlFor="period_quarter">{t("famShares.quarterOptional")}</Label>
                         <Select
                           value={dividendFormData.period_quarter}
                           onValueChange={(value) => setDividendFormData({ ...dividendFormData, period_quarter: value })}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Select quarter" />
+                            <SelectValue placeholder={t("famShares.selectQuarter")} />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="1">Q1</SelectItem>
@@ -540,7 +542,7 @@ export default function FamilyShares() {
                       </div>
                     </div>
                     <div>
-                      <Label htmlFor="amount_per_share">Amount Per Share</Label>
+                      <Label htmlFor="amount_per_share">{t("famShares.amountPerShare")}</Label>
                       <Input
                         id="amount_per_share"
                         type="number"
@@ -555,7 +557,7 @@ export default function FamilyShares() {
                       </p>
                     </div>
                     <div>
-                      <Label htmlFor="source">Source Description</Label>
+                      <Label htmlFor="source">{t("famShares.sourceDescription")}</Label>
                       <Input
                         id="source"
                         value={dividendFormData.source_description}
@@ -564,14 +566,14 @@ export default function FamilyShares() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="dividend_notes">Notes (optional)</Label>
+                      <Label htmlFor="dividend_notes">{t("famShares.notesOptional")}</Label>
                       <Textarea
                         id="dividend_notes"
                         value={dividendFormData.notes}
                         onChange={(e) => setDividendFormData({ ...dividendFormData, notes: e.target.value })}
                       />
                     </div>
-                    <Button type="submit" className="w-full">Declare Dividend</Button>
+                    <Button type="submit" className="w-full">{t("famShares.declareDividend")}</Button>
                   </form>
                 </DialogContent>
               </Dialog>
@@ -583,18 +585,18 @@ export default function FamilyShares() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left p-4">Period</th>
-                      <th className="text-right p-4">Per Share</th>
-                      <th className="text-right p-4">Total Shares</th>
-                      <th className="text-right p-4">Total Amount</th>
-                      <th className="text-center p-4">Status</th>
+                      <th className="text-left p-4">{t("famShares.period")}</th>
+                      <th className="text-right p-4">{t("famShares.perShare")}</th>
+                      <th className="text-right p-4">{t("famShares.totalShares")}</th>
+                      <th className="text-right p-4">{t("famShares.totalAmount")}</th>
+                      <th className="text-center p-4">{t("famShares.status")}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {dividends.length === 0 ? (
                       <tr>
                         <td colSpan={5} className="text-center p-8 text-muted-foreground">
-                          No dividends declared yet
+                          {t("famShares.noDividendsDeclaredYet")}
                         </td>
                       </tr>
                     ) : (
@@ -612,9 +614,9 @@ export default function FamilyShares() {
                           </td>
                           <td className="p-4 text-center">
                             {dividend.is_paid ? (
-                              <Badge variant="default">Paid</Badge>
+                              <Badge variant="default">{t("famShares.paid")}</Badge>
                             ) : (
-                              <Badge variant="secondary">Pending</Badge>
+                              <Badge variant="secondary">{t("famShares.pending")}</Badge>
                             )}
                           </td>
                         </tr>
@@ -629,15 +631,15 @@ export default function FamilyShares() {
           <TabsContent value="summary">
             <Card>
               <div className="p-4 border-b">
-                <h2 className="text-xl font-semibold">Member Share Holdings</h2>
+                <h2 className="text-xl font-semibold">{t("famShares.memberShareHoldings")}</h2>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left p-4">Member</th>
-                      <th className="text-right p-4">Shares Owned</th>
-                      <th className="text-right p-4">Total Value</th>
+                      <th className="text-left p-4">{t("famShares.member")}</th>
+                      <th className="text-right p-4">{t("famShares.sharesOwned")}</th>
+                      <th className="text-right p-4">{t("famShares.totalValue")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -662,15 +664,15 @@ export default function FamilyShares() {
       <AlertDialog open={!!deletingShareId} onOpenChange={(open) => !open && setDeletingShareId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Share</AlertDialogTitle>
+            <AlertDialogTitle>{t("famShares.deleteShare")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this share? This action cannot be undone.
+              {t("famShares.areYouSureYouWant")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("famShares.cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteShare} className="bg-destructive text-destructive-foreground">
-              Delete
+              {t("famShares.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

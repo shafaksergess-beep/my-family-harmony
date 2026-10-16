@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
@@ -38,6 +39,7 @@ interface PaymentTransaction {
 }
 
 const Payments = () => {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { family, canManageFinances, isLoading, userId } = useFamilyAuth(familySlug);
@@ -101,8 +103,8 @@ const Payments = () => {
     } catch (error) {
       console.error("Error loading payments:", error);
       toast({
-        title: "Error",
-        description: "Failed to load payment data",
+        title: t("famPayments.error"),
+        description: t("famPayments.failedToLoadPaymentData"),
         variant: "destructive",
       });
     } finally {
@@ -137,8 +139,8 @@ const Payments = () => {
       if (error) throw error;
 
       toast({
-        title: "Payment Recorded",
-        description: "Payment has been successfully recorded",
+        title: t("famPayments.paymentRecorded"),
+        description: t("famPayments.paymentHasBeenSuccessfullyRecorded"),
       });
 
       setFormData({
@@ -154,7 +156,7 @@ const Payments = () => {
       const err = error as Error;
       console.error("Error recording payment:", err);
       toast({
-        title: "Error",
+        title: t("famPayments.error"),
         description: err.message || "Failed to record payment",
         variant: "destructive",
       });
@@ -169,21 +171,21 @@ const Payments = () => {
         return (
           <Badge className="bg-green-500">
             <CheckCircle className="w-3 h-3 mr-1" />
-            Completed
+            {t("famPayments.completed")}
           </Badge>
         );
       case "pending":
         return (
           <Badge variant="outline">
             <Clock className="w-3 h-3 mr-1" />
-            Pending
+            {t("famPayments.pending")}
           </Badge>
         );
       case "failed":
         return (
           <Badge variant="destructive">
             <XCircle className="w-3 h-3 mr-1" />
-            Failed
+            {t("famPayments.failed")}
           </Badge>
         );
       default:
@@ -207,11 +209,11 @@ const Payments = () => {
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t("famPayments.back")}
               </Button>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">Payment Management</h1>
-                <p className="text-sm text-muted-foreground">Track and manage member payments</p>
+                <h1 className="text-2xl font-bold text-foreground">{t("famPayments.paymentManagement")}</h1>
+                <p className="text-sm text-muted-foreground">{t("famPayments.trackAndManageMemberPayments")}</p>
               </div>
             </div>
             <div className="flex gap-2 items-center">
@@ -220,23 +222,23 @@ const Payments = () => {
               {canManageFinances && (
                 <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button>Record Payment</Button>
+                    <Button>{t("famPayments.recordPayment")}</Button>
                   </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Record Payment</DialogTitle>
-                    <DialogDescription>Record a new payment transaction</DialogDescription>
+                    <DialogTitle>{t("famPayments.recordPayment")}</DialogTitle>
+                    <DialogDescription>{t("famPayments.recordANewPaymentTransaction")}</DialogDescription>
                   </DialogHeader>
                   <form onSubmit={handleRecordPayment} className="space-y-4">
                     <div>
-                      <Label htmlFor="member">Member</Label>
+                      <Label htmlFor="member">{t("famPayments.member")}</Label>
                       <Select
                         value={formData.member_id}
                         onValueChange={(value) => setFormData({ ...formData, member_id: value })}
                         required
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select member" />
+                          <SelectValue placeholder={t("famPayments.selectMember")} />
                         </SelectTrigger>
                         <SelectContent>
                           {members.map((member) => (
@@ -248,7 +250,7 @@ const Payments = () => {
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="amount">Amount</Label>
+                      <Label htmlFor="amount">{t("famPayments.amount")}</Label>
                       <Input
                         id="amount"
                         type="number"
@@ -258,7 +260,7 @@ const Payments = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="method">Payment Method</Label>
+                      <Label htmlFor="method">{t("famPayments.paymentMethod")}</Label>
                       <Select
                         value={formData.payment_method}
                         onValueChange={(value) => setFormData({ ...formData, payment_method: value })}
@@ -267,35 +269,35 @@ const Payments = () => {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="mobile_money">Mobile Money</SelectItem>
-                          <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                          <SelectItem value="cash">Cash</SelectItem>
+                          <SelectItem value="mobile_money">{t("famPayments.mobileMoney")}</SelectItem>
+                          <SelectItem value="bank_transfer">{t("famPayments.bankTransfer")}</SelectItem>
+                          <SelectItem value="cash">{t("famPayments.cash")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="reference">Payment Reference</Label>
+                      <Label htmlFor="reference">{t("famPayments.paymentReference")}</Label>
                       <Input
                         id="reference"
                         value={formData.payment_reference}
                         onChange={(e) => setFormData({ ...formData, payment_reference: e.target.value })}
-                        placeholder="Transaction ID or reference"
+                        placeholder={t("famPayments.transactionIdOrReference")}
                       />
                     </div>
                     <div>
-                      <Label htmlFor="notes">Notes</Label>
+                      <Label htmlFor="notes">{t("famPayments.notes")}</Label>
                       <Textarea
                         id="notes"
                         value={formData.notes}
                         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                        placeholder="Additional notes"
+                        placeholder={t("famPayments.additionalNotes")}
                       />
                     </div>
                     <Button type="submit" className="w-full" disabled={submitting}>
                       {submitting ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Recording...
+                          {t("famPayments.recording")}
                         </>
                       ) : (
                         "Record Payment"
@@ -313,15 +315,15 @@ const Payments = () => {
       <main className="container mx-auto px-4 py-8">
         <Card>
           <CardHeader>
-            <CardTitle>Payment Transactions</CardTitle>
-            <CardDescription>View all payment transactions for your family</CardDescription>
+            <CardTitle>{t("famPayments.paymentTransactions")}</CardTitle>
+            <CardDescription>{t("famPayments.viewAllPaymentTransactionsFor")}</CardDescription>
           </CardHeader>
             <CardContent>
               {payments.length === 0 ? (
                 <div className="text-center py-8 space-y-4">
-                  <p className="text-muted-foreground">No payments recorded yet</p>
+                  <p className="text-muted-foreground">{t("famPayments.noPaymentsRecordedYet")}</p>
                   <Button variant="outline" onClick={() => navigate(`/family/${familySlug}/payment-integration`)}>
-                    Set Up Mobile Money Integration
+                    {t("famPayments.setUpMobileMoneyIntegration")}
                   </Button>
                 </div>
               ) : (

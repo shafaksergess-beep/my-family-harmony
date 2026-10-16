@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -52,6 +53,7 @@ interface Member {
 }
 
 export default function Loans() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -97,7 +99,7 @@ export default function Loans() {
       const err = error as Error;
       toast({
         variant: "destructive",
-        title: "Error fetching loans",
+        title: t("famLoans.errorFetchingLoans"),
         description: err.message,
       });
     } finally {
@@ -118,7 +120,7 @@ export default function Loans() {
       const err = error as Error;
       toast({
         variant: "destructive",
-        title: "Error fetching members",
+        title: t("famLoans.errorFetchingMembers"),
         description: err.message,
       });
     }
@@ -139,8 +141,8 @@ export default function Loans() {
     if (hasOngoingLoan) {
       toast({
         variant: "destructive",
-        title: "Loan Request Denied",
-        description: "This member already has an ongoing loan. Please clear existing loan before requesting a new one.",
+        title: t("famLoans.loanRequestDenied"),
+        description: t("famLoans.thisMemberAlreadyHasAn"),
       });
       return;
     }
@@ -151,17 +153,17 @@ export default function Loans() {
     // Manual validation with dynamic minimum
     if (!newLoan.member_id) {
       setValidationErrors({ memberId: "Member is required" });
-      toast({ variant: "destructive", title: "Validation Error", description: "Please select a member" });
+      toast({ variant: "destructive", title: t("famLoans.validationError"), description: t("famLoans.pleaseSelectAMember") });
       return;
     }
     if (!newLoan.amount || amount < minLoanAmount) {
       setValidationErrors({ amount: `Minimum loan amount is ${minLoanAmount.toLocaleString()} FCFA` });
-      toast({ variant: "destructive", title: "Validation Error", description: `Minimum loan amount is ${minLoanAmount.toLocaleString()} FCFA` });
+      toast({ variant: "destructive", title: t("famLoans.validationError"), description: `Minimum loan amount is ${minLoanAmount.toLocaleString()} FCFA` });
       return;
     }
     if (!newLoan.purpose || newLoan.purpose.length < 10) {
       setValidationErrors({ purpose: "Purpose must be at least 10 characters" });
-      toast({ variant: "destructive", title: "Validation Error", description: "Please provide a detailed purpose" });
+      toast({ variant: "destructive", title: t("famLoans.validationError"), description: t("famLoans.pleaseProvideADetailedPurpose") });
       return;
     }
 
@@ -211,8 +213,8 @@ export default function Loans() {
       }
 
       toast({
-        title: "Loan request submitted",
-        description: "The loan request has been submitted for approval.",
+        title: t("famLoans.loanRequestSubmitted"),
+        description: t("famLoans.theLoanRequestHasBeen"),
       });
 
       setIsDialogOpen(false);
@@ -229,7 +231,7 @@ export default function Loans() {
       const err = error as Error;
       toast({
         variant: "destructive",
-        title: "Error requesting loan",
+        title: t("famLoans.errorRequestingLoan"),
         description: err.message,
       });
     }
@@ -252,8 +254,8 @@ export default function Loans() {
       if (error) throw error;
 
       toast({
-        title: "Loan approved",
-        description: "The loan has been approved successfully.",
+        title: t("famLoans.loanApproved"),
+        description: t("famLoans.theLoanHasBeenApproved"),
       });
 
       fetchLoans();
@@ -261,7 +263,7 @@ export default function Loans() {
       const err = error as Error;
       toast({
         variant: "destructive",
-        title: "Error approving loan",
+        title: t("famLoans.errorApprovingLoan"),
         description: err.message,
       });
     }
@@ -284,8 +286,8 @@ export default function Loans() {
       if (error) throw error;
 
       toast({
-        title: "Loan disbursed",
-        description: "The loan has been disbursed successfully.",
+        title: t("famLoans.loanDisbursed"),
+        description: t("famLoans.theLoanHasBeenDisbursed"),
       });
 
       fetchLoans();
@@ -293,7 +295,7 @@ export default function Loans() {
       const err = error as Error;
       toast({
         variant: "destructive",
-        title: "Error disbursing loan",
+        title: t("famLoans.errorDisbursingLoan"),
         description: err.message,
       });
     }
@@ -328,7 +330,7 @@ export default function Loans() {
   const isMobile = useIsMobile();
 
   if (loading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return <div className="flex items-center justify-center h-screen">{t("famLoans.loading")}</div>;
   }
 
   // Render mobile version on mobile devices
@@ -338,28 +340,28 @@ export default function Loans() {
 
   return (
     <>
-      <SEO title="Family Loans" description="Apply for, approve and track family loans with surety and repayment schedules." />
+      <SEO title={t("famLoans.familyLoans")} description={t("famLoans.applyForApproveAndTrack")} />
       <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${family?.id}`)}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-3xl font-bold">Loan Management</h1>
+          <h1 className="text-3xl font-bold">{t("famLoans.loanManagement")}</h1>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button>
-              <Plus className="mr-2 h-4 w-4" /> Request Loan
+              <Plus className="mr-2 h-4 w-4" /> {t("famLoans.requestLoan")}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Request New Loan</DialogTitle>
+              <DialogTitle>{t("famLoans.requestNewLoan")}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label>Member</Label>
+                <Label>{t("famLoans.member")}</Label>
                 <Select 
                   value={newLoan.member_id} 
                   onValueChange={(value) => {
@@ -368,7 +370,7 @@ export default function Loans() {
                   }}
                 >
                   <SelectTrigger className={validationErrors.memberId ? "border-red-500" : ""}>
-                    <SelectValue placeholder="Select member" />
+                    <SelectValue placeholder={t("famLoans.selectMember")} />
                   </SelectTrigger>
                   <SelectContent>
                     {members.map((member) => (
@@ -400,14 +402,14 @@ export default function Loans() {
                 )}
               </div>
               <div>
-                <Label>Purpose (min 10 characters)</Label>
+                <Label>{t("famLoans.purposeMin10Characters")}</Label>
                 <Input
                   value={newLoan.purpose}
                   onChange={(e) => {
                     setNewLoan({ ...newLoan, purpose: e.target.value });
                     setValidationErrors({ ...validationErrors, purpose: "" });
                   }}
-                  placeholder="Reason for loan"
+                  placeholder={t("famLoans.reasonForLoan")}
                   maxLength={500}
                   className={validationErrors.purpose ? "border-red-500" : ""}
                 />
@@ -416,7 +418,7 @@ export default function Loans() {
                 )}
               </div>
               <div>
-                <Label>Term (months, max 12)</Label>
+                <Label>{t("famLoans.termMonthsMax12")}</Label>
                 <Select 
                   value={newLoan.term_months} 
                   onValueChange={(value) => {
@@ -441,7 +443,7 @@ export default function Loans() {
                 )}
               </div>
               <div>
-                <Label>Notes (optional)</Label>
+                <Label>{t("famLoans.notesOptional")}</Label>
                 <Textarea
                   value={newLoan.notes}
                   onChange={(e) => {
@@ -467,7 +469,7 @@ export default function Loans() {
                 </p>
               </div>
               <Button onClick={handleRequestLoan} className="w-full">
-                Submit Loan Request
+                {t("famLoans.submitLoanRequest")}
               </Button>
             </div>
           </DialogContent>
@@ -479,7 +481,7 @@ export default function Loans() {
         <AlertDescription>
           <strong>Loan Deadline: November 30, {new Date().getFullYear()}</strong>
           <p className="mt-1 text-sm">
-            All loans and interest must be cleared by November of the current year. Unpaid loans may be recovered from Njangi, assistance, or other entitlements.
+            {t("famLoans.allLoansAndInterestMust")}
           </p>
         </AlertDescription>
       </Alert>
@@ -488,7 +490,7 @@ export default function Loans() {
         <Card>
           <div className="p-6">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">Active Loans</div>
+              <div className="text-sm text-muted-foreground">{t("famLoans.activeLoans")}</div>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </div>
             <div className="text-2xl font-bold mt-2">{totalLoansOut.toLocaleString()} FCFA</div>
@@ -498,7 +500,7 @@ export default function Loans() {
         <Card>
           <div className="p-6">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">Expected Interest</div>
+              <div className="text-sm text-muted-foreground">{t("famLoans.expectedInterest")}</div>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </div>
             <div className="text-2xl font-bold mt-2">{totalInterestExpected.toLocaleString()} FCFA</div>
@@ -507,7 +509,7 @@ export default function Loans() {
         <Card>
           <div className="p-6">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">Pending Requests</div>
+              <div className="text-sm text-muted-foreground">{t("famLoans.pendingRequests")}</div>
               <Clock className="h-4 w-4 text-muted-foreground" />
             </div>
             <div className="text-2xl font-bold mt-2">{loans.filter((l) => l.status === "pending").length}</div>
@@ -517,19 +519,18 @@ export default function Loans() {
 
       <Card>
         <div className="p-6 space-y-6">
-          <h2 className="text-xl font-semibold">Loan Records</h2>
+          <h2 className="text-xl font-semibold">{t("famLoans.loanRecords")}</h2>
           {loans.length === 0 ? (
             <EmptyState
               icon={DollarSign}
-              title="No loans on record"
-              description="Members can request loans up to the family limit. Approved loans accrue interest monthly and must be cleared by November."
+              title={t("famLoans.noLoansOnRecord")}
+              description={t("famLoans.membersCanRequestLoansUp")}
               primary={{
-                label: "Request a loan",
-                onClick: () => setIsDialogOpen(true),
-                icon: <Plus className="w-4 h-4 mr-2" />,
+                label: t("famLoans.requestALoan"),
+                onClick: () => {t("famLoans.setisdialogopenTrueIcon")} <Plus className="w-4 h-4 mr-2" />,
               }}
               secondary={{
-                label: "Read loan rules",
+                label: t("famLoans.readLoanRules"),
                 onClick: () => navigate(`/family/${familySlug}/loan-history`),
               }}
             />
@@ -571,20 +572,20 @@ export default function Loans() {
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-muted-foreground">Principal</p>
+                      <p className="text-muted-foreground">{t("famLoans.principal")}</p>
                       <p className="font-medium">{loan.amount.toLocaleString()} FCFA</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Total Owed</p>
+                      <p className="text-muted-foreground">{t("famLoans.totalOwed")}</p>
                       <p className="font-medium">{totalOwed.toLocaleString()} FCFA</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Term</p>
+                      <p className="text-muted-foreground">{t("famLoans.term")}</p>
                       <p className="font-medium">{loan.term_months} months @ {loan.interest_rate}%</p>
                     </div>
                     {loan.due_date && (
                       <div>
-                        <p className="text-muted-foreground">Due Date</p>
+                        <p className="text-muted-foreground">{t("famLoans.dueDate")}</p>
                         <p className="font-medium">{format(new Date(loan.due_date), "PPP")}</p>
                       </div>
                     )}
@@ -597,12 +598,12 @@ export default function Loans() {
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button size="sm" variant="outline" className="w-full">
-                            Record Payment
+                            {t("famLoans.recordPayment")}
                           </Button>
                         </DialogTrigger>
                         <DialogContent>
                           <DialogHeader>
-                            <DialogTitle>Record Loan Payment</DialogTitle>
+                            <DialogTitle>{t("famLoans.recordLoanPayment")}</DialogTitle>
                           </DialogHeader>
                           <LoanPaymentForm 
                             loan={loan} 
@@ -619,12 +620,12 @@ export default function Loans() {
                     <div className="flex gap-2">
                       {loan.status === "pending" && (
                         <Button size="sm" onClick={() => handleApproveLoan(loan.id)}>
-                          Approve
+                          {t("famLoans.approve")}
                         </Button>
                       )}
                       {loan.status === "approved" && (
                         <Button size="sm" onClick={() => handleDisburseLoan(loan.id, loan.amount, loan.term_months)}>
-                          Disburse
+                          {t("famLoans.disburse")}
                         </Button>
                       )}
                     </div>

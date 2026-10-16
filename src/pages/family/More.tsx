@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   PiggyBank,
@@ -37,6 +38,7 @@ interface MenuSection {
 }
 
 export default function More() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { isFamilyHead, isFamilyAdmin } = useFamilyAuth(familySlug);
@@ -86,7 +88,7 @@ export default function More() {
 
   return (
     <MobileLayout
-      title="More"
+      title={t("famMore.more")}
       familySlug={familySlug}
       showSearch={false}
     >
@@ -144,7 +146,7 @@ export default function More() {
               )}
             >
               <Download className="h-6 w-6" />
-              <span className="text-sm font-medium">Install App</span>
+              <span className="text-sm font-medium">{t("famMore.installApp")}</span>
             </button>
             <button
               onClick={async () => {
@@ -164,7 +166,7 @@ export default function More() {
               )}
             >
               <Share2 className="h-6 w-6" />
-              <span className="text-sm font-medium">Share App</span>
+              <span className="text-sm font-medium">{t("famMore.shareApp")}</span>
             </button>
           </div>
 
@@ -178,7 +180,7 @@ export default function More() {
             )}
           >
             <HelpCircle className="h-6 w-6 text-muted-foreground" />
-            <span className="font-medium">Help & Support</span>
+            <span className="font-medium">{t("famMore.helpSupport")}</span>
             <ChevronRight className="h-5 w-5 text-muted-foreground ml-auto" />
           </button>
         </div>
