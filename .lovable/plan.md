@@ -1,57 +1,40 @@
-## Session Management for Kinsroot
+# Plan: New homepage, English/French only, full translation, language management
 
-Kinsroot handles family financial data (contributions, loans, njangi, shares, wallets). That warrants stricter-than-default session handling, but not banking-grade — members log in from phones daily, so overly aggressive expiry hurts UX.
+## 1. New homepage at /
+- The /home-preview design becomes the homepage at `/`; the old homepage is retired.
+- Keep what the old homepage did: signed-in visitors go straight to their dashboard, live platform numbers, footer with Privacy/Terms and developer credit, install banner, SEO tags.
+- `/home-preview` redirects to `/`.
 
-### Proposed policy
+## 2. Remove Bota
+- Drop Bota from every language picker, the family setup wizard, and the translation files.
+- Anyone who had Bota selected is moved to English automatically.
+- Starting languages: English and French (both official in Cameroon). More can be added later without code changes (see 4).
 
-**1. Session expiration**
-- **Access token (JWT)**: 1 hour (Supabase default, keep it).
-- **Refresh token / max session**: 7 days of inactivity, hard cap 30 days absolute lifetime. Configured in Lovable Cloud auth settings.
-- **Idle timeout in the client**: 30 minutes of no user activity (mouse/keyboard/touch/visibility) → force `signOut({ scope: "local" })` and redirect to `/auth`. Warning modal at 28 min with "Stay signed in" button that pings `supabase.auth.getUser()` to refresh.
+## 3. Translate the whole app
+About 95 pages; only ~28 are translated today. Every visible label, button, heading, message, empty state and notification toast moves into the English and French translation files. Done in batches so each is checked:
+1. Homepage, sign-in, sign-up, password reset, onboarding, install
+2. Dashboard, profile, navigation (desktop and phone menus), notifications
+3. Family pages: members, meetings, attendance, contributions, payments and payment proofs, savings, njangi, loans, shares, assistance
+4. Reports, analytics, settings, calendar, chat
+5. Super admin panel
+Dates and money follow the chosen language. A check flags any English text left untranslated.
 
-**2. Concurrent session limits**
-- **Cap: 3 active sessions per user** (typical: phone PWA + installed Android app + desktop browser).
-- On new sign-in, if the user already has 3 active sessions, revoke the oldest via `auth.admin.signOut(sessionId)` from an edge function. Show a toast: "Signed out of oldest device."
-- New page `/profile/sessions` (or a section inside `/profile`) listing all active sessions with device/browser/last-seen, and a "Sign out" button per row plus "Sign out everywhere else."
+## 4. Super admin: add languages
+- New "Languages" page in the super admin panel: add a language (name, code, e.g. Duala, Ewondo, Fulfulde, Pidgin), turn it on or off, and fill in its translations.
+- Translations are stored online; any text not yet translated shows in English, so a half-done language never breaks a page.
+- An "export / import" option lets translators work in a spreadsheet file.
+- English and French cannot be deleted.
 
-**3. Instant session revocation on password change**
-- After `supabase.auth.updateUser({ password })` succeeds in `ResetPassword.tsx` and in the Profile change-password flow, call a new edge function `revoke-other-sessions` that uses the service role to `auth.admin.signOut(userId, 'others')`. Current device keeps its session; every other device is killed immediately.
-- Same call fires when the user clicks "Sign out everywhere else."
+## 5. Family default language
+- Family head and family admin choose the family's default language in family settings (from the languages the super admin has turned on).
+- Members of that family see it by default; each person can still pick their own language, which takes priority.
 
-### Technical details
+## Technical details
+- New table `languages` (code, name, native_name, is_active, is_builtin) and `translations` (language_code, key, value), readable by signed-in users and public for the homepage; writes limited to super admins via `is_super_admin`.
+- i18next keeps bundled en/fr JSON; custom languages loaded at runtime via `addResourceBundle`, fallback `en`.
+- `families.primary_language` reused for the family default; update restricted to family head/admin.
+- Language priority: personal choice (profile `preferred_language`) > family default > browser > English.
+- Unit tests for language priority and fallback.
 
-**Database**
-- No new tables — Supabase already stores sessions in `auth.sessions`. Read via `auth.admin.listUserSessions(userId)`.
-- Add a `user_session_metadata` table (user_id, session_id, user_agent, ip, last_seen_at, created_at, device_label) so the UI can show human-friendly device names. Populated by a small edge function `record-session` called from `AuthBootstrap` on `SIGNED_IN`. RLS: users see only their own rows; service_role full access.
-
-**Edge functions (new)**
-- `revoke-other-sessions` — auth required, calls `admin.signOut(userId, 'others')`.
-- `revoke-session` — auth required, body `{ sessionId }`, verifies session belongs to caller, calls `admin.signOut(sessionId, 'local')`.
-- `enforce-session-limit` — called from `AuthBootstrap` on sign-in; lists sessions, if >3 revokes oldest.
-- `record-session` — upserts row into `user_session_metadata`.
-
-All use `requireAuth` from `supabase/functions/_shared/auth.ts`.
-
-**Frontend**
-- New hook `src/hooks/useIdleTimeout.tsx` — tracks activity via `mousemove`, `keydown`, `touchstart`, `visibilitychange`; shows warning dialog; signs out on timeout. Mounted in `App.tsx` (or `AuthBootstrap`) when a session exists.
-- New component `src/components/IdleWarningDialog.tsx`.
-- New page `src/pages/SessionManagement.tsx` at `/profile/sessions` — lists sessions, revoke buttons, "Sign out everywhere else."
-- Link entry from `src/pages/Profile.tsx`.
-- `AuthBootstrap.tsx`: on `SIGNED_IN` also call `record-session` and `enforce-session-limit`.
-- `ResetPassword.tsx` + profile password-change: after `updateUser`, call `revoke-other-sessions`.
-
-**Lovable Cloud auth settings**
-- Set refresh token inactivity timeout: 7 days.
-- Set session absolute lifetime: 30 days.
-- Enable "Reuse detection" for refresh tokens (rotates on every refresh; reuse = full revoke).
-
-**i18n**: Add strings for idle warning, session list, revoke buttons in `en.json`, `fr.json`, `bota.json`.
-
-### Out of scope
-- No changes to OAuth flows themselves.
-- No MFA changes (web app has none; mobile has its own MFA already).
-- No IP-based geofencing.
-
-### Confirm before I build
-1. Is **30 min idle / 3 concurrent / 7 day refresh / 30 day max** acceptable, or do you want tighter (e.g. 15 min idle, 2 sessions) or looser?
-2. Should password change kill **all** sessions including current (forcing re-login on the current device), or keep the current one alive (the plan above)?
+## Note
+Section 3 is large and will run over several rounds of work; sections 1, 2, 4, 5 come first.
