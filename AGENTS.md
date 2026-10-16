@@ -1,0 +1,1 @@
+- i18n: all UI text goes through `t()` with keys in src/i18n/locales/en.json (source of truth) + fr.json; extra languages live in the `languages`/`translations` tables and load at runtime via src/i18n/languages.ts — why: super admins add languages without code changes, missing keys fall back to English.
