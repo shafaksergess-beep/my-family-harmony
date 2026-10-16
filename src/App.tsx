@@ -83,6 +83,7 @@ const EmailSettings = lazy(() => import("./pages/family/EmailSettings"));
 const AuditTrailEnhanced = lazy(() => import("./pages/family/AuditTrailEnhanced"));
 const Invitations = lazy(() => import("./pages/family/Invitations"));
 const Payments = lazy(() => import("./pages/family/Payments"));
+const PaymentProofs = lazy(() => import("./pages/family/PaymentProofs"));
 const MeetingReminders = lazy(() => import("./pages/family/MeetingReminders"));
 const PaymentIntegration = lazy(() => import("./pages/family/PaymentIntegration"));
 const ContributionAnalytics = lazy(() => import("./pages/family/ContributionAnalytics"));
@@ -212,6 +213,7 @@ const App = () => (
           <Route path="/family/:familySlug/reports" element={<FamilyModule><FamilyReports /></FamilyModule>} />
           <Route path="/family/:familySlug/invitations" element={<FamilyModule><Invitations /></FamilyModule>} />
           <Route path="/family/:familySlug/payments" element={<FamilyModule><Payments /></FamilyModule>} />
+          <Route path="/family/:familySlug/payment-proofs" element={<FamilyModule><PaymentProofs /></FamilyModule>} />
           <Route path="/family/:familySlug/payment-integration" element={<FamilyModule><PaymentIntegration /></FamilyModule>} />
           <Route path="/family/:familySlug/meeting-reminders" element={<FamilyModule><MeetingReminders /></FamilyModule>} />
           <Route path="/family/:familySlug/contribution-analytics" element={<FamilyModule><ContributionAnalytics /></FamilyModule>} />

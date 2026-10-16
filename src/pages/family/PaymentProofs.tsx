@@ -221,6 +221,7 @@ const PaymentProofs = () => {
 
         {isReviewer && (
           <TabsContent value="review" className="space-y-4">
+            {(isFamilyHead || isFamilyAdmin || isTreasurer) && <MomoSettings familyId={family!.id} initial={fam} onSaved={() => window.location.reload()} />}
             {(["pending", "partially_approved", "approved", "rejected"] as const).map((s) => (
               <div key={s} className="space-y-2">
                 <h3 className="font-semibold">{STATUS_LABEL[s]} ({queue(s).length})</h3>
@@ -279,5 +280,32 @@ const PaymentProofs = () => {
     </div>
   );
 };
+
+function MomoSettings({ familyId, initial, onSaved }: { familyId: string; initial: Record<string, string | null> | null; onSaved: () => void }) {
+  const { toast } = useToast();
+  const [v, setV] = useState({
+    momo_mtn_number: initial?.momo_mtn_number ?? "", momo_mtn_name: initial?.momo_mtn_name ?? "",
+    momo_orange_number: initial?.momo_orange_number ?? "", momo_orange_name: initial?.momo_orange_name ?? "",
+    payment_dual_review_threshold: String(initial?.payment_dual_review_threshold ?? "100000"),
+  });
+  const save = async () => {
+    const { error } = await supabase.from("families").update({ ...v, payment_dual_review_threshold: Number(v.payment_dual_review_threshold) || 100000 }).eq("id", familyId);
+    if (error) toast({ title: "Could not save", description: error.message, variant: "destructive" });
+    else { toast({ title: "Payment details saved" }); onSaved(); }
+  };
+  const f = (k: keyof typeof v, label: string) => (
+    <div><Label>{label}</Label><Input value={v[k]} onChange={(e) => setV({ ...v, [k]: e.target.value })} /></div>
+  );
+  return (
+    <Card><CardHeader><CardTitle className="text-base">Family receiving accounts</CardTitle>
+      <CardDescription>Shown to members on the Pay tab.</CardDescription></CardHeader>
+      <CardContent className="grid gap-3 md:grid-cols-2">
+        {f("momo_mtn_number", "MTN number")}{f("momo_mtn_name", "MTN account name")}
+        {f("momo_orange_number", "Orange number")}{f("momo_orange_name", "Orange account name")}
+        {f("payment_dual_review_threshold", "High-value threshold (FCFA, needs 2 reviewers)")}
+        <div className="flex items-end"><Button onClick={save}>Save</Button></div>
+      </CardContent></Card>
+  );
+}
 
 export default PaymentProofs;
