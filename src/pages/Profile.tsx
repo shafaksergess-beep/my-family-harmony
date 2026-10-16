@@ -18,7 +18,6 @@ import SEO from "@/components/SEO";
 const Profile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { t } = useTranslation();
   const { t, i18n } = useTranslation();
   const languages = useLanguages();
   const [loading, setLoading] = useState(true);
