@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const { isLoaded: recaptchaLoaded, getRecaptchaToken } = useRecaptcha();
@@ -163,8 +165,8 @@ const Auth = () => {
     if (rateLimitCheck.isBlocked) {
       const minutes = Math.ceil(rateLimitCheck.remainingTime! / 60);
       toast({
-        title: "Too many attempts",
-        description: `Please wait ${minutes} minute(s) before trying again`,
+        title: t("auth.ui.tooMany"),
+        description: t("auth.ui.waitMinutes", { minutes }),
         variant: "destructive",
       });
       return;
@@ -192,7 +194,7 @@ const Auth = () => {
         const remainingAttempts = checkRateLimit(result.data.email).attemptsRemaining;
         throw new Error(
           error.message + 
-          (remainingAttempts !== undefined ? ` (${remainingAttempts} attempts remaining)` : "")
+          (remainingAttempts !== undefined ? ` (${t("auth.ui.attemptsLeft", { count: remainingAttempts })})` : "")
         );
       }
 
@@ -200,13 +202,13 @@ const Auth = () => {
       resetRateLimit(result.data.email);
 
       toast({
-        title: "Welcome back!",
-        description: "You've successfully logged in.",
+        title: t("auth.ui.welcomeBack"),
+        description: t("auth.ui.loggedIn"),
       });
     } catch (error: any) {
       toast({
-        title: "Login failed",
-        description: error.message || "Invalid email or password",
+        title: t("auth.ui.loginFailed"),
+        description: error.message || t("auth.ui.invalidCreds"),
         variant: "destructive",
       });
     } finally {
@@ -220,13 +222,13 @@ const Auth = () => {
     setPrivacyError(null);
 
     if (!acceptedPrivacy) {
-      setPrivacyError("Please accept the Privacy Policy and Terms to continue");
+      setPrivacyError(t("auth.ui.acceptPrivacy"));
       return;
     }
 
     // Check confirm password match first
     if (signupPassword !== signupConfirmPassword) {
-      setSignupErrors({ confirmPassword: "Passwords do not match" });
+      setSignupErrors({ confirmPassword: t("auth.ui.noMatch") });
       return;
     }
     
@@ -260,8 +262,8 @@ const Auth = () => {
     if (rateLimitCheck.isBlocked) {
       const minutes = Math.ceil(rateLimitCheck.remainingTime! / 60);
       toast({
-        title: "Too many attempts",
-        description: `Please wait ${minutes} minute(s) before trying again`,
+        title: t("auth.ui.tooMany"),
+        description: t("auth.ui.waitMinutes", { minutes }),
         variant: "destructive",
       });
       return;
@@ -302,16 +304,16 @@ const Auth = () => {
       localStorage.setItem("family-together-first-login", "true");
 
       toast({
-        title: "Account created!",
-        description: "Welcome to Kinsroot. Please check your email to verify your account.",
+        title: t("auth.ui.created"),
+        description: t("auth.ui.createdDesc"),
       });
 
       // Switch to login tab
       setLoginEmail(result.data.email);
     } catch (error: any) {
       toast({
-        title: "Signup failed",
-        description: error.message || "Could not create account",
+        title: t("auth.ui.signupFailed"),
+        description: error.message || t("auth.ui.couldNotCreate"),
         variant: "destructive",
       });
     } finally {
@@ -329,7 +331,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 flex items-center justify-center p-4">
-      <SEO title="Sign in" description="Sign in or create your Kinsroot account to manage your family's meetings, contributions and savings." />
+      <SEO title={t("auth.ui.seoTitle")} description={t("auth.ui.seoDesc")} />
       <div className="w-full max-w-md">
         {/* Pending Invitation Banner */}
         {pendingInvitation && (
@@ -341,8 +343,8 @@ const Auth = () => {
               <div className="flex-1">
                 <p className="text-sm font-medium">
                   {pendingInvitation.inviterName 
-                    ? `${pendingInvitation.inviterName} invited you to join`
-                    : "You've been invited to join"
+                    ? t("auth.ui.invitedBy", { name: pendingInvitation.inviterName })
+                    : t("auth.ui.invited")
                   }
                 </p>
                 <p className="text-sm text-primary font-semibold">{pendingInvitation.familyName}</p>
@@ -362,12 +364,12 @@ const Auth = () => {
               className="w-24 h-24 mx-auto rounded-full object-cover shadow-lg"
             />
           </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Kinsroot — Rooted in Heritage, Built for Tomorrow</h1>
-          <h2 className="sr-only">Sign in to your account or create a new one</h2>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{t("auth.ui.h1")}</h1>
+          <h2 className="sr-only">{t("auth.ui.h2")}</h2>
           <p className="text-muted-foreground">
             {pendingInvitation 
-              ? "Sign in or create an account to accept your invitation"
-              : "Manage your family reunion with ease"
+              ? t("auth.ui.subInvite")
+              : t("auth.ui.sub")
             }
           </p>
         </div>
@@ -379,7 +381,7 @@ const Auth = () => {
               variant="outline"
               className="w-full"
               disabled={loading}
-              aria-label="Continue with Google"
+              aria-label={t("auth.ui.google")}
               onClick={async () => {
                 setLoading(true);
                 stashOAuthRedirect(redirectUrl);
@@ -392,7 +394,7 @@ const Auth = () => {
                   if (result.redirected) return;
                 } catch (err) {
                   toast({
-                    title: "Google sign-in failed",
+                    title: t("auth.ui.googleFailed"),
                     description: describeOAuthError("google", err),
                     variant: "destructive",
                   });
@@ -406,14 +408,14 @@ const Auth = () => {
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
-              {loading ? "Opening Google…" : "Continue with Google"}
+              {loading ? t("auth.ui.openingGoogle") : t("auth.ui.google")}
             </Button>
             <Button
               type="button"
               variant="outline"
               className="w-full"
               disabled={loading}
-              aria-label="Continue with Apple"
+              aria-label={t("auth.ui.apple")}
               onClick={async () => {
                 setLoading(true);
                 stashOAuthRedirect(redirectUrl);
@@ -425,7 +427,7 @@ const Auth = () => {
                   if (result.redirected) return;
                 } catch (err) {
                   toast({
-                    title: "Apple sign-in failed",
+                    title: t("auth.ui.appleFailed"),
                     description: describeOAuthError("apple", err),
                     variant: "destructive",
                   });
@@ -436,7 +438,7 @@ const Auth = () => {
               <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M17.05 20.28c-.98.95-2.05.86-3.08.4-1.09-.47-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.08zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
               </svg>
-              {loading ? "Opening Apple…" : "Continue with Apple"}
+              {loading ? t("auth.ui.openingApple") : t("auth.ui.apple")}
             </Button>
           </div>
           <div className="relative mb-4">
@@ -444,19 +446,19 @@ const Auth = () => {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">Or continue with email</span>
+              <span className="bg-card px-2 text-muted-foreground">{t("auth.ui.orEmail")}</span>
             </div>
           </div>
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="login">{t("auth.ui.login")}</TabsTrigger>
+              <TabsTrigger value="signup">{t("auth.ui.signup")}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="login">
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="login-email">Email</Label>
+                  <Label htmlFor="login-email">{t("auth.ui.email")}</Label>
                   <Input
                     id="login-email"
                     type="email"
@@ -474,7 +476,7 @@ const Auth = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="login-password">Password</Label>
+                  <Label htmlFor="login-password">{t("auth.ui.password")}</Label>
                   <div className="relative">
                     <Input
                       id="login-password"
@@ -494,7 +496,7 @@ const Auth = () => {
                       className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                       onClick={() => setShowLoginPassword(!showLoginPassword)}
                       tabIndex={-1}
-                      aria-label={showLoginPassword ? "Hide password" : "Show password"}
+                      aria-label={showLoginPassword ? t("auth.ui.hidePw") : t("auth.ui.showPw")}
                     >
                       {showLoginPassword ? (
                         <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -516,10 +518,10 @@ const Auth = () => {
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Logging in...
+                      {t("auth.ui.loggingIn")}
                     </>
                   ) : (
-                    "Login"
+                    t("auth.ui.login")
                   )}
                 </Button>
 
@@ -534,7 +536,7 @@ const Auth = () => {
                       setForgotSent(false);
                     }}
                   >
-                    Forgot your password?
+                    {t("auth.ui.forgot")}
                   </Button>
                 </div>
               </form>
@@ -543,7 +545,7 @@ const Auth = () => {
             <TabsContent value="signup">
               <form onSubmit={handleSignup} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-name">Full Name</Label>
+                  <Label htmlFor="signup-name">{t("auth.ui.fullName")}</Label>
                   <Input
                     id="signup-name"
                     type="text"
@@ -561,7 +563,7 @@ const Auth = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email">{t("auth.ui.email")}</Label>
                   <Input
                     id="signup-email"
                     type="email"
@@ -579,7 +581,7 @@ const Auth = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="signup-phone">Phone (optional)</Label>
+                  <Label htmlFor="signup-phone">{t("auth.ui.phone")}</Label>
                   <Input
                     id="signup-phone"
                     type="tel"
@@ -597,7 +599,7 @@ const Auth = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password">{t("auth.ui.password")}</Label>
                   <div className="relative">
                     <Input
                       id="signup-password"
@@ -618,7 +620,7 @@ const Auth = () => {
                       className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                       onClick={() => setShowSignupPassword(!showSignupPassword)}
                       tabIndex={-1}
-                      aria-label={showSignupPassword ? "Hide password" : "Show password"}
+                      aria-label={showSignupPassword ? t("auth.ui.hidePw") : t("auth.ui.showPw")}
                     >
                       {showSignupPassword ? (
                         <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -632,12 +634,12 @@ const Auth = () => {
                   )}
                   <PasswordStrength password={signupPassword} />
                   <p className="text-xs text-muted-foreground">
-                    Must contain uppercase, lowercase, and number
+                    {t("auth.ui.pwRule")}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="signup-confirm-password">Confirm Password</Label>
+                  <Label htmlFor="signup-confirm-password">{t("auth.ui.confirmPw")}</Label>
                   <div className="relative">
                     <Input
                       id="signup-confirm-password"
@@ -657,7 +659,7 @@ const Auth = () => {
                       className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                       onClick={() => setShowSignupConfirmPassword(!showSignupConfirmPassword)}
                       tabIndex={-1}
-                      aria-label={showSignupConfirmPassword ? "Hide password confirmation" : "Show password confirmation"}
+                      aria-label={showSignupConfirmPassword ? t("auth.ui.hideConfirm") : t("auth.ui.showConfirm")}
                     >
                       {showSignupConfirmPassword ? (
                         <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -670,7 +672,7 @@ const Auth = () => {
                     <p className="text-sm text-destructive">{signupErrors.confirmPassword}</p>
                   )}
                   {signupConfirmPassword && signupPassword === signupConfirmPassword && (
-                    <p className="text-xs text-primary">✓ Passwords match</p>
+                    <p className="text-xs text-primary">✓ {t("auth.ui.match")}</p>
                   )}
                 </div>
 
@@ -685,11 +687,11 @@ const Auth = () => {
                     aria-describedby={privacyError ? "privacy-error" : undefined}
                   />
                   <Label htmlFor="accept-privacy" className="text-sm font-normal leading-snug cursor-pointer">
-                    I agree to the{" "}
+                    {t("auth.ui.agree")}{" "}
                     <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">
-                      Privacy Policy
+                      {t("auth.ui.privacy")}
                     </a>{" "}
-                    and Terms of Service.
+                    {t("auth.ui.andTerms")}
                   </Label>
                 </div>
                 {privacyError && (
@@ -704,10 +706,10 @@ const Auth = () => {
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Creating account...
+                      {t("auth.ui.creating")}
                     </>
                   ) : (
-                    "Create Account"
+                    t("auth.ui.create")
                   )}
                 </Button>
               </form>
@@ -722,7 +724,7 @@ const Auth = () => {
               className="w-full"
             >
               <Ticket className="w-4 h-4 mr-2" />
-              Have an invitation code?
+              {t("auth.ui.haveCode")}
               <ArrowRight className="w-4 h-4 ml-auto" />
             </Button>
           </div>
@@ -737,19 +739,19 @@ const Auth = () => {
                   <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
                     <Users className="w-6 h-6 text-primary" />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground">Check your email</h3>
+                  <h3 className="text-lg font-semibold text-foreground">{t("auth.ui.checkEmail")}</h3>
                   <p className="text-sm text-muted-foreground">
-                    If an account exists with that email, we've sent a password reset link. Please check your inbox and spam folder.
+                    {t("auth.ui.checkEmailDesc")}
                   </p>
                   <Button variant="outline" className="w-full" onClick={() => setShowForgotPassword(false)}>
-                    Back to Login
+                    {t("auth.ui.backLogin")}
                   </Button>
                 </div>
               ) : (
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground">Reset Password</h3>
-                    <p className="text-sm text-muted-foreground">Enter your email and we'll send you a reset link.</p>
+                    <h3 className="text-lg font-semibold text-foreground">{t("auth.ui.resetPw")}</h3>
+                    <p className="text-sm text-muted-foreground">{t("auth.ui.resetDesc")}</p>
                   </div>
                   <form
                     onSubmit={async (e) => {
@@ -772,7 +774,7 @@ const Auth = () => {
                     className="space-y-4"
                   >
                     <div className="space-y-2">
-                      <Label htmlFor="forgot-email">Email Address</Label>
+                      <Label htmlFor="forgot-email">{t("auth.ui.emailAddr")}</Label>
                       <Input
                         id="forgot-email"
                         type="email"
@@ -785,10 +787,10 @@ const Auth = () => {
                     </div>
                     <div className="flex gap-2">
                       <Button type="button" variant="outline" className="flex-1" onClick={() => setShowForgotPassword(false)}>
-                        Cancel
+                        {t("auth.ui.cancel")}
                       </Button>
                       <Button type="submit" className="flex-1" disabled={forgotLoading}>
-                        {forgotLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send Reset Link"}
+                        {forgotLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : t("auth.ui.sendLink")}
                       </Button>
                     </div>
                   </form>
@@ -804,7 +806,7 @@ const Auth = () => {
             onClick={() => navigate("/")}
             className="text-muted-foreground"
           >
-            Back to home
+            {t("auth.ui.backHome")}
           </Button>
         </div>
       </div>

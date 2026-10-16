@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -50,6 +51,7 @@ function wasRecentlyDismissed(): boolean {
  * - Dismissal persists for 14 days.
  */
 export const InstallBanner = () => {
+  const { t } = useTranslation();
   const [evt, setEvt] = useState<BeforeInstallPromptEvent | null>(null);
   const [dismissed, setDismissed] = useState(() => wasRecentlyDismissed());
   const [standalone, setStandalone] = useState(() => isStandalone());
@@ -104,7 +106,7 @@ export const InstallBanner = () => {
         <button
           onClick={dismiss}
           className="absolute top-2 right-2 text-muted-foreground hover:text-foreground"
-          aria-label="Dismiss install prompt"
+          aria-label={t("install.dismiss")}
         >
           <X className="w-4 h-4" />
         </button>
@@ -114,15 +116,14 @@ export const InstallBanner = () => {
           </div>
           <div className="min-w-0">
             <p className="font-semibold text-sm text-foreground mb-1">
-              Install Kinsroot on your iPhone
+              {t("install.iosTitle")}
             </p>
             <p className="text-xs text-muted-foreground mb-2">
-              Tap <Share className="inline w-3.5 h-3.5 mx-0.5 align-text-bottom" /> Share,
-              then <Plus className="inline w-3.5 h-3.5 mx-0.5 align-text-bottom" />
-              <span className="font-medium">&nbsp;Add to Home Screen</span>.
+              {t("install.tap")} <Share className="inline w-3.5 h-3.5 mx-0.5 align-text-bottom" /> {t("install.shareThen")} <Plus className="inline w-3.5 h-3.5 mx-0.5 align-text-bottom" />
+              <span className="font-medium">&nbsp;{t("install.a2hs")}</span>.
             </p>
             <Link to="/install" className="text-xs text-primary hover:underline">
-              See full instructions →
+              {t("install.fullInstr")}
             </Link>
           </div>
         </div>
@@ -138,7 +139,7 @@ export const InstallBanner = () => {
       <button
         onClick={dismiss}
         className="absolute top-2 right-2 text-muted-foreground hover:text-foreground"
-        aria-label="Dismiss install prompt"
+        aria-label={t("install.dismiss")}
       >
         <X className="w-4 h-4" />
       </button>
@@ -147,12 +148,12 @@ export const InstallBanner = () => {
           <Download className="w-5 h-5 text-primary" />
         </div>
         <div>
-          <p className="font-semibold text-sm text-foreground mb-1">Install Kinsroot</p>
+          <p className="font-semibold text-sm text-foreground mb-1">{t("install.title")}</p>
           <p className="text-xs text-muted-foreground mb-3">
-            Add to your home screen for faster access and offline use.
+            {t("install.desc")}
           </p>
           <Button size="sm" onClick={install} className="w-full">
-            Install app
+            {t("install.installApp")}
           </Button>
         </div>
       </div>
