@@ -1,5 +1,10 @@
 # Roadmap
 
+- [ ] Replace Median integration with verified Natively bridge
+- [ ] Secure self-account deletion with English/French confirmation
+- [ ] Generate branded master icon and store graphics with listing guidance
+- [ ] Verify browser flow, deletion safeguards, and native adapter tests
+
 - [x] New homepage at / (old design retired, /home-preview redirects)
 - [x] Remove Bota; English + French built in
 - [x] Super admin Languages page (add, activate, translate, CSV export/import)
