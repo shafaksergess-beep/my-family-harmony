@@ -1,3 +1,4 @@
+import { useLanguages } from "@/i18n/languages";
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -38,7 +39,7 @@ const familySchema = z.object({
   name: z.string().min(3, 'Family name must be at least 3 characters'),
   slug: z.string().min(3, 'Slug must be at least 3 characters').regex(/^[a-z0-9-]+$/, 'Slug must only contain lowercase letters, numbers, and hyphens'),
   description: z.string().optional(),
-  primary_language: z.enum(['en', 'fr', 'bota']),
+  primary_language: z.string().min(2),
   meeting_frequency: z.enum(['monthly', 'quarterly', 'weekly']),
   meeting_day: z.string(),
   meeting_time: z.string(),
@@ -232,9 +233,7 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="en">English</SelectItem>
-                            <SelectItem value="fr">French</SelectItem>
-                            <SelectItem value="bota">Bota</SelectItem>
+                            {(languages.length ? languages : [{ code: "en", native_name: "English" }, { code: "fr", native_name: "Français" }]).map((l) => <SelectItem key={l.code} value={l.code}>{l.native_name}</SelectItem>)}
                           </SelectContent>
                         </Select>
                         <FormMessage />

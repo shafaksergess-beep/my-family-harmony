@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useLanguages } from "@/i18n/languages";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -300,9 +301,7 @@ const Profile = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="fr">Français</SelectItem>
-                    <SelectItem value="bota">Bota</SelectItem>
+                    {(languages.length ? languages : [{ code: "en", native_name: "English" }, { code: "fr", native_name: "Français" }]).map((l) => <SelectItem key={l.code} value={l.code}>{l.native_name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
