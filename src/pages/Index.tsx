@@ -1,377 +1,318 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Users, Calendar, DollarSign, TrendingUp, Heart, Shield, Home, PiggyBank, FileText, Award } from "lucide-react";
-import SplashScreen from "@/components/SplashScreen";
-import SEO from "@/components/SEO";
-import InstallBanner from "@/components/InstallBanner";
+import { ArrowRight, Calendar, CheckCircle2, HandHeart, Menu, PiggyBank, RefreshCcw, ShieldCheck, Users, WifiOff, X, Landmark, Sprout } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
+import { supabase } from "@/integrations/supabase/client";
+import SEO from "@/components/SEO";
+import SplashScreen from "@/components/SplashScreen";
+import InstallBanner from "@/components/InstallBanner";
+import { useLanguages, setPersonalLanguage } from "@/i18n/languages";
+import "./home/home.css";
 
-// Splash is a native cold-start experience only — on the web it delays LCP.
-const isNativeShell = (() => {
-  try {
-    return Capacitor.isNativePlatform();
-  } catch {
-    return false;
-  }
-})();
+const isNativeShell = (() => { try { return Capacitor.isNativePlatform(); } catch { return false; } })();
 
-const Index = () => {
+const c = (v: string, a?: number) => (a === undefined ? `hsl(var(--${v}))` : `hsl(var(--${v}) / ${a})`);
+
+function Reveal({ children, className = "", delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [vis, setVis] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !("IntersectionObserver" in window)) return setVis(true);
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVis(true); io.disconnect(); } }, { threshold: 0.15 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return <div ref={ref} style={{ transitionDelay: `${delay}ms` }} className={`hp-reveal ${vis ? "is-visible" : ""} ${className}`}>{children}</div>;
+}
+
+function Avatar({ i, tone }: { i: string; tone: string }) {
+  return <span className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[11px] font-semibold ring-2" style={{ background: c(tone, 0.18), color: c(tone === "hp-gold" ? "hp-ink" : tone), boxShadow: `0 0 0 2px ${c("hp-paper")}` }}>{i}</span>;
+}
+
+function ProductPreview() {
+  const { t } = useTranslation();
+  const p = (k: string) => t(`home.preview.${k}`);
+  return (
+    <div className="relative mx-auto w-full max-w-[520px]" aria-label={p("aria")} role="img">
+      <div className="absolute -inset-6 -z-10 rounded-[48px] opacity-70 blur-2xl" style={{ background: `radial-gradient(60% 60% at 70% 30%, ${c("hp-gold", 0.35)}, transparent), radial-gradient(50% 50% at 20% 80%, ${c("hp-terracotta", 0.22)}, transparent)` }} />
+      <div className="rounded-[28px] p-5 sm:p-6" style={{ background: c("hp-paper"), boxShadow: "var(--hp-shadow-lg)", border: `1px solid ${c("hp-line")}` }}>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.18em]" style={{ color: c("hp-ink-soft") }}>{p("family")}</p>
+            <p className="hp-serif mt-1 text-xl">{p("greeting")}</p>
+          </div>
+          <div className="flex -space-x-2"><Avatar i="EN" tone="hp-forest" /><Avatar i="MA" tone="hp-terracotta" /><Avatar i="JT" tone="hp-gold" /><Avatar i="+9" tone="hp-forest" /></div>
+        </div>
+        <div className="mt-5 rounded-2xl p-5" style={{ background: c("hp-forest"), color: c("hp-ivory") }}>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] opacity-70">{p("next")}</p>
+              <p className="hp-serif mt-1 text-2xl">{p("meeting")}</p>
+              <p className="mt-1 text-sm opacity-80">{p("when")}</p>
+            </div>
+            <div className="rounded-xl px-3 py-2 text-center" style={{ background: c("hp-ivory", 0.12) }}>
+              <p className="text-[10px] uppercase opacity-70">{p("month")}</p><p className="hp-serif text-2xl leading-none">02</p>
+            </div>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2 text-xs">
+            {["agenda1", "agenda2", "agenda3"].map((k) => <span key={k} className="rounded-full px-3 py-1" style={{ background: c("hp-ivory", 0.12) }}>{p(k)}</span>)}
+          </div>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-4">
+          <div className="rounded-2xl p-4" style={{ background: c("hp-cream") }}>
+            <p className="text-xs" style={{ color: c("hp-ink-soft") }}>{p("contrib")}</p>
+            <p className="hp-serif mt-1 text-2xl">9 <span className="text-base" style={{ color: c("hp-ink-soft") }}>{p("ofPaid")}</span></p>
+            <div className="mt-3 h-2 rounded-full" style={{ background: c("hp-line") }}><div className="hp-bar h-2 w-3/4 rounded-full" style={{ background: c("hp-forest") }} /></div>
+          </div>
+          <div className="rounded-2xl p-4" style={{ background: c("hp-cream") }}>
+            <p className="text-xs" style={{ color: c("hp-ink-soft") }}>{p("cycle")}</p>
+            <p className="hp-serif mt-1 text-2xl">{p("round")}</p>
+            <p className="mt-2 text-xs" style={{ color: c("hp-ink-soft") }}>{p("nextUp")}</p>
+          </div>
+        </div>
+        <ul className="mt-4 space-y-2 text-sm">
+          {[["MA", "act1"], ["JT", "act2"]].map(([i, k]) => (
+            <li key={k} className="flex items-center gap-3 rounded-xl px-3 py-2" style={{ border: `1px solid ${c("hp-line")}` }}>
+              <Avatar i={i} tone="hp-terracotta" /><span className="flex-1">{p(k)}</span><span className="text-xs" style={{ color: c("hp-ink-soft") }}>{p(`${k}When`)}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="absolute -bottom-16 -left-4 w-56 rounded-2xl p-4 sm:-left-12" style={{ background: c("hp-paper"), boxShadow: "var(--hp-shadow-lg)", border: `1px solid ${c("hp-line")}` }}>
+        <div className="flex items-center gap-2 text-sm font-medium"><CheckCircle2 className="h-4 w-4" style={{ color: c("hp-forest") }} /> {p("approved")}</div>
+        <p className="mt-1 text-xs" style={{ color: c("hp-ink-soft") }}>{p("approvedDetail")}</p>
+      </div>
+      <div className="absolute -right-3 -top-5 hidden rounded-full px-4 py-2 text-xs font-medium sm:flex sm:items-center sm:gap-2" style={{ background: c("hp-gold"), color: c("hp-ink"), boxShadow: "var(--hp-shadow)" }}>
+        <WifiOff className="h-3.5 w-3.5" /> {p("offline")}
+      </div>
+    </div>
+  );
+}
+
+export default function Index() {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { i18n } = useTranslation();
   const [showSplash, setShowSplash] = useState(isNativeShell);
-  const [lang, setLang] = useState(i18n.language || "en");
-  const [stats, setStats] = useState({ activeMembers: 0, avgContribution: 0, avgInterestRate: 0, meetingsPerYear: 0 });
-
-  const switchLang = (code: string) => {
-    setLang(code);
-    i18n.changeLanguage(code);
-    try { localStorage.setItem("kinsroot-lang", code); } catch { /* ignore */ }
-  };
+  const [open, setOpen] = useState(false);
+  const [stats, setStats] = useState({ members: 0, meetings: 0, interest: 0 });
+  const langs = useLanguages();
+  const langList = langs.length ? langs : [{ code: "en", native_name: "English" }, { code: "fr", native_name: "Français" }];
+  const lang = (i18n.language || "en").split("-")[0];
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate("/dashboard");
-      }
-    };
-    checkAuth();
-
-    // Fetch real platform stats via secure RPC function
-    const fetchStats = async () => {
-      const { data } = await supabase.rpc("get_platform_stats");
-      if (data && typeof data === 'object' && !Array.isArray(data)) {
+    supabase.auth.getSession().then(({ data: { session } }) => { if (session) navigate("/dashboard"); });
+    supabase.rpc("get_platform_stats").then(({ data }) => {
+      if (data && typeof data === "object" && !Array.isArray(data)) {
         const d = data as Record<string, number>;
-        setStats({
-          activeMembers: d.active_members || 0,
-          avgContribution: d.avg_contribution || 0,
-          avgInterestRate: d.avg_interest_rate || 0,
-          meetingsPerYear: d.meetings_this_year || 0,
-        });
+        setStats({ members: d.active_members || 0, meetings: d.meetings_this_year || 0, interest: d.avg_interest_rate || 0 });
       }
-    };
-    fetchStats();
+    });
   }, [navigate]);
 
-  if (showSplash) {
-    return <SplashScreen onComplete={() => setShowSplash(false)} duration={3500} />;
-  }
+  if (showSplash) return <SplashScreen onComplete={() => setShowSplash(false)} duration={3500} />;
+
+  const NAV = [
+    { href: "#platform", label: t("home.nav.platform") },
+    { href: "#prosperity", label: t("home.nav.contributions") },
+    { href: "#how", label: t("home.nav.how") },
+    { href: "#stories", label: t("home.nav.stories") },
+  ];
+  const btnPrimary = "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all hover:-translate-y-0.5";
+  const LangToggle = ({ pad }: { pad: string }) => (
+    <div className="flex rounded-full p-0.5 text-xs" role="group" aria-label={t("home.nav.language")} style={{ border: `1px solid ${c("hp-line")}` }}>
+      {langList.map((l) => (
+        <button key={l.code} onClick={() => setPersonalLanguage(l.code)} aria-pressed={lang === l.code} title={l.native_name} className={`rounded-full ${pad} font-medium uppercase transition-colors`} style={lang === l.code ? { background: c("hp-forest"), color: c("hp-ivory") } : { color: c("hp-ink-soft") }}>{l.code}</button>
+      ))}
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-background">
-      <SEO
-        title="Kinsroot — Rooted in Heritage, Built for Tomorrow"
-        description="Run your family njangi, contributions and meetings — all in one place. Kinsroot tracks savings, loans, assistance and attendance in one platform."
-      />
-      <main id="main-content">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary-hover to-secondary/20 text-primary-foreground">
-        <div className="absolute inset-0 bg-[url('/lovable-uploads/pattern.svg')] opacity-10"></div>
-        <div className="container mx-auto px-4 py-20 relative z-10">
-          <div className="max-w-4xl mx-auto text-center animate-fade-in">
-            <div className="mb-8">
-              <img
-                src="/logo.jpg"
-                alt="Kinsroot Logo"
-                width="128"
-                height="128"
-                fetchPriority="high"
-                decoding="async"
-                className="w-32 h-32 mx-auto rounded-full object-cover shadow-2xl border-4 border-primary-foreground/20"
-              />
+    <div className="hp-root min-h-screen scroll-smooth">
+      <SEO title={t("home.seoTitle")} description={t("home.seoDesc")} />
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Instrument+Sans:wght@400;500;600&display=swap" />
+      <style>{`html{scroll-behavior:smooth}@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}`}</style>
+
+      <header className="sticky top-0 z-40 backdrop-blur-md" style={{ background: c("hp-ivory", 0.82), borderBottom: `1px solid ${c("hp-line", 0.7)}` }}>
+        <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 lg:px-8" aria-label={t("home.nav.main")}>
+          <a href="#top" className="flex items-center gap-2.5">
+            <img src="/logo.jpg" alt="Kinsroot Logo" width={36} height={36} fetchPriority="high" className="h-9 w-9 rounded-full object-cover" />
+            <span className="hp-serif text-xl font-medium">Kinsroot</span>
+          </a>
+          <ul className="hidden items-center gap-8 text-sm md:flex">
+            {NAV.map((n) => <li key={n.href}><a href={n.href} style={{ color: c("hp-ink-soft") }}>{n.label}</a></li>)}
+          </ul>
+          <div className="hidden items-center gap-4 md:flex">
+            <LangToggle pad="px-2.5 py-1" />
+            <Link to="/auth" className={btnPrimary} style={{ background: c("hp-forest"), color: c("hp-ivory") }}>{t("home.getStarted")}</Link>
+          </div>
+          <button className="md:hidden rounded-full p-2" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="hp-mobile-nav" aria-label={open ? t("home.nav.close") : t("home.nav.open")}>
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </nav>
+        {open && (
+          <div id="hp-mobile-nav" className="md:hidden px-5 pb-5" style={{ borderTop: `1px solid ${c("hp-line")}` }}>
+            <ul className="space-y-1 py-3">{NAV.map((n) => <li key={n.href}><a href={n.href} onClick={() => setOpen(false)} className="block rounded-lg px-2 py-2.5">{n.label}</a></li>)}</ul>
+            <div className="flex items-center justify-between gap-3">
+              <LangToggle pad="px-3 py-1.5" />
+              <Link to="/auth" className={btnPrimary} style={{ background: c("hp-forest"), color: c("hp-ivory") }}>{t("home.getStarted")}</Link>
             </div>
+          </div>
+        )}
+      </header>
 
-            <div className="mb-6 inline-flex items-center gap-3 bg-primary-foreground/10 backdrop-blur-sm px-6 py-3 rounded-full border border-primary-foreground/20">
-              <Home className="w-5 h-5" />
-              <span className="text-sm font-medium">EN · FR · Works offline</span>
-            </div>
+      <main id="top">
+        <section className="relative overflow-hidden">
+          <div className="hp-grain pointer-events-none absolute inset-0 opacity-60" aria-hidden />
+          <svg className="pointer-events-none absolute -left-40 top-10 h-[520px] w-[520px] opacity-40" viewBox="0 0 200 200" aria-hidden><path fill={c("hp-sage")} d="M44.7,-58.6C57.3,-49.9,66.4,-35.4,70.3,-19.6C74.2,-3.8,72.9,13.3,65.6,27C58.3,40.6,45,50.8,30.4,58.4C15.8,66,-0.2,71,-16.6,68.6C-33,66.2,-49.8,56.5,-60.2,42.1C-70.6,27.7,-74.5,8.6,-70.6,-8.4C-66.7,-25.4,-55,-40.2,-41,-48.8C-27,-57.4,-13.5,-59.7,1.5,-61.6C16.5,-63.5,32.1,-67.3,44.7,-58.6Z" transform="translate(100 100)" /></svg>
+          <div className="relative mx-auto grid max-w-7xl items-center gap-16 px-5 pb-24 pt-14 lg:grid-cols-[1.05fr_1fr] lg:px-8 lg:pb-32 lg:pt-20">
+            <Reveal>
+              <p className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium" style={{ background: c("hp-cream"), color: c("hp-forest") }}>
+                <Sprout className="h-3.5 w-3.5" /> {t("home.badge")}
+              </p>
+              <h1 className="hp-serif mt-6 text-[2.6rem] font-medium leading-[1.04] sm:text-6xl lg:text-[4.4rem]">
+                {t("home.h1a")}<br /><em className="font-normal" style={{ color: c("hp-terracotta") }}>{t("home.h1b")}</em>
+              </h1>
+              <p className="mt-6 max-w-xl text-lg leading-relaxed" style={{ color: c("hp-ink-soft") }}>{t("home.sub")}</p>
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <Link to="/auth" className={`${btnPrimary} px-7 py-3.5 text-base`} style={{ background: c("hp-forest"), color: c("hp-ivory"), boxShadow: "var(--hp-shadow)" }}>{t("home.getStartedFree")} <ArrowRight className="h-4 w-4" /></Link>
+                <a href="#platform" className="inline-flex items-center justify-center rounded-full px-6 py-3.5 text-base font-medium" style={{ border: `1px solid ${c("hp-line")}` }}>{t("home.explore")}</a>
+              </div>
+              <p className="mt-8 flex items-center gap-2 text-sm" style={{ color: c("hp-ink-soft") }}>
+                <ShieldCheck className="h-4 w-4" style={{ color: c("hp-forest") }} /> {t("home.privacy")}
+              </p>
+            </Reveal>
+            <Reveal delay={150}><ProductPreview /></Reveal>
+          </div>
+        </section>
 
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              Run your family njangi, contributions and meetings — all in one place.
-            </h1>
+        <section aria-label={t("home.proof.aria")} style={{ background: c("hp-forest-deep"), color: c("hp-ivory") }}>
+          <div className="mx-auto grid max-w-7xl gap-8 px-5 py-10 sm:grid-cols-3 lg:px-8">
+            {([[Users, "1"], [Landmark, "2"], [WifiOff, "3"]] as const).map(([Icon, n]) => (
+              <div key={n} className="flex gap-4"><Icon className="mt-0.5 h-5 w-5 shrink-0" style={{ color: c("hp-gold") }} /><div><p className="font-semibold">{t(`home.proof.t${n}`)}</p><p className="mt-1 text-sm opacity-75">{t(`home.proof.d${n}`)}</p></div></div>
+            ))}
+          </div>
+        </section>
 
-            <p className="text-xl md:text-2xl mb-8 text-primary-foreground/90 max-w-2xl mx-auto">
-              Kinsroot helps families schedule meetings, collect contributions, manage savings, loans and shares — even offline.
-            </p>
+        <section id="platform" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-24 lg:px-8 lg:py-32">
+          <Reveal className="max-w-2xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: c("hp-terracotta") }}>{t("home.platform.eyebrow")}</p>
+            <h2 className="hp-serif mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("home.platform.title")}</h2>
+          </Reveal>
+          <div className="mt-14 grid gap-5 lg:grid-cols-6">
+            <Reveal className="lg:col-span-4 lg:row-span-2">
+              <article className="hp-lift relative h-full overflow-hidden rounded-[28px] p-8 sm:p-10" style={{ background: c("hp-forest"), color: c("hp-ivory"), boxShadow: "var(--hp-shadow)" }}>
+                <Calendar className="h-7 w-7" style={{ color: c("hp-gold") }} />
+                <h3 className="hp-serif mt-6 text-3xl font-medium sm:text-4xl">{t("home.platform.meetingsTitle")}</h3>
+                <p className="mt-3 max-w-md opacity-80">{t("home.platform.meetingsDesc")}</p>
+                <div className="mt-8 grid max-w-md grid-cols-3 gap-3 text-center text-xs">
+                  {[["jan", "Mama Agnes"], ["feb", "Uncle Peter"], ["mar", "Ebude N."]].map(([m, h]) => (
+                    <div key={m} className="rounded-xl p-3" style={{ background: c("hp-ivory", 0.1) }}><p className="hp-serif text-lg">{t(`home.platform.${m}`)}</p><p className="opacity-75">{h}</p></div>
+                  ))}
+                </div>
+                <div className="pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full" style={{ background: c("hp-gold", 0.15) }} aria-hidden />
+              </article>
+            </Reveal>
+            {[
+              { I: RefreshCcw, k: "njangi", bg: "hp-cream", span: "lg:col-span-2" },
+              { I: PiggyBank, k: "loans", bg: "hp-paper", span: "lg:col-span-2" },
+              { I: HandHeart, k: "support", bg: "hp-sage", span: "lg:col-span-3" },
+              { I: ShieldCheck, k: "payments", bg: "hp-paper", span: "lg:col-span-3" },
+            ].map(({ I, k, bg, span }, idx) => (
+              <Reveal key={k} delay={idx * 80} className={span}>
+                <article className="hp-lift h-full rounded-[24px] p-7" style={{ background: c(bg), border: `1px solid ${c("hp-line")}` }}>
+                  <I className="h-6 w-6" style={{ color: c("hp-terracotta") }} />
+                  <h3 className="hp-serif mt-5 text-2xl font-medium">{t(`home.platform.${k}T`)}</h3>
+                  <p className="mt-2 text-sm leading-relaxed" style={{ color: c("hp-ink-soft") }}>{t(`home.platform.${k}D`)}</p>
+                </article>
+              </Reveal>
+            ))}
+          </div>
+        </section>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Button
-                size="lg"
-                className="bg-secondary text-secondary-foreground hover:bg-secondary-hover shadow-lg hover:shadow-xl transition-all text-lg px-8 py-6"
-                onClick={() => (window.location.href = "/auth")}
-              >
-                Get Started
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() =>
-                  document.getElementById("features")?.scrollIntoView({
-                    behavior: "smooth",
-                  })
-                }
-                className="border-primary-foreground/30 text-primary-foreground text-lg px-8 py-6 bg-yellow-600 hover:bg-yellow-500"
-              >
-                See how Kinsroot works
-              </Button>
-            </div>
+        <section id="prosperity" className="scroll-mt-20" style={{ background: c("hp-cream") }}>
+          <div className="mx-auto grid max-w-7xl items-center gap-14 px-5 py-24 lg:grid-cols-2 lg:px-8 lg:py-28">
+            <Reveal>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: c("hp-terracotta") }}>{t("home.prosperity.eyebrow")}</p>
+              <h2 className="hp-serif mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("home.prosperity.title")}</h2>
+              <p className="mt-5 max-w-lg text-lg leading-relaxed" style={{ color: c("hp-ink-soft") }}>{t("home.prosperity.body")}</p>
+              <dl className="mt-8 grid max-w-lg grid-cols-3 gap-4">
+                {[["members", `${stats.members}+`], ["meetings", String(stats.meetings)], ["interest", `${stats.interest.toFixed(1)}%`]].map(([k, v]) => (
+                  <div key={k}><dt className="text-xs" style={{ color: c("hp-ink-soft") }}>{t(`home.stats.${k}`)}</dt><dd className="hp-serif mt-1 text-3xl">{v}</dd></div>
+                ))}
+              </dl>
+            </Reveal>
+            <Reveal delay={120}>
+              <div className="rounded-[28px] p-7 sm:p-9" style={{ background: c("hp-paper"), boxShadow: "var(--hp-shadow)" }}>
+                <p className="text-sm" style={{ color: c("hp-ink-soft") }}>{t("home.prosperity.sample")}</p>
+                <div className="mt-6 flex h-44 items-end gap-2 sm:gap-3" aria-hidden>
+                  {[28, 36, 34, 48, 52, 60, 58, 70, 76, 84, 90, 100].map((h, i) => (
+                    <div key={i} className="hp-bar flex-1 rounded-t-lg" style={{ height: `${h}%`, background: i === 11 ? c("hp-terracotta") : c("hp-forest", 0.25 + i * 0.06), transformOrigin: "bottom", animationName: "none" }} />
+                  ))}
+                </div>
+                <div className="mt-6 grid grid-cols-3 gap-3 text-sm" style={{ borderTop: `1px solid ${c("hp-line")}` }}>
+                  {[["contributions", "hp-forest"], ["njangi", "hp-gold"], ["support", "hp-terracotta"]].map(([l, tone]) => (
+                    <p key={l} className="flex items-center gap-2 pt-4"><span className="h-2.5 w-2.5 rounded-full" style={{ background: c(tone) }} />{t(`home.prosperity.${l}`)}</p>
+                  ))}
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </section>
 
-            {/* Language Selector */}
-            <div className="flex items-center justify-center gap-2 text-sm" role="group" aria-label="Language">
-              {[
-                { code: "en", label: "English" },
-                { code: "fr", label: "Français" },
-                { code: "bota", label: "Bota" },
-              ].map((l) => (
-                <button
-                  key={l.code}
-                  onClick={() => switchLang(l.code)}
-                  className={`px-4 py-2 rounded-lg transition-all border ${
-                    lang === l.code
-                      ? "bg-primary-foreground/15 border-primary-foreground/30"
-                      : "border-transparent hover:bg-primary-foreground/10"
-                  }`}
-                  aria-pressed={lang === l.code}
-                >
-                  {l.label}
-                </button>
+        <section id="how" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-24 lg:px-8 lg:py-28">
+          <Reveal><h2 className="hp-serif text-4xl font-medium sm:text-5xl">{t("home.how.title")}</h2></Reveal>
+          <ol className="mt-14 grid gap-10 md:grid-cols-3">
+            {[1, 2, 3].map((n, i) => (
+              <Reveal key={n} delay={i * 100}>
+                <li className="relative pt-8" style={{ borderTop: `1px solid ${c("hp-ink", 0.2)}` }}>
+                  <span className="hp-serif absolute -top-5 left-0 px-2 text-3xl" style={{ background: c("hp-ivory"), color: c("hp-terracotta") }}>0{n}</span>
+                  <h3 className="text-lg font-semibold">{t(`home.how.s${n}`)}</h3>
+                  <p className="mt-2 leading-relaxed" style={{ color: c("hp-ink-soft") }}>{t(`home.how.d${n}`)}</p>
+                </li>
+              </Reveal>
+            ))}
+          </ol>
+        </section>
+
+        <section id="stories" className="scroll-mt-20 pb-24 lg:pb-28">
+          <div className="mx-auto max-w-7xl px-5 lg:px-8">
+            <Reveal className="flex flex-wrap items-end justify-between gap-4">
+              <h2 className="hp-serif text-4xl font-medium sm:text-5xl">{t("home.stories.title")}</h2>
+              <span className="rounded-full px-3 py-1 text-xs font-medium" style={{ background: c("hp-cream"), color: c("hp-ink-soft") }}>{t("home.stories.tag")}</span>
+            </Reveal>
+            <div className="mt-12 grid gap-5 md:grid-cols-[1.3fr_1fr_1fr]">
+              {[1, 2, 3].map((n, i) => (
+                <Reveal key={n} delay={i * 80}>
+                  <figure className="hp-lift h-full rounded-[24px] p-7" style={i === 0 ? { background: c("hp-terracotta"), color: c("hp-paper") } : { background: c("hp-paper"), border: `1px solid ${c("hp-line")}` }}>
+                    <blockquote className={`hp-serif leading-snug ${i === 0 ? "text-2xl sm:text-3xl" : "text-xl"}`}>{t(`home.stories.q${n}`)}</blockquote>
+                    <figcaption className="mt-6 text-sm opacity-80">{t(`home.stories.w${n}`)}</figcaption>
+                  </figure>
+                </Reveal>
               ))}
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Decorative bottom wave */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0V120Z"
-              fill="hsl(var(--background))"
-            />
-          </svg>
-        </div>
-      </section>
+        <section className="px-5 pb-20 lg:px-8">
+          <Reveal className="relative mx-auto max-w-7xl overflow-hidden rounded-[36px] px-8 py-16 text-center sm:py-20">
+            <div className="absolute inset-0 -z-10" style={{ background: c("hp-forest-deep") }} />
+            <div className="hp-grain absolute inset-0 -z-10 opacity-20" aria-hidden />
+            <h2 className="hp-serif mx-auto max-w-2xl text-4xl font-medium sm:text-5xl" style={{ color: c("hp-ivory") }}>{t("home.cta.title")}</h2>
+            <p className="mx-auto mt-4 max-w-lg" style={{ color: c("hp-ivory", 0.75) }}>{t("home.cta.sub")}</p>
+            <Link to="/auth" className={`${btnPrimary} mt-9 px-8 py-4 text-base`} style={{ background: c("hp-gold"), color: c("hp-ink") }}>{t("home.getStarted")} <ArrowRight className="h-4 w-4" /></Link>
+          </Reveal>
+        </section>
+      </main>
 
-      {/* Stats Section */}
-      <section className="py-16 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
-            <Card className="p-6 text-center border-primary/10 hover:border-primary/30 transition-all hover:shadow-lg">
-              <Users className="w-10 h-10 mx-auto mb-3 text-primary" />
-              <div className="text-3xl font-bold text-primary mb-1">{stats.activeMembers}+</div>
-              <div className="text-sm text-muted-foreground">Active Members</div>
-            </Card>
-            <Card className="p-6 text-center border-secondary/10 hover:border-secondary/30 transition-all hover:shadow-lg">
-              <DollarSign className="w-10 h-10 mx-auto mb-3 text-secondary" />
-              <div className="text-3xl font-bold text-secondary mb-1">{stats.avgContribution >= 1000 ? `${Math.round(stats.avgContribution / 1000)}K` : stats.avgContribution}</div>
-              <div className="text-sm text-muted-foreground">Monthly Contribution</div>
-            </Card>
-            <Card className="p-6 text-center border-accent/10 hover:border-accent/30 transition-all hover:shadow-lg">
-              <PiggyBank className="w-10 h-10 mx-auto mb-3 text-accent" />
-              <div className="text-3xl font-bold text-accent mb-1">{stats.avgInterestRate.toFixed(1)}%</div>
-              <div className="text-sm text-muted-foreground">Avg Loan Interest</div>
-            </Card>
-            <Card className="p-6 text-center border-primary/10 hover:border-primary/30 transition-all hover:shadow-lg">
-              <Calendar className="w-10 h-10 mx-auto mb-3 text-primary" />
-              <div className="text-3xl font-bold text-foreground mb-1">{stats.meetingsPerYear}</div>
-              <div className="text-sm text-muted-foreground">Meetings/Year</div>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-foreground">Complete Family Management</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Everything your family needs to thrive together, digitized and automated
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            <FeatureCard
-              icon={<Calendar className="w-8 h-8" />}
-              title="Meeting Management"
-              description="Track attendance, hosting calendar, and automatically calculate lateness fines. Never miss a monthly gathering."
-              color="primary"
-            />
-            <FeatureCard
-              icon={<DollarSign className="w-8 h-8" />}
-              title="Financial Tracking"
-              description="Monitor contributions, individual savings, and family coffers with real-time dashboards and reports."
-              color="secondary"
-            />
-            <FeatureCard
-              icon={<TrendingUp className="w-8 h-8" />}
-              title="Njangi (Rotating Savings)"
-              description="Manage cycles, track participants, and automate payout schedules for your collective savings group."
-              color="accent"
-            />
-            <FeatureCard
-              icon={<FileText className="w-8 h-8" />}
-              title="Loan Management"
-              description="Request, approve, and track loans with automatic interest calculations and payment schedules."
-              color="primary"
-            />
-            <FeatureCard
-              icon={<Award className="w-8 h-8" />}
-              title="Shares & Dividends"
-              description="Purchase shares, track ownership, and receive annual dividends from family investments."
-              color="secondary"
-            />
-            <FeatureCard
-              icon={<Heart className="w-8 h-8" />}
-              title="Assistance Events"
-              description="Coordinate support for births, deaths, sickness, and joyful occasions with automated contributions."
-              color="accent"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="py-20 bg-muted/20" aria-labelledby="how-it-works-heading">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 id="how-it-works-heading" className="text-4xl font-bold mb-4 text-foreground">How it works</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Get your family running on Kinsroot in three steps</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[
-              { n: "1", title: "Create your family", body: "Set up your family space, invite members and assign roles in minutes." },
-              { n: "2", title: "Run your activities", body: "Schedule meetings, record contributions, manage loans and njangi cycles." },
-              { n: "3", title: "See the impact", body: "Track health, generate receipts and reports, and grow together year on year." },
-            ].map((s) => (
-              <Card key={s.n} className="p-8 text-center hover:shadow-lg transition-all border-primary/10">
-                <div className="mx-auto w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg mb-4">
-                  {s.n}
-                </div>
-                <h3 className="text-xl font-bold mb-2 text-foreground">{s.title}</h3>
-                <p className="text-muted-foreground">{s.body}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-20" aria-labelledby="testimonials-heading">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 id="testimonials-heading" className="text-4xl font-bold mb-4 text-foreground">Loved by families</h2>
-            <p className="text-lg text-muted-foreground">Real stories from families using Kinsroot</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {[
-              { quote: "We used to argue over who paid what. Now everyone sees the same record — peace at last.", who: "Treasurer, Bota Land family" },
-              { quote: "Scheduling a year of meetings in one click changed our family rhythm completely.", who: "Family Head, Cameroon" },
-              { quote: "Our njangi cycle has never been smoother. Payouts and reminders just work.", who: "Member, diaspora chapter" },
-            ].map((t, i) => (
-              <Card key={i} className="p-6 border-secondary/20 hover:shadow-lg transition-all">
-                <div className="text-secondary text-3xl leading-none mb-2" aria-hidden="true">“</div>
-                <p className="text-foreground mb-4 leading-relaxed">{t.quote}</p>
-                <p className="text-sm text-muted-foreground font-medium">— {t.who}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Cultural Heritage Section */}
-      <section className="py-20 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <Shield className="w-16 h-16 mx-auto mb-6 text-primary" />
-            <h2 className="text-4xl font-bold mb-6 text-foreground">Rooted in Heritage, Built for Tomorrow</h2>
-            <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              The descendants of the family carry forward a legacy of unity, shared property, education, and Christian
-              values. Our app honors these traditions while embracing modern tools to strengthen family bonds and secure
-              our collective prosperity.
-            </p>
-            <div className="flex flex-wrap justify-center gap-6 text-sm">
-              <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border border-border">
-                <div className="w-2 h-2 rounded-full bg-primary"></div>
-                <span>Unity & Solidarity</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border border-border">
-                <div className="w-2 h-2 rounded-full bg-secondary"></div>
-                <span>Shared Prosperity</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border border-border">
-                <div className="w-2 h-2 rounded-full bg-accent"></div>
-                <span>Cultural Pride</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary to-primary-hover text-primary-foreground">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to Strengthen Your Family Bonds?</h2>
-          <p className="text-xl mb-8 text-primary-foreground/90 max-w-2xl mx-auto">
-            Join us in building a prosperous future together
-          </p>
-          <Button
-            size="lg"
-            className="bg-secondary text-secondary-foreground hover:bg-secondary-hover shadow-xl hover:shadow-2xl transition-all text-lg px-10 py-6 animate-glow"
-            onClick={() => (window.location.href = "/auth")}
-          >
-            Get Started Today
-          </Button>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-card border-t border-border py-12">
-        <div className="container mx-auto px-4">
-          <div className="text-center text-muted-foreground space-y-2">
-            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm">
-              <a href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</a>
-              <span aria-hidden="true">·</span>
-              <a href="/terms" className="hover:text-foreground transition-colors">Terms of Service</a>
-            </div>
-            <p>Developed by Softserge.</p>
-            <p>Copyright 2026 All rights reserved.</p>
-            <p className="text-sm">
-              <a href="mailto:softserge.dev@gmail.com" className="hover:text-foreground transition-colors">softserge.dev@gmail.com</a>
-            </p>
-          </div>
+      <footer style={{ borderTop: `1px solid ${c("hp-line")}` }}>
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-5 py-8 text-sm sm:flex-row lg:px-8" style={{ color: c("hp-ink-soft") }}>
+          <div className="flex items-center gap-2"><img src="/logo.jpg" alt="" width={24} height={24} className="h-6 w-6 rounded-full" /><span>{t("home.footer.credit")}</span></div>
+          <div className="flex gap-5"><Link to="/privacy">{t("home.footer.privacy")}</Link><Link to="/terms">{t("home.footer.terms")}</Link><a href="mailto:softserge.dev@gmail.com">softserge.dev@gmail.com</a></div>
         </div>
       </footer>
-      </main>
       <InstallBanner />
     </div>
   );
-};
-interface FeatureCardProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  color: "primary" | "secondary" | "accent";
 }
-const FeatureCard = ({ icon, title, description, color }: FeatureCardProps) => {
-  const colorClasses = {
-    primary: "text-primary border-primary/20 hover:border-primary/40",
-    secondary: "text-secondary border-secondary/20 hover:border-secondary/40",
-    accent: "text-accent border-accent/20 hover:border-accent/40",
-  };
-  return (
-    <Card className={`p-8 transition-all hover:shadow-xl border-2 ${colorClasses[color]} group`}>
-      <div
-        className={`mb-4 ${color === "primary" ? "text-primary" : color === "secondary" ? "text-secondary" : "text-accent"} group-hover:scale-110 transition-transform`}
-      >
-        {icon}
-      </div>
-      <h3 className="text-xl font-bold mb-3 text-foreground">{title}</h3>
-      <p className="text-muted-foreground leading-relaxed">{description}</p>
-    </Card>
-  );
-};
-export default Index;
