@@ -21,7 +21,7 @@ const SessionManagementPage = lazy(() => import("./pages/SessionManagement"));
 // Lazy load core pages
 const Index = lazy(() => import("./pages/Index"));
 const WhatIsNjangi = lazy(() => import("./pages/blog/WhatIsNjangi"));
-const HomePreview = lazy(() => import("./pages/home-preview/HomePreview"));
+const AdminLanguages = lazy(() => import("./pages/admin/Languages"));
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -148,7 +148,7 @@ const App = () => (
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/home-preview" element={<HomePreview />} />
+            <Route path="/home-preview" element={<Navigate to="/" replace />} />
             <Route path="/blog/what-is-njangi" element={<WhatIsNjangi />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
@@ -177,6 +177,7 @@ const App = () => (
         <Route path="/admin/role-permissions" element={<AdminModule><RolePermissions /></AdminModule>} />
         <Route path="/admin/user-activity" element={<AdminModule><UserActivity /></AdminModule>} />
         <Route path="/admin/announcements" element={<AdminModule><AdminAnnouncements /></AdminModule>} />
+        <Route path="/admin/languages" element={<AdminModule><AdminLanguages /></AdminModule>} />
         <Route path="/admin/system-health" element={<AdminModule><SystemHealth /></AdminModule>} />
           
           {/* Family Role Management */}
