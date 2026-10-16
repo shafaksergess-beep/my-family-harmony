@@ -14,6 +14,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { JoinFamilyOptions } from "@/components/invitations/JoinFamilyOptions";
 import { InstallMenuItem } from "@/components/InstallMenuItem";
 import SEO from "@/components/SEO";
+import { DeleteAccount } from "@/components/settings/DeleteAccount";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -341,6 +342,7 @@ const Profile = () => {
             </form>
           </CardContent>
         </Card>
+        <DeleteAccount />
       </main>
 
       {/* Join Family Dialog */}
