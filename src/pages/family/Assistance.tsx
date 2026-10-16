@@ -1,3 +1,4 @@
+import i18n from "@/i18n/config";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -46,15 +47,15 @@ interface FamilyMember {
 }
 
 const EVENT_TYPES = {
-  birth: { label: t("famAssistance.birth"), amount: 5000, description: "5,000 FCFA per member" },
-  member_death: { label: t("famAssistance.memberDeath"), amount: 1000000, description: "1,000,000 FCFA total" },
-  spouse_death: { label: t("famAssistance.spouseDeath"), amount: 500000, description: "500,000 FCFA total" },
-  child_death: { label: t("famAssistance.childDeath"), amount: 500000, description: "500,000 FCFA total" },
-  external_wonya: { label: t("famAssistance.externalWonyaKotto"), amount: 150000, description: t("famAssistance.upTo150000Fcfa") },
-  external_other: { label: t("famAssistance.externalOther"), amount: 100000, description: t("famAssistance.upTo100000Fcfa") },
-  sickness: { label: t("famAssistance.sickness5Days"), amount: 50000, description: "50,000 FCFA" },
-  wedding: { label: t("famAssistance.wedding"), amount: 100000, description: "100,000 FCFA" },
-  ceremony_invitation: { label: t("famAssistance.otherCeremony"), amount: 2500, description: "2,500 FCFA per member" },
+  birth: { get label() { return i18n.t("famAssistance.birth"); }, amount: 5000, description: "5,000 FCFA per member" },
+  member_death: { get label() { return i18n.t("famAssistance.memberDeath"); }, amount: 1000000, description: "1,000,000 FCFA total" },
+  spouse_death: { get label() { return i18n.t("famAssistance.spouseDeath"); }, amount: 500000, description: "500,000 FCFA total" },
+  child_death: { get label() { return i18n.t("famAssistance.childDeath"); }, amount: 500000, description: "500,000 FCFA total" },
+  external_wonya: { get label() { return i18n.t("famAssistance.externalWonyaKotto"); }, amount: 150000, get description() { return i18n.t("famAssistance.upTo150000Fcfa"); } },
+  external_other: { get label() { return i18n.t("famAssistance.externalOther"); }, amount: 100000, get description() { return i18n.t("famAssistance.upTo100000Fcfa"); } },
+  sickness: { get label() { return i18n.t("famAssistance.sickness5Days"); }, amount: 50000, description: "50,000 FCFA" },
+  wedding: { get label() { return i18n.t("famAssistance.wedding"); }, amount: 100000, description: "100,000 FCFA" },
+  ceremony_invitation: { get label() { return i18n.t("famAssistance.otherCeremony"); }, amount: 2500, description: "2,500 FCFA per member" },
 };
 
 export default function FamilyAssistance() {

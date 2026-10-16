@@ -1,3 +1,4 @@
+import i18n from "@/i18n/config";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
@@ -46,13 +47,13 @@ interface Member {
 }
 
 const ROLE_INFO: Record<string, { label: string; color: string }> = {
-  family_head: { label: t("famMembers.familyHead"), color: "bg-purple-500" },
-  family_admin: { label: t("famMembers.familyAdmin"), color: "bg-blue-500" },
-  secretary: { label: t("famMembers.secretary"), color: "bg-green-500" },
-  treasurer: { label: t("famMembers.treasurer"), color: "bg-yellow-500" },
-  loan_committee: { label: t("famMembers.loanCommittee"), color: "bg-orange-500" },
-  member: { label: t("famMembers.member"), color: "bg-gray-500" },
-  guest: { label: t("famMembers.guest"), color: "bg-slate-500" },
+  family_head: { get label() { return i18n.t("famMembers.familyHead"); }, color: "bg-purple-500" },
+  family_admin: { get label() { return i18n.t("famMembers.familyAdmin"); }, color: "bg-blue-500" },
+  secretary: { get label() { return i18n.t("famMembers.secretary"); }, color: "bg-green-500" },
+  treasurer: { get label() { return i18n.t("famMembers.treasurer"); }, color: "bg-yellow-500" },
+  loan_committee: { get label() { return i18n.t("famMembers.loanCommittee"); }, color: "bg-orange-500" },
+  member: { get label() { return i18n.t("famMembers.member"); }, color: "bg-gray-500" },
+  guest: { get label() { return i18n.t("famMembers.guest"); }, color: "bg-slate-500" },
 };
 
 const getRoleLabel = (role: string) =>

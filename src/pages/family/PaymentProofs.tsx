@@ -69,7 +69,7 @@ const PaymentProofs = () => {
     { id: "orange" as Provider, name: "Orange Money", ussd: "#150#", number: fam?.momo_orange_number, holder: fam?.momo_orange_name, cls: "bg-[hsl(25_95%_53%)] text-primary-foreground" },
   ];
 
-  const copy = (t: string) => { navigator.clipboard.writeText(t); toast({ title: t("famPaymentProofs.copied") }); };
+  const copy = (txt: string) => { navigator.clipboard.writeText(txt); toast({ title: t("famPaymentProofs.copied") }); };
 
   const submit = async () => {
     if (!family || !memberId || !userId || !provider || !file) return;
@@ -284,6 +284,7 @@ const PaymentProofs = () => {
 };
 
 function MomoSettings({ familyId, initial, onSaved }: { familyId: string; initial: Record<string, string | null> | null; onSaved: () => void }) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [v, setV] = useState({
     momo_mtn_number: initial?.momo_mtn_number ?? "", momo_mtn_name: initial?.momo_mtn_name ?? "",
