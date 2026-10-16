@@ -146,9 +146,11 @@ Deno.serve(async (req) => {
 
     // 1) Meetings happening in the next ~25h (reminder_1d window)
     //    and the next ~75min (attendance deadline window).
-    const in25h = new Date(now.getTime() + 25 * 3600 * 1000);
+    const in8d = new Date(now.getTime() + 8 * 24 * 3600 * 1000);
     const fromDate = now.toISOString().slice(0, 10);
-    const toDate = in25h.toISOString().slice(0, 10);
+    const toDate = in8d.toISOString().slice(0, 10);
+    const todayStr = fromDate;
+    const utcHour = now.getUTCHours();
 
     const { data: meetings, error: mErr } = await admin
       .from("meetings")
@@ -171,10 +173,13 @@ Deno.serve(async (req) => {
       const msUntil = start.getTime() - now.getTime();
       const hoursUntil = msUntil / 3600_000;
 
-      // Determine which notifications apply right now
+      // Determine which notifications apply right now (dedup log guarantees once each)
+      const send7d = hoursUntil > 165 && hoursUntil <= 169; // week-of
       const send24h = hoursUntil > 22 && hoursUntil <= 25; // reminder_1d
-      const send1h = hoursUntil > 0 && hoursUntil <= 1.25; // attendance deadline
-      if (!send24h && !send1h) {
+      const sendMorning = m.meeting_date === todayStr && utcHour >= 6 && utcHour < 10 && hoursUntil > 1.5; // morning-of
+      const send1h = hoursUntil > 0.3 && hoursUntil <= 1.25; // attendance deadline
+      const send15m = hoursUntil > 0 && hoursUntil <= 0.3; // final check-in call
+      if (!send7d && !send24h && !sendMorning && !send1h && !send15m) {
         skipped++;
         continue;
       }
