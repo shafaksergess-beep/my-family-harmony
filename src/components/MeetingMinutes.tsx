@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { RealtimeChannel } from "@supabase/supabase-js";
@@ -34,6 +35,7 @@ interface MeetingMinutesProps {
 }
 
 export const MeetingMinutes = ({ meetingId, canEdit }: MeetingMinutesProps) => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [minutes, setMinutes] = useState<Minutes>({
     content: "",
@@ -146,8 +148,8 @@ export const MeetingMinutes = ({ meetingId, canEdit }: MeetingMinutesProps) => {
   const handleGenerateSummary = async () => {
     if (!minutes.content) {
       toast({
-        title: "No content",
-        description: "Please add meeting minutes first",
+        title: t("mtgUi.No_content"),
+        description: t("mtgUi.Please_add_meeting_minutes_first"),
         variant: "destructive",
       });
       return;
@@ -177,7 +179,7 @@ export const MeetingMinutes = ({ meetingId, canEdit }: MeetingMinutesProps) => {
 
       if (summaryData?.error) {
         toast({
-          title: "AI Error",
+          title: t("mtgUi.AI_Error"),
           description: summaryData.error,
           variant: "destructive",
         });
@@ -195,14 +197,14 @@ export const MeetingMinutes = ({ meetingId, canEdit }: MeetingMinutesProps) => {
       });
 
       toast({
-        title: "Summary Generated",
-        description: "AI summary has been added to the meeting minutes",
+        title: t("mtgUi.Summary_Generated"),
+        description: t("mtgUi.AI_summary_has_been_added_to_the_meeting_minutes"),
       });
     } catch (error: any) {
       console.error("Error generating summary:", error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to generate summary",
+        title: t("mtgUi.Error"),
+        description: error.message || t("mtgUi.Failed_to_generate_summary"),
         variant: "destructive",
       });
     } finally {
@@ -240,14 +242,14 @@ export const MeetingMinutes = ({ meetingId, canEdit }: MeetingMinutesProps) => {
       }
 
       toast({
-        title: "Success",
-        description: "Meeting minutes saved",
+        title: t("mtgUi.Success"),
+        description: t("mtgUi.Meeting_minutes_saved"),
       });
     } catch (error: any) {
       console.error("Error saving minutes:", error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to save minutes",
+        title: t("mtgUi.Error"),
+        description: error.message || t("mtgUi.Failed_to_save_minutes"),
         variant: "destructive",
       });
     } finally {
@@ -288,7 +290,7 @@ export const MeetingMinutes = ({ meetingId, canEdit }: MeetingMinutesProps) => {
   };
 
   if (loading) {
-    return <div>Loading minutes...</div>;
+    return <div>{t("mtgUi.Loading_minutes")}</div>;
   }
 
   return (
@@ -298,7 +300,7 @@ export const MeetingMinutes = ({ meetingId, canEdit }: MeetingMinutesProps) => {
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              Meeting Minutes
+              {t("mtgUi.Meeting_Minutes")}
             </CardTitle>
             {canEdit && (
               <div className="flex gap-2">
@@ -310,18 +312,18 @@ export const MeetingMinutes = ({ meetingId, canEdit }: MeetingMinutesProps) => {
                   {generating ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Generating...
+                      {t("mtgUi.Generating")}
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-4 h-4 mr-2" />
-                      AI Summary
+                      {t("mtgUi.AI_Summary")}
                     </>
                   )}
                 </Button>
                 <Button onClick={handleSave} disabled={saving}>
                   <Save className="w-4 h-4 mr-2" />
-                  {saving ? "Saving..." : "Save Minutes"}
+                  {saving ? t("mtgUi.Saving") : t("mtgUi.Save_Minutes")}
                 </Button>
               </div>
             )}
@@ -330,12 +332,12 @@ export const MeetingMinutes = ({ meetingId, canEdit }: MeetingMinutesProps) => {
         <CardContent className="space-y-6">
           {/* Main Content */}
           <div>
-            <Label htmlFor="content">Meeting Notes</Label>
+            <Label htmlFor="content">{t("mtgUi.Meeting_Notes")}</Label>
             <Textarea
               id="content"
               value={minutes.content}
               onChange={(e) => setMinutes({ ...minutes, content: e.target.value })}
-              placeholder="Document the main discussions, topics covered, and general notes from the meeting..."
+              placeholder={t("mtgUi.Document_the_main_discussions_topics_covered_and_g")}
               rows={8}
               disabled={!canEdit}
               className="mt-2"
@@ -344,7 +346,7 @@ export const MeetingMinutes = ({ meetingId, canEdit }: MeetingMinutesProps) => {
 
           {/* Decisions Made */}
           <div>
-            <h4 className="font-semibold mb-3">Decisions Made</h4>
+            <h4 className="font-semibold mb-3">{t("mtgUi.Decisions_Made")}</h4>
             {minutes.decisions_made.length > 0 ? (
               <div className="space-y-2 mb-4">
                 {minutes.decisions_made.map((decision, index) => (
@@ -368,25 +370,25 @@ export const MeetingMinutes = ({ meetingId, canEdit }: MeetingMinutesProps) => {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground mb-4">No decisions recorded yet</p>
+              <p className="text-sm text-muted-foreground mb-4">{t("mtgUi.No_decisions_recorded_yet")}</p>
             )}
 
             {canEdit && (
               <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
                 <Input
-                  placeholder="Decision title"
+                  placeholder={t("mtgUi.Decision_title")}
                   value={newDecision.title}
                   onChange={(e) => setNewDecision({ ...newDecision, title: e.target.value })}
                 />
                 <Textarea
-                  placeholder="Decision description (optional)"
+                  placeholder={t("mtgUi.Decision_description_optional")}
                   value={newDecision.description}
                   onChange={(e) => setNewDecision({ ...newDecision, description: e.target.value })}
                   rows={2}
                 />
                 <Button onClick={handleAddDecision} variant="outline" size="sm">
                   <Plus className="w-4 h-4 mr-2" />
-                  Add Decision
+                  {t("mtgUi.Add_Decision")}
                 </Button>
               </div>
             )}
@@ -394,7 +396,7 @@ export const MeetingMinutes = ({ meetingId, canEdit }: MeetingMinutesProps) => {
 
           {/* Action Items */}
           <div>
-            <h4 className="font-semibold mb-3">Action Items</h4>
+            <h4 className="font-semibold mb-3">{t("mtgUi.Action_Items")}</h4>
             {minutes.action_items.length > 0 ? (
               <div className="space-y-2 mb-4">
                 {minutes.action_items.map((action, index) => (
@@ -425,32 +427,32 @@ export const MeetingMinutes = ({ meetingId, canEdit }: MeetingMinutesProps) => {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground mb-4">No action items recorded yet</p>
+              <p className="text-sm text-muted-foreground mb-4">{t("mtgUi.No_action_items_recorded_yet")}</p>
             )}
 
             {canEdit && (
               <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
                 <Input
-                  placeholder="Action item / task"
+                  placeholder={t("mtgUi.Action_item_task")}
                   value={newAction.task}
                   onChange={(e) => setNewAction({ ...newAction, task: e.target.value })}
                 />
                 <div className="grid grid-cols-2 gap-3">
                   <Input
-                    placeholder="Assignee"
+                    placeholder={t("mtgUi.Assignee")}
                     value={newAction.assignee}
                     onChange={(e) => setNewAction({ ...newAction, assignee: e.target.value })}
                   />
                   <Input
                     type="date"
-                    placeholder="Deadline"
+                    placeholder={t("mtgUi.Deadline")}
                     value={newAction.deadline}
                     onChange={(e) => setNewAction({ ...newAction, deadline: e.target.value })}
                   />
                 </div>
                 <Button onClick={handleAddAction} variant="outline" size="sm">
                   <Plus className="w-4 h-4 mr-2" />
-                  Add Action Item
+                  {t("mtgUi.Add_Action_Item")}
                 </Button>
               </div>
             )}

@@ -261,12 +261,12 @@ const PaymentProofs = () => {
                   </tbody>
                 </table>
                 <p><span className="text-muted-foreground">{t("famPaymentProofs.details")}</span> {open.reason}</p>
-                {open.rejection_reason && <p className="text-destructive">Rejected: {open.rejection_reason}</p>}
+                {open.rejection_reason && <p className="text-destructive">{t("mtgUi.Rejected")} {open.rejection_reason}</p>}
                 <p className="text-xs text-muted-foreground">{t("famPaymentProofs.aiReadsTheScreenshotOnly")}</p>
                 {isReviewer && open.submitted_by !== userId && ["pending", "partially_approved"].includes(open.status) && (
                   <div className="space-y-2 border-t pt-3">
-                    {open.requires_dual_review && <p className="text-muted-foreground">{open.status === "pending" ? "Requires 2 approvals — yours will be the first." : open.first_reviewer === userId ? "You gave the first approval; another reviewer must confirm." : "Your approval will finalize this payment."}</p>}
-                    <Textarea placeholder="Notes (required to reject)" value={notes} onChange={(e) => setNotes(e.target.value)} />
+                    {open.requires_dual_review && <p className="text-muted-foreground">{open.status === "pending" ? t("mtgUi.Requires_2_approvals_yours_will_be_the_first") : open.first_reviewer === userId ? t("mtgUi.You_gave_the_first_approval_another_reviewer_must_") : t("mtgUi.Your_approval_will_finalize_this_payment")}</p>}
+                    <Textarea placeholder={t("mtgUi.Notes_required_to_reject")} value={notes} onChange={(e) => setNotes(e.target.value)} />
                     <div className="flex flex-wrap gap-2">
                       <Button disabled={busy || open.first_reviewer === userId} onClick={() => review("approve")}>{t("famPaymentProofs.approve")}</Button>
                       <Button variant="destructive" disabled={busy} onClick={() => review("reject")}>{t("famPaymentProofs.reject")}</Button>

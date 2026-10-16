@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +20,7 @@ interface MeetingsCalendarProps {
 }
 
 export const MeetingsCalendar = ({ meetings, onDateSelect }: MeetingsCalendarProps) => {
+  const { t } = useTranslation();
   const meetingDates = meetings.map(m => new Date(m.meeting_date));
   
   const getMeetingsForDate = (date: Date) => {
@@ -42,7 +44,7 @@ export const MeetingsCalendar = ({ meetings, onDateSelect }: MeetingsCalendarPro
     <div className="grid md:grid-cols-2 gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>Meeting Calendar</CardTitle>
+          <CardTitle>{t("mtgUi.Meeting_Calendar")}</CardTitle>
         </CardHeader>
         <CardContent>
           <Calendar
@@ -64,9 +66,9 @@ export const MeetingsCalendar = ({ meetings, onDateSelect }: MeetingsCalendarPro
         <CardHeader>
           <CardTitle>
             {selectedDate ? (
-              <>Selected Date</>
+              <>{t("mtgUi.Selected_Date")}</>
             ) : (
-              <>Upcoming Meetings</>
+              <>{t("mtgUi.Upcoming_Meetings")}</>
             )}
           </CardTitle>
         </CardHeader>
@@ -77,7 +79,7 @@ export const MeetingsCalendar = ({ meetings, onDateSelect }: MeetingsCalendarPro
                 <div key={meeting.id} className="border rounded-lg p-4 space-y-2">
                   <div className="flex items-center justify-between">
                     <Badge variant={meeting.is_completed ? "secondary" : "default"}>
-                      {meeting.is_completed ? "Completed" : "Upcoming"}
+                      {meeting.is_completed ? t("mtgUi.Completed") : t("mtgUi.Upcoming")}
                     </Badge>
                     <Badge variant="outline" className="capitalize">
                       {meeting.meeting_type}
@@ -104,7 +106,7 @@ export const MeetingsCalendar = ({ meetings, onDateSelect }: MeetingsCalendarPro
             </div>
           ) : selectedDate ? (
             <p className="text-center text-muted-foreground py-8">
-              No meetings scheduled for this date
+              {t("mtgUi.No_meetings_scheduled_for_this_date")}
             </p>
           ) : (
             <div className="space-y-4">
