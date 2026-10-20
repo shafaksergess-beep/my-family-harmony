@@ -43,6 +43,13 @@
       "when": 1792145907218,
       "tag": "0005_account_owned_file_lookup",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792485166267,
+      "tag": "0006_read_account_sessions",
+      "breakpoints": true
     }
   ]
 }
