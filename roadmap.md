@@ -6,7 +6,7 @@
 - [x] Verify signed-in confirmation, authorization rejection, and native adapter tests (27 tests pass)
 - [ ] Verify irreversible deletion using a disposable member (requires a designated test account)
 - [ ] Verify native push/OAuth and capture store screenshots (requires Natively device builds)
-- [ ] Resolve existing session-management failure (unsupported listUserSessions API; separate prelaunch blocker)
+- [ ] Repair active-session listing and other-device sign-out securely (confirmed unsupported listing and incorrect revocation identifier; awaiting approval of revised controls)
 
 - [x] New homepage at / (old design retired, /home-preview redirects)
 - [x] Remove Bota; English + French built in
