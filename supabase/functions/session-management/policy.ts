@@ -1,14 +1,6 @@
-import { z } from "npm:zod@3";
-
-export const requestSchema = z.object({
-  action: z.enum(["list", "record", "revoke-others"]),
-  currentSessionId: z.string().uuid().optional(),
-  sessionId: z.string().uuid().optional(),
-}).strict();
-
 export function currentSessionId(claims: Record<string, unknown>): string | undefined {
-  const parsed = z.string().uuid().safeParse(claims.session_id);
-  return parsed.success ? parsed.data : undefined;
+  const sid = claims.session_id;
+  return typeof sid === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sid) ? sid : undefined;
 }
 
 export async function revokeOtherSessions(

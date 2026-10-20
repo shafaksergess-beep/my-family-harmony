@@ -1,175 +1,73 @@
-// Unified session management edge function.
-// Actions: list | revoke | revoke-others | record | enforce-limit
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
-import { requireAuth } from "../_shared/auth.ts";
+import { z } from "npm:zod@3";
+import { currentSessionId, revokeOtherSessions } from "./policy.ts";
 
-const MAX_SESSIONS = 3;
-
-function admin() {
-  return createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-  );
-}
+const requestSchema = z.object({
+  action: z.enum(["list", "record", "revoke-others"]),
+  currentSessionId: z.string().uuid().optional(),
+  sessionId: z.string().uuid().optional(),
+}).strict();
 
 function deviceLabel(ua: string | null): string {
   if (!ua) return "Unknown device";
-  const s = ua;
-  let os = "Unknown OS";
-  if (/Windows/i.test(s)) os = "Windows";
-  else if (/Android/i.test(s)) os = "Android";
-  else if (/iPhone|iPad|iOS/i.test(s)) os = "iOS";
-  else if (/Mac OS X|Macintosh/i.test(s)) os = "macOS";
-  else if (/Linux/i.test(s)) os = "Linux";
-  let br = "Browser";
-  if (/Edg\//i.test(s)) br = "Edge";
-  else if (/Chrome\//i.test(s) && !/Chromium/i.test(s)) br = "Chrome";
-  else if (/Firefox\//i.test(s)) br = "Firefox";
-  else if (/Safari\//i.test(s)) br = "Safari";
-  else if (/Kinsroot|Capacitor/i.test(s)) br = "Kinsroot App";
-  return `${br} on ${os}`;
+  const os = /Android/i.test(ua) ? "Android" : /iPhone|iPad|iOS/i.test(ua) ? "iOS" : /Windows/i.test(ua) ? "Windows" : /Mac OS X|Macintosh/i.test(ua) ? "macOS" : /Linux/i.test(ua) ? "Linux" : "Unknown OS";
+  const browser = /Kinsroot|Natively|Capacitor/i.test(ua) ? "Kinsroot App" : /Edg\//i.test(ua) ? "Edge" : /Chrome\//i.test(ua) ? "Chrome" : /Firefox\//i.test(ua) ? "Firefox" : /Safari\//i.test(ua) ? "Safari" : "Browser";
+  return `${browser} on ${os}`;
 }
 
 Deno.serve(async (req) => {
+  const reply = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
+    status, headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-
+  if (req.method !== "POST") return reply({ error: "Method not allowed" }, 405);
   try {
-    const auth = await requireAuth(req, corsHeaders);
-    if (auth instanceof Response) return auth;
-    const { userId } = auth;
-
-    const url = new URL(req.url);
-    const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
-    const action: string = body.action ?? url.searchParams.get("action") ?? "list";
-    const sb = admin();
-
-    const currentSessionId: string | undefined =
-      body.currentSessionId ?? url.searchParams.get("currentSessionId") ?? undefined;
-
-    // Helpers
-    const listSessions = async () => {
-      const { data, error } = await sb.auth.admin.listUserSessions(userId);
+    const header = req.headers.get("Authorization");
+    if (!header?.startsWith("Bearer ")) return reply({ error: "Unauthorized" }, 401);
+    const jwt = header.slice(7);
+    const client = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_ANON_KEY") ?? "", {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data, error: claimsError } = await client.auth.getClaims(jwt);
+    if (claimsError || !data?.claims) return reply({ error: "Unauthorized" }, 401);
+    const sid = currentSessionId(data.claims);
+    const userId = data.claims.sub;
+    if (!sid || !userId) return reply({ error: "Active session required" }, 401);
+    const parsed = requestSchema.safeParse(await req.json().catch(() => null));
+    if (!parsed.success) return reply({ error: "Invalid or unsupported session action" }, 400);
+    const sb = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const list = async () => {
+      const { data: sessions, error } = await sb.rpc("list_account_sessions", { p_user_id: userId, p_current_session_id: sid });
       if (error) throw error;
-      return data?.sessions ?? [];
+      return sessions ?? [];
     };
-
-    if (action === "record") {
+    // This also checks the session still exists; a signed JWT alone is insufficient.
+    const sessions = await list();
+    if (parsed.data.action === "record") {
+      if (parsed.data.sessionId && parsed.data.sessionId !== sid) return reply({ error: "Session does not match authenticated device" }, 400);
       const ua = req.headers.get("user-agent");
-      const ip =
-        req.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
-        req.headers.get("cf-connecting-ip") ??
-        null;
-      const sessionId = body.sessionId;
-      if (!sessionId) {
-        return new Response(JSON.stringify({ error: "sessionId required" }), {
-          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      await sb.from("user_session_metadata").upsert({
-        user_id: userId,
-        session_id: sessionId,
-        user_agent: ua,
-        device_label: deviceLabel(ua),
-        ip_address: ip,
+      const { error } = await sb.from("user_session_metadata").upsert({
+        user_id: userId, session_id: sid, user_agent: ua, device_label: deviceLabel(ua),
+        ip_address: req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? req.headers.get("cf-connecting-ip") ?? null,
         last_seen_at: new Date().toISOString(),
       }, { onConflict: "user_id,session_id" });
-      return new Response(JSON.stringify({ ok: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      if (error) throw error;
+      return reply({ ok: true });
     }
-
-    if (action === "enforce-limit") {
-      const sessions = await listSessions();
-      if (sessions.length <= MAX_SESSIONS) {
-        return new Response(JSON.stringify({ ok: true, revoked: 0 }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      // Sort oldest first; keep current session, revoke oldest until <= MAX
-      const sorted = [...sessions].sort((a: any, b: any) =>
-        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-      );
-      const toRevoke = sorted
-        .filter((s: any) => s.id !== currentSessionId)
-        .slice(0, Math.max(0, sessions.length - MAX_SESSIONS));
-      for (const s of toRevoke) {
-        try { await sb.auth.admin.signOut(s.id, "local"); } catch (e) { console.error(e); }
-        await sb.from("user_session_metadata").delete()
-          .eq("user_id", userId).eq("session_id", s.id);
-      }
-      return new Response(JSON.stringify({ ok: true, revoked: toRevoke.length }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (parsed.data.action === "revoke-others") {
+      await revokeOtherSessions((token, scope) => sb.auth.admin.signOut(token, scope), jwt);
+      const remaining = await list();
+      if (remaining.some((s: { id: string }) => s.id !== sid)) throw new Error("Other sessions remain active");
+      return reply({ ok: true, revoked: sessions.filter((s: { id: string }) => s.id !== sid).length });
     }
-
-    if (action === "list") {
-      const sessions = await listSessions();
-      const { data: meta } = await sb.from("user_session_metadata")
-        .select("*").eq("user_id", userId);
-      const metaMap = new Map((meta ?? []).map((m: any) => [m.session_id, m]));
-      const merged = sessions.map((s: any) => ({
-        id: s.id,
-        created_at: s.created_at,
-        updated_at: s.updated_at,
-        not_after: s.not_after,
-        user_agent: s.user_agent ?? metaMap.get(s.id)?.user_agent ?? null,
-        device_label: metaMap.get(s.id)?.device_label ?? deviceLabel(s.user_agent ?? null),
-        ip_address: metaMap.get(s.id)?.ip_address ?? null,
-        last_seen_at: metaMap.get(s.id)?.last_seen_at ?? s.updated_at ?? s.created_at,
-        is_current: currentSessionId ? s.id === currentSessionId : false,
-      }));
-      return new Response(JSON.stringify({ sessions: merged, max: MAX_SESSIONS }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    if (action === "revoke") {
-      const sessionId = body.sessionId;
-      if (!sessionId) {
-        return new Response(JSON.stringify({ error: "sessionId required" }), {
-          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const sessions = await listSessions();
-      if (!sessions.find((s: any) => s.id === sessionId)) {
-        return new Response(JSON.stringify({ error: "Session not found" }), {
-          status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      await sb.auth.admin.signOut(sessionId, "local");
-      await sb.from("user_session_metadata").delete()
-        .eq("user_id", userId).eq("session_id", sessionId);
-      return new Response(JSON.stringify({ ok: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    if (action === "revoke-others") {
-      const sessions = await listSessions();
-      let count = 0;
-      for (const s of sessions) {
-        if (s.id === currentSessionId) continue;
-        try {
-          await sb.auth.admin.signOut(s.id, "local");
-          count++;
-        } catch (e) { console.error(e); }
-      }
-      await sb.from("user_session_metadata").delete()
-        .eq("user_id", userId)
-        .neq("session_id", currentSessionId ?? "00000000-0000-0000-0000-000000000000");
-      return new Response(JSON.stringify({ ok: true, revoked: count }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    return new Response(JSON.stringify({ error: "Unknown action" }), {
-      status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  } catch (e) {
-    console.error("session-management error", e);
-    return new Response(JSON.stringify({ error: String(e?.message ?? e) }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return reply({ sessions: sessions.map((s: { id: string; device_label: string | null; user_agent: string | null }) => ({
+      ...s, device_label: s.device_label ?? deviceLabel(s.user_agent), is_current: s.id === sid,
+    })) });
+  } catch (error) {
+    console.error("session-management operation failed", error);
+    return reply({ error: "Could not complete session operation" }, 500);
   }
 });
