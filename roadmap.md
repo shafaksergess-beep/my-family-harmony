@@ -6,7 +6,8 @@
 - [x] Verify signed-in confirmation, authorization rejection, and native adapter tests (27 tests pass)
 - [ ] Verify irreversible deletion using a disposable member (requires a designated test account)
 - [ ] Verify native push/OAuth and capture store screenshots (requires Natively device builds)
-- [ ] Repair active-session listing and other-device sign-out securely (confirmed unsupported listing and incorrect revocation identifier; awaiting approval of revised controls)
+- [x] Replace unsupported session APIs with service-only session listing and JWT-based other-device sign-out; remove unsupported individual revoke/device-cap claims (31 tests pass)
+- [ ] Verify real signed-in device listing and other-device sign-out (preview-issued test token lacks a device session; requires ordinary app sign-in and disposable account for destructive verification)
 
 - [x] New homepage at / (old design retired, /home-preview redirects)
 - [x] Remove Bota; English + French built in

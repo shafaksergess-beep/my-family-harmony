@@ -3217,6 +3217,19 @@ export type Database = {
         Returns: boolean
       }
       is_super_admin: { Args: { check_user_id: string }; Returns: boolean }
+      list_account_sessions: {
+        Args: { p_current_session_id: string; p_user_id: string }
+        Returns: {
+          created_at: string
+          device_label: string
+          id: string
+          ip_address: string
+          last_seen_at: string
+          not_after: string
+          updated_at: string
+          user_agent: string
+        }[]
+      }
       log_activity: {
         Args: {
           p_action_type: string

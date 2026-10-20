@@ -1,4 +1,19 @@
 {
+  "deviceSessions": {
+    "title": "Active sessions",
+    "description": "Devices signed into your Kinsroot account.",
+    "expiryNotice": "After signing out other devices, their access may continue until existing access tokens expire.",
+    "loadFailed": "Could not load active devices.",
+    "signOutFailed": "Could not sign out other devices. Please try again.",
+    "signedOut": "Other devices have been signed out. This device stays signed in.",
+    "thisDevice": "This device",
+    "unknownDevice": "Unknown device",
+    "lastActive": "Last active {{time}}",
+    "ip": "IP {{address}}",
+    "empty": "No active devices found.",
+    "retry": "Try again",
+    "signOutOthers": "Sign out of all other devices"
+  },
   "common": {
     "back": "Back",
     "loading": "Loading...",

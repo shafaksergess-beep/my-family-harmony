@@ -64,8 +64,8 @@ export function AuthBootstrap() {
         if (!mounted) return;
         if (event === "SIGNED_IN" && session) {
           await handleSession(session.user);
-          // Record device metadata and enforce concurrent-session cap.
-          sessionManager.recordCurrent().then(() => sessionManager.enforceLimit()).catch(() => {});
+          // Record device metadata after the auth storage lock is released.
+          sessionManager.recordCurrent().catch(() => {});
           const stashed = consumeOAuthRedirect();
           // Read the pathname at handler time — the effect deps are [], so
           // `location` from useLocation is stale after client-side navigation.

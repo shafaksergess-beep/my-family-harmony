@@ -1,4 +1,19 @@
 {
+  "deviceSessions": {
+    "title": "Sessions actives",
+    "description": "Appareils connectés à votre compte Kinsroot.",
+    "expiryNotice": "Après la déconnexion des autres appareils, leur accès peut continuer jusqu’à l’expiration des jetons d’accès existants.",
+    "loadFailed": "Impossible de charger les appareils connectés.",
+    "signOutFailed": "Impossible de déconnecter les autres appareils. Réessayez.",
+    "signedOut": "Les autres appareils ont été déconnectés. Cet appareil reste connecté.",
+    "thisDevice": "Cet appareil",
+    "unknownDevice": "Appareil inconnu",
+    "lastActive": "Dernière activité {{time}}",
+    "ip": "IP {{address}}",
+    "empty": "Aucun appareil connecté trouvé.",
+    "retry": "Réessayer",
+    "signOutOthers": "Déconnecter tous les autres appareils"
+  },
   "common": {
     "back": "Retour",
     "loading": "Chargement...",
