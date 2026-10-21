@@ -107,44 +107,27 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
   const onSubmit = async (data: FamilyFormData) => {
     setIsSubmitting(true);
     try {
-      const { data: family, error } = await supabase
-        .from('families')
-        .insert({
-          name: data.name,
-          slug: data.slug,
-          description: data.description,
-          primary_language: data.primary_language,
-          meeting_frequency: data.meeting_frequency,
-          meeting_day: data.meeting_day,
-          meeting_time: data.meeting_time,
-          mandatory_contribution: data.mandatory_contribution,
-          njangi_amount: data.njangi_amount,
-          loan_interest_rate: data.loan_interest_rate,
-          share_value: data.share_value,
-        })
-        .select()
-        .single();
+      const { data: rows, error } = await supabase.rpc('create_family_self_service', {
+        p_name: data.name,
+        p_slug: data.slug,
+        p_description: data.description ?? '',
+        p_primary_language: data.primary_language,
+        p_meeting_frequency: data.meeting_frequency,
+        p_meeting_day: data.meeting_day,
+        p_meeting_time: data.meeting_time,
+        p_mandatory_contribution: data.mandatory_contribution,
+        p_njangi_amount: data.njangi_amount,
+        p_loan_interest_rate: data.loan_interest_rate,
+        p_share_value: data.share_value,
+      });
 
       if (error) throw error;
+      const family = Array.isArray(rows) ? rows[0] : rows;
+      if (!family) throw new Error('Family not created');
 
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not found');
-
-      // Add creator as family head
-      const { error: memberError } = await supabase
-        .from('family_members')
-        .insert({
-          family_id: family.id,
-          user_id: user.id,
-          role: 'family_head',
-        });
-
-      if (memberError) throw memberError;
-
-      toast.success('Family created successfully!');
-      onComplete(family.id);
-      navigate(`/family/${family.slug}`);
+      toast.success(t('familySetup.created'));
+      onComplete(family.family_id);
+      navigate(`/family/${family.family_slug}/invitations`);
     } catch (error: any) {
       console.error('Error creating family:', error);
       toast.error(error.message || 'Failed to create family');
