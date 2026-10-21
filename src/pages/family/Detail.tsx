@@ -17,6 +17,7 @@ import { FamilyChatbot } from "@/components/chat/FamilyChatbot";
 import SEO from "@/components/SEO";
 import { FamilyHealthWidget } from "@/components/family/FamilyHealthWidget";
 import { FamilyLanguageCard } from "@/components/family/FamilyLanguageCard";
+import { FamilyLifecycleBanner } from "@/components/family/FamilyLifecycleBanner";
 
 interface ModuleCategory {
   id: string;
@@ -206,6 +207,7 @@ const FamilyDetail = () => {
             </Button>
           )}
           
+          {family && canManageInvitations && <FamilyLifecycleBanner familyId={family.id} familySlug={familySlug} />}
           {family && <FinancialWidget familyId={family.id} />}
           
           <Tabs defaultValue={categories[0]?.slug || "meetings"} className="space-y-4">
