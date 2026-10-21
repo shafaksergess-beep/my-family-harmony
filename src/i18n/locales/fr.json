@@ -403,7 +403,9 @@
     "back": "Retour",
     "skip": "Passer",
     "next": "Suivant",
-    "letsGo": "C'est parti !"
+    "letsGo": "C'est parti !",
+    "createFamily": "Créer une nouvelle famille",
+    "createHint": "Les nouvelles familles doivent inviter au moins un autre membre dans les 14 jours, sinon elles sont suspendues puis supprimées."
   },
   "home": {
     "seoTitle": "Kinsroot — Rassemblez la famille",
@@ -2641,5 +2643,38 @@
     "confirm": "Supprimer définitivement",
     "reauth": "Pour votre sécurité, déconnectez-vous puis reconnectez-vous et revenez ici dans les 15 minutes.",
     "failed": "Votre compte n’a pas pu être supprimé. Réessayez ou contactez l’assistance."
+  },
+  "familySetup": {
+    "title": "Créez votre famille",
+    "subtitle": "Configurez le profil et les paramètres de votre famille",
+    "name": "Nom de la famille",
+    "slug": "Adresse web de la famille",
+    "slugHelp": "Utilisée dans les liens. Lettres minuscules, chiffres et tirets uniquement.",
+    "description": "Description (facultative)",
+    "descriptionPh": "À propos de votre famille...",
+    "language": "Langue principale",
+    "frequency": "Fréquence des réunions",
+    "weekly": "Hebdomadaire",
+    "monthly": "Mensuelle",
+    "quarterly": "Trimestrielle",
+    "day": "Jour de réunion",
+    "time": "Heure de réunion",
+    "contribution": "Cotisation obligatoire (FCFA)",
+    "njangi": "Montant du Njangi (FCFA)",
+    "interest": "Taux d'intérêt des prêts (%)",
+    "share": "Valeur d'une part (FCFA)",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "create": "Créer la famille",
+    "step": "Étape {{step}} sur {{total}}",
+    "created": "Famille créée ! Invitez au moins un membre dans les 14 jours pour la garder active.",
+    "failed": "Échec de la création de la famille"
+  },
+  "familyLifecycle": {
+    "suspendedTitle": "Cette famille est suspendue",
+    "suspendedBody": "Aucun autre membre n'a rejoint la famille en 14 jours. Invitez un membre dans les {{days}} jour(s), sinon la famille sera supprimée.",
+    "deadlineTitle": "Invitez votre premier membre",
+    "deadlineBody": "Ajoutez au moins un autre membre dans les {{days}} jour(s) pour garder cette famille active.",
+    "invite": "Inviter des membres"
   }
 }

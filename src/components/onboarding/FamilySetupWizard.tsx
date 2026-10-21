@@ -130,7 +130,7 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
       navigate(`/family/${family.family_slug}/invitations`);
     } catch (error: any) {
       console.error('Error creating family:', error);
-      toast.error(error.message || 'Failed to create family');
+      toast.error(error.message || t('familySetup.failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -140,16 +140,14 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Create Your Family</DialogTitle>
-          <DialogDescription>
-            Set up your family profile and default settings
-          </DialogDescription>
+          <DialogTitle>{t("familySetup.title")}</DialogTitle>
+          <DialogDescription>{t("familySetup.subtitle")}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-muted-foreground">
-              <span>Step {step} of {totalSteps}</span>
+              <span>{t("familySetup.step", { step, total: totalSteps })}</span>
               <span>{Math.round(progress)}%</span>
             </div>
             <Progress value={progress} />
@@ -164,7 +162,7 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Family Name</FormLabel>
+                        <FormLabel>{t("familySetup.name")}</FormLabel>
                         <FormControl>
                           <Input placeholder="Wonya Kotto Family" {...field} />
                         </FormControl>
@@ -178,13 +176,11 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
                     name="slug"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Family Slug</FormLabel>
+                        <FormLabel>{t("familySetup.slug")}</FormLabel>
                         <FormControl>
                           <Input placeholder="wonya-kotto" {...field} />
                         </FormControl>
-                        <FormDescription>
-                          Used in URLs. Only lowercase letters, numbers, and hyphens.
-                        </FormDescription>
+                        <FormDescription>{t("familySetup.slugHelp")}</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -195,9 +191,9 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
                     name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Description (Optional)</FormLabel>
+                        <FormLabel>{t("familySetup.description")}</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="About your family..." {...field} />
+                          <Textarea placeholder={t("familySetup.descriptionPh")} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -209,7 +205,7 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
                     name="primary_language"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Primary Language</FormLabel>
+                        <FormLabel>{t("familySetup.language")}</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
@@ -234,7 +230,7 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
                     name="meeting_frequency"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Meeting Frequency</FormLabel>
+                        <FormLabel>{t("familySetup.frequency")}</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
@@ -242,9 +238,9 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="weekly">Weekly</SelectItem>
-                            <SelectItem value="monthly">Monthly</SelectItem>
-                            <SelectItem value="quarterly">Quarterly</SelectItem>
+                            <SelectItem value="weekly">{t("familySetup.weekly")}</SelectItem>
+                            <SelectItem value="monthly">{t("familySetup.monthly")}</SelectItem>
+                            <SelectItem value="quarterly">{t("familySetup.quarterly")}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -257,7 +253,7 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
                     name="meeting_day"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Meeting Day</FormLabel>
+                        <FormLabel>{t("familySetup.day")}</FormLabel>
                         <FormControl>
                           <Input placeholder="last_saturday" {...field} />
                         </FormControl>
@@ -271,7 +267,7 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
                     name="meeting_time"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Meeting Time</FormLabel>
+                        <FormLabel>{t("familySetup.time")}</FormLabel>
                         <FormControl>
                           <Input type="time" {...field} />
                         </FormControl>
@@ -289,7 +285,7 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
                     name="mandatory_contribution"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Mandatory Contribution (FCFA)</FormLabel>
+                        <FormLabel>{t("familySetup.contribution")}</FormLabel>
                         <FormControl>
                           <Input type="number" {...field} />
                         </FormControl>
@@ -303,7 +299,7 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
                     name="njangi_amount"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Njangi Amount (FCFA)</FormLabel>
+                        <FormLabel>{t("familySetup.njangi")}</FormLabel>
                         <FormControl>
                           <Input type="number" {...field} />
                         </FormControl>
@@ -317,7 +313,7 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
                     name="loan_interest_rate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Loan Interest Rate (%)</FormLabel>
+                        <FormLabel>{t("familySetup.interest")}</FormLabel>
                         <FormControl>
                           <Input type="number" step="0.1" {...field} />
                         </FormControl>
@@ -331,7 +327,7 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
                     name="share_value"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Share Value (FCFA)</FormLabel>
+                        <FormLabel>{t("familySetup.share")}</FormLabel>
                         <FormControl>
                           <Input type="number" {...field} />
                         </FormControl>
@@ -349,17 +345,14 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
                   onClick={handlePrevious}
                   disabled={step === 1}
                   className="flex-1"
-                >
-                  Previous
+                > {t("familySetup.previous")}
                 </Button>
                 {step < totalSteps ? (
-                  <Button type="button" onClick={handleNext} className="flex-1">
-                    Next
+                  <Button type="button" onClick={handleNext} className="flex-1"> {t("familySetup.next")}
                   </Button>
                 ) : (
                   <Button type="submit" disabled={isSubmitting} className="flex-1">
-                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Create Family
+                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} {t("familySetup.create")}
                   </Button>
                 )}
               </div>
