@@ -118,7 +118,7 @@ serve(async (req) => {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                from: 'Family Together <onboarding@resend.dev>',
+                from: 'Kinsroot <onboarding@resend.dev>',
                 to: [member.email],
                 subject: `Attendance Reminder: ${(meeting.families as any)?.name} Meeting`,
                 html: `

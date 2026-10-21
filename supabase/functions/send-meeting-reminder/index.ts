@@ -81,19 +81,19 @@ const handler = async (req: Request): Promise<Response> => {
       .filter((member) => member.profiles?.email)
       .map((member) =>
         resend.emails.send({
-          from: "Family Together <onboarding@resend.dev>",
+          from: "Kinsroot <onboarding@resend.dev>",
           to: [member.profiles.email],
           subject: `Reminder: ${familyName} Meeting on ${meetingDate}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px 10px 0 0;">
-                <img src="https://31382291-0546-4a70-a015-b86eb65a55a3.lovableproject.com/logo.jpg" alt="Family Together" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 16px; border: 3px solid rgba(255,255,255,0.3);" />
+              <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #1a3d2e 0%, #2d5a45 100%); border-radius: 10px 10px 0 0;">
+                <img src="https://kinsroot.softserge.com/logo.jpg" alt="Kinsroot" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 16px; border: 3px solid rgba(255,255,255,0.3);" />
                 <h1 style="color: white; margin: 0;">Meeting Reminder</h1>
               </div>
               <div style="padding: 30px; background: #f9f9f9;">
                 <p>Hello ${member.profiles.full_name || "Family Member"},</p>
                 <p>This is a reminder about the upcoming <strong>${familyName}</strong> meeting:</p>
-                <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea;">
+                <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #1a3d2e;">
                   <p style="margin: 5px 0;"><strong>Date:</strong> ${meetingDate}</p>
                   <p style="margin: 5px 0;"><strong>Time:</strong> ${meetingTime}</p>
                   ${meeting.location ? `<p style="margin: 5px 0;"><strong>Location:</strong> ${meeting.location}</p>` : ""}
@@ -103,7 +103,7 @@ const handler = async (req: Request): Promise<Response> => {
                 <p style="color: #666; font-size: 14px; margin-top: 30px;">Please make sure to attend on time to avoid late fines.</p>
               </div>
               <div style="text-align: center; padding: 20px; color: #999; font-size: 12px; border-top: 1px solid #ddd;">
-                © ${new Date().getFullYear()} Family Together. All rights reserved.
+                © ${new Date().getFullYear()} Kinsroot. All rights reserved.
               </div>
             </div>
           `,

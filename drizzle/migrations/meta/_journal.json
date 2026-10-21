@@ -50,6 +50,13 @@
       "when": 1792485166267,
       "tag": "0006_read_account_sessions",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792616581986,
+      "tag": "0007_family_member_deadline_lifecycle",
+      "breakpoints": true
     }
   ]
 }

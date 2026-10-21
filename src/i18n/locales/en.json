@@ -403,7 +403,9 @@
     "back": "Back",
     "skip": "Skip",
     "next": "Next",
-    "letsGo": "Let's Go!"
+    "letsGo": "Let's Go!",
+    "createFamily": "Create a new family",
+    "createHint": "New families must invite at least one other member within 14 days, or they are suspended and later deleted."
   },
   "home": {
     "seoTitle": "Kinsroot — Bring the family together",
@@ -2641,5 +2643,38 @@
     "confirm": "Permanently delete",
     "reauth": "For your security, sign out and sign in again, then return here within 15 minutes.",
     "failed": "Your account could not be deleted. Please try again or contact support."
+  },
+  "familySetup": {
+    "title": "Create Your Family",
+    "subtitle": "Set up your family profile and default settings",
+    "name": "Family Name",
+    "slug": "Family Slug",
+    "slugHelp": "Used in URLs. Only lowercase letters, numbers, and hyphens.",
+    "description": "Description (Optional)",
+    "descriptionPh": "About your family...",
+    "language": "Primary Language",
+    "frequency": "Meeting Frequency",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "quarterly": "Quarterly",
+    "day": "Meeting Day",
+    "time": "Meeting Time",
+    "contribution": "Mandatory Contribution (FCFA)",
+    "njangi": "Njangi Amount (FCFA)",
+    "interest": "Loan Interest Rate (%)",
+    "share": "Share Value (FCFA)",
+    "previous": "Previous",
+    "next": "Next",
+    "create": "Create Family",
+    "step": "Step {{step}} of {{total}}",
+    "created": "Family created! Invite at least one member within 14 days to keep it active.",
+    "failed": "Failed to create family"
+  },
+  "familyLifecycle": {
+    "suspendedTitle": "This family is suspended",
+    "suspendedBody": "No other member joined within 14 days. Invite a member within {{days}} day(s) or the family will be deleted.",
+    "deadlineTitle": "Invite your first member",
+    "deadlineBody": "Add at least one other member within {{days}} day(s) to keep this family active.",
+    "invite": "Invite members"
   }
 }

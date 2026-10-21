@@ -19,3 +19,8 @@
 - [x] Translate batch 3: family money & meetings pages
 - [x] Translate batch 4: reports, analytics, settings, calendar, chat
 - [x] Translate batch 5: super admin panel
+
+- [x] Self-service family creation alongside admin-created families
+- [x] 14-day member deadline with reminders, suspension and deletion (daily check)
+- [x] Kinsroot branding on all emails (testing sender kept)
+- [ ] Switch emails to a verified domain sender (waiting on user's domain)
