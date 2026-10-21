@@ -24,3 +24,4 @@
 - [x] 14-day member deadline with reminders, suspension and deletion (daily check)
 - [x] Kinsroot branding on all emails (testing sender kept)
 - [ ] Switch emails to a verified domain sender (waiting on user's domain)
+- [ ] Promotional video recordings: Flow 1 self-service onboarding (portrait + landscape), with 14-day suspension walkthrough
