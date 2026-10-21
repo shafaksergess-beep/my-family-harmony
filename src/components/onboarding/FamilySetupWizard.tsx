@@ -1,4 +1,5 @@
 import { useLanguages } from "@/i18n/languages";
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -59,6 +60,7 @@ interface FamilySetupWizardProps {
 
 export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWizardProps) {
   const languages = useLanguages();
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
