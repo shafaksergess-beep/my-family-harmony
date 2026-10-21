@@ -1,6 +1,6 @@
 import { useLanguages } from "@/i18n/languages";
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
+import { shouldIgnoreSubmit } from '@/lib/submitGuard';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 
@@ -64,6 +65,9 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  // Guard: the Create button replaces Next at the same spot, so a fast
+  // double-click on Next would otherwise submit the form unintentionally.
+  const stepEnteredAt = useRef(Date.now());
 
   const form = useForm<FamilyFormData>({
     resolver: zodResolver(familySchema),
@@ -96,6 +100,7 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
 
     const isValid = await form.trigger(fieldsToValidate);
     if (isValid && step < totalSteps) {
+      stepEnteredAt.current = Date.now();
       setStep(step + 1);
     }
   };
@@ -107,6 +112,7 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
   };
 
   const onSubmit = async (data: FamilyFormData) => {
+    if (shouldIgnoreSubmit(stepEnteredAt.current, Date.now())) return;
     setIsSubmitting(true);
     try {
       const { data: rows, error } = await supabase.rpc('create_family_self_service', {
