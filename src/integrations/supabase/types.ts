@@ -843,6 +843,7 @@ export type Database = {
           child_death_amount: number | null
           contribution_scope: string | null
           created_at: string | null
+          created_by: string | null
           deactivated_at: string | null
           description: string | null
           external_other_amount: number | null
@@ -859,6 +860,7 @@ export type Database = {
           meeting_day: string | null
           meeting_frequency: string | null
           meeting_time: string | null
+          member_deadline_at: string | null
           member_death_amount: number | null
           min_loan_amount: number | null
           min_savings_amount: number | null
@@ -874,6 +876,7 @@ export type Database = {
           sickness_assistance_amount: number | null
           slug: string
           spouse_death_amount: number | null
+          suspended_at: string | null
           updated_at: string | null
           wedding_assistance_amount: number | null
         }
@@ -883,6 +886,7 @@ export type Database = {
           child_death_amount?: number | null
           contribution_scope?: string | null
           created_at?: string | null
+          created_by?: string | null
           deactivated_at?: string | null
           description?: string | null
           external_other_amount?: number | null
@@ -899,6 +903,7 @@ export type Database = {
           meeting_day?: string | null
           meeting_frequency?: string | null
           meeting_time?: string | null
+          member_deadline_at?: string | null
           member_death_amount?: number | null
           min_loan_amount?: number | null
           min_savings_amount?: number | null
@@ -914,6 +919,7 @@ export type Database = {
           sickness_assistance_amount?: number | null
           slug: string
           spouse_death_amount?: number | null
+          suspended_at?: string | null
           updated_at?: string | null
           wedding_assistance_amount?: number | null
         }
@@ -923,6 +929,7 @@ export type Database = {
           child_death_amount?: number | null
           contribution_scope?: string | null
           created_at?: string | null
+          created_by?: string | null
           deactivated_at?: string | null
           description?: string | null
           external_other_amount?: number | null
@@ -939,6 +946,7 @@ export type Database = {
           meeting_day?: string | null
           meeting_frequency?: string | null
           meeting_time?: string | null
+          member_deadline_at?: string | null
           member_death_amount?: number | null
           min_loan_amount?: number | null
           min_savings_amount?: number | null
@@ -954,6 +962,7 @@ export type Database = {
           sickness_assistance_amount?: number | null
           slug?: string
           spouse_death_amount?: number | null
+          suspended_at?: string | null
           updated_at?: string | null
           wedding_assistance_amount?: number | null
         }
@@ -1031,6 +1040,38 @@ export type Database = {
             columns: ["member_id"]
             isOneToOne: false
             referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_lifecycle_notices: {
+        Row: {
+          cycle_key: string
+          family_id: string
+          id: string
+          notice_type: string
+          sent_at: string
+        }
+        Insert: {
+          cycle_key: string
+          family_id: string
+          id?: string
+          notice_type: string
+          sent_at?: string
+        }
+        Update: {
+          cycle_key?: string
+          family_id?: string
+          id?: string
+          notice_type?: string
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_lifecycle_notices_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
             referencedColumns: ["id"]
           },
         ]
@@ -3150,6 +3191,25 @@ export type Database = {
       check_user_belongs_to_family: {
         Args: { _family_id: string; _user_id: string }
         Returns: boolean
+      }
+      create_family_self_service: {
+        Args: {
+          p_description: string
+          p_loan_interest_rate: number
+          p_mandatory_contribution: number
+          p_meeting_day: string
+          p_meeting_frequency: string
+          p_meeting_time: string
+          p_name: string
+          p_njangi_amount: number
+          p_primary_language: string
+          p_share_value: number
+          p_slug: string
+        }
+        Returns: {
+          family_id: string
+          family_slug: string
+        }[]
       }
       generate_reference_code: { Args: never; Returns: string }
       get_activity_logs_safe: {
