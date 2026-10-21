@@ -327,6 +327,7 @@ const FamilyDetail = () => {
             </div>
           </>
         )}
+        {family && canManageInvitations && <FamilyLifecycleBanner familyId={family.id} familySlug={familySlug} />}
         {family && <FinancialWidget familyId={family.id} />}
         
         <Tabs defaultValue={categories[0]?.slug || "meetings"} className="space-y-6">

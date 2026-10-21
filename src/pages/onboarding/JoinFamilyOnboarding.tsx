@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Users, LogOut, Sparkles } from "lucide-react";
 import { JoinFamilyOptions } from "@/components/invitations/JoinFamilyOptions";
 import SEO from "@/components/SEO";
+import { FamilySetupWizard } from "@/components/onboarding/FamilySetupWizard";
+import { Home } from "lucide-react";
 
 const JoinFamilyOnboarding = () => {
   const navigate = useNavigate();
@@ -14,6 +16,7 @@ const JoinFamilyOnboarding = () => {
   const [loading, setLoading] = useState(true);
   const [displayName, setDisplayName] = useState<string>("");
   const [showJoin, setShowJoin] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -81,6 +84,10 @@ const JoinFamilyOnboarding = () => {
             <Button className="w-full" size="lg" onClick={() => setShowJoin(true)}>
               <Users className="h-4 w-4 mr-2" /> {t("joinFamilyOnboarding.joinFamily")}
             </Button>
+            <Button className="w-full" size="lg" variant="secondary" onClick={() => setShowCreate(true)}>
+              <Home className="h-4 w-4 mr-2" /> {t("joinFamilyOnboarding.createFamily")}
+            </Button>
+            <p className="text-xs text-muted-foreground text-center">{t("joinFamilyOnboarding.createHint")}</p>
             <Button
               variant="outline"
               className="w-full"
@@ -98,6 +105,7 @@ const JoinFamilyOnboarding = () => {
         </p>
       </div>
       <JoinFamilyOptions open={showJoin} onOpenChange={setShowJoin} />
+      <FamilySetupWizard open={showCreate} onComplete={() => setShowCreate(false)} onClose={() => setShowCreate(false)} />
     </div>
   );
 };
