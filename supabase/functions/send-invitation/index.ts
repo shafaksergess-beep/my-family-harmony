@@ -88,21 +88,21 @@ const handler = async (req: Request): Promise<Response> => {
     const acceptUrl = `${Deno.env.get("SUPABASE_URL")?.replace("/v1", "")}/accept-invitation?token=${invitation.token}`;
 
     const emailResponse = await resend.emails.send({
-      from: "Family Together <onboarding@resend.dev>",
+      from: "Kinsroot <onboarding@resend.dev>",
       to: [invitation.email],
       subject: `You're invited to join ${familyName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px 10px 0 0;">
-            <img src="https://31382291-0546-4a70-a015-b86eb65a55a3.lovableproject.com/logo.jpg" alt="Family Together" style="width: 70px; height: 70px; border-radius: 50%; margin-bottom: 16px; border: 3px solid rgba(255,255,255,0.3);" />
+          <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #1a3d2e 0%, #2d5a45 100%); border-radius: 10px 10px 0 0;">
+            <img src="https://kinsroot.softserge.com/logo.jpg" alt="Kinsroot" style="width: 70px; height: 70px; border-radius: 50%; margin-bottom: 16px; border: 3px solid rgba(255,255,255,0.3);" />
             <h1 style="color: white; margin: 0;">You're Invited!</h1>
           </div>
           <div style="padding: 30px; background: #f9f9f9;">
             <p>Hello,</p>
-            <p><strong>${inviterName}</strong> has invited you to join <strong>${familyName}</strong> on Family Together.</p>
+            <p><strong>${inviterName}</strong> has invited you to join <strong>${familyName}</strong> on Kinsroot.</p>
             <p>Your role will be: <strong>${invitation.role.replace("_", " ").toUpperCase()}</strong></p>
             <div style="margin: 30px 0; text-align: center;">
-              <a href="${acceptUrl}" style="background-color: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+              <a href="${acceptUrl}" style="background-color: #1a3d2e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
                 Accept Invitation
               </a>
             </div>
@@ -110,7 +110,7 @@ const handler = async (req: Request): Promise<Response> => {
             <p style="color: #666; font-size: 14px;">If you didn't expect this invitation, you can safely ignore this email.</p>
           </div>
           <div style="text-align: center; padding: 20px; color: #999; font-size: 12px; border-top: 1px solid #ddd;">
-            © ${new Date().getFullYear()} Family Together. All rights reserved.
+            © ${new Date().getFullYear()} Kinsroot. All rights reserved.
           </div>
         </div>
       `,

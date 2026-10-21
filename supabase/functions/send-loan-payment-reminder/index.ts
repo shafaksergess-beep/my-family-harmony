@@ -137,7 +137,7 @@ Deno.serve(async (req) => {
             </a>
             
             <p style="color: #666; font-size: 14px; margin-top: 30px;">
-              This is an automated reminder from Family Together. If you have questions, please contact your family head or treasurer.
+              This is an automated reminder from Kinsroot. If you have questions, please contact your family head or treasurer.
             </p>
           </div>
         `;
@@ -150,7 +150,7 @@ Deno.serve(async (req) => {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              from: 'Family Together <notifications@familytogether.app>',
+              from: 'Kinsroot <onboarding@resend.dev>',
               to: [profile.email],
               subject: subject,
               html: emailBody,

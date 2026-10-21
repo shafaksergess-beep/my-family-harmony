@@ -267,37 +267,37 @@ const handler = async (req: Request): Promise<Response> => {
       <html>
         <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${subject}</title></head>
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-            <img src="https://31382291-0546-4a70-a015-b86eb65a55a3.lovableproject.com/logo.jpg" alt="Family Together" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 16px; border: 3px solid rgba(255,255,255,0.3);" />
-            <h1 style="margin: 0;">Family Together</h1>
+          <div style="background: linear-gradient(135deg, #1a3d2e 0%, #2d5a45 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
+            <img src="https://kinsroot.softserge.com/logo.jpg" alt="Kinsroot" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 16px; border: 3px solid rgba(255,255,255,0.3);" />
+            <h1 style="margin: 0;">Kinsroot</h1>
             <p style="margin: 10px 0 0 0; opacity: 0.9;">${familyName}</p>
           </div>
           <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
             <p>Hello ${userName},</p>
-            <div style="display: inline-block; background: #667eea; color: white; padding: 5px 15px; border-radius: 20px; font-size: 14px; margin-bottom: 15px;">${eventType}</div>
-            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea;">
+            <div style="display: inline-block; background: #1a3d2e; color: white; padding: 5px 15px; border-radius: 20px; font-size: 14px; margin-bottom: 15px;">${eventType}</div>
+            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #1a3d2e;">
               <p style="margin: 0;">${eventDetails}</p>
             </div>
-            ${actionUrl ? `<center><a href="${actionUrl}" style="display: inline-block; background: #667eea; color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; margin: 20px 0;">View Details</a></center>` : ''}
-            <p style="color: #666; font-size: 14px; margin-top: 20px;">This is an automated notification from Family Together.</p>
+            ${actionUrl ? `<center><a href="${actionUrl}" style="display: inline-block; background: #1a3d2e; color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; margin: 20px 0;">View Details</a></center>` : ''}
+            <p style="color: #666; font-size: 14px; margin-top: 20px;">This is an automated notification from Kinsroot.</p>
           </div>
           <div style="text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
-            <p>© ${new Date().getFullYear()} Family Together. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Kinsroot. All rights reserved.</p>
           </div>
         </body>
       </html>
     ` : `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h1 style="color: #333; border-bottom: 2px solid #4F46E5; padding-bottom: 10px;">Family Together</h1>
+        <h1 style="color: #333; border-bottom: 2px solid #4F46E5; padding-bottom: 10px;">Kinsroot</h1>
         <div style="margin: 20px 0; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
-          ${message || 'Notification from Family Together'}
+          ${message || 'Notification from Kinsroot'}
         </div>
-        <p style="color: #666; font-size: 14px; margin-top: 30px;">This is an automated notification from Family Together admin system.</p>
+        <p style="color: #666; font-size: 14px; margin-top: 30px;">This is an automated notification from Kinsroot admin system.</p>
       </div>
     `;
 
     const emailResponse = await resend.emails.send({
-      from: "Family Together <onboarding@resend.dev>",
+      from: "Kinsroot <onboarding@resend.dev>",
       to: toArray,
       subject,
       html: emailHtml,

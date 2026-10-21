@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'Family Together <reports@familytogether.app>',
+            from: 'Kinsroot <onboarding@resend.dev>',
             to: schedule.recipients,
             subject: `${schedule.name} - Automated Report`,
             html: `

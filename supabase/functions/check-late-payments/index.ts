@@ -116,7 +116,7 @@ const handler = async (req: Request): Promise<Response> => {
               to: memberEmail,
               subject: `Payment Reminder: ${daysLate} days overdue`,
               userName: memberName,
-              familyName: "Family Together",
+              familyName: "Kinsroot",
               eventType: "Payment Overdue",
               eventDetails: `Your contribution of ${contribution.amount} FCFA due on ${contributionDate.toLocaleDateString()} is now ${daysLate} days overdue. Please make your payment as soon as possible to avoid additional late fees.`,
             },

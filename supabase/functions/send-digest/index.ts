@@ -122,19 +122,19 @@ const handler = async (req: Request): Promise<Response> => {
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .header { background: linear-gradient(135deg, #1a3d2e 0%, #2d5a45 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
             .content { background: #f9fafb; padding: 30px; }
             .stat-card { background: white; padding: 20px; margin: 15px 0; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-            .stat-value { font-size: 32px; font-weight: bold; color: #667eea; }
+            .stat-value { font-size: 32px; font-weight: bold; color: #1a3d2e; }
             .stat-label { color: #6b7280; font-size: 14px; margin-top: 5px; }
             .footer { background: #1f2937; color: white; padding: 20px; text-align: center; border-radius: 0 0 10px 10px; }
-            .highlight { color: #667eea; font-weight: bold; }
+            .highlight { color: #1a3d2e; font-weight: bold; }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="header">
-              <img src="https://31382291-0546-4a70-a015-b86eb65a55a3.lovableproject.com/logo.jpg" alt="Family Together" style="width: 70px; height: 70px; border-radius: 50%; margin-bottom: 16px; border: 3px solid rgba(255,255,255,0.3);" />
+              <img src="https://kinsroot.softserge.com/logo.jpg" alt="Kinsroot" style="width: 70px; height: 70px; border-radius: 50%; margin-bottom: 16px; border: 3px solid rgba(255,255,255,0.3);" />
               <h1>${family.name}</h1>
               <p>${period === "weekly" ? "Weekly" : "Monthly"} Digest</p>
               <p>${startDate.toLocaleDateString()} - ${now.toLocaleDateString()}</p>
@@ -177,7 +177,7 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
 
             <div class="footer">
-              <p>This is an automated digest from Family Together</p>
+              <p>This is an automated digest from Kinsroot</p>
               <p>Visit your family dashboard to see more details</p>
             </div>
           </div>
@@ -192,7 +192,7 @@ const handler = async (req: Request): Promise<Response> => {
 
         try {
           await resend.emails.send({
-            from: "Family Together <onboarding@resend.dev>",
+            from: "Kinsroot <onboarding@resend.dev>",
             to: testMode ? profile.email : [profile.email],
             subject: `${family.name} - ${period === "weekly" ? "Weekly" : "Monthly"} Digest`,
             html: emailHtml,
