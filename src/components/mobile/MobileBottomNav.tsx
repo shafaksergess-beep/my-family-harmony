@@ -1,14 +1,15 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, Users, Calendar, Wallet, MoreHorizontal } from 'lucide-react';
+import { Home, Users, Calendar, Wallet, Plus, Receipt, QrCode, HandCoins, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptics } from '@/lib/haptics';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
 interface NavItem {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   path: string;
-  badge?: number;
 }
 
 interface MobileBottomNavProps {
@@ -20,100 +21,102 @@ export function MobileBottomNav({ familySlug, className }: MobileBottomNavProps)
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const base = familySlug ? `/family/${familySlug}` : null;
+  const p = (sub: string) => (base ? `${base}${sub}` : '/dashboard');
 
-  const navItems: NavItem[] = [
-    {
-      label: t("nav.home"),
-      icon: Home,
-      path: familySlug ? `/family/${familySlug}` : '/dashboard',
-    },
-    {
-      label: t("nav.members"),
-      icon: Users,
-      path: familySlug ? `/family/${familySlug}/members` : '/dashboard',
-    },
-    {
-      label: t("nav.meetings"),
-      icon: Calendar,
-      path: familySlug ? `/family/${familySlug}/meetings` : '/dashboard',
-    },
-    {
-      label: t("nav.finance"),
-      icon: Wallet,
-      path: familySlug ? `/family/${familySlug}/contributions` : '/dashboard',
-    },
-    {
-      label: t("nav.more"),
-      icon: MoreHorizontal,
-      path: familySlug ? `/family/${familySlug}/more` : '/dashboard',
-    },
+  const left: NavItem[] = [
+    { label: t("nav.home"), icon: Home, path: base ?? '/dashboard' },
+    { label: t("nav.members"), icon: Users, path: p('/members') },
+  ];
+  const right: NavItem[] = [
+    { label: t("nav.meetings"), icon: Calendar, path: p('/meetings') },
+    { label: t("nav.finance"), icon: Wallet, path: p('/contributions') },
+  ];
+  const actions = [
+    { label: t('mobileHome.submitProof'), icon: Receipt, path: p('/payment-proofs') },
+    { label: t('mobileHome.scanQr'), icon: QrCode, path: p('/meetings') },
+    { label: t('mobileHome.requestLoan'), icon: HandCoins, path: p('/loans') },
+    { label: t('mobileHome.requestAssistance'), icon: Heart, path: p('/assistance') },
   ];
 
-  const handleNavClick = async (path: string) => {
+  const go = async (path: string) => {
     await haptics.selection();
+    setOpen(false);
     navigate(path);
   };
 
   const isActive = (path: string) => {
-    if (path === `/family/${familySlug}` || path === '/dashboard') {
-      return location.pathname === path;
-    }
+    if (path === base || path === '/dashboard') return location.pathname === path || location.pathname === '/dashboard';
     return location.pathname.startsWith(path);
   };
 
-  return (
-    <nav
-      className={cn(
-        'fixed bottom-0 left-0 right-0 z-50',
-        'bg-card border-t border-border',
-        'safe-area-bottom',
-        className
-      )}
-    >
-      <div className="flex h-16 items-center justify-around px-2">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const active = isActive(item.path);
+  const renderItem = (item: NavItem) => {
+    const Icon = item.icon;
+    const active = isActive(item.path);
+    return (
+      <button
+        key={item.label}
+        onClick={() => go(item.path)}
+        aria-current={active ? 'page' : undefined}
+        className={cn(
+          'relative flex h-14 flex-1 flex-col items-center justify-center gap-1 transition-colors',
+          active ? 'text-primary' : 'text-muted-foreground'
+        )}
+      >
+        <Icon className="h-6 w-6" />
+        <span className={cn('text-[11px]', active ? 'font-semibold' : 'font-medium')}>{item.label}</span>
+        {active && <span className="absolute bottom-0 h-1 w-6 rounded-full bg-primary" />}
+      </button>
+    );
+  };
 
-          return (
+  return (
+    <>
+      <nav
+        className={cn('fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card shadow-[0_-4px_20px_-8px_hsl(var(--foreground)/0.15)]', className)}
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
+        <div className="flex h-16 items-center px-2">
+          {left.map(renderItem)}
+          <div className="flex flex-1 justify-center">
             <button
-              key={item.path}
-              onClick={() => handleNavClick(item.path)}
-              className={cn(
-                'flex flex-col items-center justify-center',
-                'w-16 h-14 rounded-lg',
-                'transition-colors duration-200',
-                active
-                  ? 'text-primary bg-primary/10'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-              )}
+              aria-label={t('mobileHome.actions')}
+              onClick={async () => { await haptics.light(); setOpen(true); }}
+              className="-mt-8 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-4 ring-card active:scale-95 transition-transform"
             >
-              <div className="relative">
-                <Icon
-                  className={cn(
-                    'h-5 w-5 mb-1',
-                    active && 'text-primary'
-                  )}
-                />
-                {item.badge && item.badge > 0 && (
-                  <span className="absolute -top-1 -right-2 h-4 w-4 bg-destructive text-destructive-foreground text-[10px] font-medium rounded-full flex items-center justify-center">
-                    {item.badge > 9 ? '9+' : item.badge}
-                  </span>
-                )}
-              </div>
-              <span
-                className={cn(
-                  'text-[10px] font-medium',
-                  active ? 'text-primary' : 'text-muted-foreground'
-                )}
-              >
-                {item.label}
-              </span>
+              <Plus className="h-8 w-8" />
             </button>
-          );
-        })}
-      </div>
-    </nav>
+          </div>
+          {right.map(renderItem)}
+        </div>
+      </nav>
+
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent side="bottom" className="rounded-t-3xl pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+          <SheetHeader>
+            <SheetTitle>{t('mobileHome.actions')}</SheetTitle>
+          </SheetHeader>
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            {actions.map((a) => {
+              const Icon = a.icon;
+              return (
+                <button
+                  key={a.label}
+                  onClick={() => go(a.path)}
+                  className="flex min-h-[96px] flex-col items-center justify-center gap-2 rounded-2xl bg-secondary p-3 text-center text-sm font-medium text-foreground active:scale-95 transition-transform"
+                >
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  {a.label}
+                </button>
+              );
+            })}
+          </div>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }
 
