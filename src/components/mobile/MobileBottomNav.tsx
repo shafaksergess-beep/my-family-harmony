@@ -104,7 +104,7 @@ export function MobileBottomNav({ familySlug, className }: MobileBottomNavProps)
                 <button
                   key={a.label}
                   onClick={() => go(a.path)}
-                  className="flex min-h-[96px] flex-col items-center justify-center gap-2 rounded-2xl bg-secondary p-3 text-center text-sm font-medium text-foreground active:scale-95 transition-transform"
+                  className="flex min-h-[96px] flex-col items-center justify-center gap-2 rounded-2xl bg-muted p-3 text-center text-sm font-medium text-foreground active:scale-95 transition-transform"
                 >
                   <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground">
                     <Icon className="h-5 w-5" />
