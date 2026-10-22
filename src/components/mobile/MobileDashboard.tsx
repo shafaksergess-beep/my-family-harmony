@@ -345,11 +345,13 @@ export function MobileDashboard() {
       >
         {/* Curved branded header */}
         <header
-          className="relative overflow-hidden bg-primary text-primary-foreground rounded-b-[2rem] px-5 pb-6 shadow-lg"
+          className="relative z-30 bg-primary text-primary-foreground rounded-b-[2rem] px-5 pb-6 shadow-lg"
           style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
         >
+          <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden rounded-b-[2rem]">
           <div aria-hidden className="pointer-events-none absolute -right-10 -top-10 h-44 w-44 rounded-full bg-primary-foreground/10" />
           <div aria-hidden className="pointer-events-none absolute right-16 top-20 h-24 w-24 rounded-full bg-accent/20" />
+          </div>
 
           <div className="relative flex items-center justify-between">
             <h1 className="text-3xl font-bold tracking-tight">Kinsroot</h1>
