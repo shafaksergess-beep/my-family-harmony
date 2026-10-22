@@ -111,7 +111,20 @@ const FamilyMore = lazy(() => import("./pages/family/More"));
 const FamilyChat = lazy(() => import("./pages/family/Chat"));
 const FamilyCalendar = lazy(() => import("./pages/family/Calendar"));
 
-const queryClient = new QueryClient();
+// offlineFirst: show cached data instantly and never hang waiting for a
+// network that isn't there; avoid refetch storms on weak connections.
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      networkMode: "offlineFirst",
+      staleTime: 60_000,
+      gcTime: 24 * 60 * 60 * 1000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+    mutations: { networkMode: "offlineFirst" },
+  },
+});
 
 const LoadingFallback = () => <PageLoadingSkeleton />;
 
