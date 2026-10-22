@@ -104,13 +104,13 @@ export default defineConfig(({ mode }) => ({
           },
 
           {
-            // Supabase auth/storage/functions — NetworkFirst (fresh preferred,
-            // fall back to cache offline).
-            urlPattern: /^https:\/\/.*\.supabase\.co\/(auth|storage|functions)\/.*/i,
+            // Storage files — NetworkFirst with a short timeout. Sign-in
+            // requests are never cached so tokens are always fresh and fast.
+            urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/.*/i,
             handler: "NetworkFirst",
             options: {
               cacheName: "supabase-api-cache",
-              networkTimeoutSeconds: 5,
+              networkTimeoutSeconds: 3,
               expiration: { maxEntries: 50, maxAgeSeconds: 300 },
               cacheableResponse: { statuses: [0, 200] },
             },
