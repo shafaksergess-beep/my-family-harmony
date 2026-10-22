@@ -290,11 +290,11 @@ export function MobileDashboard() {
   const tiles = [
     { label: t('mobileHome.pay'), icon: Wallet, path: slug ? `/family/${slug}/payment-proofs` : '/dashboard', tone: 'bg-primary/10 text-primary' },
     { label: t('mobileHome.checkIn'), icon: QrCode, path: slug ? `/family/${slug}/meetings` : '/dashboard', tone: 'bg-accent/20 text-accent-foreground' },
-    { label: t('mobileHome.loans'), icon: HandCoins, path: slug ? `/family/${slug}/loans` : '/dashboard', tone: 'bg-secondary text-secondary-foreground' },
+    { label: t('mobileHome.loans'), icon: HandCoins, path: slug ? `/family/${slug}/loans` : '/dashboard', tone: 'bg-secondary/25 text-foreground' },
     { label: t('mobileHome.savings'), icon: PiggyBank, path: slug ? `/family/${slug}/savings` : '/dashboard', tone: 'bg-destructive/10 text-destructive' },
     { label: t('mobileHome.members'), icon: Users, path: slug ? `/family/${slug}/members` : '/dashboard', tone: 'bg-primary/10 text-primary' },
     { label: t('mobileHome.assistance'), icon: Heart, path: slug ? `/family/${slug}/assistance` : '/dashboard', tone: 'bg-accent/20 text-accent-foreground' },
-    { label: t('mobileHome.reports'), icon: TrendingUp, path: slug ? `/family/${slug}/reports` : '/dashboard', tone: 'bg-secondary text-secondary-foreground' },
+    { label: t('mobileHome.reports'), icon: TrendingUp, path: slug ? `/family/${slug}/reports` : '/dashboard', tone: 'bg-secondary/25 text-foreground' },
     { label: t('mobileHome.more'), icon: Building2, path: slug ? `/family/${slug}/more` : '/dashboard', tone: 'bg-muted text-foreground' },
   ];
 
@@ -445,7 +445,7 @@ export function MobileDashboard() {
           </section>
 
           {/* Savings summary */}
-          <Card className="flex items-center justify-between rounded-2xl bg-secondary p-4">
+          <Card className="flex items-center justify-between rounded-2xl bg-secondary/20 p-4">
             <div>
               <p className="text-xs text-muted-foreground">{t('mobileHome.mySavings')}</p>
               <p className="text-2xl font-bold text-foreground">{stats.totalSavings.toLocaleString()} FCFA</p>
