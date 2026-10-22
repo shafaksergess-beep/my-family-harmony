@@ -2705,5 +2705,12 @@
     "requestLoan": "Request a loan",
     "requestAssistance": "Request assistance",
     "scanQr": "Meeting check-in"
+  },
+  "mobileSearch": {
+    "chat": "Chat",
+    "calendar": "Calendar",
+    "searching": "Searching…",
+    "noResults": "No members, meetings or pages found",
+    "bellUnread": "Notifications, {{count}} new"
   }
 }

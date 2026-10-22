@@ -27,6 +27,8 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
+import { MobileSearch } from './MobileSearch';
+import { fetchAlertCounts, totalAlerts, type AlertCounts } from '@/lib/mobileAlerts';
 import { haptics } from '@/lib/haptics';
 import { MobileLayout } from './MobileLayout';
 import { PullToRefresh } from './PullToRefresh';
