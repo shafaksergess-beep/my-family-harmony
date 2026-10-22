@@ -2705,5 +2705,12 @@
     "requestLoan": "Demander un prêt",
     "requestAssistance": "Demander une assistance",
     "scanQr": "Pointage à la réunion"
+  },
+  "mobileSearch": {
+    "chat": "Discussion",
+    "calendar": "Calendrier",
+    "searching": "Recherche…",
+    "noResults": "Aucun membre, réunion ou page trouvé",
+    "bellUnread": "Notifications, {{count}} nouvelles"
   }
 }

@@ -27,6 +27,8 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
+import { MobileSearch } from './MobileSearch';
+import { fetchAlertCounts, totalAlerts, type AlertCounts } from '@/lib/mobileAlerts';
 import { haptics } from '@/lib/haptics';
 import { MobileLayout } from './MobileLayout';
 import { PullToRefresh } from './PullToRefresh';
@@ -281,6 +283,28 @@ export function MobileDashboard() {
     disabled: !isOnline,
   });
 
+  const [alertCounts, setAlertCounts] = useState<AlertCounts | null>(null);
+  useEffect(() => {
+    const familyId = selectedFamily?.family_id;
+    if (!familyId) return;
+    let active = true;
+    const refresh = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const c = await fetchAlertCounts(familyId, session.user.id, memberId, stats.pendingContributions);
+      if (active) setAlertCounts(c);
+    };
+    refresh();
+    const channel = supabase
+      .channel(`mobile-alerts-${familyId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'in_app_notifications' }, refresh)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `family_id=eq.${familyId}` }, refresh)
+      .subscribe();
+    const timer = setInterval(refresh, 60000);
+    return () => { active = false; clearInterval(timer); supabase.removeChannel(channel); };
+  }, [selectedFamily?.family_id, memberId, stats.pendingContributions]);
+  const alertCount = alertCounts ? totalAlerts(alertCounts) : 0;
+
   const slug = selectedFamily?.family_slug;
   const go = async (path: string) => {
     await haptics.light();
@@ -330,12 +354,14 @@ export function MobileDashboard() {
           <div className="relative flex items-center justify-between">
             <h1 className="text-3xl font-bold tracking-tight">Kinsroot</h1>
             <button
-              aria-label={t('mobileHome.notifications')}
-              onClick={() => slug && go(`/family/${slug}/notifications`)}
+              aria-label={alertCount > 0 ? t('mobileSearch.bellUnread', { count: alertCount }) : t('mobileHome.notifications')}
+              onClick={() => slug && go(alertCounts && alertCounts.unreadNotifications === 0 && alertCounts.newMessages > 0 ? `/family/${slug}/chat` : alertCounts && alertCounts.unreadNotifications === 0 && alertCounts.pendingDues > 0 ? `/family/${slug}/contributions` : `/family/${slug}/notifications`)}
               className="relative flex h-11 w-11 items-center justify-center rounded-full bg-primary-foreground/10 active:scale-95 transition-transform"
             >
               <Bell className="h-6 w-6" />
-              <span className="absolute right-2.5 top-2.5 h-2.5 w-2.5 rounded-full bg-destructive ring-2 ring-primary" />
+              {alertCount > 0 && (
+                <span data-testid="bell-dot" className="absolute right-2.5 top-2.5 h-2.5 w-2.5 rounded-full bg-destructive ring-2 ring-primary" />
+              )}
             </button>
           </div>
 
@@ -371,21 +397,7 @@ export function MobileDashboard() {
             </DropdownMenu>
           )}
 
-          <form
-            className="relative mt-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (slug) go(`/family/${slug}/members`);
-            }}
-          >
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="search"
-              placeholder={t('mobileHome.search')}
-              aria-label={t('mobileHome.search')}
-              className="h-12 w-full rounded-2xl bg-card pl-12 pr-4 text-base text-foreground placeholder:text-muted-foreground shadow-sm outline-none focus:ring-2 focus:ring-accent"
-            />
-          </form>
+          <MobileSearch familyId={selectedFamily?.family_id} familySlug={slug} />
         </header>
 
         <div className="space-y-7 px-4 pt-6 pb-4">
