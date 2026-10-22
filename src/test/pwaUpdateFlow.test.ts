@@ -107,6 +107,14 @@ describe("'New version ready' reload preserves state", () => {
     expect(cfg).toMatch(/registerType:\s*"prompt"/);
   });
 
+  it("new versions apply automatically without the user clearing cache", async () => {
+    const fs: any = await import("node:fs/promises" as any);
+    const src = await fs.readFile("src/components/PWAUpdatePrompt.tsx", "utf8");
+    expect(src).toMatch(/registration\.update\(\)/);
+    expect(src).toMatch(/updateServiceWorker\(true\)/);
+    expect(src).toMatch(/vite:preloadError/);
+  });
+
   it("changelog.json exposes a version + highlights for the update dialog", async () => {
     const fs: any = await import("node:fs/promises" as any);
     const raw = await fs.readFile("public/changelog.json", "utf8");

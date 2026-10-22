@@ -95,7 +95,6 @@ function PWAUpdatePromptInner() {
 
   useEffect(() => {
     if (!needRefresh) return;
-    setNeedRefresh(false);
 
     // Apply the update automatically. Wait until the user leaves the app or a
     // short grace period passes, so nobody loses a form mid-typing.
