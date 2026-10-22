@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { markChatSeen } from '@/lib/mobileAlerts';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -76,6 +77,7 @@ export function useFamilyChat({ familyId, memberId }: UseFamilyChatOptions) {
     if (!familyId) return;
 
     fetchMessages();
+    markChatSeen(familyId);
 
     const channel = supabase
       .channel(`chat-${familyId}`)
