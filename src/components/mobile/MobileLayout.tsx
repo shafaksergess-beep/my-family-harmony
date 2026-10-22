@@ -54,7 +54,7 @@ export function MobileLayout({
         className
       )}
       style={{
-        paddingTop: safeAreaTop > 0 ? `${safeAreaTop}px` : undefined,
+        paddingTop: showHeader && safeAreaTop > 0 ? `${safeAreaTop}px` : undefined,
       }}
     >
       {showHeader && (
@@ -77,7 +77,7 @@ export function MobileLayout({
         )}
         style={{
           paddingBottom: showBottomNav
-            ? `calc(4rem + ${safeAreaBottom}px)`
+            ? `calc(6rem + ${safeAreaBottom}px)`
             : safeAreaBottom > 0
             ? `${safeAreaBottom}px`
             : undefined,
