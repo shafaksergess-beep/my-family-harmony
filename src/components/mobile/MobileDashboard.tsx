@@ -17,7 +17,10 @@ import {
   CheckCircle,
   DollarSign,
   Heart,
+  Bell,
+  Search,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -65,6 +68,7 @@ interface ActivityItem {
 
 export function MobileDashboard() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { isOnline } = useOnlineStatus();
   const [loading, setLoading] = useState(true);
   const [userFamilies, setUserFamilies] = useState<UserFamily[]>([]);
@@ -277,47 +281,33 @@ export function MobileDashboard() {
     disabled: !isOnline,
   });
 
-  const quickActions = [
-    {
-      label: 'Pay',
-      icon: Wallet,
-      path: selectedFamily ? `/family/${selectedFamily.family_slug}/contributions` : '/dashboard',
-      color: 'bg-primary text-primary-foreground',
-    },
-    {
-      label: 'Check-in',
-      icon: QrCode,
-      path: selectedFamily ? `/family/${selectedFamily.family_slug}/meetings` : '/dashboard',
-      color: 'bg-secondary text-secondary-foreground',
-    },
-    {
-      label: 'Loan',
-      icon: HandCoins,
-      path: selectedFamily ? `/family/${selectedFamily.family_slug}/loans` : '/dashboard',
-      color: 'bg-accent text-accent-foreground',
-    },
-    {
-      label: 'Savings',
-      icon: PiggyBank,
-      path: selectedFamily ? `/family/${selectedFamily.family_slug}/savings` : '/dashboard',
-      color: 'bg-muted text-foreground',
-    },
+  const slug = selectedFamily?.family_slug;
+  const go = async (path: string) => {
+    await haptics.light();
+    navigate(path);
+  };
+
+  const tiles = [
+    { label: t('mobileHome.pay'), icon: Wallet, path: slug ? `/family/${slug}/payment-proofs` : '/dashboard', tone: 'bg-primary/10 text-primary' },
+    { label: t('mobileHome.checkIn'), icon: QrCode, path: slug ? `/family/${slug}/meetings` : '/dashboard', tone: 'bg-accent/20 text-accent-foreground' },
+    { label: t('mobileHome.loans'), icon: HandCoins, path: slug ? `/family/${slug}/loans` : '/dashboard', tone: 'bg-secondary text-secondary-foreground' },
+    { label: t('mobileHome.savings'), icon: PiggyBank, path: slug ? `/family/${slug}/savings` : '/dashboard', tone: 'bg-destructive/10 text-destructive' },
+    { label: t('mobileHome.members'), icon: Users, path: slug ? `/family/${slug}/members` : '/dashboard', tone: 'bg-primary/10 text-primary' },
+    { label: t('mobileHome.assistance'), icon: Heart, path: slug ? `/family/${slug}/assistance` : '/dashboard', tone: 'bg-accent/20 text-accent-foreground' },
+    { label: t('mobileHome.reports'), icon: TrendingUp, path: slug ? `/family/${slug}/reports` : '/dashboard', tone: 'bg-secondary text-secondary-foreground' },
+    { label: t('mobileHome.more'), icon: Building2, path: slug ? `/family/${slug}/more` : '/dashboard', tone: 'bg-muted text-foreground' },
   ];
 
   if (loading) {
     return (
-      <MobileLayout title="Kinsroot" showBottomNav={false}>
+      <MobileLayout showHeader={false} showBottomNav={false}>
         <DashboardSkeleton />
       </MobileLayout>
     );
   }
 
   return (
-    <MobileLayout
-      title="Kinsroot"
-      familySlug={selectedFamily?.family_slug}
-      showSearch={false}
-    >
+    <MobileLayout showHeader={false} familySlug={slug}>
       <OfflineIndicator />
       <PullToRefresh pullDistance={pullDistance} isRefreshing={isRefreshing} />
 
@@ -329,46 +319,51 @@ export function MobileDashboard() {
           transition: pullDistance === 0 ? 'transform 0.2s ease-out' : undefined,
         }}
       >
-        <div className="p-4 space-y-6">
-          {/* Family Selector */}
+        {/* Curved branded header */}
+        <header
+          className="relative overflow-hidden bg-primary text-primary-foreground rounded-b-[2rem] px-5 pb-6 shadow-lg"
+          style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
+        >
+          <div aria-hidden className="pointer-events-none absolute -right-10 -top-10 h-44 w-44 rounded-full bg-primary-foreground/10" />
+          <div aria-hidden className="pointer-events-none absolute right-16 top-20 h-24 w-24 rounded-full bg-accent/20" />
+
+          <div className="relative flex items-center justify-between">
+            <h1 className="text-3xl font-bold tracking-tight">Kinsroot</h1>
+            <button
+              aria-label={t('mobileHome.notifications')}
+              onClick={() => slug && go(`/family/${slug}/notifications`)}
+              className="relative flex h-11 w-11 items-center justify-center rounded-full bg-primary-foreground/10 active:scale-95 transition-transform"
+            >
+              <Bell className="h-6 w-6" />
+              <span className="absolute right-2.5 top-2.5 h-2.5 w-2.5 rounded-full bg-destructive ring-2 ring-primary" />
+            </button>
+          </div>
+
           {userFamilies.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Card className="p-4 cursor-pointer active:bg-muted/50">
-                  <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Building2 className="h-6 w-6 text-primary" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold truncate">
-                        {selectedFamily?.family_name || 'Select Family'}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {selectedFamily?.user_role.replace('_', ' ')}
-                      </p>
-                    </div>
-                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                </Card>
+                <button className="relative mt-4 flex w-full items-center gap-2 text-left">
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-lg font-semibold">
+                      {selectedFamily?.family_name || t('mobileHome.selectFamily')}
+                    </span>
+                    <span className="block text-xs capitalize opacity-80">
+                      {selectedFamily?.user_role.replace(/_/g, ' ')}
+                    </span>
+                  </span>
+                  {userFamilies.length > 1 && <ChevronDown className="h-5 w-5 shrink-0" />}
+                </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-72">
                 {userFamilies.map((family) => (
-                  <DropdownMenuItem
-                    key={family.family_id}
-                    onClick={() => handleFamilyChange(family)}
-                    className="py-3"
-                  >
-                    <div className="flex items-center gap-3 w-full">
+                  <DropdownMenuItem key={family.family_id} onClick={() => handleFamilyChange(family)} className="py-3">
+                    <div className="flex w-full items-center gap-3">
                       <Building2 className="h-5 w-5 text-primary" />
                       <div className="flex-1">
                         <p className="font-medium">{family.family_name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {family.user_role.replace('_', ' ')}
-                        </p>
+                        <p className="text-xs capitalize text-muted-foreground">{family.user_role.replace(/_/g, ' ')}</p>
                       </div>
-                      {selectedFamily?.family_id === family.family_id && (
-                        <CheckCircle className="h-4 w-4 text-primary" />
-                      )}
+                      {selectedFamily?.family_id === family.family_id && <CheckCircle className="h-4 w-4 text-primary" />}
                     </div>
                   </DropdownMenuItem>
                 ))}
@@ -376,160 +371,129 @@ export function MobileDashboard() {
             </DropdownMenu>
           )}
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 gap-3">
-            <Card className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center">
-                  <AlertCircle className="h-5 w-5 text-amber-600" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Pending</p>
-                  <p className="text-xl font-bold">{stats.pendingContributions}</p>
-                </div>
-              </div>
-            </Card>
+          <form
+            className="relative mt-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (slug) go(`/family/${slug}/members`);
+            }}
+          >
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="search"
+              placeholder={t('mobileHome.search')}
+              aria-label={t('mobileHome.search')}
+              className="h-12 w-full rounded-2xl bg-card pl-12 pr-4 text-base text-foreground placeholder:text-muted-foreground shadow-sm outline-none focus:ring-2 focus:ring-accent"
+            />
+          </form>
+        </header>
 
-            <Card className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
-                  <PiggyBank className="h-5 w-5 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Savings</p>
-                  <p className="text-xl font-bold">
-                    {(stats.totalSavings / 1000).toFixed(0)}K
-                  </p>
-                </div>
-              </div>
-            </Card>
-
-            <Card className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
-                  <HandCoins className="h-5 w-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Active Loans</p>
-                  <p className="text-xl font-bold">{stats.activeLoans}</p>
-                </div>
-              </div>
-            </Card>
-
-            <Card className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
-                  <Calendar className="h-5 w-5 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Meetings</p>
-                  <p className="text-xl font-bold">{stats.upcomingMeetings}</p>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* Next Meeting Banner */}
-          {stats.nextMeetingDate && (
-            <Card
-              className="p-4 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground cursor-pointer"
-              onClick={async () => {
-                await haptics.light();
-                navigate(`/family/${selectedFamily?.family_slug}/meetings`);
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Calendar className="h-8 w-8" />
-                  <div>
-                    <p className="text-sm opacity-90">Next Meeting</p>
-                    <p className="font-semibold">
-                      {format(new Date(stats.nextMeetingDate), 'EEEE, MMM d')}
-                    </p>
-                  </div>
-                </div>
-                <ChevronRight className="h-5 w-5" />
-              </div>
-            </Card>
-          )}
-
-          {/* Quick Actions */}
-          <div>
-            <h3 className="text-sm font-semibold text-muted-foreground mb-3 px-1">
-              Quick Actions
-            </h3>
-            <div className="grid grid-cols-4 gap-3">
-              {quickActions.map((action) => {
-                const Icon = action.icon;
+        <div className="space-y-7 px-4 pt-6 pb-4">
+          {/* Quick actions */}
+          <section>
+            <h2 className="mb-3 px-1 text-xl font-bold text-foreground">{t('mobileHome.quickActions')}</h2>
+            <div className="grid grid-cols-4 gap-x-2 gap-y-4">
+              {tiles.map((tile) => {
+                const Icon = tile.icon;
                 return (
-                  <Card
-                    key={action.label}
-                    className={cn(
-                      'p-3 flex flex-col items-center gap-2 cursor-pointer',
-                      'active:scale-95 transition-transform'
-                    )}
-                    onClick={async () => {
-                      await haptics.light();
-                      navigate(action.path);
-                    }}
+                  <button
+                    key={tile.label}
+                    onClick={() => go(tile.path)}
+                    className="flex min-h-[88px] flex-col items-center gap-2 active:scale-95 transition-transform"
                   >
-                    <div className={cn('h-12 w-12 rounded-xl flex items-center justify-center', action.color)}>
-                      <Icon className="h-6 w-6" />
-                    </div>
-                    <span className="text-xs font-medium">{action.label}</span>
-                  </Card>
+                    <span className={cn('flex h-16 w-16 items-center justify-center rounded-2xl shadow-sm', tile.tone)}>
+                      <Icon className="h-7 w-7" />
+                    </span>
+                    <span className="text-center text-xs font-medium leading-tight text-foreground">{tile.label}</span>
+                  </button>
                 );
               })}
             </div>
-          </div>
+          </section>
 
-          {/* Recent Activity */}
-          <div>
-            <div className="flex items-center justify-between mb-3 px-1">
-              <h3 className="text-sm font-semibold text-muted-foreground">
-                Recent Activity
-              </h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-xs h-auto py-1"
-                onClick={async () => {
-                  await haptics.light();
-                  navigate(`/family/${selectedFamily?.family_slug}/audit-trail`);
-                }}
-              >
-                View All
-              </Button>
+          {/* Highlight cards */}
+          <section className="grid grid-cols-2 gap-3">
+            <Card
+              onClick={() => slug && go(`/family/${slug}/payment-proofs`)}
+              className="flex min-h-[96px] cursor-pointer items-center gap-3 rounded-2xl p-4 shadow-md active:scale-[0.98] transition-transform"
+            >
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent/20 text-accent-foreground">
+                <AlertCircle className="h-6 w-6" />
+              </span>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-foreground">{t('mobileHome.dues')}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t('mobileHome.pendingCount', { count: stats.pendingContributions })}
+                </p>
+              </div>
+            </Card>
+            <Card
+              onClick={() => slug && go(`/family/${slug}/meetings`)}
+              className="flex min-h-[96px] cursor-pointer items-center gap-3 rounded-2xl p-4 shadow-md active:scale-[0.98] transition-transform"
+            >
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Calendar className="h-6 w-6" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-foreground">{t('mobileHome.nextMeeting')}</p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {stats.nextMeetingDate ? format(new Date(stats.nextMeetingDate), 'EEE, MMM d') : t('mobileHome.noneScheduled')}
+                </p>
+              </div>
+              <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+            </Card>
+          </section>
+
+          {/* Savings summary */}
+          <Card className="flex items-center justify-between rounded-2xl bg-secondary p-4">
+            <div>
+              <p className="text-xs text-muted-foreground">{t('mobileHome.mySavings')}</p>
+              <p className="text-2xl font-bold text-foreground">{stats.totalSavings.toLocaleString()} FCFA</p>
             </div>
-            <Card className="divide-y divide-border">
-              {activities.length > 0 ? (
-                activities.map((activity) => {
+            <div className="text-right">
+              <p className="text-xs text-muted-foreground">{t('mobileHome.activeLoans')}</p>
+              <p className="text-2xl font-bold text-foreground">{stats.activeLoans}</p>
+            </div>
+          </Card>
+
+          {/* Recent activity */}
+          <section>
+            <div className="mb-3 flex items-center justify-between px-1">
+              <h2 className="text-xl font-bold text-foreground">{t('mobileHome.recentActivity')}</h2>
+              <button
+                onClick={() => slug && go(`/family/${slug}/notifications`)}
+                className="min-h-[44px] px-2 text-sm font-semibold text-primary"
+              >
+                {t('mobileHome.seeAll')}
+              </button>
+            </div>
+            {activities.length > 0 ? (
+              <div className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2 scrollbar-hide">
+                {activities.map((activity) => {
                   const Icon = activity.icon;
                   return (
-                    <div key={activity.id} className="flex items-start gap-3 p-4">
-                      <div className={cn('h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0', activity.iconBg)}>
-                        <Icon className="h-4 w-4" />
+                    <Card key={activity.id} className="w-60 shrink-0 snap-start overflow-hidden rounded-2xl shadow-md">
+                      <div className="flex h-24 items-center justify-center bg-primary text-primary-foreground">
+                        <Icon className="h-10 w-10 opacity-90" />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{activity.title}</p>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {activity.description}
+                      <div className="p-3">
+                        <p className="truncate text-sm font-semibold capitalize text-foreground">{activity.title}</p>
+                        <p className="truncate text-xs text-muted-foreground">{activity.description}</p>
+                        <p className="mt-1 text-[11px] text-muted-foreground">
+                          {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })}
                         </p>
                       </div>
-                      <p className="text-xs text-muted-foreground whitespace-nowrap">
-                        {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })}
-                      </p>
-                    </div>
+                    </Card>
                   );
-                })
-              ) : (
-                <div className="p-8 text-center text-muted-foreground">
-                  <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">No recent activity</p>
-                </div>
-              )}
-            </Card>
-          </div>
+                })}
+              </div>
+            ) : (
+              <Card className="rounded-2xl p-8 text-center text-muted-foreground">
+                <Clock className="mx-auto mb-2 h-8 w-8 opacity-50" />
+                <p className="text-sm">{t('mobileHome.noActivity')}</p>
+              </Card>
+            )}
+          </section>
         </div>
       </div>
     </MobileLayout>
