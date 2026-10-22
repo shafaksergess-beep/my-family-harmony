@@ -47,15 +47,41 @@ function PWAUpdatePromptInner() {
     offlineReady: [offlineReady, setOfflineReady],
     updateServiceWorker,
   } = useRegisterSW({
-    onRegisteredSW(swUrl) {
+    onRegisteredSW(swUrl, registration) {
       // eslint-disable-next-line no-console
       console.log("[PWA] Service worker registered:", swUrl);
+      if (!registration) return;
+      // Check for a newer release hourly and whenever the app returns to the foreground,
+      // so installed users pick up new versions without clearing their cache.
+      const check = () => {
+        if (navigator.onLine) void registration.update().catch(() => undefined);
+      };
+      window.setInterval(check, 60 * 60 * 1000);
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") check();
+      });
     },
     onRegisterError(err) {
       // eslint-disable-next-line no-console
       console.warn("[PWA] Service worker registration error", err);
     },
   });
+
+  // If an old open tab asks for a code file removed by a new release, reload once onto the new version.
+  useEffect(() => {
+    const onPreloadError = (e: Event) => {
+      e.preventDefault();
+      if (sessionStorage.getItem("kr-reloaded-for-update")) return;
+      sessionStorage.setItem("kr-reloaded-for-update", "1");
+      window.location.reload();
+    };
+    window.addEventListener("vite:preloadError", onPreloadError);
+    const clear = window.setTimeout(() => sessionStorage.removeItem("kr-reloaded-for-update"), 10000);
+    return () => {
+      window.removeEventListener("vite:preloadError", onPreloadError);
+      window.clearTimeout(clear);
+    };
+  }, []);
 
   useEffect(() => {
     if (offlineReady) {
@@ -69,25 +95,28 @@ function PWAUpdatePromptInner() {
 
   useEffect(() => {
     if (!needRefresh) return;
-
-    // Best-effort fetch of the release notes — cache-bust so the SW
-    // doesn't serve the stale copy right at the moment of update.
-    void fetch(`/changelog.json?ts=${Date.now()}`, { cache: "no-store" })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((c: Changelog | null) => setChangelog(c));
-
-    toast({
-      title: "New version ready",
-      description: "Refresh to apply the latest improvements.",
-      duration: 12000,
-      action: (
-        <Button size="sm" onClick={() => setDialogOpen(true)}>
-          What's new
-        </Button>
-      ) as any,
-    });
     setNeedRefresh(false);
-  }, [needRefresh, setNeedRefresh]);
+
+    // Apply the update automatically. Wait until the user leaves the app or a
+    // short grace period passes, so nobody loses a form mid-typing.
+    let done = false;
+    const apply = () => {
+      if (done) return;
+      const el = document.activeElement as HTMLElement | null;
+      const typing = !!el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable);
+      if (typing && document.visibilityState === "visible") return;
+      done = true;
+      void updateServiceWorker(true);
+    };
+    toast({ title: "Updating Kinsroot", description: "Loading the latest version…", duration: 4000 });
+    const onHide = () => document.visibilityState === "hidden" && apply();
+    document.addEventListener("visibilitychange", onHide);
+    const timer = window.setInterval(apply, 4000);
+    return () => {
+      document.removeEventListener("visibilitychange", onHide);
+      window.clearInterval(timer);
+    };
+  }, [needRefresh, setNeedRefresh, updateServiceWorker]);
 
   const applyUpdate = () => {
     // updateServiceWorker(true) messages the waiting worker with SKIP_WAITING,
