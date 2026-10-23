@@ -4,3 +4,6 @@
 - Self-account deletion uses an authenticated edge endpoint and auth lifecycle cleanup; anonymized ledger identities survive removal of sign-in credentials. Why: preserve family accounting without retaining personal profile data.
 - Auth state listeners defer database requests until after the callback returns. Why: prevent auth storage-lock deadlocks during signed-in reloads.
 - Device management reads authoritative sessions through a service-only public read-only RPC, derives the current session from verified JWT claims, and revokes others using JWT-based Auth sign-out; never promise individual revocation or a device cap without supported APIs. Why: metadata deletion and session UUIDs cannot revoke authentication sessions.
+- Group types: `families.entity_type` is family|association|tontine (default family); creation goes through the 12-arg `create_family_self_service` overload — keep the 11-arg version for older callers.
+- Module activation: modules are default-on; a `family_module_settings` row with `is_enabled=false` hides them. Gate navigation via `useFamilyModules` and routes via `ModuleGate` — never delete data when a module is disabled.
+- Platform roles: super admins in `super_admins`, support team in `support_admins` (read-mostly); check via `is_super_admin`/`is_support_admin` security-definer RPCs, never client storage.

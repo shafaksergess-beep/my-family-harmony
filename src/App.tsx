@@ -17,6 +17,7 @@ import { OfflineBootstrap } from "@/components/OfflineBootstrap";
 import { PWAUpdatePrompt } from "@/components/PWAUpdatePrompt";
 import { AuthBootstrap } from "@/components/AuthBootstrap";
 import { IdleWarningDialog } from "@/components/IdleWarningDialog";
+import { ModuleGate } from "@/components/family/ModuleGate";
 const SessionManagementPage = lazy(() => import("./pages/SessionManagement"));
 // Lazy load core pages
 const Index = lazy(() => import("./pages/Index"));
@@ -68,6 +69,7 @@ const MemberDetail = lazy(() => import("./pages/family/MemberDetail"));
 const PDFReports = lazy(() => import("./pages/family/PDFReports"));
 const MeetingCheckIn = lazy(() => import("./pages/family/MeetingCheckIn"));
 const FamilyMeetings = lazy(() => import("./pages/family/Meetings"));
+const FamilyModuleSettings = lazy(() => import("./pages/family/ModuleSettings"));
 const FamilyContributions = lazy(() => import("./pages/family/Contributions"));
 const ContributionSettings = lazy(() => import("./pages/family/ContributionSettings"));
 const FinancialSettings = lazy(() => import("./pages/family/FinancialSettings"));
@@ -195,10 +197,11 @@ const App = () => (
           
           {/* Family Role Management */}
           <Route path="/family/:familySlug/role-management" element={<FamilyModule><RoleManagement /></FamilyModule>} />
+          <Route path="/family/:familySlug/module-settings" element={<FamilyModule><FamilyModuleSettings /></FamilyModule>} />
           
           <Route path="/family/:familySlug" element={<FamilyModule><FamilyDetail /></FamilyModule>} />
           <Route path="/family/:familySlug/audit-trail-enhanced" element={<FamilyModule><AuditTrailEnhanced /></FamilyModule>} />
-          <Route path="/family/:familySlug/analytics" element={<FamilyModule><FamilyAnalytics /></FamilyModule>} />
+          <Route path="/family/:familySlug/analytics" element={<FamilyModule><ModuleGate moduleSlug="analytics"><FamilyAnalytics /></ModuleGate></FamilyModule>} />
           <Route path="/family/:familySlug/financial-analytics" element={<FamilyModule><FinancialAnalytics /></FamilyModule>} />
           <Route path="/family/:familySlug/notifications" element={<FamilyModule><Notifications /></FamilyModule>} />
           <Route path="/family/:familySlug/audit-trail" element={<FamilyModule><AuditTrail /></FamilyModule>} />
@@ -208,27 +211,27 @@ const App = () => (
           <Route path="/family/:familySlug/pdf-reports" element={<FamilyModule><PDFReports /></FamilyModule>} />
           <Route path="/family/:familySlug/meetings/:meetingId" element={<FamilyModule><MeetingDetail /></FamilyModule>} />
           <Route path="/family/:familySlug/meetings/:meetingId/checkin" element={<FamilyModule><MeetingCheckIn /></FamilyModule>} />
-          <Route path="/family/:familySlug/meetings" element={<FamilyModule><FamilyMeetings /></FamilyModule>} />
-          <Route path="/family/:familySlug/contributions" element={<FamilyModule><FamilyContributions /></FamilyModule>} />
+          <Route path="/family/:familySlug/meetings" element={<FamilyModule><ModuleGate moduleSlug="meetings"><FamilyMeetings /></ModuleGate></FamilyModule>} />
+          <Route path="/family/:familySlug/contributions" element={<FamilyModule><ModuleGate moduleSlug="contributions"><FamilyContributions /></ModuleGate></FamilyModule>} />
           <Route path="/family/:familySlug/contribution-settings" element={<FamilyModule><ContributionSettings /></FamilyModule>} />
           <Route path="/family/:familySlug/financial-settings" element={<FamilyModule><FinancialSettings /></FamilyModule>} />
-          <Route path="/family/:familySlug/loans" element={<FamilyModule><FamilyLoans /></FamilyModule>} />
+          <Route path="/family/:familySlug/loans" element={<FamilyModule><ModuleGate moduleSlug="loans"><FamilyLoans /></ModuleGate></FamilyModule>} />
           <Route path="/family/:familySlug/loan-committee" element={<FamilyModule><LoanCommitteeDashboard /></FamilyModule>} />
           <Route path="/family/:familySlug/loan-analytics" element={<FamilyModule><LoanAnalytics /></FamilyModule>} />
           <Route path="/family/:familySlug/loan-history" element={<FamilyModule><LoanHistory /></FamilyModule>} />
           <Route path="/family/:familySlug/attendance" element={<FamilyModule><FamilyAttendance /></FamilyModule>} />
-          <Route path="/family/:familySlug/savings" element={<FamilyModule><FamilySavings /></FamilyModule>} />
-          <Route path="/family/:familySlug/njangi" element={<FamilyModule><FamilyNjangi /></FamilyModule>} />
-          <Route path="/family/:familySlug/assistance" element={<FamilyModule><FamilyAssistance /></FamilyModule>} />
-          <Route path="/family/:familySlug/shares" element={<FamilyModule><FamilyShares /></FamilyModule>} />
-          <Route path="/family/:familySlug/balloting" element={<FamilyModule><Balloting /></FamilyModule>} />
+          <Route path="/family/:familySlug/savings" element={<FamilyModule><ModuleGate moduleSlug="savings"><FamilySavings /></ModuleGate></FamilyModule>} />
+          <Route path="/family/:familySlug/njangi" element={<FamilyModule><ModuleGate moduleSlug="njangi"><FamilyNjangi /></ModuleGate></FamilyModule>} />
+          <Route path="/family/:familySlug/assistance" element={<FamilyModule><ModuleGate moduleSlug="assistance"><FamilyAssistance /></ModuleGate></FamilyModule>} />
+          <Route path="/family/:familySlug/shares" element={<FamilyModule><ModuleGate moduleSlug="shares"><FamilyShares /></ModuleGate></FamilyModule>} />
+          <Route path="/family/:familySlug/balloting" element={<FamilyModule><ModuleGate moduleSlug="balloting"><Balloting /></ModuleGate></FamilyModule>} />
           <Route path="/family/:familySlug/attendance-analytics" element={<FamilyModule><AttendanceAnalytics /></FamilyModule>} />
           <Route path="/family/:familySlug/meeting-analytics" element={<FamilyModule><MeetingAnalyticsDashboard /></FamilyModule>} />
           <Route path="/family/:familySlug/meeting-templates" element={<FamilyModule><MeetingTemplates /></FamilyModule>} />
           <Route path="/family/:familySlug/meeting-settings" element={<FamilyModule><MeetingSettings /></FamilyModule>} />
           <Route path="/family/:familySlug/reports" element={<FamilyModule><FamilyReports /></FamilyModule>} />
           <Route path="/family/:familySlug/invitations" element={<FamilyModule><Invitations /></FamilyModule>} />
-          <Route path="/family/:familySlug/payments" element={<FamilyModule><Payments /></FamilyModule>} />
+          <Route path="/family/:familySlug/payments" element={<FamilyModule><ModuleGate moduleSlug="payments"><Payments /></ModuleGate></FamilyModule>} />
           <Route path="/family/:familySlug/payment-proofs" element={<FamilyModule><PaymentProofs /></FamilyModule>} />
           <Route path="/family/:familySlug/payment-integration" element={<FamilyModule><PaymentIntegration /></FamilyModule>} />
           <Route path="/family/:familySlug/meeting-reminders" element={<FamilyModule><MeetingReminders /></FamilyModule>} />
@@ -246,8 +249,8 @@ const App = () => (
           <Route path="/settings/notifications" element={<Suspense fallback={<PageLoadingSkeleton />}><NotificationSettings /></Suspense>} />
 
           <Route path="/family/:familySlug/more" element={<FamilyModule><FamilyMore /></FamilyModule>} />
-          <Route path="/family/:familySlug/chat" element={<FamilyModule><FamilyChat /></FamilyModule>} />
-          <Route path="/family/:familySlug/calendar" element={<FamilyModule><FamilyCalendar /></FamilyModule>} />
+          <Route path="/family/:familySlug/chat" element={<FamilyModule><ModuleGate moduleSlug="chat"><FamilyChat /></ModuleGate></FamilyModule>} />
+          <Route path="/family/:familySlug/calendar" element={<FamilyModule><ModuleGate moduleSlug="calendar"><FamilyCalendar /></ModuleGate></FamilyModule>} />
           <Route path="/family/:familySlug/pending-approvals" element={<FamilyModule><PendingApprovals /></FamilyModule>} />
           <Route path="/accept-invitation" element={<AcceptInvitation />} />
           <Route path="/join" element={<JoinFamily />} />

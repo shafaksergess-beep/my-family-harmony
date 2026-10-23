@@ -18,6 +18,9 @@ import SEO from "@/components/SEO";
 import { FamilyHealthWidget } from "@/components/family/FamilyHealthWidget";
 import { FamilyLanguageCard } from "@/components/family/FamilyLanguageCard";
 import { FamilyLifecycleBanner } from "@/components/family/FamilyLifecycleBanner";
+import { useFamilyModules } from "@/hooks/useFamilyModules";
+import { entityTerm } from "@/lib/entityTerms";
+import { Badge } from "@/components/ui/badge";
 
 interface ModuleCategory {
   id: string;
@@ -53,6 +56,8 @@ const FamilyDetail = () => {
   const [loadingModules, setLoadingModules] = useState(true);
   const [pendingApprovalsCount, setPendingApprovalsCount] = useState(0);
   const [modulesError, setModulesError] = useState<string | null>(null);
+  const { isModuleEnabled } = useFamilyModules(family?.id);
+
   
   const canManageInvitations = isFamilyHead || isFamilyAdmin;
 
@@ -122,6 +127,8 @@ const FamilyDetail = () => {
       // Filter modules based on user role
       const allModules = modulesRes.data || [];
       const filteredModules = allModules.filter((module) => {
+        // Modules disabled for this family stay hidden for everyone.
+        if (!isModuleEnabled(module.slug)) return false;
         const requiredRoles = module.required_roles as string[] | null;
         // If no required roles, everyone can access
         if (!requiredRoles || requiredRoles.length === 0) {
@@ -287,7 +294,12 @@ const FamilyDetail = () => {
                 {t("famDetail.backToDashboard")}
               </Button>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">{family?.name}</h1>
+                 <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                  {family?.name}
+                  <Badge variant="secondary" className="text-xs font-normal">
+                    {entityTerm(family?.entity_type, t, "singular")}
+                  </Badge>
+                </h1>
                 <p className="text-sm text-muted-foreground">
                   {family?.description || "Family management dashboard"}
                   {isSuperAdmin

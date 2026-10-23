@@ -36,6 +36,7 @@ interface FamilyMembership {
 interface UserWithFamilies extends UserProfile {
   families: FamilyMembership[];
   is_super_admin: boolean;
+  is_support_admin: boolean;
 }
 
 export default function Users() {
@@ -188,6 +189,12 @@ export default function Users() {
 
       const superAdminIds = new Set(superAdmins?.map(sa => sa.user_id) || []);
 
+      // Fetch support admins (read-mostly platform role for the support team)
+      const { data: supportAdmins } = await supabase
+        .from("support_admins")
+        .select("user_id");
+      const supportAdminIds = new Set(supportAdmins?.map(sa => sa.user_id) || []);
+
       // Combine data
       const usersWithFamilies: UserWithFamilies[] = (profiles || []).map(profile => ({
         ...profile,
@@ -199,6 +206,7 @@ export default function Users() {
             family: m.families as any,
           })),
         is_super_admin: superAdminIds.has(profile.id),
+        is_support_admin: supportAdminIds.has(profile.id),
       }));
 
       setUsers(usersWithFamilies);
@@ -211,6 +219,33 @@ export default function Users() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleToggleSupportAdmin = async (user: UserWithFamilies) => {
+    try {
+      if (user.is_support_admin) {
+        const { error } = await supabase
+          .from("support_admins")
+          .delete()
+          .eq("user_id", user.id);
+        if (error) throw error;
+        toast({ title: t("admUsers.supportAdminRevoked", { name: user.full_name }) });
+      } else {
+        const { error } = await supabase
+          .from("support_admins")
+          .insert({ user_id: user.id });
+        if (error) throw error;
+        toast({ title: t("admUsers.supportAdminGranted", { name: user.full_name }) });
+      }
+      fetchUsers();
+    } catch (error) {
+      console.error("Error toggling support admin:", error);
+      toast({
+        title: t("admUsers.error"),
+        description: t("admUsers.supportAdminError"),
+        variant: "destructive",
+      });
     }
   };
 
@@ -678,6 +713,9 @@ export default function Users() {
                             {user.is_super_admin && (
                               <Badge variant="destructive">{t("admUsers.superAdmin")}</Badge>
                             )}
+                            {user.is_support_admin && (
+                              <Badge variant="secondary">{t("admUsers.supportAdmin")}</Badge>
+                            )}
                           </div>
                           <div className="space-y-1 text-sm text-muted-foreground">
                             <p>{user.email}</p>
@@ -688,20 +726,33 @@ export default function Users() {
                               ) : (
                                 user.families.map((fm) => (
                                   <Badge key={fm.family_id} variant="secondary">
-                                    {fm.family.name} - {fm.role.replace("_", " ")}
+                                    {fm.family?.name ?? t("admUsers.unknownFamily")} - {fm.role.replace("_", " ")}
                                   </Badge>
                                 ))
                               )}
                             </div>
                           </div>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => navigate(`/admin/users/${user.id}`)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          {userRole === "super_admin" && !user.is_super_admin && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleToggleSupportAdmin(user)}
+                            >
+                              {user.is_support_admin
+                                ? t("admUsers.removeSupportAdmin")
+                                : t("admUsers.makeSupportAdmin")}
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => navigate(`/admin/users/${user.id}`)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

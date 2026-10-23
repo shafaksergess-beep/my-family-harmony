@@ -2540,7 +2540,14 @@
     "youMustBeASuper": "You must be a super admin, family head, or family admin to access this page",
     "emailPasswordFullNamePhone": "email,password,full_name,phone,family_name,role",
     "user1ExampleComPassword123John": "user1@example.com,password123,John Doe,+1234567890,Smith Family,member",
-    "user2ExampleComPassword456Jane": "user2@example.com,password456,Jane Smith,,Jones Family,treasurer"
+    "user2ExampleComPassword456Jane": "user2@example.com,password456,Jane Smith,,Jones Family,treasurer",
+    "supportAdmin": "Support admin",
+    "makeSupportAdmin": "Make support admin",
+    "removeSupportAdmin": "Remove support admin",
+    "supportAdminGranted": "{{name}} is now a support admin",
+    "supportAdminRevoked": "Support admin removed for {{name}}",
+    "supportAdminError": "Could not update the support admin role",
+    "unknownFamily": "Unknown group"
   },
   "admAdminNotificationsList": {
     "markAllRead": "Mark all read",
@@ -2669,7 +2676,22 @@
     "create": "Create Family",
     "step": "Step {{step}} of {{total}}",
     "created": "Family created! Invite at least one member within 14 days to keep it active.",
-    "failed": "Failed to create family"
+    "failed": "Failed to create family",
+    "entityType": "What are you creating?",
+    "entity": {
+      "family": {
+        "label": "Family",
+        "desc": "Extended family or clan managing contributions, meetings and mutual aid"
+      },
+      "association": {
+        "label": "Association / Community",
+        "desc": "Cultural association, alumni group or community organisation"
+      },
+      "tontine": {
+        "label": "Tontine / Njangi Group",
+        "desc": "Rotating savings group focused on njangi payouts and contributions"
+      }
+    }
   },
   "familyLifecycle": {
     "suspendedTitle": "This family is suspended",
@@ -2713,5 +2735,40 @@
     "searching": "Searching…",
     "noResults": "No members, meetings or pages found",
     "bellUnread": "Notifications, {{count}} new"
+  },
+  "entity": {
+    "family": {
+      "singular": "Family",
+      "plural": "Families",
+      "member": "Member",
+      "members": "Members"
+    },
+    "association": {
+      "singular": "Association",
+      "plural": "Associations",
+      "member": "Member",
+      "members": "Members"
+    },
+    "tontine": {
+      "singular": "Tontine Group",
+      "plural": "Tontine Groups",
+      "member": "Participant",
+      "members": "Participants"
+    }
+  },
+  "moduleSettings": {
+    "title": "Module Settings",
+    "subtitle": "Choose which modules are active for {{name}}",
+    "seoTitle": "Module Settings | Kinsroot",
+    "seoDescription": "Activate or deactivate modules for your group",
+    "accessDenied": "Only family heads, admins and platform admins can manage modules",
+    "loadError": "Could not load module settings",
+    "saveError": "Could not save the module setting",
+    "moduleEnabled": "{{name}} is now active",
+    "moduleDisabledToast": "{{name}} is now hidden for this group",
+    "moduleDisabled": "This module has been deactivated for this group",
+    "footerNote": "Disabled modules are hidden from the dashboard and menus. Existing data is kept and reappears when you reactivate a module.",
+    "menuLabel": "Module Settings",
+    "menuDescription": "Activate or deactivate modules"
   }
 }

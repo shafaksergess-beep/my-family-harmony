@@ -38,6 +38,7 @@ import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 
 const familySchema = z.object({
+  entity_type: z.enum(['family', 'association', 'tontine']),
   name: z.string().min(3, 'Family name must be at least 3 characters'),
   slug: z.string().min(3, 'Slug must be at least 3 characters').regex(/^[a-z0-9-]+$/, 'Slug must only contain lowercase letters, numbers, and hyphens'),
   description: z.string().optional(),
@@ -72,6 +73,7 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
   const form = useForm<FamilyFormData>({
     resolver: zodResolver(familySchema),
     defaultValues: {
+      entity_type: 'family',
       name: '',
       slug: '',
       description: '',
@@ -93,7 +95,7 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
     let fieldsToValidate: (keyof FamilyFormData)[] = [];
     
     if (step === 1) {
-      fieldsToValidate = ['name', 'slug', 'description', 'primary_language'];
+      fieldsToValidate = ['entity_type', 'name', 'slug', 'description', 'primary_language'];
     } else if (step === 2) {
       fieldsToValidate = ['meeting_frequency', 'meeting_day', 'meeting_time'];
     }
@@ -127,6 +129,7 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
         p_njangi_amount: data.njangi_amount,
         p_loan_interest_rate: data.loan_interest_rate,
         p_share_value: data.share_value,
+        p_entity_type: data.entity_type,
       });
 
       if (error) throw error;
@@ -165,6 +168,34 @@ export function FamilySetupWizard({ open, onComplete, onClose }: FamilySetupWiza
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {step === 1 && (
                 <>
+                  <FormField
+                    control={form.control}
+                    name="entity_type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("familySetup.entityType")}</FormLabel>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                          {(['family', 'association', 'tontine'] as const).map((type) => (
+                            <button
+                              key={type}
+                              type="button"
+                              onClick={() => field.onChange(type)}
+                              className={`rounded-lg border p-3 text-left transition-colors ${
+                                field.value === type
+                                  ? 'border-primary bg-primary/10'
+                                  : 'border-border hover:bg-muted/50'
+                              }`}
+                            >
+                              <p className="font-medium text-sm">{t(`familySetup.entity.${type}.label`)}</p>
+                              <p className="text-xs text-muted-foreground mt-1">{t(`familySetup.entity.${type}.desc`)}</p>
+                            </button>
+                          ))}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <FormField
                     control={form.control}
                     name="name"

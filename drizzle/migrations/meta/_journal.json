@@ -57,6 +57,13 @@
       "when": 1792616581986,
       "tag": "0007_family_member_deadline_lifecycle",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792796455230,
+      "tag": "0008_entity_types_support_admin_module_toggles",
+      "breakpoints": true
     }
   ]
 }

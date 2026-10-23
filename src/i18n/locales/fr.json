@@ -2540,7 +2540,14 @@
     "youMustBeASuper": "Vous devez être super administrateur, chef de famille ou administrateur de famille pour accéder à cette page",
     "emailPasswordFullNamePhone": "email,password,full_name,phone,family_name,role",
     "user1ExampleComPassword123John": "user1@example.com,password123,John Doe,+1234567890,Famille Smith,member",
-    "user2ExampleComPassword456Jane": "user2@example.com,password456,Jane Smith,,Famille Jones,treasurer"
+    "user2ExampleComPassword456Jane": "user2@example.com,password456,Jane Smith,,Famille Jones,treasurer",
+    "supportAdmin": "Admin support",
+    "makeSupportAdmin": "Nommer admin support",
+    "removeSupportAdmin": "Retirer l'admin support",
+    "supportAdminGranted": "{{name}} est maintenant admin support",
+    "supportAdminRevoked": "Admin support retiré pour {{name}}",
+    "supportAdminError": "Impossible de modifier le rôle admin support",
+    "unknownFamily": "Groupe inconnu"
   },
   "admAdminNotificationsList": {
     "markAllRead": "Tout marquer comme lu",
@@ -2669,7 +2676,22 @@
     "create": "Créer la famille",
     "step": "Étape {{step}} sur {{total}}",
     "created": "Famille créée ! Invitez au moins un membre dans les 14 jours pour la garder active.",
-    "failed": "Échec de la création de la famille"
+    "failed": "Échec de la création de la famille",
+    "entityType": "Que souhaitez-vous créer ?",
+    "entity": {
+      "family": {
+        "label": "Famille",
+        "desc": "Famille élargie ou clan gérant cotisations, réunions et entraide"
+      },
+      "association": {
+        "label": "Association / Communauté",
+        "desc": "Association culturelle, groupe d'anciens élèves ou organisation communautaire"
+      },
+      "tontine": {
+        "label": "Groupe de tontine / Njangi",
+        "desc": "Groupe d'épargne rotative axé sur les distributions njangi et les cotisations"
+      }
+    }
   },
   "familyLifecycle": {
     "suspendedTitle": "Cette famille est suspendue",
@@ -2713,5 +2735,40 @@
     "searching": "Recherche…",
     "noResults": "Aucun membre, réunion ou page trouvé",
     "bellUnread": "Notifications, {{count}} nouvelles"
+  },
+  "entity": {
+    "family": {
+      "singular": "Famille",
+      "plural": "Familles",
+      "member": "Membre",
+      "members": "Membres"
+    },
+    "association": {
+      "singular": "Association",
+      "plural": "Associations",
+      "member": "Membre",
+      "members": "Membres"
+    },
+    "tontine": {
+      "singular": "Groupe de tontine",
+      "plural": "Groupes de tontine",
+      "member": "Participant",
+      "members": "Participants"
+    }
+  },
+  "moduleSettings": {
+    "title": "Paramètres des modules",
+    "subtitle": "Choisissez les modules actifs pour {{name}}",
+    "seoTitle": "Paramètres des modules | Kinsroot",
+    "seoDescription": "Activez ou désactivez les modules de votre groupe",
+    "accessDenied": "Seuls les chefs de famille, administrateurs et administrateurs de la plateforme peuvent gérer les modules",
+    "loadError": "Impossible de charger les paramètres des modules",
+    "saveError": "Impossible d'enregistrer le paramètre du module",
+    "moduleEnabled": "{{name}} est maintenant actif",
+    "moduleDisabledToast": "{{name}} est maintenant masqué pour ce groupe",
+    "moduleDisabled": "Ce module a été désactivé pour ce groupe",
+    "footerNote": "Les modules désactivés sont masqués du tableau de bord et des menus. Les données existantes sont conservées et réapparaissent à la réactivation.",
+    "menuLabel": "Paramètres des modules",
+    "menuDescription": "Activer ou désactiver les modules"
   }
 }
