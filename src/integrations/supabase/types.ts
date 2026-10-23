@@ -846,6 +846,7 @@ export type Database = {
           created_by: string | null
           deactivated_at: string | null
           description: string | null
+          entity_type: string
           external_other_amount: number | null
           external_wonya_amount: number | null
           fine_after_30min: number | null
@@ -889,6 +890,7 @@ export type Database = {
           created_by?: string | null
           deactivated_at?: string | null
           description?: string | null
+          entity_type?: string
           external_other_amount?: number | null
           external_wonya_amount?: number | null
           fine_after_30min?: number | null
@@ -932,6 +934,7 @@ export type Database = {
           created_by?: string | null
           deactivated_at?: string | null
           description?: string | null
+          entity_type?: string
           external_other_amount?: number | null
           external_wonya_amount?: number | null
           fine_after_30min?: number | null
@@ -2939,6 +2942,24 @@ export type Database = {
         }
         Relationships: []
       }
+      support_admins: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       system_announcements: {
         Row: {
           active: boolean
@@ -3192,25 +3213,46 @@ export type Database = {
         Args: { _family_id: string; _user_id: string }
         Returns: boolean
       }
-      create_family_self_service: {
-        Args: {
-          p_description: string
-          p_loan_interest_rate: number
-          p_mandatory_contribution: number
-          p_meeting_day: string
-          p_meeting_frequency: string
-          p_meeting_time: string
-          p_name: string
-          p_njangi_amount: number
-          p_primary_language: string
-          p_share_value: number
-          p_slug: string
-        }
-        Returns: {
-          family_id: string
-          family_slug: string
-        }[]
-      }
+      create_family_self_service:
+        | {
+            Args: {
+              p_description: string
+              p_loan_interest_rate: number
+              p_mandatory_contribution: number
+              p_meeting_day: string
+              p_meeting_frequency: string
+              p_meeting_time: string
+              p_name: string
+              p_njangi_amount: number
+              p_primary_language: string
+              p_share_value: number
+              p_slug: string
+            }
+            Returns: {
+              family_id: string
+              family_slug: string
+            }[]
+          }
+        | {
+            Args: {
+              p_description: string
+              p_entity_type?: string
+              p_loan_interest_rate: number
+              p_mandatory_contribution: number
+              p_meeting_day: string
+              p_meeting_frequency: string
+              p_meeting_time: string
+              p_name: string
+              p_njangi_amount: number
+              p_primary_language: string
+              p_share_value: number
+              p_slug: string
+            }
+            Returns: {
+              family_id: string
+              family_slug: string
+            }[]
+          }
       generate_reference_code: { Args: never; Returns: string }
       get_activity_logs_safe: {
         Args: { p_family_id?: string; p_limit?: number }
@@ -3277,6 +3319,7 @@ export type Database = {
         Returns: boolean
       }
       is_super_admin: { Args: { check_user_id: string }; Returns: boolean }
+      is_support_admin: { Args: { check_user_id: string }; Returns: boolean }
       list_account_sessions: {
         Args: { p_current_session_id: string; p_user_id: string }
         Returns: {
