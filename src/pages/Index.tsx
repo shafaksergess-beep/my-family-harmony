@@ -188,6 +188,7 @@ export default function Index() {
         </section>
 
         <section aria-label={t("home.proof.aria")} style={{ background: c("hp-forest-deep"), color: c("hp-ivory") }}>
+          <h2 className="sr-only">{t("home.proof.aria")}</h2>
           <div className="mx-auto grid max-w-7xl gap-8 px-5 py-10 sm:grid-cols-3 lg:px-8">
             {([[Users, "1"], [Landmark, "2"], [WifiOff, "3"]] as const).map(([Icon, n]) => (
               <div key={n} className="flex gap-4"><Icon className="mt-0.5 h-5 w-5 shrink-0" style={{ color: c("hp-gold") }} /><div><p className="font-semibold">{t(`home.proof.t${n}`)}</p><p className="mt-1 text-sm opacity-75">{t(`home.proof.d${n}`)}</p></div></div>
@@ -202,7 +203,7 @@ export default function Index() {
           </Reveal>
           <div className="mt-14 grid gap-5 lg:grid-cols-6">
             <Reveal className="lg:col-span-4 lg:row-span-2">
-              <article className="hp-lift relative h-full overflow-hidden rounded-[28px] p-8 sm:p-10" style={{ background: c("hp-forest"), color: c("hp-ivory"), boxShadow: "var(--hp-shadow)" }}>
+              <div className="hp-lift relative h-full overflow-hidden rounded-[28px] p-8 sm:p-10" style={{ background: c("hp-forest"), color: c("hp-ivory"), boxShadow: "var(--hp-shadow)" }}>
                 <Calendar className="h-7 w-7" style={{ color: c("hp-gold") }} />
                 <h3 className="hp-serif mt-6 text-3xl font-medium sm:text-4xl">{t("home.platform.meetingsTitle")}</h3>
                 <p className="mt-3 max-w-md opacity-80">{t("home.platform.meetingsDesc")}</p>
@@ -212,7 +213,7 @@ export default function Index() {
                   ))}
                 </div>
                 <div className="pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full" style={{ background: c("hp-gold", 0.15) }} aria-hidden />
-              </article>
+              </div>
             </Reveal>
             {[
               { I: RefreshCcw, k: "njangi", bg: "hp-cream", span: "lg:col-span-2" },
@@ -221,11 +222,11 @@ export default function Index() {
               { I: ShieldCheck, k: "payments", bg: "hp-paper", span: "lg:col-span-3" },
             ].map(({ I, k, bg, span }, idx) => (
               <Reveal key={k} delay={idx * 80} className={span}>
-                <article className="hp-lift h-full rounded-[24px] p-7" style={{ background: c(bg), border: `1px solid ${c("hp-line")}` }}>
+                <div className="hp-lift h-full rounded-[24px] p-7" style={{ background: c(bg), border: `1px solid ${c("hp-line")}` }}>
                   <I className="h-6 w-6" style={{ color: c("hp-terracotta") }} />
                   <h3 className="hp-serif mt-5 text-2xl font-medium">{t(`home.platform.${k}T`)}</h3>
                   <p className="mt-2 text-sm leading-relaxed" style={{ color: c("hp-ink-soft") }}>{t(`home.platform.${k}D`)}</p>
-                </article>
+                </div>
               </Reveal>
             ))}
           </div>
@@ -309,7 +310,7 @@ export default function Index() {
       <footer style={{ borderTop: `1px solid ${c("hp-line")}` }}>
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-5 py-8 text-sm sm:flex-row lg:px-8" style={{ color: c("hp-ink-soft") }}>
           <div className="flex items-center gap-2"><img src="/logo.jpg" alt="" width={24} height={24} className="h-6 w-6 rounded-full" /><span>{t("home.footer.credit")}</span></div>
-          <div className="flex gap-5"><Link to="/privacy">{t("home.footer.privacy")}</Link><Link to="/terms">{t("home.footer.terms")}</Link><a href="mailto:softserge.dev@gmail.com">softserge.dev@gmail.com</a></div>
+          <div className="flex gap-5"><Link to="/blog/what-is-njangi">{t("home.footer.blog")}</Link><Link to="/privacy">{t("home.footer.privacy")}</Link><Link to="/terms">{t("home.footer.terms")}</Link><a href="mailto:softserge.dev@gmail.com">softserge.dev@gmail.com</a></div>
         </div>
       </footer>
       <InstallBanner />

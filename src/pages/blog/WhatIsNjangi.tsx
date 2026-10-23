@@ -20,7 +20,7 @@ const structuredData = {
     },
   },
   datePublished: "2026-07-11",
-  dateModified: "2026-07-11",
+  dateModified: "2026-08-23",
   mainEntityOfPage: "https://kinsroot.softserge.com/blog/what-is-njangi",
 };
 
@@ -30,6 +30,7 @@ export default function WhatIsNjangi() {
       <SEO
         title="What Is a Njangi? A Guide to Rotating Savings for Families"
         description="Learn what a njangi is, how rotating savings work in Cameroonian and West African families, and how to digitize your family's njangi with Kinsroot."
+        ogImage="https://kinsroot.softserge.com/og-njangi.png"
       />
       <Helmet>
         <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
@@ -77,6 +78,26 @@ export default function WhatIsNjangi() {
               Njangis have funded weddings, school fees, land purchases, funerals and
               business ideas for generations. They work because they replace formal banking
               with something stronger: <strong>social trust</strong>.
+            </p>
+
+            <h2 className="text-2xl font-semibold mt-10 mb-3">What does the word "njangi" mean?</h2>
+            <p>
+              <strong>Njangi</strong> is the word used in Cameroon's North West and South West
+              regions for a rotating savings group. Depending on the community and language,
+              you will see the same tradition spelled or named differently:
+            </p>
+            <ul className="list-disc ml-6 space-y-1">
+              <li><strong>Njangui</strong> — a common French-influenced spelling of the same word.</li>
+              <li><strong>Tontine</strong> — the name used in francophone Cameroon and West Africa.</li>
+              <li><strong>Susu</strong> (or <em>esusu</em>) — used in Ghana, Nigeria and the Caribbean.</li>
+              <li><strong>Chama</strong> — the East African (Kenya, Tanzania) equivalent.</li>
+              <li><strong>Ekub</strong> — the Ethiopian version of the same rotating pot.</li>
+              <li><strong>Stokvel</strong> — the South African savings-club tradition.</li>
+            </ul>
+            <p>
+              Whatever the name, the mechanics are identical: a trusted circle contributes a
+              fixed amount on a schedule, and the pot rotates to one member per cycle. This
+              guide uses "njangi" because that is the word most Kinsroot families use.
             </p>
 
             <h2 className="text-2xl font-semibold mt-10 mb-3">How a njangi works</h2>

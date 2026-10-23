@@ -5,6 +5,8 @@ interface SEOProps {
   description?: string;
   canonical?: string;
   noIndex?: boolean;
+  /** Absolute https URL of a page-specific social preview image (1200x630). */
+  ogImage?: string;
 }
 
 const DEFAULT_DESCRIPTION =
@@ -18,7 +20,7 @@ const SITE_ORIGIN = "https://kinsroot.softserge.com";
  * android-app:// alternate so Google can deep-link search results into
  * the installed Play Store app (App Indexing).
  */
-export const SEO = ({ title, description, canonical, noIndex }: SEOProps) => {
+export const SEO = ({ title, description, canonical, noIndex, ogImage }: SEOProps) => {
   const fullTitle = title.includes("Kinsroot") ? title : `${title} | Kinsroot`;
   const desc = description ?? DEFAULT_DESCRIPTION;
   const url =
@@ -45,6 +47,8 @@ export const SEO = ({ title, description, canonical, noIndex }: SEOProps) => {
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={desc} />
       {url && <meta property="og:url" content={url} />}
+      {ogImage && <meta property="og:image" content={ogImage} />}
+      {ogImage && <meta name="twitter:image" content={ogImage} />}
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={desc} />
     </Helmet>
