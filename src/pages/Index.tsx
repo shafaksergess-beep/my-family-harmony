@@ -1,3 +1,4 @@
+import { WhatsAppSupportLink } from "@/components/WhatsAppSupportLink";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
