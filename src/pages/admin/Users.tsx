@@ -726,7 +726,7 @@ export default function Users() {
                               ) : (
                                 user.families.map((fm) => (
                                   <Badge key={fm.family_id} variant="secondary">
-                                    {fm.family.name} - {fm.role.replace("_", " ")}
+                                    {fm.family?.name ?? t("admUsers.unknownFamily")} - {fm.role.replace("_", " ")}
                                   </Badge>
                                 ))
                               )}
