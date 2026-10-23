@@ -24,12 +24,14 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { MobileLayout } from '@/components/mobile/MobileLayout';
 import { useFamilyAuth } from '@/hooks/useFamilyAuth';
+import { useFamilyModules } from '@/hooks/useFamilyModules';
 
 interface MenuItem {
   label: string;
   description?: string;
   icon: React.ComponentType<{ className?: string }>;
   path: string;
+  moduleSlug?: string;
 }
 
 interface MenuSection {
@@ -41,7 +43,8 @@ export default function More() {
   const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
-  const { isFamilyHead, isFamilyAdmin } = useFamilyAuth(familySlug);
+  const { family, isFamilyHead, isFamilyAdmin } = useFamilyAuth(familySlug);
+  const { isModuleEnabled } = useFamilyModules(family?.id);
 
   const canManageFamily = isFamilyHead || isFamilyAdmin;
 
@@ -49,25 +52,25 @@ export default function More() {
     {
       title: 'Financial',
       items: [
-        { label: 'Savings', description: 'Personal savings accounts', icon: PiggyBank, path: `/family/${familySlug}/savings` },
-        { label: 'Njangi', description: 'Rotating savings circles', icon: HeartHandshake, path: `/family/${familySlug}/njangi` },
-        { label: 'Loans', description: 'Loan applications & tracking', icon: HandCoins, path: `/family/${familySlug}/loans` },
-        { label: 'Shares & Dividends', description: 'Family shareholding', icon: Wallet, path: `/family/${familySlug}/shares` },
+        { label: 'Savings', description: 'Personal savings accounts', icon: PiggyBank, path: `/family/${familySlug}/savings`, moduleSlug: 'savings' },
+        { label: 'Njangi', description: 'Rotating savings circles', icon: HeartHandshake, path: `/family/${familySlug}/njangi`, moduleSlug: 'njangi' },
+        { label: 'Loans', description: 'Loan applications & tracking', icon: HandCoins, path: `/family/${familySlug}/loans`, moduleSlug: 'loans' },
+        { label: 'Shares & Dividends', description: 'Family shareholding', icon: Wallet, path: `/family/${familySlug}/shares`, moduleSlug: 'shares' },
       ],
     },
     {
       title: 'Assistance',
       items: [
-        { label: 'Assistance Events', description: 'Birth, death, sickness support', icon: Heart, path: `/family/${familySlug}/assistance` },
-        { label: 'Balloting', description: 'Fair allocation system', icon: CalendarDays, path: `/family/${familySlug}/balloting` },
+        { label: 'Assistance Events', description: 'Birth, death, sickness support', icon: Heart, path: `/family/${familySlug}/assistance`, moduleSlug: 'assistance' },
+        { label: 'Balloting', description: 'Fair allocation system', icon: CalendarDays, path: `/family/${familySlug}/balloting`, moduleSlug: 'balloting' },
       ],
     },
     {
       title: 'Analytics & Reports',
       items: [
-        { label: 'Analytics Dashboard', description: 'Financial insights', icon: BarChart3, path: `/family/${familySlug}/analytics` },
-        { label: 'PDF Reports', description: 'Generate detailed reports', icon: FileText, path: `/family/${familySlug}/pdf-reports` },
-        { label: 'Export Data', description: 'Download your data', icon: Download, path: `/family/${familySlug}/export-scheduler` },
+        { label: 'Analytics Dashboard', description: 'Financial insights', icon: BarChart3, path: `/family/${familySlug}/analytics`, moduleSlug: 'analytics' },
+        { label: 'PDF Reports', description: 'Generate detailed reports', icon: FileText, path: `/family/${familySlug}/pdf-reports`, moduleSlug: 'pdf-reports' },
+        { label: 'Export Data', description: 'Download your data', icon: Download, path: `/family/${familySlug}/export-scheduler`, moduleSlug: 'export-scheduler' },
       ],
     },
     // Settings section only visible to family head and family admin
@@ -77,9 +80,20 @@ export default function More() {
         { label: 'Notifications', description: 'Manage alerts & reminders', icon: Bell, path: `/family/${familySlug}/notifications` },
         { label: 'Notification Settings', description: 'Customize preferences', icon: Settings, path: `/family/${familySlug}/notification-settings` },
         { label: 'Invitations & Requests', description: 'Manage invites & join requests', icon: UserPlus, path: `/family/${familySlug}/invitations` },
+        { label: t('moduleSettings.menuLabel'), description: t('moduleSettings.menuDescription'), icon: Settings, path: `/family/${familySlug}/module-settings` },
       ],
     }] : []),
   ];
+
+  // Hide modules the family has switched off in Module Settings.
+  const visibleSections = menuSections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter(
+        (item) => !item.moduleSlug || isModuleEnabled(item.moduleSlug),
+      ),
+    }))
+    .filter((section) => section.items.length > 0);
 
   const handleNavigate = async (path: string) => {
     await haptics.light();
@@ -94,7 +108,7 @@ export default function More() {
     >
       <ScrollArea className="h-full">
         <div className="p-4 space-y-6">
-          {menuSections.map((section, sectionIndex) => (
+          {visibleSections.map((section, sectionIndex) => (
             <div key={section.title}>
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1">
                 {section.title}
