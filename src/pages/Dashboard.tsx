@@ -367,6 +367,7 @@ const Dashboard = () => {
             Softserge
           </a>
           . © {new Date().getFullYear()} All rights reserved.
+          <div className="mt-2"><WhatsAppSupportLink className="text-primary hover:underline" /></div>
         </div>
       </footer>
 

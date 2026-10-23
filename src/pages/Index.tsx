@@ -310,7 +310,7 @@ export default function Index() {
       <footer style={{ borderTop: `1px solid ${c("hp-line")}` }}>
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-5 py-8 text-sm sm:flex-row lg:px-8" style={{ color: c("hp-ink-soft") }}>
           <div className="flex items-center gap-2"><img src="/logo.jpg" alt="" width={24} height={24} className="h-6 w-6 rounded-full" /><span>{t("home.footer.credit")}</span></div>
-          <div className="flex gap-5"><Link to="/blog/what-is-njangi">{t("home.footer.blog")}</Link><Link to="/privacy">{t("home.footer.privacy")}</Link><Link to="/terms">{t("home.footer.terms")}</Link><a href="mailto:softserge.dev@gmail.com">softserge.dev@gmail.com</a></div>
+          <div className="flex flex-wrap justify-center gap-5"><Link to="/blog/what-is-njangi">{t("home.footer.blog")}</Link><Link to="/privacy">{t("home.footer.privacy")}</Link><Link to="/terms">{t("home.footer.terms")}</Link><WhatsAppSupportLink /><a href="mailto:softserge.dev@gmail.com">softserge.dev@gmail.com</a></div>
         </div>
       </footer>
       <InstallBanner />

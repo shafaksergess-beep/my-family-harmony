@@ -28,6 +28,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 import SEO from "@/components/SEO";
+import { GovernanceOrganigram } from "@/components/family/GovernanceOrganigram";
 
 interface Member {
   id: string;
@@ -68,6 +69,7 @@ const Members = () => {
     canManageMembers, family, isLoading: authLoading, userId, isFamilyHead, isFamilyAdmin
   } = useFamilyAuth(familySlug);
   const isMobile = useIsMobile();
+  const [view, setView] = useState<"list" | "org">("list");
 
   const [loading, setLoading] = useState(true);
   const [members, setMembers] = useState<Member[]>([]);
@@ -364,8 +366,18 @@ const Members = () => {
           </Select>
         </div>
 
+        <div className="inline-flex rounded-lg border border-border p-1">
+          {(["list", "org"] as const).map((v) => (
+            <Button key={v} size="sm" variant={view === v ? "default" : "ghost"} onClick={() => setView(v)}>
+              {t(v === "list" ? "organigram.listView" : "organigram.orgView")}
+            </Button>
+          ))}
+        </div>
+
+        {view === "org" && <GovernanceOrganigram members={filteredMembers} roleLabel={getRoleLabel} />}
+
         {/* Members Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className={view === "org" ? "hidden" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"}>
           {filteredMembers.map((member) => (
             <Card key={member.id} className="p-6 hover:shadow-lg transition-shadow relative group">
               <div className="space-y-4">
