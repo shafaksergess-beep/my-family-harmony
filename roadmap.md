@@ -28,7 +28,7 @@
 - [ ] Verify the daily family-lifecycle check end-to-end with a real reminder→suspension→deletion run (recording simulated the suspension state directly)
 
 ## Enhancements (Oct 2026)
-- [ ] 1. Entity types: Family / Association / Tontine group in creation wizard + dynamic vocabulary
-- [ ] 2. Per-family module activation toggles (family head/admin/superadmin) gating dashboard + More + routes
-- [ ] 3. Support admin platform role (read-mostly, one step below super admin)
-- [ ] Tests + validation for all three
+- [x] 1. Entity types: Family / Association / Tontine group in creation wizard + dynamic vocabulary (validated: tontine group created end-to-end)
+- [x] 2. Per-family module activation toggles (family head/admin/superadmin) gating dashboard + More + routes (validated: Loans hidden + route bounce)
+- [x] 3. Support admin platform role (read-mostly, one step below super admin) (validated: grant + revoke in admin Users page)
+- [x] Tests + validation for all three (46 tests pass)
