@@ -26,3 +26,9 @@
 - [ ] Switch emails to a verified domain sender (waiting on user's domain)
 - [x] Promotional video recordings: Flow 1 self-service onboarding (portrait + landscape), with 14-day suspension walkthrough
 - [ ] Verify the daily family-lifecycle check end-to-end with a real reminder→suspension→deletion run (recording simulated the suspension state directly)
+
+## Enhancements (Oct 2026)
+- [ ] 1. Entity types: Family / Association / Tontine group in creation wizard + dynamic vocabulary
+- [ ] 2. Per-family module activation toggles (family head/admin/superadmin) gating dashboard + More + routes
+- [ ] 3. Support admin platform role (read-mostly, one step below super admin)
+- [ ] Tests + validation for all three
