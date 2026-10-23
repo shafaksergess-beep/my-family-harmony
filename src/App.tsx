@@ -17,6 +17,7 @@ import { OfflineBootstrap } from "@/components/OfflineBootstrap";
 import { PWAUpdatePrompt } from "@/components/PWAUpdatePrompt";
 import { AuthBootstrap } from "@/components/AuthBootstrap";
 import { IdleWarningDialog } from "@/components/IdleWarningDialog";
+import { ModuleGate } from "@/components/family/ModuleGate";
 const SessionManagementPage = lazy(() => import("./pages/SessionManagement"));
 // Lazy load core pages
 const Index = lazy(() => import("./pages/Index"));
@@ -68,6 +69,7 @@ const MemberDetail = lazy(() => import("./pages/family/MemberDetail"));
 const PDFReports = lazy(() => import("./pages/family/PDFReports"));
 const MeetingCheckIn = lazy(() => import("./pages/family/MeetingCheckIn"));
 const FamilyMeetings = lazy(() => import("./pages/family/Meetings"));
+const FamilyModuleSettings = lazy(() => import("./pages/family/ModuleSettings"));
 const FamilyContributions = lazy(() => import("./pages/family/Contributions"));
 const ContributionSettings = lazy(() => import("./pages/family/ContributionSettings"));
 const FinancialSettings = lazy(() => import("./pages/family/FinancialSettings"));
