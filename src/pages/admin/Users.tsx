@@ -222,6 +222,33 @@ export default function Users() {
     }
   };
 
+  const handleToggleSupportAdmin = async (user: UserWithFamilies) => {
+    try {
+      if (user.is_support_admin) {
+        const { error } = await supabase
+          .from("support_admins")
+          .delete()
+          .eq("user_id", user.id);
+        if (error) throw error;
+        toast({ title: t("admUsers.supportAdminRevoked", { name: user.full_name }) });
+      } else {
+        const { error } = await supabase
+          .from("support_admins")
+          .insert({ user_id: user.id });
+        if (error) throw error;
+        toast({ title: t("admUsers.supportAdminGranted", { name: user.full_name }) });
+      }
+      fetchUsers();
+    } catch (error) {
+      console.error("Error toggling support admin:", error);
+      toast({
+        title: t("admUsers.error"),
+        description: t("admUsers.supportAdminError"),
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleCreateUser = async () => {
     if (!newUser.email || !newUser.password || !newUser.full_name) {
       toast({
