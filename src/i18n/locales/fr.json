@@ -2546,7 +2546,8 @@
     "removeSupportAdmin": "Retirer l'admin support",
     "supportAdminGranted": "{{name}} est maintenant admin support",
     "supportAdminRevoked": "Admin support retiré pour {{name}}",
-    "supportAdminError": "Impossible de modifier le rôle admin support"
+    "supportAdminError": "Impossible de modifier le rôle admin support",
+    "unknownFamily": "Groupe inconnu"
   },
   "admAdminNotificationsList": {
     "markAllRead": "Tout marquer comme lu",

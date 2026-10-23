@@ -2546,7 +2546,8 @@
     "removeSupportAdmin": "Remove support admin",
     "supportAdminGranted": "{{name}} is now a support admin",
     "supportAdminRevoked": "Support admin removed for {{name}}",
-    "supportAdminError": "Could not update the support admin role"
+    "supportAdminError": "Could not update the support admin role",
+    "unknownFamily": "Unknown group"
   },
   "admAdminNotificationsList": {
     "markAllRead": "Mark all read",
