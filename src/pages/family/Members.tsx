@@ -301,7 +301,15 @@ const Members = () => {
   }
 
   if (isMobile) {
-    return <MobileMembers />;
+    return (
+      <>
+        <MobileMembers />
+        <section className="px-4 pb-28 pt-2" aria-label={t("organigram.orgView")}>
+          <h2 className="mb-3 text-lg font-semibold">{t("organigram.orgView")}</h2>
+          <GovernanceOrganigram members={filteredMembers} roleLabel={getRoleLabel} />
+        </section>
+      </>
+    );
   }
 
   return (
