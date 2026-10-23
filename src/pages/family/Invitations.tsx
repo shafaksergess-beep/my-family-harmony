@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, Mail, Check, X, Clock, Share2, Link2, QrCode, UserPlus, Copy, Users } from "lucide-react";
+import { Loader2, ArrowLeft, Mail, Check, X, Clock, Share2, Link2, QrCode, UserPlus, Copy, Users, MessageCircle } from "lucide-react";
+import { whatsAppLink } from "@/lib/whatsapp";
 import { Badge } from "@/components/ui/badge";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { ShareInvitationSheet } from "@/components/invitations/ShareInvitationSheet";
@@ -519,6 +520,16 @@ const Invitations = () => {
                               title={t("famInvitations.share")}
                             >
                               <Share2 className="w-4 h-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" asChild title={t("whatsapp.shareInvite")}>
+                              <a
+                                aria-label={t("whatsapp.shareInvite")}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                href={whatsAppLink(t("whatsapp.inviteMessage", { family: family?.name ?? "", link: getInviteLink(invitation) }))}
+                              >
+                                <MessageCircle className="w-4 h-4" />
+                              </a>
                             </Button>
                           </div>
                         )}

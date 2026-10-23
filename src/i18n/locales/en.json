@@ -2770,5 +2770,27 @@
     "footerNote": "Disabled modules are hidden from the dashboard and menus. Existing data is kept and reappears when you reactivate a module.",
     "menuLabel": "Module Settings",
     "menuDescription": "Activate or deactivate modules"
+  },
+  "whatsapp": {
+    "supportLabel": "WhatsApp support",
+    "supportMessage": "Hello Kinsroot Support, I have a question about my group:",
+    "shareInvite": "Share via WhatsApp",
+    "inviteMessage": "You're invited to join {{family}} on Kinsroot. Accept here: {{link}}",
+    "memberHello": "Hello {{name}}, "
+  },
+  "organigram": {
+    "listView": "List",
+    "orgView": "Organigram",
+    "houses": "Houses & branches",
+    "noHouse": "No house assigned",
+    "vacant": "No one assigned yet",
+    "rep": "House representative",
+    "memberCount_one": "{{count}} member",
+    "memberCount_other": "{{count}} members",
+    "tier": {
+      "executive": "Executive leadership",
+      "finance": "Finance bureau",
+      "secretariat": "Secretariat"
+    }
   }
 }

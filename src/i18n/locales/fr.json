@@ -2770,5 +2770,27 @@
     "footerNote": "Les modules désactivés sont masqués du tableau de bord et des menus. Les données existantes sont conservées et réapparaissent à la réactivation.",
     "menuLabel": "Paramètres des modules",
     "menuDescription": "Activer ou désactiver les modules"
+  },
+  "whatsapp": {
+    "supportLabel": "Assistance WhatsApp",
+    "supportMessage": "Bonjour l'assistance Kinsroot, j'ai une question concernant mon groupe :",
+    "shareInvite": "Partager via WhatsApp",
+    "inviteMessage": "Vous êtes invité(e) à rejoindre {{family}} sur Kinsroot. Acceptez ici : {{link}}",
+    "memberHello": "Bonjour {{name}}, "
+  },
+  "organigram": {
+    "listView": "Liste",
+    "orgView": "Organigramme",
+    "houses": "Maisons et branches",
+    "noHouse": "Aucune maison attribuée",
+    "vacant": "Personne n'est encore désigné",
+    "rep": "Représentant de la maison",
+    "memberCount_one": "{{count}} membre",
+    "memberCount_other": "{{count}} membres",
+    "tier": {
+      "executive": "Direction exécutive",
+      "finance": "Bureau financier",
+      "secretariat": "Secrétariat"
+    }
   }
 }
