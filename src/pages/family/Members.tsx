@@ -521,13 +521,13 @@ const Members = () => {
                 placeholder={t("famMembers.houseName")}
               />
             </div>
-            <div className={isMobile ? "bottom-action-bar border-t border-border bg-background p-4 pb-safe" : "flex justify-end gap-2"}>
+            <BottomActionBar className={isMobile ? "pb-safe" : "!static !border-0 !p-0"}>
               <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>{t("famMembers.cancel")}</Button>
               <Button type="submit" disabled={!addForm.user_id || adding}>
                 {adding && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 {t("famMembers.addMember")}
               </Button>
-            </div>
+            </BottomActionBar>
           </form>
         </DialogContent>
       </Dialog>
@@ -594,10 +594,10 @@ const Members = () => {
               />
               {!isMobile && <Label>{t("famMembers.houseRepresentative")}</Label>}
             </div>
-            <div className={isMobile ? "bottom-action-bar border-t border-border bg-background p-4 pb-safe" : "flex justify-end gap-2"}>
+            <BottomActionBar className={isMobile ? "pb-safe" : "!static !border-0 !p-0"}>
               <Button variant="outline" onClick={() => setIsEditOpen(false)}>{t("famMembers.cancel")}</Button>
               <Button onClick={handleEditMember}>{t("famMembers.saveChanges")}</Button>
-            </div>
+            </BottomActionBar>
           </div>
         </DialogContent>
       </Dialog>

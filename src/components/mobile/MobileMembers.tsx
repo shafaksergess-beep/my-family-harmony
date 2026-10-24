@@ -33,7 +33,8 @@ interface Props {
 /** Presentation only: Members owns all reads, authorization and mutations. */
 export function MobileMembers(props: Props) {
   const { t } = useTranslation(); const navigate = useNavigate(); const { familySlug } = useParams();
-  const { members, allMembers, roleLabel, canManageMembers } = props;
+  const { allMembers, roleLabel, canManageMembers } = props;
+  const members = [...props.members].sort((a, b) => Number(b.user_id === props.userId) - Number(a.user_id === props.userId));
   const houses = new Set(allMembers.map(m => m.house_name).filter(Boolean)).size;
   return <div className="min-w-0 bg-background">
     <OfflineIndicator />
@@ -63,7 +64,7 @@ export function MobileMembers(props: Props) {
           <DataCards rows={members} getRowKey={m => m.id}
             title={m => <span className="flex min-w-0 items-center gap-2"><Avatar className="h-10 w-10 shrink-0"><AvatarImage src={m.profiles.avatar_url ?? undefined} /><AvatarFallback><User className="h-5 w-5" /></AvatarFallback></Avatar><span className="truncate">{m.profiles.full_name}</span></span>}
             subtitle={m => m.profiles.email || m.profiles.phone || ""}
-            status={m => <div className="flex flex-wrap gap-1">{m.assignedRoles.map(role => <Badge key={role} variant="outline">{roleLabel(role)}</Badge>)}{m.is_house_representative && <Badge variant="secondary">{t("famMembers.houseRep")}</Badge>}</div>}
+            status={m => <div className="flex flex-wrap gap-1">{m.assignedRoles.map(role => <Badge key={role} variant="outline" className="text-foreground">{roleLabel(role)}</Badge>)}{m.is_house_representative && <Badge variant="secondary">{t("famMembers.houseRep")}</Badge>}</div>}
             columns={[{ key: "house", label: t("famMembers.houseName"), render: m => m.house_name || t("phase3.notAssigned") }]}
             onRowClick={m => navigate(`/family/${familySlug}/members/${m.id}`)}
             actions={m => canShowMemberActions(canManageMembers, m.user_id, props.userId) ? [
