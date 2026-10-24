@@ -16,7 +16,7 @@ export const ResponsiveDialogContent = React.forwardRef<React.ElementRef<typeof 
   if (!isMobile) return <DialogContent ref={ref} className={className} {...props}>{children}</DialogContent>;
   return <SheetContent ref={ref} side="bottom" className={cn('responsive-dialog !max-w-full !max-h-[90dvh] !overflow-hidden rounded-t-2xl p-0', className)} {...props}>
     <div className="mx-auto mt-3 h-1 w-10 shrink-0 rounded-full bg-border" aria-hidden="true" />
-    <div className="responsive-dialog-scroll min-h-0 overflow-y-auto overscroll-contain px-4 pt-4">{children}</div>
+    <div className="responsive-dialog-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-4">{children}</div>
   </SheetContent>;
 });
 ResponsiveDialogContent.displayName = 'ResponsiveDialogContent';

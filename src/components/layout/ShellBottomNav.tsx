@@ -9,13 +9,15 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import { haptics } from '@/lib/haptics';
-type Item = { key: string; label: string; icon: ComponentType<{ className?: string }>; path?: string; module?: string; onClick?: () => void };
+import { NotificationInbox } from '@/components/NotificationInbox';
+type Item = { key: string; label: string; icon: ComponentType<{ className?: string }>; path?: string; module?: string; onClick?: () => void; inbox?: boolean };
 function NavBar({ items, quickActions = [] }: { items: Item[]; quickActions?: Item[] }) {
   const { t } = useTranslation(); const navigate = useNavigate(); const location = useLocation(); const [open, setOpen] = useState(false);
   const go = (item: Item) => { void haptics.selection(); setOpen(false); if (item.onClick) item.onClick(); else if (item.path) navigate(item.path); };
   const render = (item: Item) => {
     const active = item.path && (location.pathname === item.path || (item.key !== 'home' && item.key !== 'overview' && location.pathname.startsWith(item.path + '/')));
-    return <Button key={item.key} variant="ghost" aria-label={item.label} aria-current={active ? 'page' : undefined} onClick={() => go(item)} className={cn('!h-16 min-w-0 flex-1 flex-col gap-1 rounded-none px-0 py-1', active ? 'text-primary' : 'text-muted-foreground')}><item.icon className="h-5 w-5 shrink-0" /><span className="max-w-full truncate px-0.5 text-[10px] leading-tight">{item.label}</span></Button>;
+    const control = <Button key={item.key} variant="ghost" aria-label={item.label} aria-current={active ? 'page' : undefined} onClick={item.inbox ? undefined : () => go(item)} className={cn('!h-16 min-w-0 flex-1 flex-col gap-1 rounded-none px-0 py-1', active ? 'text-primary' : 'text-muted-foreground')}><item.icon className="h-5 w-5 shrink-0" /><span className="max-w-full truncate px-0.5 text-[10px] leading-tight">{item.label}</span></Button>;
+    return item.inbox ? <NotificationInbox key={item.key} trigger={control} /> : control;
   };
   return <>
     <nav aria-label={t('foundation.navigation')} data-shell-nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card pb-safe">
@@ -61,7 +63,7 @@ function PersonalNav() {
   return <NavBar items={[
     { key: 'home', label: t('nav.home'), icon: Home, path: '/dashboard' },
     { key: 'families', label: t('foundation.families'), icon: Building2, onClick: () => dashboardSection('families') },
-    { key: 'notifications', label: t('foundation.notifications'), icon: Bell, onClick: () => dashboardSection('notifications') },
+    { key: 'notifications', label: t('foundation.notifications'), icon: Bell, inbox: true },
     { key: 'profile', label: t('foundation.profile'), icon: User, path: '/profile' },
   ]} />;
 }

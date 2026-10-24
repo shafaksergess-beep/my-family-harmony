@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useDevice } from '@/hooks/useDevice';
 import { ShellContext, type ShellConfig } from '@/hooks/useShellConfig';
@@ -26,7 +26,16 @@ export function AppShell() {
   const checkIn = /\/meetings\/[^/]+\/checkin(?:\/|$)/.test(location.pathname);
   const hide = !!config.hideBottomNav || checkIn || keyboardOpen;
   const value = useMemo(() => ({ insideShell: true, keyboardOpen, config, register }), [keyboardOpen, config, register]);
-  return <ShellContext.Provider value={value}>{isMobile ? <div data-app-shell data-nav-visible={!hide} className="app-shell min-h-screen min-w-0 bg-background" style={{ '--keyboard-inset': `${keyboardInset}px` } as React.CSSProperties}>
+  useEffect(() => {
+    const section = location.hash.slice(1);
+    if (!section) return;
+    const scroll = () => { const target = document.getElementById(section); if (target) { target.scrollIntoView({ behavior: 'smooth' }); return true; } return false; };
+    if (scroll()) return;
+    const observer = new MutationObserver(() => { if (scroll()) observer.disconnect(); });
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [location.pathname, location.hash]);
+  return <ShellContext.Provider value={value}>{isMobile ? <div data-app-shell data-nav-visible={!hide} className="app-shell min-h-screen min-w-0 bg-background" style={{ '--keyboard-inset': `${keyboardInset}px` } as CSSProperties}>
     <div className="shell-content min-w-0"><Outlet /></div>
     {!hide && <ShellBottomNav familySlug={familySlug} admin={location.pathname.startsWith('/admin')} />}
   </div> : <Outlet />}</ShellContext.Provider>;
