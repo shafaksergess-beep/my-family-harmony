@@ -1,5 +1,11 @@
 # Roadmap
 
+## Signup and unassigned user recovery
+- [x] Share membership-aware sign-in destinations while preserving invitations and platform-admin access
+- [x] Expose the existing creation wizard on empty desktop/mobile dashboards
+- [x] Add direct superadmin family assignment and search in the unassigned-member picker
+- [ ] Verify tests and signed-in setup/admin flows
+
 ## App-wide UI/UX hardening
 - [x] Fix shared controls, dialogs, tables, tabs and mobile content sizing
 - [x] Fix overflowing admin and family page headers/actions without changing permissions
