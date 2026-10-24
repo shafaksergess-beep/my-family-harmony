@@ -216,7 +216,7 @@ All colors MUST be HSL.
   }
   
   body {
-    overscroll-behavior-y: contain;
+    overscroll-behavior-y: auto;
   }
   
   /* Increase touch targets on mobile */
@@ -235,7 +235,7 @@ All colors MUST be HSL.
 /* PWA standalone mode adjustments */
 @media all and (display-mode: standalone) {
   body {
-    overscroll-behavior: none;
+    overscroll-behavior-y: contain;
   }
 }
 
@@ -319,7 +319,8 @@ All colors MUST be HSL.
 .responsive-dialog { display: flex; flex-direction: column; }
 .responsive-dialog-scroll { max-height: calc(90dvh - 1rem); }
 @media (max-width: 767px) {
-  html, body, #root { max-width: 100%; overflow-x: hidden; }
+  html, body, #root { max-width: 100%; overflow-x: clip; }
+  html, body { overflow-y: visible; height: auto; -webkit-overflow-scrolling: touch; }
   img, video, svg, canvas { max-width: 100%; }
   h1, h2, h3, h4, h5, h6 { overflow-wrap: anywhere; }
   .container { padding-left: 1rem; padding-right: 1rem; }
