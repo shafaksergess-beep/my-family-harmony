@@ -65,6 +65,10 @@ export default function Users() {
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [userRole, setUserRole] = useState<"super_admin" | "family_head" | "family_admin" | null>(null);
   const [managedFamilies, setManagedFamilies] = useState<string[]>([]);
+  const [assignUser, setAssignUser] = useState<UserWithFamilies | null>(null);
+  const [assignmentFamily, setAssignmentFamily] = useState("");
+  const [assignmentRole, setAssignmentRole] = useState<Database["public"]["Enums"]["user_role"]>("member");
+  const [assigning, setAssigning] = useState(false);
   const { suspended, refresh: refreshSuspended } = useSuspendedUsers(userRole === "super_admin" ? users.map((u) => u.id) : []);
   
   // New user form state
@@ -235,6 +239,26 @@ export default function Users() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAssignFamily = async () => {
+    if (userRole !== "super_admin" || !assignUser || assignUser.families.length || !families.some(f => f.id === assignmentFamily) || assigning) return;
+    setAssigning(true);
+    try {
+      const { error } = await supabase.from("family_members").insert({ user_id: assignUser.id, family_id: assignmentFamily, role: assignmentRole });
+      if (error) throw error;
+      toast({ title: t("admUsers.success"), description: t("admUserDetail.userAddedToFamilySuccessfully") });
+      setAssignUser(null);
+      await fetchUsers();
+    } catch {
+      toast({ title: t("admUsers.error"), description: t("admin.addMemberFailed"), variant: "destructive" });
+    } finally { setAssigning(false); }
+  };
+
+  const openAssignment = (user: UserWithFamilies) => {
+    setAssignmentFamily("");
+    setAssignmentRole("member");
+    setAssignUser(user);
   };
 
   const handleToggleSupportAdmin = async (user: UserWithFamilies) => {
@@ -749,10 +773,12 @@ export default function Users() {
                           </div>
                         </div>
                         {isMobile ? <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="icon" className="text-foreground" aria-label={t("foundation.moreActions")}><MoreVertical className="h-5 w-5" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end">
+                          {userRole === "super_admin" && user.families.length === 0 && <DropdownMenuItem onClick={() => openAssignment(user)}><UserPlus className="h-4 w-4" />{t("screenRecovery.assignFamily")}</DropdownMenuItem>}
                           {userRole === "super_admin" && !user.is_super_admin && <DropdownMenuItem onClick={() => handleToggleSupportAdmin(user)}>{user.is_support_admin ? t("admUsers.removeSupportAdmin") : t("admUsers.makeSupportAdmin")}</DropdownMenuItem>}
                           <DropdownMenuItem onClick={() => navigate(`/admin/users/${user.id}`)}><Edit className="h-4 w-4" />{t("famMembers.edit")}</DropdownMenuItem>
                           <UserAdminActions variant="menu" user={user} isSuperAdminViewer={userRole === "super_admin"} isSelf={user.id === currentUserId} isSuspended={suspended.has(user.id)} onChanged={refreshSuspended} />
                         </DropdownMenuContent></DropdownMenu> : (                        <div className="flex flex-wrap items-center gap-2">
+                          {userRole === "super_admin" && user.families.length === 0 && <Button variant="outline" size="sm" onClick={() => openAssignment(user)}><UserPlus className="mr-2 h-4 w-4" />{t("screenRecovery.assignFamily")}</Button>}
                           {userRole === "super_admin" && !user.is_super_admin && (
                             <Button
                               variant="outline"
@@ -783,6 +809,21 @@ export default function Users() {
         </Card>
       </div>
       <UserAdminDialogs />
+      <Dialog open={!!assignUser} onOpenChange={(open) => { if (!open && !assigning) setAssignUser(null); }}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>{t("screenRecovery.assignFamily")}</DialogTitle></DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="break-words text-sm text-muted-foreground">{assignUser?.full_name} ({assignUser?.email})</p>
+            <div className="space-y-2"><Label htmlFor="assignment-family">{t("admUsers.selectAFamily")}</Label>
+              <Select value={assignmentFamily} onValueChange={setAssignmentFamily}><SelectTrigger id="assignment-family"><SelectValue placeholder={t("admUsers.selectAFamily")} /></SelectTrigger><SelectContent>{families.map(family => <SelectItem key={family.id} value={family.id}>{family.name}</SelectItem>)}</SelectContent></Select>
+            </div>
+            <div className="space-y-2"><Label htmlFor="assignment-role">{t("admUsers.role")}</Label>
+              <Select value={assignmentRole} onValueChange={(value) => setAssignmentRole(value as Database["public"]["Enums"]["user_role"])}><SelectTrigger id="assignment-role"><SelectValue /></SelectTrigger><SelectContent>{(["member", "family_head", "family_admin", "treasurer", "secretary", "loan_committee", "guest"] as const).map(role => <SelectItem key={role} value={role}>{t(`roles.${role}`)}</SelectItem>)}</SelectContent></Select>
+            </div>
+          </div>
+          <ResponsiveDialogFooter><Button variant="outline" disabled={assigning} onClick={() => setAssignUser(null)}>{t("common.cancel")}</Button><Button disabled={!assignmentFamily || assigning} onClick={handleAssignFamily}>{t("screenRecovery.assignFamily")}</Button></ResponsiveDialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

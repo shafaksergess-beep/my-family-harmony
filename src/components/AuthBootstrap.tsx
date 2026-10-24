@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { syncUserProfile, consumeOAuthRedirect } from "@/lib/authSync";
 import { resolveSignInDestination } from "@/lib/membershipSync";
@@ -21,7 +21,6 @@ import { sessionManager } from "@/lib/sessionManager";
  */
 export function AuthBootstrap() {
   const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
     let mounted = true;

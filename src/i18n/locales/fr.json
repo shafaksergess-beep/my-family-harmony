@@ -3008,6 +3008,7 @@
     "failed": "Votre compte n’a pas pu être supprimé. Réessayez ou contactez l’assistance."
   },
   "familySetup": {
+    "createGroup": "Créer une famille, association ou tontine",
     "title": "Créez votre famille",
     "subtitle": "Configurez le profil et les paramètres de votre famille",
     "name": "Nom de la famille",

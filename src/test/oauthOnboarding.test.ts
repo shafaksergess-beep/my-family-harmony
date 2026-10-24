@@ -12,13 +12,15 @@ const { authState, fromMock } = vi.hoisted(() => ({
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
+    rpc: vi.fn().mockResolvedValue({ data: false, error: null }),
     auth: authState,
     from: fromMock,
   },
 }));
 
 import { syncUserProfile, stashOAuthRedirect, consumeOAuthRedirect, describeOAuthError } from "@/lib/authSync";
-import { needsFamilyOnboarding } from "@/lib/membershipSync";
+import { needsFamilyOnboarding, resolveSignInDestination } from "@/lib/membershipSync";
+import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
 const googleUser = {
