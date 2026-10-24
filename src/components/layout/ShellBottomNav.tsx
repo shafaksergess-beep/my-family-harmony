@@ -13,7 +13,7 @@ import { filterEnabledItems, isItemActive, nextNavHidden } from '@/lib/shellNav'
 import { NotificationInbox } from '@/components/NotificationInbox';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-type Item = { key: string; label: string; icon: ComponentType<{ className?: string }>; path?: string; module?: string; onClick?: () => void; inbox?: boolean };
+type Item = { key: string; label: string; icon: ComponentType<{ className?: string; strokeWidth?: number }>; path?: string; module?: string; onClick?: () => void; inbox?: boolean };
 function NavBar({ items, quickActions = [] }: { items: Item[]; quickActions?: Item[] }) {
   const { t } = useTranslation(); const navigate = useNavigate(); const location = useLocation(); const [open, setOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
