@@ -1,3 +1,4 @@
+import { useShellConfig } from '@/hooks/useShellConfig';
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -47,6 +48,7 @@ interface AttendanceRecord {
 }
 
 export function MobileMeetings() {
+  const shell = useShellConfig();
   const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
@@ -237,7 +239,7 @@ export function MobileMeetings() {
         
         {!isOnline && <OfflineIndicator />}
 
-        <div className="space-y-4 p-4 pb-24">
+        <div className={shell?.insideShell ? 'space-y-4 p-4' : 'space-y-4 p-4 pb-24'}>
           {/* Today's Meeting Highlight */}
           {todaysMeeting && !todaysMeeting.is_completed && (
             <Card className="bg-primary/5 border-primary/30">

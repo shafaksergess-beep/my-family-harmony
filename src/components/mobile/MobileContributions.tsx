@@ -1,3 +1,4 @@
+import { useShellConfig } from '@/hooks/useShellConfig';
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,6 +44,7 @@ interface Contribution {
 }
 
 export function MobileContributions() {
+  const shell = useShellConfig();
   const { familySlug } = useParams();
   const { toast } = useToast();
   const { family, canManageFinances, isLoading: authLoading, userId } = useFamilyAuth(familySlug);
@@ -202,7 +204,7 @@ export function MobileContributions() {
         
         {!isOnline && <OfflineIndicator />}
 
-        <div className="space-y-4 p-4 pb-24">
+        <div className={shell?.insideShell ? 'space-y-4 p-4' : 'space-y-4 p-4 pb-24'}>
           {/* Stats Cards */}
           <div className="grid grid-cols-2 gap-3">
             <Card className="bg-primary/5">

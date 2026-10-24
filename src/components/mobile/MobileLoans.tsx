@@ -1,3 +1,4 @@
+import { useShellConfig } from '@/hooks/useShellConfig';
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -60,6 +61,7 @@ interface Member {
 }
 
 export function MobileLoans() {
+  const shell = useShellConfig();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -282,7 +284,7 @@ export function MobileLoans() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className={shell?.insideShell ? 'min-h-screen bg-background' : 'min-h-screen bg-background pb-20'}>
       <OfflineIndicator />
       
       {/* Header */}

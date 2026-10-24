@@ -23,5 +23,5 @@ ResponsiveDialogContent.displayName = 'ResponsiveDialogContent';
 export function ResponsiveDialogBody({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) { return <div className={cn('min-w-0 py-4', className)} {...props} />; }
 export function ResponsiveDialogFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   const { isMobile } = useDevice();
-  return <DialogFooter className={cn(isMobile && 'sticky bottom-0 z-10 border-t border-border bg-background pt-3 pb-safe', className)} {...props} />;
+  return <DialogFooter className={cn(isMobile && 'responsive-dialog-footer sticky bottom-0 z-10 border-t border-border bg-background pt-3 pb-safe', className)} {...props} />;
 }

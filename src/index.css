@@ -327,3 +327,12 @@ All colors MUST be HSL.
   [role="dialog"].responsive-dialog { max-width: 100%; padding: 0; }
 }
 html[data-device="mobile"] .app-shell [data-shell-nav] { padding-inline: env(safe-area-inset-left, 0px) env(safe-area-inset-right, 0px); }
+
+.responsive-dialog-scroll { display: flex; flex-direction: column; }
+.responsive-dialog-scroll > .responsive-dialog-footer { margin-top: auto; padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px)); }
+.app-shell .shell-content { padding-top: env(safe-area-inset-top, 0px); }
+.app-shell .shell-content .pt-safe { padding-top: 0; }
+@media (max-width: 767px) {
+  .app-screens .page-header > div { flex-wrap: nowrap; }
+  .app-shell .shell-content .min-h-screen { min-height: calc(100dvh - var(--shell-nav-height) - env(safe-area-inset-bottom, 0px)); }
+}
