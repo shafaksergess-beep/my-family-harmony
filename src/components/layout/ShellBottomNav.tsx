@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ComponentType } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, Users, Calendar, Wallet, Plus, Receipt, QrCode, HandCoins, Heart, MoreHorizontal, Bell, User, Building2, BarChart3 } from 'lucide-react';
+import { Home, Users, Calendar, Wallet, Plus, Receipt, QrCode, HandCoins, Heart, MoreHorizontal, Bell, User, Building2, BarChart3, type LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useFamilyAuth } from '@/hooks/useFamilyAuth';
 import { useFamilyModules } from '@/hooks/useFamilyModules';
@@ -13,7 +13,7 @@ import { filterEnabledItems, isItemActive, nextNavHidden } from '@/lib/shellNav'
 import { NotificationInbox } from '@/components/NotificationInbox';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-type Item = { key: string; label: string; icon: ComponentType<{ className?: string; strokeWidth?: number }>; path?: string; module?: string; onClick?: () => void; inbox?: boolean };
+type Item = { key: string; label: string; icon: LucideIcon; path?: string; module?: string; onClick?: () => void; inbox?: boolean };
 function NavBar({ items, quickActions = [] }: { items: Item[]; quickActions?: Item[] }) {
   const { t } = useTranslation(); const navigate = useNavigate(); const location = useLocation(); const [open, setOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
