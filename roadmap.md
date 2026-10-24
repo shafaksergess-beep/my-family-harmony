@@ -69,3 +69,7 @@
 - [x] Adapt requested primary family, administration and profile/settings presentation without data changes (remaining gaps in docs/MOBILE_PHASE3B_VALIDATION.md)
 - [x] Validate 24 routes at six sizes and document remaining gaps (144 checks; 60 tests pass)
 - [ ] Populated meeting-detail, role-specific financial actions and physical-device validation (requires designated disposable records/native builds)
+
+## Phase 4 final mobile audit
+- [ ] Close presentation gaps, audit all registered routes and polish sheets/contrast/install metadata
+- [ ] Verify accessible routes at five mobile sizes, French and dark mode; document limitations

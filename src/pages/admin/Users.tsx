@@ -1,3 +1,5 @@
+import { useDevice } from "@/hooks/useDevice";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ResponsiveDialog as Dialog, ResponsiveDialogContent as DialogContent, ResponsiveDialogHeader as DialogHeader, ResponsiveDialogTitle as DialogTitle, ResponsiveDialogTrigger as DialogTrigger } from "@/components/ui/responsive-dialog";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Plus, Search, UserPlus, Edit, Trash2, Download } from "lucide-react";
+import { ArrowLeft, Plus, Search, UserPlus, Edit, Trash2, Download, MoreVertical } from "lucide-react";
 import { exportToCSV } from "@/lib/export";
 import { useTranslation } from "react-i18next";
 
@@ -41,6 +43,7 @@ interface UserWithFamilies extends UserProfile {
 }
 
 export default function Users() {
+  const { isMobile } = useDevice();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -727,14 +730,17 @@ export default function Users() {
                               ) : (
                                 user.families.map((fm) => (
                                   <Badge key={fm.family_id} variant="secondary">
-                                    {fm.family?.name ?? t("admUsers.unknownFamily")} - {fm.role.replace("_", " ")}
+                                    {fm.family?.name ?? t("admUsers.unknownFamily")} - {t(`roles.${fm.role}`)}
                                   </Badge>
                                 ))
                               )}
                             </div>
                           </div>
                         </div>
-                        <div className="flex flex-wrap items-center gap-2">
+                        {isMobile ? <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="icon" className="text-foreground" aria-label={t("foundation.moreActions")}><MoreVertical className="h-5 w-5" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end">
+                          {userRole === "super_admin" && !user.is_super_admin && <DropdownMenuItem onClick={() => handleToggleSupportAdmin(user)}>{user.is_support_admin ? t("admUsers.removeSupportAdmin") : t("admUsers.makeSupportAdmin")}</DropdownMenuItem>}
+                          <DropdownMenuItem onClick={() => navigate(`/admin/users/${user.id}`)}><Edit className="h-4 w-4" />{t("famMembers.edit")}</DropdownMenuItem>
+                        </DropdownMenuContent></DropdownMenu> : (                        <div className="flex flex-wrap items-center gap-2">
                           {userRole === "super_admin" && !user.is_super_admin && (
                             <Button
                               variant="outline"
@@ -753,7 +759,7 @@ export default function Users() {
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
-                        </div>
+                        </div>) }
                       </div>
                     </CardContent>
                   </Card>

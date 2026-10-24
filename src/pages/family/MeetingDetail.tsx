@@ -28,7 +28,7 @@ interface Meeting {
 }
 
 const MeetingDetail = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { familySlug, meetingId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -117,7 +117,7 @@ const MeetingDetail = () => {
               <p className="text-sm text-muted-foreground">{family?.name}</p>
             </div>
             <Badge variant={meeting.is_completed ? "secondary" : "default"}>
-              {meeting.is_completed ? "Completed" : "Upcoming"}
+              {meeting.is_completed ? t("phase4.completed") : t("phase4.upcoming")}
             </Badge>
           </div>
         </div>
@@ -136,7 +136,7 @@ const MeetingDetail = () => {
                 <div>
                   <p className="text-sm text-muted-foreground">{t("famMeetingDetail.date")}</p>
                   <p className="font-medium">
-                    {new Date(meeting.meeting_date).toLocaleDateString('en-US', {
+                    {new Date(meeting.meeting_date).toLocaleDateString(i18n.language, {
                       weekday: 'long',
                       year: 'numeric',
                       month: 'long',

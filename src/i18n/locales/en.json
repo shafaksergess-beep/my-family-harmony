@@ -1,4 +1,11 @@
 {
+  "phase4": {
+  "completed": "Completed",
+  "upcoming": "Upcoming",
+  "loadingPage": "Loading page",
+  "templateExample": "e.g. monthly meeting",
+  "agendaCount": "{{count}} agenda items"
+},
   "phase3b": {
   "management": "Management",
   "meetingTitle": "Meetings",

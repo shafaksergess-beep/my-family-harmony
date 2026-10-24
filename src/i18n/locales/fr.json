@@ -1,4 +1,11 @@
 {
+  "phase4": {
+  "completed": "Terminée",
+  "upcoming": "À venir",
+  "loadingPage": "Chargement de la page",
+  "templateExample": "Ex. réunion mensuelle",
+  "agendaCount": "{{count}} points à l’ordre du jour"
+},
   "phase3b": {
   "management": "Gestion",
   "meetingTitle": "Réunions",
