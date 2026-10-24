@@ -1,3 +1,4 @@
+import { ResponsiveDialogFooter } from "@/components/ui/responsive-dialog";
 import { ManagementTable, ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
@@ -353,7 +354,7 @@ export default function FamilyShares() {
                   <DialogHeader>
                     <DialogTitle>{editingShare ? "Edit Share" : "Issue New Share"}</DialogTitle>
                   </DialogHeader>
-                  <form onSubmit={handleCreateOrUpdateShare} className="space-y-4">
+                  <form onSubmit={handleCreateOrUpdateShare} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields space-y-4">
                     <div>
                       <Label htmlFor="member">{t("famShares.member")}</Label>
                       <Select
@@ -427,7 +428,7 @@ export default function FamilyShares() {
                         onChange={(e) => setShareFormData({ ...shareFormData, notes: e.target.value })}
                       />
                     </div>
-                    <Button type="submit" className="w-full">{editingShare ? "Update Share" : "Issue Share"}</Button>
+                    </div><ResponsiveDialogFooter><Button type="submit" className="w-full">{editingShare ? "Update Share" : "Issue Share"}</Button></ResponsiveDialogFooter>
                   </form>
                 </DialogContent>
               </Dialog>
@@ -512,7 +513,7 @@ export default function FamilyShares() {
                   <DialogHeader>
                     <DialogTitle>{t("famShares.declareDividend")}</DialogTitle>
                   </DialogHeader>
-                  <form onSubmit={handleCreateDividend} className="space-y-4">
+                  <form onSubmit={handleCreateDividend} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="period_year">{t("famShares.year")}</Label>
@@ -574,7 +575,7 @@ export default function FamilyShares() {
                         onChange={(e) => setDividendFormData({ ...dividendFormData, notes: e.target.value })}
                       />
                     </div>
-                    <Button type="submit" className="w-full">{t("famShares.declareDividend")}</Button>
+                    </div><ResponsiveDialogFooter><Button type="submit" className="w-full">{t("famShares.declareDividend")}</Button></ResponsiveDialogFooter>
                   </form>
                 </DialogContent>
               </Dialog>

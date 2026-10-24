@@ -1,3 +1,4 @@
+import { ResponsiveDialogFooter } from "@/components/ui/responsive-dialog";
 import { ManagementTable, ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect, useCallback } from "react";
@@ -391,7 +392,7 @@ export default function FamilySavings() {
                 <DialogHeader>
                   <DialogTitle>{editingSaving ? "Edit Savings Record" : (canManageFinances ? "Add Savings Record" : "Record My Savings")}</DialogTitle>
                 </DialogHeader>
-                <form onSubmit={editingSaving ? handleEditSave : handleSubmit} className="space-y-4">
+                <form onSubmit={editingSaving ? handleEditSave : handleSubmit} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields space-y-4">
                   {canManageFinances && (
                     <div>
                       <Label htmlFor="member">{t("famSavings.member")}</Label>
@@ -421,7 +422,7 @@ export default function FamilySavings() {
                     <Label htmlFor="notes">{t("phase3b.optionalNotes")}</Label>
                     <Textarea id="notes" value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} />
                   </div>
-                  <Button type="submit" className="w-full">{editingSaving ? "Save Changes" : (canManageFinances ? "Add Savings" : "Submit for Approval")}</Button>
+                  </div><ResponsiveDialogFooter><Button type="submit" className="w-full">{editingSaving ? "Save Changes" : (canManageFinances ? "Add Savings" : "Submit for Approval")}</Button></ResponsiveDialogFooter>
                 </form>
               </DialogContent>
             </Dialog>

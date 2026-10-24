@@ -1,3 +1,4 @@
+import { ResponsiveDialogFooter } from "@/components/ui/responsive-dialog";
 import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
@@ -386,7 +387,7 @@ const FamilyMeetings = () => {
                         {t("famMeetings.scheduleMonthlyMeetingsForThe")}
                       </DialogDescription>
                     </DialogHeader>
-                    <form onSubmit={handleBulkSchedule} className="space-y-4">
+                    <form onSubmit={handleBulkSchedule} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="bulk-start-date">{t("famMeetings.startDate")}</Label>
                         <Input
@@ -434,12 +435,12 @@ const FamilyMeetings = () => {
                           placeholder={t("famMeetings.meetingLocation")}
                         />
                       </div>
-                      <div className="flex justify-end gap-2">
+                      </div><ResponsiveDialogFooter className="flex justify-end gap-2">
                         <Button type="button" variant="outline" onClick={() => setIsBulkDialogOpen(false)}>
                           {t("famMeetings.cancel")}
                         </Button>
                         <Button type="submit">{t("famMeetings.scheduleMeetings")}</Button>
-                      </div>
+                      </ResponsiveDialogFooter>
                     </form>
                   </DialogContent>
                 </Dialog>
@@ -458,7 +459,7 @@ const FamilyMeetings = () => {
                     {t("famMeetings.createANewFamilyMeeting")}
                   </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="date">{t("famMeetings.meetingDate")}</Label>
@@ -569,12 +570,12 @@ const FamilyMeetings = () => {
                       <p className="text-sm text-red-500">{validationErrors.agenda}</p>
                     )}
                   </div>
-                  <div className="flex justify-end gap-2">
+                  </div><ResponsiveDialogFooter className="flex justify-end gap-2">
                     <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                       {t("famMeetings.cancel")}
                     </Button>
                     <Button type="submit">{t("famMeetings.createMeeting")}</Button>
-                  </div>
+                  </ResponsiveDialogFooter>
                 </form>
               </DialogContent>
             </Dialog>

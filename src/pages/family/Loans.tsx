@@ -1,3 +1,4 @@
+import { ResponsiveDialogFooter } from "@/components/ui/responsive-dialog";
 import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
@@ -358,7 +359,7 @@ export default function Loans() {
             <DialogHeader>
               <DialogTitle>{t("famLoans.requestNewLoan")}</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
+            <div className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields space-y-4">
               <div>
                 <Label>{t("famLoans.member")}</Label>
                 <Select 
@@ -467,9 +468,9 @@ export default function Loans() {
                   )}
                 </p>
               </div>
-              <Button onClick={handleRequestLoan} className="w-full">
+              </div><ResponsiveDialogFooter><Button onClick={handleRequestLoan} className="w-full">
                 {t("famLoans.submitLoanRequest")}
-              </Button>
+              </Button></ResponsiveDialogFooter>
             </div>
           </DialogContent>
         </Dialog>

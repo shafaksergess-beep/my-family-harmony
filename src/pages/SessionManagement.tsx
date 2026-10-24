@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/layout/PageHeader";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -51,17 +52,7 @@ export default function SessionManagement() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8 max-w-3xl mx-auto">
       <SEO title={t("deviceSessions.title")} description={t("deviceSessions.description")} noIndex />
-      <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="mb-4">
-        <ArrowLeft className="w-4 h-4 mr-2" /> {t("common.back")}
-      </Button>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <ShieldCheck className="w-6 h-6 text-primary" /> {t("deviceSessions.title")}
-        </h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          {t("deviceSessions.expiryNotice")}
-        </p>
-      </div>
+      <PageHeader title={t("deviceSessions.title")} subtitle={t("deviceSessions.expiryNotice")} backTo="/profile" />
 
       {loading ? (
         <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>

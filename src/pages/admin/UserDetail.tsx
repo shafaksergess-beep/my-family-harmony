@@ -1,3 +1,5 @@
+import { PageHeader } from "@/components/layout/PageHeader";
+import { useDevice } from "@/hooks/useDevice";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,6 +36,7 @@ interface FamilyMembership {
 export default function UserDetail() {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
+  const { isMobile } = useDevice();
   const { toast } = useToast();
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
@@ -275,9 +278,9 @@ export default function UserDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background p-4 md:p-6">
       <div className="max-w-4xl mx-auto space-y-6">
-        <div className="flex items-center gap-4">
+        {isMobile ? <PageHeader title={t("admUserDetail.userDetails")} backTo="/admin/users" /> : <div className="flex items-center gap-4">
           <Button
             variant="ghost"
             size="icon"
@@ -289,7 +292,7 @@ export default function UserDetail() {
             <h1 className="text-3xl font-bold">{t("admUserDetail.userDetails")}</h1>
             <p className="text-muted-foreground">{t("admUserDetail.manageUserProfileAndFamily")}</p>
           </div>
-        </div>
+        </div>}
 
         <Card>
           <CardHeader>
@@ -332,9 +335,9 @@ export default function UserDetail() {
               />
               <Label htmlFor="is_working">{t("admUserDetail.currentlyWorking")}</Label>
             </div>
-            <Button onClick={handleSaveProfile} disabled={saving}>
+            <Button onClick={handleSaveProfile} disabled={saving} className="w-full sm:w-auto">
               <Save className="mr-2 h-4 w-4" />
-              {saving ? "Saving..." : "Save Profile"}
+              {saving ? t("phase4.saving") : t("phase4.saveProfile")}
             </Button>
           </CardContent>
         </Card>
@@ -350,7 +353,7 @@ export default function UserDetail() {
               <div className="space-y-3">
                 {memberships.map((membership) => (
                   <div key={membership.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex-1">
+                    <div className="min-w-0 flex-1">
                       <p className="font-medium">{membership.family?.name ?? t("admUsers.unknownFamily")}</p>
                       <Select
                         value={membership.role}
@@ -369,7 +372,7 @@ export default function UserDetail() {
                     </div>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                        <Button variant="ghost" size="icon" aria-label={t("admUserDetail.removeFromFamily")}>
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </AlertDialogTrigger>
@@ -426,7 +429,7 @@ export default function UserDetail() {
                       <SelectItem value="family_head">{t("admUserDetail.familyHead")}</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Button onClick={handleAddMembership}>
+                  <Button onClick={handleAddMembership} aria-label={t("admUserDetail.addToFamily")}>
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>

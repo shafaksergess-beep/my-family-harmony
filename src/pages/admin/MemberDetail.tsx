@@ -1,3 +1,6 @@
+import { PageHeader } from "@/components/layout/PageHeader";
+import { ManagementTable } from "@/components/layout/ManagementMobile";
+import { useDevice } from "@/hooks/useDevice";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -34,6 +37,7 @@ interface MemberData {
 const MemberDetail = () => {
   const { familyId, memberId } = useParams();
   const navigate = useNavigate();
+  const { isMobile } = useDevice();
   const { toast } = useToast();
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
@@ -190,7 +194,7 @@ const MemberDetail = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      {isMobile ? <PageHeader title={member.profiles?.full_name || t("admMemberDetail.memberNotFound")} backTo={`/admin/families/${familyId}/members`} actions={[{key:"export", label:t("admMemberDetail.exportPdf"), icon:FileText, onClick:handleExportPDF}]} /> : <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -208,7 +212,7 @@ const MemberDetail = () => {
             </div>
           </div>
         </div>
-      </header>
+      </header>}
 
       <main className="container mx-auto px-4 py-8">
         {/* Member Header */}
@@ -224,7 +228,7 @@ const MemberDetail = () => {
               
               <div className="flex-1 space-y-4">
                 <div>
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex flex-wrap items-center gap-3 mb-2">
                     <h1 className="text-3xl font-bold">{member.profiles?.full_name}</h1>
                     {member.is_house_representative && (
                       <Badge variant="secondary">
@@ -235,7 +239,7 @@ const MemberDetail = () => {
                   </div>
                   <Badge variant="outline">
                     <Shield className="w-3 h-3 mr-1" />
-                    {member.role.replace('_', ' ').toUpperCase()}
+                    {t(`roles.${member.role}`)}
                   </Badge>
                 </div>
 
@@ -350,36 +354,36 @@ const MemberDetail = () => {
                 {contributions.length === 0 ? (
                   <p className="text-muted-foreground">{t("admMemberDetail.noContributionsRecorded")}</p>
                 ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>{t("admMemberDetail.date")}</TableHead>
-                        <TableHead>{t("admMemberDetail.type")}</TableHead>
-                        <TableHead>{t("admMemberDetail.amount")}</TableHead>
-                        <TableHead>{t("admMemberDetail.status")}</TableHead>
-                        <TableHead>{t("admMemberDetail.paymentDate")}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
+                  <ManagementTable>
+                    <thead>
+                      <tr>
+                        <th>{t("admMemberDetail.date")}</th>
+                        <th>{t("admMemberDetail.type")}</th>
+                        <th>{t("admMemberDetail.amount")}</th>
+                        <th>{t("admMemberDetail.status")}</th>
+                        <th>{t("admMemberDetail.paymentDate")}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
                       {contributions.map((contribution) => (
-                        <TableRow key={contribution.id}>
-                          <TableCell>{new Date(contribution.contribution_date).toLocaleDateString()}</TableCell>
-                          <TableCell className="capitalize">{contribution.type}</TableCell>
-                          <TableCell>{formatCurrency(contribution.amount)}</TableCell>
-                          <TableCell>
+                        <tr key={contribution.id}>
+                          <td>{new Date(contribution.contribution_date).toLocaleDateString()}</td>
+                          <td className="capitalize">{contribution.type}</td>
+                          <td>{formatCurrency(contribution.amount)}</td>
+                          <td>
                             <Badge variant={contribution.status === 'paid' ? 'default' : 'secondary'}>
                               {contribution.status}
                             </Badge>
-                          </TableCell>
-                          <TableCell>
+                          </td>
+                          <td>
                             {contribution.payment_date 
                               ? new Date(contribution.payment_date).toLocaleDateString() 
                               : '-'}
-                          </TableCell>
-                        </TableRow>
+                          </td>
+                        </tr>
                       ))}
-                    </TableBody>
-                  </Table>
+                    </tbody>
+                  </ManagementTable>
                 )}
               </CardContent>
             </Card>
@@ -394,36 +398,36 @@ const MemberDetail = () => {
                 {loans.length === 0 ? (
                   <p className="text-muted-foreground">{t("admMemberDetail.noLoansRecorded")}</p>
                 ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>{t("admMemberDetail.date")}</TableHead>
-                        <TableHead>{t("admMemberDetail.amount")}</TableHead>
-                        <TableHead>{t("admMemberDetail.interestRate")}</TableHead>
-                        <TableHead>{t("admMemberDetail.paid")}</TableHead>
-                        <TableHead>{t("admMemberDetail.status")}</TableHead>
-                        <TableHead>{t("admMemberDetail.dueDate")}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
+                  <ManagementTable>
+                    <thead>
+                      <tr>
+                        <th>{t("admMemberDetail.date")}</th>
+                        <th>{t("admMemberDetail.amount")}</th>
+                        <th>{t("admMemberDetail.interestRate")}</th>
+                        <th>{t("admMemberDetail.paid")}</th>
+                        <th>{t("admMemberDetail.status")}</th>
+                        <th>{t("admMemberDetail.dueDate")}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
                       {loans.map((loan) => (
-                        <TableRow key={loan.id}>
-                          <TableCell>{new Date(loan.created_at).toLocaleDateString()}</TableCell>
-                          <TableCell>{formatCurrency(loan.amount)}</TableCell>
-                          <TableCell>{loan.interest_rate}%</TableCell>
-                          <TableCell>{formatCurrency(loan.amount_paid || 0)}</TableCell>
-                          <TableCell>
+                        <tr key={loan.id}>
+                          <td>{new Date(loan.created_at).toLocaleDateString()}</td>
+                          <td>{formatCurrency(loan.amount)}</td>
+                          <td>{loan.interest_rate}%</td>
+                          <td>{formatCurrency(loan.amount_paid || 0)}</td>
+                          <td>
                             <Badge variant={loan.status === 'paid' ? 'default' : 'secondary'}>
                               {loan.status}
                             </Badge>
-                          </TableCell>
-                          <TableCell>
+                          </td>
+                          <td>
                             {loan.due_date ? new Date(loan.due_date).toLocaleDateString() : '-'}
-                          </TableCell>
-                        </TableRow>
+                          </td>
+                        </tr>
                       ))}
-                    </TableBody>
-                  </Table>
+                    </tbody>
+                  </ManagementTable>
                 )}
               </CardContent>
             </Card>
@@ -438,24 +442,24 @@ const MemberDetail = () => {
                 {savings.length === 0 ? (
                   <p className="text-muted-foreground">{t("admMemberDetail.noSavingsRecorded")}</p>
                 ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>{t("admMemberDetail.month")}</TableHead>
-                        <TableHead>{t("admMemberDetail.amount")}</TableHead>
-                        <TableHead>{t("admMemberDetail.notes")}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
+                  <ManagementTable>
+                    <thead>
+                      <tr>
+                        <th>{t("admMemberDetail.month")}</th>
+                        <th>{t("admMemberDetail.amount")}</th>
+                        <th>{t("admMemberDetail.notes")}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
                       {savings.map((saving) => (
-                        <TableRow key={saving.id}>
-                          <TableCell>{new Date(saving.month).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}</TableCell>
-                          <TableCell>{formatCurrency(saving.amount)}</TableCell>
-                          <TableCell>{saving.notes || '-'}</TableCell>
-                        </TableRow>
+                        <tr key={saving.id}>
+                          <td>{new Date(saving.month).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}</td>
+                          <td>{formatCurrency(saving.amount)}</td>
+                          <td>{saving.notes || '-'}</td>
+                        </tr>
                       ))}
-                    </TableBody>
-                  </Table>
+                    </tbody>
+                  </ManagementTable>
                 )}
               </CardContent>
             </Card>
@@ -470,38 +474,38 @@ const MemberDetail = () => {
                 {attendance.length === 0 ? (
                   <p className="text-muted-foreground">{t("admMemberDetail.noAttendanceRecords")}</p>
                 ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>{t("admMemberDetail.meetingDate")}</TableHead>
-                        <TableHead>{t("admMemberDetail.type")}</TableHead>
-                        <TableHead>{t("admMemberDetail.status")}</TableHead>
-                        <TableHead>{t("admMemberDetail.checkInTime")}</TableHead>
-                        <TableHead>{t("admMemberDetail.fine")}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
+                  <ManagementTable>
+                    <thead>
+                      <tr>
+                        <th>{t("admMemberDetail.meetingDate")}</th>
+                        <th>{t("admMemberDetail.type")}</th>
+                        <th>{t("admMemberDetail.status")}</th>
+                        <th>{t("admMemberDetail.checkInTime")}</th>
+                        <th>{t("admMemberDetail.fine")}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
                       {attendance.map((record: any) => (
-                        <TableRow key={record.id}>
-                          <TableCell>{new Date(record.meetings.meeting_date).toLocaleDateString()}</TableCell>
-                          <TableCell className="capitalize">{record.meetings.meeting_type}</TableCell>
-                          <TableCell>
+                        <tr key={record.id}>
+                          <td>{new Date(record.meetings.meeting_date).toLocaleDateString()}</td>
+                          <td className="capitalize">{record.meetings.meeting_type}</td>
+                          <td>
                             <Badge variant={record.status === 'present' ? 'default' : 'secondary'}>
                               {record.status}
                             </Badge>
-                          </TableCell>
-                          <TableCell>
+                          </td>
+                          <td>
                             {record.check_in_time 
                               ? new Date(record.check_in_time).toLocaleTimeString() 
                               : '-'}
-                          </TableCell>
-                          <TableCell>
+                          </td>
+                          <td>
                             {record.fine_amount ? formatCurrency(record.fine_amount) : '-'}
-                          </TableCell>
-                        </TableRow>
+                          </td>
+                        </tr>
                       ))}
-                    </TableBody>
-                  </Table>
+                    </tbody>
+                  </ManagementTable>
                 )}
               </CardContent>
             </Card>

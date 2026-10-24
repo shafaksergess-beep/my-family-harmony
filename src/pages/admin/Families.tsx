@@ -1,3 +1,4 @@
+import { ResponsiveDialogFooter } from "@/components/ui/responsive-dialog";
 import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -336,7 +337,7 @@ const AdminFamilies = () => {
                       {editingFamily ? t("admin.updateFamilyInfo") : t("admin.addNewFamily")}
                     </DialogDescription>
                   </DialogHeader>
-                  <form onSubmit={handleSubmit} className="space-y-4">
+                  <form onSubmit={handleSubmit} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">{t("admin.familyName")}</Label>
                       <Input
@@ -367,14 +368,14 @@ const AdminFamilies = () => {
                         rows={3}
                       />
                     </div>
-                    <div className="flex justify-end gap-2">
+                    </div><ResponsiveDialogFooter className="flex justify-end gap-2">
                       <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                         {t("common.cancel")}
                       </Button>
                       <Button type="submit">
                         {editingFamily ? t("common.edit") : t("common.create")}
                       </Button>
-                    </div>
+                    </ResponsiveDialogFooter>
                   </form>
                 </DialogContent>
               </Dialog>

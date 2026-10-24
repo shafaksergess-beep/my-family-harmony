@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/layout/PageHeader";
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -100,9 +101,7 @@ const LinkedAccounts = () => {
         canonical="/profile/linked-accounts"
       />
       <div className="max-w-3xl mx-auto p-4 md:p-8">
-        <Button variant="ghost" size="sm" onClick={() => navigate("/profile")} className="mb-4">
-          <ArrowLeft className="h-4 w-4 mr-2" /> {t("linkedAccounts.backToProfile")}
-        </Button>
+        <PageHeader title={t("linkedAccounts.title")} backTo="/profile" />
 
         <Card>
           <CardHeader>
@@ -137,7 +136,7 @@ const LinkedAccounts = () => {
                       return (
                         <li
                           key={identity.identity_id}
-                          className="flex items-center justify-between gap-3 rounded-lg border p-3"
+                          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-3"
                         >
                           <div className="flex items-center gap-3 min-w-0">
                             {isEmail ? <Mail className="h-5 w-5 text-muted-foreground shrink-0" />

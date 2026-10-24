@@ -1,3 +1,4 @@
+import { ResponsiveDialogFooter } from "@/components/ui/responsive-dialog";
 import { ManagementTable, ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
@@ -395,7 +396,7 @@ export default function FamilyNjangi() {
                 <DialogHeader>
                   <DialogTitle>{t("famNjangi.createNjangiCycle")}</DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleCreateCycle} className="space-y-4">
+                <form onSubmit={handleCreateCycle} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields space-y-4">
                   <div>
                     <Label htmlFor="name">{t("famNjangi.cycleName")}</Label>
                     <Input
@@ -436,7 +437,7 @@ export default function FamilyNjangi() {
                       onChange={(e) => setCycleFormData({ ...cycleFormData, notes: e.target.value })}
                     />
                   </div>
-                  <Button type="submit" className="w-full">{t("famNjangi.createCycle")}</Button>
+                  </div><ResponsiveDialogFooter><Button type="submit" className="w-full">{t("famNjangi.createCycle")}</Button></ResponsiveDialogFooter>
                 </form>
               </DialogContent>
             </Dialog>

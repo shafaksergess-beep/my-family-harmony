@@ -1,3 +1,4 @@
+import { ResponsiveDialogFooter } from "@/components/ui/responsive-dialog";
 import { ManagementTable, ManagementHeader } from "@/components/layout/ManagementMobile";
 import i18n from "@/i18n/config";
 import { useTranslation } from "react-i18next";
@@ -426,7 +427,7 @@ export default function FamilyAssistance() {
                 <DialogHeader>
                   <DialogTitle>{t("famAssistance.recordAssistanceEvent")}</DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="member">{t("famAssistance.member")}</Label>
@@ -581,7 +582,7 @@ export default function FamilyAssistance() {
                       <p className="text-sm text-red-500 mt-1">{validationErrors.notes}</p>
                     )}
                   </div>
-                  <Button type="submit" className="w-full">{t("famAssistance.recordEvent")}</Button>
+                  </div><ResponsiveDialogFooter><Button type="submit" className="w-full">{t("famAssistance.recordEvent")}</Button></ResponsiveDialogFooter>
                 </form>
               </DialogContent>
             </Dialog>
