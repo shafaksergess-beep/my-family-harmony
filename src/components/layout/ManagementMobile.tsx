@@ -34,7 +34,7 @@ export function ManagementTable({ children, ...props }: HTMLAttributes<HTMLTable
       const cell = cells[index + 1];
       if (!cell) return null;
       const action = index + 1 === heads.length - 1 && /action/i.test(String(head.props.children)) || index + 1 === heads.length - 1 && containsControl(cell.props.children);
-      return <div className="min-w-0"><div className="mb-1 text-xs text-muted-foreground">{head.props.children}</div>{action ? <Popover><PopoverTrigger asChild><Button variant="outline" size="icon" aria-label={t("foundation.moreActions")}><MoreVertical className="h-5 w-5" /></Button></PopoverTrigger><PopoverContent align="end" className="management-row-actions w-auto max-w-full">{cell.props.children}</PopoverContent></Popover> : cell.props.children}</div>;
+      return <div className="pointer-events-auto min-w-0"><div className="mb-1 text-xs text-muted-foreground">{head.props.children}</div>{action ? <Popover><PopoverTrigger asChild><Button variant="outline" size="icon" aria-label={t("foundation.moreActions")}><MoreVertical className="h-5 w-5" /></Button></PopoverTrigger><PopoverContent align="end" className="management-row-actions w-auto max-w-full">{cell.props.children}</PopoverContent></Popover> : cell.props.children}</div>;
     } }))}
     emptyState={<>{emptyRows.map(row => <Fragment key={row.key}>{elements(row.props.children)[0]?.props.children}</Fragment>)}</>}
   />;
