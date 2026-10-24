@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -46,6 +47,7 @@ interface AttendanceRecord {
 }
 
 export function MobileMeetings() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -215,7 +217,7 @@ export function MobileMeetings() {
 
   if (authLoading || loading) {
     return (
-      <MobileLayout title="Meetings" familySlug={familySlug}>
+      <MobileLayout title={t("mobilePolish.meetings")} familySlug={familySlug}>
         <div className="space-y-4 p-4">
           <SkeletonCard />
           <SkeletonCard />
@@ -226,7 +228,7 @@ export function MobileMeetings() {
   }
 
   return (
-    <MobileLayout title="Meetings" familySlug={familySlug}>
+    <MobileLayout title={t("mobilePolish.meetings")} familySlug={familySlug}>
       <div {...handlers} className="relative">
         <PullToRefresh 
           pullDistance={pullDistance}
@@ -241,7 +243,7 @@ export function MobileMeetings() {
             <Card className="bg-primary/5 border-primary/30">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <Badge className="bg-primary">Today's Meeting</Badge>
+                  <Badge className="bg-primary">{t("mobilePolish.today")}</Badge>
                   <div className="flex items-center gap-1 text-sm">
                     <Clock className="h-3 w-3" />
                     <span>{todaysMeeting.meeting_time}</span>
@@ -258,7 +260,7 @@ export function MobileMeetings() {
                 {myAttendance.includes(todaysMeeting.id) ? (
                   <div className="flex items-center gap-2 text-green-600">
                     <CheckCircle className="h-5 w-5" />
-                    <span className="font-medium">You've checked in</span>
+                    <span className="font-medium">{t("mobilePolish.checkedIn")}</span>
                   </div>
                 ) : (
                   <Button 
@@ -266,7 +268,7 @@ export function MobileMeetings() {
                     onClick={() => handleCheckIn(todaysMeeting.id)}
                   >
                     <QrCode className="h-4 w-4 mr-2" />
-                    Scan QR to Check In
+                    {t("mobilePolish.scan")}
                   </Button>
                 )}
               </CardContent>
@@ -279,21 +281,21 @@ export function MobileMeetings() {
               <CardContent className="p-3 text-center">
                 <Calendar className="h-5 w-5 mx-auto mb-1 text-primary" />
                 <p className="text-lg font-bold">{upcomingMeetings.length}</p>
-                <p className="text-xs text-muted-foreground">Upcoming</p>
+                <p className="text-xs text-muted-foreground">{t("mobilePolish.upcoming")}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-3 text-center">
                 <CheckCircle className="h-5 w-5 mx-auto mb-1 text-green-500" />
                 <p className="text-lg font-bold">{attendedMeetings}</p>
-                <p className="text-xs text-muted-foreground">Attended</p>
+                <p className="text-xs text-muted-foreground">{t("mobilePolish.attended")}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-3 text-center">
                 <Users className="h-5 w-5 mx-auto mb-1 text-blue-500" />
                 <p className="text-lg font-bold">{attendanceRate}%</p>
-                <p className="text-xs text-muted-foreground">Rate</p>
+                <p className="text-xs text-muted-foreground">{t("mobilePolish.rate")}</p>
               </CardContent>
             </Card>
           </div>
@@ -302,10 +304,10 @@ export function MobileMeetings() {
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="upcoming">
-                Upcoming ({upcomingMeetings.length})
+                {t("mobilePolish.upcoming")} ({upcomingMeetings.length})
               </TabsTrigger>
               <TabsTrigger value="past">
-                Past ({pastMeetings.length})
+                {t("mobilePolish.past")} ({pastMeetings.length})
               </TabsTrigger>
             </TabsList>
 
@@ -314,7 +316,7 @@ export function MobileMeetings() {
                 <Card>
                   <CardContent className="p-8 text-center text-muted-foreground">
                     <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>No upcoming meetings</p>
+                    <p>{t("mobilePolish.noUpcoming")}</p>
                   </CardContent>
                 </Card>
               ) : (
@@ -335,7 +337,7 @@ export function MobileMeetings() {
                 <Card>
                   <CardContent className="p-8 text-center text-muted-foreground">
                     <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>No past meetings</p>
+                    <p>{t("mobilePolish.noPast")}</p>
                   </CardContent>
                 </Card>
               ) : (
@@ -357,7 +359,7 @@ export function MobileMeetings() {
       <Sheet open={scannerSheetOpen} onOpenChange={setScannerSheetOpen}>
         <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl">
           <SheetHeader>
-            <SheetTitle>Scan Meeting QR Code</SheetTitle>
+            <SheetTitle>{t("mobilePolish.scanTitle")}</SheetTitle>
           </SheetHeader>
           <div className="mt-4">
             <MobileQRScanner

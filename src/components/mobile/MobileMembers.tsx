@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,6 +49,7 @@ interface Member {
 }
 
 export function MobileMembers() {
+  const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -91,11 +93,12 @@ export function MobileMembers() {
   }, [family?.id]);
 
   const loadMembers = async () => {
+    if (!family) return;
     try {
       const { data: membersData, error: membersError } = await supabase
         .from("family_members")
         .select("id, user_id, role, house_name, is_house_representative")
-        .eq("family_id", family!.id)
+        .eq("family_id", family.id)
         .order("role");
 
       if (membersError) throw membersError;
@@ -129,26 +132,27 @@ export function MobileMembers() {
   };
 
   const loadStats = async () => {
+    if (!family) return;
     try {
       // Get contributions total
       const { data: contributions } = await supabase
         .from("contributions")
         .select("amount")
-        .eq("family_id", family!.id)
+        .eq("family_id", family.id)
         .eq("status", "paid");
 
       // Get active loans
       const { data: loans } = await supabase
         .from("loans")
         .select("amount")
-        .eq("family_id", family!.id)
+        .eq("family_id", family.id)
         .eq("status", "disbursed");
 
       // Get next meeting
       const { data: meeting } = await supabase
         .from("meetings")
         .select("meeting_date")
-        .eq("family_id", family!.id)
+        .eq("family_id", family.id)
         .gte("meeting_date", new Date().toISOString().split("T")[0])
         .order("meeting_date")
         .limit(1)
@@ -302,8 +306,8 @@ export function MobileMembers() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-xl font-bold">Family Members</h1>
-              <p className="text-xs text-muted-foreground">{members.length} members</p>
+              <h1 className="text-xl font-bold">{t("mobilePolish.members")}</h1>
+              <p className="text-xs text-muted-foreground">{t("mobilePolish.memberCount", { count: members.length })}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -324,30 +328,30 @@ export function MobileMembers() {
                 }}
               >
                 <UserPlus className="h-4 w-4 mr-1" />
-                Invite
+                {t("mobilePolish.invite")}
               </Button>
             )}
           </div>
         </div>
 
         {/* Search */}
-        <div className="mt-3 flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <div className="mt-3 flex flex-col gap-2 min-[480px]:flex-row">
+          <div className="relative min-w-0 flex-1">
+            <Search className="pointer-events-none absolute left-3 top-3.5 text-muted-foreground h-4 w-4" />
             <Input
-              placeholder="Search members..."
+              placeholder={t("mobilePolish.search")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
             />
           </div>
           <Select value={filterRole} onValueChange={setFilterRole}>
-            <SelectTrigger className="w-[120px]">
+            <SelectTrigger className="w-full min-[480px]:w-40 [&>span]:flex-1">
               <Filter className="h-4 w-4 mr-1" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Roles</SelectItem>
+              <SelectItem value="all">{t("mobilePolish.roles")}</SelectItem>
               <SelectItem value="family_head">Head</SelectItem>
               <SelectItem value="family_admin">Admin</SelectItem>
               <SelectItem value="treasurer">Treasurer</SelectItem>
@@ -364,15 +368,15 @@ export function MobileMembers() {
         <TabsList className="w-full grid grid-cols-3">
           <TabsTrigger value="members" className="text-xs">
             <Users className="h-4 w-4 mr-1" />
-            Members
+            {t("common.members")}
           </TabsTrigger>
           <TabsTrigger value="stats" className="text-xs">
             <Info className="h-4 w-4 mr-1" />
-            Stats
+            {t("mobilePolish.stats")}
           </TabsTrigger>
           <TabsTrigger value="info" className="text-xs">
             <BookOpen className="h-4 w-4 mr-1" />
-            Heritage
+            {t("mobilePolish.heritage")}
           </TabsTrigger>
         </TabsList>
 
@@ -382,7 +386,7 @@ export function MobileMembers() {
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <Crown className="h-4 w-4" />
-                Leadership ({roleGroups.leadership.length})
+                {t("mobilePolish.leadership")} ({roleGroups.leadership.length})
               </div>
               {roleGroups.leadership.map((member) => (
                 <MemberCard
