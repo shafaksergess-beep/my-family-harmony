@@ -232,6 +232,14 @@
       "assistance": "Assistance",
       "chat": "Discussion",
       "njangi": "Njangi"
+    },
+    "adminHomeV2": {
+      "primary": "Espaces principaux",
+      "more": "Autres outils",
+      "familiesDesc": "Groupes sur la plateforme",
+      "usersDesc": "Comptes et accès",
+      "analyticsDesc": "Tendances de la plateforme",
+      "logsDesc": "Actions des administrateurs"
     }
   },
   "foundation": {
@@ -1360,7 +1368,15 @@
     "live": "En direct",
     "qrOpensDetail": "Le scan ouvre la page de détails de cette réunion.",
     "attendanceTab": "Présences ({{count}})",
-    "noUpcomingMeeting": "Aucune réunion à venir pour l'enregistrement"
+    "noUpcomingMeeting": "Aucune réunion à venir pour l'enregistrement",
+    "latenessFine": "Amende de retard : {{minutes}} minutes",
+    "checkedInLate": "Présence enregistrée ({{minutes}} min de retard). Amende : {{fine}}",
+    "checkedInOk": "Présence enregistrée avec succès",
+    "failedToCheckIn": "Impossible d'enregistrer la présence. Veuillez réessayer.",
+    "dateLabel": "Date",
+    "timeLabel": "Heure",
+    "typeLabel": "Type",
+    "lateBy": "En retard de {{minutes}} minutes, amende : {{fine}}"
   },
   "famBalloting": {
     "assignmentType": "Type d'affectation",
@@ -3096,6 +3112,36 @@
       "executive": "Direction exécutive",
       "finance": "Bureau financier",
       "secretariat": "Secrétariat"
+    }
+  },
+  "userAdmin": {
+    "suspended": "Suspendu",
+    "suspend": "Suspendre",
+    "reactivate": "Réactiver",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "history": "Historique d'activité",
+    "historyTitle": "Activité de {{name}}",
+    "historyDescription": "Les 100 actions les plus récentes de cet utilisateur.",
+    "confirmButton": "Confirmer",
+    "failed": "L'action n'a pas pu être effectuée. Veuillez réessayer.",
+    "confirm": {
+      "suspend": {
+        "title": "Suspendre ce compte ?",
+        "body": "{{name}} sera déconnecté et ne pourra plus se connecter jusqu'à sa réactivation. Ses données et dossiers familiaux sont conservés."
+      },
+      "unsuspend": {
+        "title": "Réactiver ce compte ?",
+        "body": "{{name}} pourra de nouveau se connecter."
+      },
+      "reset": {
+        "title": "Envoyer une réinitialisation ?",
+        "body": "Un lien de réinitialisation du mot de passe sera envoyé à {{email}}."
+      }
+    },
+    "done": {
+      "suspend": "{{name}} a été suspendu",
+      "unsuspend": "{{name}} a été réactivé",
+      "reset": "E-mail de réinitialisation envoyé à {{name}}"
     }
   }
 }

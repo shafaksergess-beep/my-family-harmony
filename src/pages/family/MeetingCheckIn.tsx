@@ -380,7 +380,7 @@ const MeetingCheckIn = () => {
                       <h3 className="font-semibold mb-2">{t("famMeetingCheckIn.meetingDetails")}</h3>
                       <p className="text-sm">{t("famMeetingCheckIn.dateLabel")}: {new Date(meeting.meeting_date).toLocaleDateString(i18n.language)}</p>
                       <p className="text-sm">{t("famMeetingCheckIn.timeLabel")}: {meeting.meeting_time?.slice(0, 5)}</p>
-                      <p className="text-sm">{t("famMeetingCheckIn.typeLabel")}: {t(`meetingTypes.${meeting.meeting_type}`, { defaultValue: meeting.meeting_type })}</p>
+                      <p className="text-sm">{t("famMeetingCheckIn.typeLabel")}: {t(`phase2.meetingTypes.${meeting.meeting_type}`, { defaultValue: meeting.meeting_type })}</p>
                     </div>
 
                     <Button onClick={handleCheckIn} className="w-full" size="lg">

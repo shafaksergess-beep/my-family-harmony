@@ -232,6 +232,14 @@
       "assistance": "Assistance",
       "chat": "Chat",
       "njangi": "Njangi"
+    },
+    "adminHomeV2": {
+      "primary": "Main areas",
+      "more": "More tools",
+      "familiesDesc": "Groups on the platform",
+      "usersDesc": "Accounts and access",
+      "analyticsDesc": "Platform trends",
+      "logsDesc": "Admin actions"
     }
   },
   "foundation": {
@@ -1360,7 +1368,15 @@
     "live": "Live",
     "qrOpensDetail": "Scanning opens this meeting's details page.",
     "attendanceTab": "Attendance ({{count}})",
-    "noUpcomingMeeting": "No upcoming meeting to check in to"
+    "noUpcomingMeeting": "No upcoming meeting to check in to",
+    "latenessFine": "Lateness fine: {{minutes}} minutes late",
+    "checkedInLate": "Checked in ({{minutes}} min late). Fine: {{fine}}",
+    "checkedInOk": "Checked in successfully",
+    "failedToCheckIn": "Could not check in. Please try again.",
+    "dateLabel": "Date",
+    "timeLabel": "Time",
+    "typeLabel": "Type",
+    "lateBy": "Late by {{minutes}} minutes, fine: {{fine}}"
   },
   "famBalloting": {
     "assignmentType": "Assignment Type",
@@ -3096,6 +3112,36 @@
       "executive": "Executive leadership",
       "finance": "Finance bureau",
       "secretariat": "Secretariat"
+    }
+  },
+  "userAdmin": {
+    "suspended": "Suspended",
+    "suspend": "Suspend",
+    "reactivate": "Reactivate",
+    "resetPassword": "Reset password",
+    "history": "Activity history",
+    "historyTitle": "Activity of {{name}}",
+    "historyDescription": "The 100 most recent actions by this user.",
+    "confirmButton": "Confirm",
+    "failed": "The action could not be completed. Please try again.",
+    "confirm": {
+      "suspend": {
+        "title": "Suspend this account?",
+        "body": "{{name}} will be signed out and unable to sign in until reactivated. Their data and family records are kept."
+      },
+      "unsuspend": {
+        "title": "Reactivate this account?",
+        "body": "{{name}} will be able to sign in again."
+      },
+      "reset": {
+        "title": "Send a password reset?",
+        "body": "A password reset link will be emailed to {{email}}."
+      }
+    },
+    "done": {
+      "suspend": "{{name}} has been suspended",
+      "unsuspend": "{{name}} has been reactivated",
+      "reset": "Password reset email sent to {{name}}"
     }
   }
 }
