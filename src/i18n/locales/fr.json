@@ -1,5 +1,6 @@
 {
   "mobilePolish": {
+    "memberTab": "Membres",
     "members": "Membres de la famille",
     "memberCount": "{{count}} membres",
     "invite": "Inviter",

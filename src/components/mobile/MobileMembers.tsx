@@ -368,7 +368,7 @@ export function MobileMembers() {
         <TabsList className="w-full grid grid-cols-3">
           <TabsTrigger value="members" className="text-xs">
             <Users className="h-4 w-4 mr-1" />
-            {t("common.members")}
+            {t("mobilePolish.memberTab")}
           </TabsTrigger>
           <TabsTrigger value="stats" className="text-xs">
             <Info className="h-4 w-4 mr-1" />
