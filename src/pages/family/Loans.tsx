@@ -359,7 +359,7 @@ export default function Loans() {
             <DialogHeader>
               <DialogTitle>{t("famLoans.requestNewLoan")}</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
+            <div className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields">
               <div>
                 <Label>{t("famLoans.member")}</Label>
                 <Select 
@@ -468,7 +468,7 @@ export default function Loans() {
                   )}
                 </p>
               </div>
-              <ResponsiveDialogFooter><Button onClick={handleRequestLoan} className="w-full">
+              </div><ResponsiveDialogFooter><Button onClick={handleRequestLoan} className="w-full">
                 {t("famLoans.submitLoanRequest")}
               </Button></ResponsiveDialogFooter>
             </div>

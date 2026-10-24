@@ -471,7 +471,7 @@ export default function Contributions() {
                     <DialogHeader>
                       <DialogTitle>{t("famContributions.recordNewContribution")}</DialogTitle>
                     </DialogHeader>
-                    <div className="space-y-4">
+                    <div className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields">
                       <div>
                         <Label>{t("famContributions.contributionFor")}</Label>
                         <Select value={dialogScope} onValueChange={(value) => setDialogScope(value as "member" | "house")}>
@@ -606,7 +606,7 @@ export default function Contributions() {
                           <p className="text-sm text-red-500 mt-1">{validationErrors.notes}</p>
                         )}
                       </div>
-                      <ResponsiveDialogFooter><Button onClick={handleAddContribution} className="w-full">
+                      </div><ResponsiveDialogFooter><Button onClick={handleAddContribution} className="w-full">
                         {t("famContributions.addContribution")}
                       </Button></ResponsiveDialogFooter>
                     </div>

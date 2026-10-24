@@ -387,7 +387,7 @@ const FamilyMeetings = () => {
                         {t("famMeetings.scheduleMonthlyMeetingsForThe")}
                       </DialogDescription>
                     </DialogHeader>
-                    <form onSubmit={handleBulkSchedule} className="space-y-4">
+                    <form onSubmit={handleBulkSchedule} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields">
                       <div className="space-y-2">
                         <Label htmlFor="bulk-start-date">{t("famMeetings.startDate")}</Label>
                         <Input
@@ -435,7 +435,7 @@ const FamilyMeetings = () => {
                           placeholder={t("famMeetings.meetingLocation")}
                         />
                       </div>
-                      <ResponsiveDialogFooter className="flex justify-end gap-2">
+                      </div><ResponsiveDialogFooter className="flex justify-end gap-2">
                         <Button type="button" variant="outline" onClick={() => setIsBulkDialogOpen(false)}>
                           {t("famMeetings.cancel")}
                         </Button>
@@ -459,7 +459,7 @@ const FamilyMeetings = () => {
                     {t("famMeetings.createANewFamilyMeeting")}
                   </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="date">{t("famMeetings.meetingDate")}</Label>
@@ -570,7 +570,7 @@ const FamilyMeetings = () => {
                       <p className="text-sm text-red-500">{validationErrors.agenda}</p>
                     )}
                   </div>
-                  <ResponsiveDialogFooter className="flex justify-end gap-2">
+                  </div><ResponsiveDialogFooter className="flex justify-end gap-2">
                     <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                       {t("famMeetings.cancel")}
                     </Button>

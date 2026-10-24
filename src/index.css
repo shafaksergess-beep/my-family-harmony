@@ -354,3 +354,8 @@ html[data-device="mobile"] .responsive-dialog-scroll { max-height: min(calc(90dv
 html[data-device="mobile"] .responsive-dialog-scroll > form { flex: 1; }
 html[data-device="mobile"] .responsive-dialog-scroll :where(.responsive-dialog-footer) { margin-top: 1rem; }
 @media (prefers-reduced-motion: reduce) { #ks-boot .ks-bar::after { animation: none; } }
+
+html[data-device="mobile"] .responsive-dialog-scroll:has(.responsive-dialog-form) { overflow: hidden; }
+html[data-device="mobile"] .responsive-dialog-form { display: flex; flex-direction: column; min-height: 0; overflow: hidden; flex: 1; }
+html[data-device="mobile"] .responsive-dialog-fields { overflow-y: auto; min-height: 0; overscroll-behavior: contain; flex: 1; padding-bottom: 1rem; }
+html[data-device="mobile"] .responsive-dialog-fields > * + * { margin-top: 1rem; }

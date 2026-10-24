@@ -427,7 +427,7 @@ export default function FamilyAssistance() {
                 <DialogHeader>
                   <DialogTitle>{t("famAssistance.recordAssistanceEvent")}</DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="member">{t("famAssistance.member")}</Label>
@@ -582,7 +582,7 @@ export default function FamilyAssistance() {
                       <p className="text-sm text-red-500 mt-1">{validationErrors.notes}</p>
                     )}
                   </div>
-                  <ResponsiveDialogFooter><Button type="submit" className="w-full">{t("famAssistance.recordEvent")}</Button></ResponsiveDialogFooter>
+                  </div><ResponsiveDialogFooter><Button type="submit" className="w-full">{t("famAssistance.recordEvent")}</Button></ResponsiveDialogFooter>
                 </form>
               </DialogContent>
             </Dialog>

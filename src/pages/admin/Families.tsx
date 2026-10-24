@@ -337,7 +337,7 @@ const AdminFamilies = () => {
                       {editingFamily ? t("admin.updateFamilyInfo") : t("admin.addNewFamily")}
                     </DialogDescription>
                   </DialogHeader>
-                  <form onSubmit={handleSubmit} className="space-y-4">
+                  <form onSubmit={handleSubmit} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields">
                     <div className="space-y-2">
                       <Label htmlFor="name">{t("admin.familyName")}</Label>
                       <Input
@@ -368,7 +368,7 @@ const AdminFamilies = () => {
                         rows={3}
                       />
                     </div>
-                    <ResponsiveDialogFooter className="flex justify-end gap-2">
+                    </div><ResponsiveDialogFooter className="flex justify-end gap-2">
                       <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                         {t("common.cancel")}
                       </Button>

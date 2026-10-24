@@ -396,7 +396,7 @@ export default function FamilyNjangi() {
                 <DialogHeader>
                   <DialogTitle>{t("famNjangi.createNjangiCycle")}</DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleCreateCycle} className="space-y-4">
+                <form onSubmit={handleCreateCycle} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields">
                   <div>
                     <Label htmlFor="name">{t("famNjangi.cycleName")}</Label>
                     <Input
@@ -437,7 +437,7 @@ export default function FamilyNjangi() {
                       onChange={(e) => setCycleFormData({ ...cycleFormData, notes: e.target.value })}
                     />
                   </div>
-                  <ResponsiveDialogFooter><Button type="submit" className="w-full">{t("famNjangi.createCycle")}</Button></ResponsiveDialogFooter>
+                  </div><ResponsiveDialogFooter><Button type="submit" className="w-full">{t("famNjangi.createCycle")}</Button></ResponsiveDialogFooter>
                 </form>
               </DialogContent>
             </Dialog>
