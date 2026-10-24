@@ -1,5 +1,10 @@
 # Roadmap
 
+## App-wide UI/UX hardening
+- [ ] Fix shared controls, dialogs, tables, tabs and mobile content sizing
+- [ ] Fix overflowing admin and family page headers/actions without changing permissions
+- [ ] Validate signed-in screens and interactions at mobile, tablet and desktop sizes
+
 - [x] Replace Median integration with verified Natively bridge
 - [x] Add authenticated self-account deletion with English/French confirmation
 - [x] Generate branded master icon and store graphics with listing guidance
