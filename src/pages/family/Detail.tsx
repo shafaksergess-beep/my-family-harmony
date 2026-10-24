@@ -331,7 +331,7 @@ const FamilyDetail = () => {
                 size="sm"
                 onClick={() => navigate(`/family/${family.slug}/pending-approvals`)}
               >
-                Pending approvals
+                {t("phase2.pendingApprovals")}
                 {pendingApprovalsCount > 0 && (
                   <span className="ml-2 inline-flex items-center justify-center rounded-full bg-background/20 px-2 py-0.5 text-xs font-semibold">
                     {pendingApprovalsCount}

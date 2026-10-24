@@ -129,6 +129,7 @@ export function MobileDashboard() {
     setStats({ pendingContributions: 0, totalSavings: 0, activeLoans: 0, upcomingMeetings: 0, nextMeetingDate: null });
     setActivities([]);
     setAttention([]);
+    setMemberId(null);
     try {
       // Get member ID
       const { data: memberData } = await supabase
@@ -317,7 +318,7 @@ export function MobileDashboard() {
 
   const slug = selectedFamily?.family_slug;
   const { canManageLoans, canManageMembers } = useFamilyAuth(slug);
-  const { isModuleEnabled } = useFamilyModules(selectedFamily?.family_id);
+  const { isModuleEnabled, disabledSlugs } = useFamilyModules(selectedFamily?.family_id);
   useEffect(() => {
     if (!selectedFamily?.family_id) return;
     let active = true;
@@ -334,8 +335,8 @@ export function MobileDashboard() {
       if (active) setAttention(items.filter(i => i.count > 0 && (i.key !== 'dues' || isModuleEnabled('contributions'))));
     };
     load(); return () => { active = false; };
-  }, [selectedFamily?.family_id, canManageLoans, canManageMembers, stats.pendingContributions]);
-  useEffect(() => { if (selectedFamily) loadActivities(selectedFamily.family_id); }, [i18n.language, formatAmount]);
+  }, [selectedFamily?.family_id, canManageLoans, canManageMembers, stats.pendingContributions, disabledSlugs]);
+  useEffect(() => { if (selectedFamily) loadActivities(selectedFamily.family_id); }, [selectedFamily?.family_id, i18n.language, formatAmount]);
   const go = async (path: string) => {
     await haptics.light();
     navigate(path);

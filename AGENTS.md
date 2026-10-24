@@ -12,5 +12,6 @@
 
 - DeviceProvider/useDevice is the single reactive device source; usePlatform/useIsMobile are compatibility adapters. Why: first-render mobile classification and breakpoint changes must agree everywhere.
 - AppShell owns authenticated mobile navigation, safe-area clearance and keyboard state; legacy MobileLayout defers nav ownership inside it. Why: prevent duplicate bars and bottom spacing without altering route permissions.
-- Shared PageHeader and responsive primitives live in components/layout and responsive-dialog; only Analytics and desktop Members use the new header in foundation phase. Why: later page migrations stay mechanical and out of this phase.
+- Shared PageHeader and responsive primitives live in components/layout and responsive-dialog; Phase 2 dashboards and analytics reuse these controls with mobile-only branches. Why: desktop composition and existing permissions stay independent of mobile presentation.
+- Mobile analytics adapters reuse each report's existing computed values and chronological series; categorical compaction is presentation-only and preserves totals. Why: mobile readability must not change financial calculations or data access.
 - BrowserRouter route shell options are registered via ShellRouteConfig/useShellConfig, including check-in hiding. Why: declarative Routes cannot expose data-router useMatches handles.

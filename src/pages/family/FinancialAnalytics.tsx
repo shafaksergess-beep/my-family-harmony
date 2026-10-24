@@ -302,9 +302,9 @@ const FinancialAnalytics = () => {
                     <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <Legend />
-                    <Line type="monotone" dataKey="contributions" stroke="hsl(var(--primary))" strokeWidth={2} />
-                    <Line type="monotone" dataKey="loans" stroke="#3b82f6" strokeWidth={2} />
-                    <Line type="monotone" dataKey="savings" stroke="#10b981" strokeWidth={2} />
+                    <Line type="monotone" dataKey="contributions" name={t("famFinancialAnalytics.contributions")} stroke="hsl(var(--primary))" strokeWidth={2} />
+                    <Line type="monotone" dataKey="loans" name={t("famFinancialAnalytics.loans")} stroke="#3b82f6" strokeWidth={2} />
+                    <Line type="monotone" dataKey="savings" name={t("famFinancialAnalytics.savings")} stroke="#10b981" strokeWidth={2} />
                   </LineChart>
                 </ResponsiveContainer></MobileChart>
               </ChartContainer>
