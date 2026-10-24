@@ -1,4 +1,4 @@
-import { Children, Fragment, isValidElement, useState, type ReactNode, type ReactElement } from "react";
+import { Children, Fragment, isValidElement, useState, type ReactNode, type ReactElement, type HTMLAttributes } from "react";
 import { MoreVertical, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useDevice } from "@/hooks/useDevice";
@@ -18,7 +18,7 @@ function elements(children: ReactNode): Element[] {
 }
 
 /** Adapts already-rendered rows, preserving their parent-owned handlers and guards. */
-export function ManagementTable({ children, ...props }: React.HTMLAttributes<HTMLTableElement>) {
+export function ManagementTable({ children, ...props }: HTMLAttributes<HTMLTableElement>) {
   const { isMobile } = useDevice();
   const { t } = useTranslation();
   if (!isMobile) return <table {...props}>{children}</table>;
@@ -40,7 +40,11 @@ export function ManagementTable({ children, ...props }: React.HTMLAttributes<HTM
   />;
 }
 function containsControl(children: ReactNode): boolean {
-  return elements(children).some(child => child.type === "button" || typeof child.type !== "string" || containsControl(child.props.children));
+  return elements(children).some(child => {
+    const component = child.type as { displayName?: string; name?: string };
+    const name = typeof child.type === "string" ? child.type : component.displayName ?? component.name ?? "";
+    return /button|dialog|menu|receipt/i.test(name) || containsControl(child.props.children);
+  });
 }
 
 /** Keeps existing header controls mounted in a sheet without duplicating their logic. */
