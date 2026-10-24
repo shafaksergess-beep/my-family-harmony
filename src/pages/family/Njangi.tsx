@@ -1,3 +1,4 @@
+import { ManagementTable, ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -7,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { ArrowLeft, Plus, CheckCircle2, Trash2, UserPlus } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ResponsiveDialog as Dialog, ResponsiveDialogContent as DialogContent, ResponsiveDialogHeader as DialogHeader, ResponsiveDialogTitle as DialogTitle, ResponsiveDialogTrigger as DialogTrigger } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -356,7 +357,7 @@ export default function FamilyNjangi() {
       <SEO title={t("famNjangi.njangiCycles")} description={t("famNjangi.manageNjangiRotatingSavingsCycles")} />
       <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
+        <ManagementHeader className="flex items-center justify-between" title={"Njangi (Rotating Savings)"} as="div">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="h-5 w-5" />
@@ -367,7 +368,7 @@ export default function FamilyNjangi() {
             <LanguageSwitcher />
             <CurrencySelector />
           </div>
-        </div>
+        </ManagementHeader>
 
         <div className="flex justify-between items-center">
           <div className="flex gap-2">
@@ -505,7 +506,7 @@ export default function FamilyNjangi() {
                 )}
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <ManagementTable className="w-full">
                   <thead>
                     <tr className="border-b">
                       <th className="text-left p-4">{t("famNjangi.order")}</th>
@@ -574,7 +575,7 @@ export default function FamilyNjangi() {
                       ))
                     )}
                   </tbody>
-                </table>
+                </ManagementTable>
               </div>
             </Card>
           </>

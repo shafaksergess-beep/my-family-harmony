@@ -1,3 +1,4 @@
+import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -5,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ResponsiveDialog as Dialog, ResponsiveDialogContent as DialogContent, ResponsiveDialogHeader as DialogHeader, ResponsiveDialogTitle as DialogTitle, ResponsiveDialogTrigger as DialogTrigger } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -411,9 +412,7 @@ export default function Contributions() {
   }
 
   // Use mobile-optimized view on mobile devices
-  if (isMobile) {
-    return <MobileContributions />;
-  }
+  
 
   return (
     <>
@@ -421,7 +420,7 @@ export default function Contributions() {
       <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          <ManagementHeader className="flex flex-wrap items-center justify-between gap-3" title={t("famContributions.contributions")} as="div">
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -436,7 +435,7 @@ export default function Contributions() {
               <LanguageSwitcher />
               <CurrencySelector />
             </div>
-          </div>
+          </ManagementHeader>
           <div className="flex flex-wrap items-center justify-end gap-2 mt-4 border-t pt-4 border-border">
             {canManageFinances && (
               <BulkPaymentMenu

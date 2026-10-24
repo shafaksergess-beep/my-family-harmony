@@ -1,3 +1,4 @@
+import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -104,7 +105,7 @@ const MeetingSettings = () => {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
+          <ManagementHeader className="flex items-center gap-4" title={t("famMeetingSettings.meetingSettings")} as="div">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               {t("famMeetingSettings.back")}
@@ -116,7 +117,7 @@ const MeetingSettings = () => {
               </h1>
               <p className="text-sm text-muted-foreground">{t("famMeetingSettings.configureMeetingSchedulesAndFines")}</p>
             </div>
-          </div>
+          </ManagementHeader>
         </div>
       </header>
 

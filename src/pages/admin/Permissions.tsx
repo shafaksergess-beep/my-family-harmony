@@ -1,3 +1,4 @@
+import { ManagementTable, ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -92,7 +93,7 @@ const Permissions = () => {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+          <ManagementHeader className="flex items-center justify-between" title={t("admPermissions.permissionsOverview")} as="div">
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate("/admin/families")}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -108,7 +109,7 @@ const Permissions = () => {
             </div>
             
             <LanguageSwitcher />
-          </div>
+          </ManagementHeader>
         </div>
       </header>
 
@@ -139,7 +140,7 @@ const Permissions = () => {
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
-                  <table className="w-full">
+                  <ManagementTable className="w-full">
                     <thead>
                       <tr className="border-b">
                         <th className="text-left py-3 px-4 font-medium">{t("admPermissions.action")}</th>
@@ -192,7 +193,7 @@ const Permissions = () => {
                         </tr>
                       ))}
                     </tbody>
-                  </table>
+                  </ManagementTable>
                 </div>
               </CardContent>
             </Card>

@@ -1,3 +1,4 @@
+import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -8,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { usePlatform } from "@/hooks/usePlatform";
 import { Loader2, ArrowLeft, Plus, Calendar, MapPin, Clock, QrCode, CalendarRange } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ResponsiveDialog as Dialog, ResponsiveDialogContent as DialogContent, ResponsiveDialogDescription as DialogDescription, ResponsiveDialogHeader as DialogHeader, ResponsiveDialogTitle as DialogTitle, ResponsiveDialogTrigger as DialogTrigger } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -349,9 +350,7 @@ const FamilyMeetings = () => {
   }
 
   // Use mobile-optimized view on mobile devices
-  if (isMobile) {
-    return <MobileMeetings />;
-  }
+  
 
   return (
     <>
@@ -359,7 +358,7 @@ const FamilyMeetings = () => {
       <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          <ManagementHeader className="flex flex-wrap items-center justify-between gap-3" title={t("phase3b.management")} as="div">
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -581,7 +580,7 @@ const FamilyMeetings = () => {
             </Dialog>
               </div>
             )}
-          </div>
+          </ManagementHeader>
         </div>
       </header>
 

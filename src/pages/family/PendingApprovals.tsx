@@ -1,3 +1,4 @@
+import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
@@ -125,7 +126,7 @@ export default function PendingApprovals() {
     <>
       <SEO title={t("famPendingApprovals.pendingApprovals")} description={t("famPendingApprovals.reviewAndActOnPending")} />
       <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-card">
+        <ManagementHeader className="border-b border-border bg-card" title={t("famPendingApprovals.pendingApprovals")} as="header">
           <div className="container mx-auto px-4 py-4 flex items-center gap-3">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="w-4 h-4 mr-2" /> {t("famPendingApprovals.back")}
@@ -139,7 +140,7 @@ export default function PendingApprovals() {
               </p>
             </div>
           </div>
-        </header>
+        </ManagementHeader>
 
         <main className="container mx-auto px-4 py-6 space-y-6">
           {total === 0 && (

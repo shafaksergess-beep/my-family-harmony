@@ -1,3 +1,4 @@
+import { ManagementTable, ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -7,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { ArrowLeft, Plus, TrendingUp, Pencil, Trash2 } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ResponsiveDialog as Dialog, ResponsiveDialogContent as DialogContent, ResponsiveDialogHeader as DialogHeader, ResponsiveDialogTitle as DialogTitle, ResponsiveDialogTrigger as DialogTrigger } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -302,7 +303,7 @@ export default function FamilyShares() {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
+        <ManagementHeader className="flex items-center justify-between" title={t("famShares.sharesDividends")} as="div">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="h-5 w-5" />
@@ -313,7 +314,7 @@ export default function FamilyShares() {
             <CurrencySelector />
             <LanguageSwitcher />
           </div>
-        </div>
+        </ManagementHeader>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="p-6">
@@ -435,7 +436,7 @@ export default function FamilyShares() {
 
             <Card>
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <ManagementTable className="w-full">
                   <thead>
                     <tr className="border-b">
                       <th className="text-left p-4">Share #</th>
@@ -491,7 +492,7 @@ export default function FamilyShares() {
                       })
                     )}
                   </tbody>
-                </table>
+                </ManagementTable>
               </div>
             </Card>
           </TabsContent>
@@ -512,7 +513,7 @@ export default function FamilyShares() {
                     <DialogTitle>{t("famShares.declareDividend")}</DialogTitle>
                   </DialogHeader>
                   <form onSubmit={handleCreateDividend} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="period_year">{t("famShares.year")}</Label>
                         <Input
@@ -582,7 +583,7 @@ export default function FamilyShares() {
 
             <Card>
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <ManagementTable className="w-full">
                   <thead>
                     <tr className="border-b">
                       <th className="text-left p-4">{t("famShares.period")}</th>
@@ -623,7 +624,7 @@ export default function FamilyShares() {
                       ))
                     )}
                   </tbody>
-                </table>
+                </ManagementTable>
               </div>
             </Card>
           </TabsContent>
@@ -634,7 +635,7 @@ export default function FamilyShares() {
                 <h2 className="text-xl font-semibold">{t("famShares.memberShareHoldings")}</h2>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <ManagementTable className="w-full">
                   <thead>
                     <tr className="border-b">
                       <th className="text-left p-4">{t("famShares.member")}</th>
@@ -653,7 +654,7 @@ export default function FamilyShares() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                </ManagementTable>
               </div>
             </Card>
           </TabsContent>

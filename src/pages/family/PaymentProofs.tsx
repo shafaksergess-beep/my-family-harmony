@@ -1,3 +1,4 @@
+import { ManagementTable, ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -12,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ResponsiveDialog as Dialog, ResponsiveDialogContent as DialogContent, ResponsiveDialogDescription as DialogDescription, ResponsiveDialogHeader as DialogHeader, ResponsiveDialogTitle as DialogTitle } from "@/components/ui/responsive-dialog";
 import { AlertTriangle, ArrowLeft, Copy, Loader2, ShieldCheck, Upload } from "lucide-react";
 
 type Provider = "mtn" | "orange";
@@ -149,10 +150,10 @@ const PaymentProofs = () => {
   return (
     <div className="container mx-auto max-w-4xl space-y-6 p-4">
       <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}><ArrowLeft className="mr-2 h-4 w-4" />{t("famPaymentProofs.back")}</Button>
-      <div>
+      <ManagementHeader title={t("famPaymentProofs.mobileMoneyPayments")} as="div">
         <h1 className="text-2xl font-bold">{t("famPaymentProofs.mobileMoneyPayments")}</h1>
         <p className="text-muted-foreground">{t("famPaymentProofs.payWithMtnOrOrange")}</p>
-      </div>
+      </ManagementHeader>
 
       <Tabs defaultValue="pay">
         <TabsList className="flex w-full overflow-x-auto">
@@ -248,7 +249,7 @@ const PaymentProofs = () => {
               <div className="space-y-3 text-sm">
                 {open.duplicate_of && <p className="rounded bg-destructive/10 p-2 text-destructive">{t("famPaymentProofs.possibleDuplicateThisTransactionId")}</p>}
                 {open.amount_mismatch && <p className="rounded bg-destructive/10 p-2 text-destructive">{t("famPaymentProofs.amountOnReceiptDoesNot")}</p>}
-                <table className="w-full">
+                <ManagementTable className="w-full">
                   <thead><tr className="text-left text-muted-foreground"><th>{t("famPaymentProofs.field")}</th><th>{t("famPaymentProofs.memberSays")}</th><th>Receipt (AI)</th></tr></thead>
                   <tbody>
                     <tr><td>{t("famPaymentProofs.amount")}</td><td>{Number(open.claimed_amount).toLocaleString()}</td><td className={open.amount_mismatch ? "text-destructive font-semibold" : ""}>{String(ex.amount ?? "—")}</td></tr>
@@ -259,7 +260,7 @@ const PaymentProofs = () => {
                     <tr><td>{t("famPaymentProofs.recipient")}</td><td>—</td><td>{[ex.recipient_name, ex.recipient_phone].filter(Boolean).join(" · ") || "—"}</td></tr>
                     <tr><td>{t("famPaymentProofs.confidence")}</td><td></td><td>{ex.confidence != null ? `${Math.round(Number(ex.confidence) * 100)}%` : open.ai_status}</td></tr>
                   </tbody>
-                </table>
+                </ManagementTable>
                 <p><span className="text-muted-foreground">{t("famPaymentProofs.details")}</span> {open.reason}</p>
                 {open.rejection_reason && <p className="text-destructive">{t("mtgUi.Rejected")} {open.rejection_reason}</p>}
                 <p className="text-xs text-muted-foreground">{t("famPaymentProofs.aiReadsTheScreenshotOnly")}</p>

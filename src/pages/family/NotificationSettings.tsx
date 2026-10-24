@@ -1,3 +1,4 @@
+import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { NotificationPreferences } from '@/components/settings/NotificationPreferences';
 import { ThemeToggle } from '@/components/settings/ThemeToggle';
@@ -8,12 +9,12 @@ export default function NotificationSettings() {
   const { t } = useTranslation();
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div>
+      <ManagementHeader title={t("famNotificationSettings.settingsPreferences")} as="div">
         <h1 className="text-3xl font-bold mb-2">{t("famNotificationSettings.settingsPreferences")}</h1>
         <p className="text-muted-foreground">
           {t("famNotificationSettings.manageYourAppAppearanceAnd")}
         </p>
-      </div>
+      </ManagementHeader>
 
       <Card>
         <CardHeader>

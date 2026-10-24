@@ -1,3 +1,4 @@
+import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -11,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { ArrowLeft, CheckCircle, XCircle, Clock } from "lucide-react";
 import { format } from "date-fns";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ResponsiveDialog as Dialog, ResponsiveDialogContent as DialogContent, ResponsiveDialogHeader as DialogHeader, ResponsiveDialogTitle as DialogTitle, ResponsiveDialogTrigger as DialogTrigger } from "@/components/ui/responsive-dialog";
 
 interface LoanRequest {
   id: string;
@@ -166,7 +167,7 @@ export default function LoanCommitteeDashboard() {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-5xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
+        <ManagementHeader className="flex items-center justify-between" title={t("famLoanCommitteeDashboard.loanCommitteeDashboard")} as="div">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="h-5 w-5" />
@@ -176,7 +177,7 @@ export default function LoanCommitteeDashboard() {
               <p className="text-muted-foreground">{t("famLoanCommitteeDashboard.reviewAndEvaluateLoanRequests")}</p>
             </div>
           </div>
-        </div>
+        </ManagementHeader>
 
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
@@ -215,7 +216,7 @@ export default function LoanCommitteeDashboard() {
                     <Badge variant="outline">{t("famLoanCommitteeDashboard.pending")}</Badge>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
                     <div>
                       <p className="text-sm text-muted-foreground">{t("famLoanCommitteeDashboard.loanAmount")}</p>
                       <p className="text-lg font-bold">{loan.amount.toLocaleString()} FCFA</p>
