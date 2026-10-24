@@ -17,6 +17,7 @@ import SEO from "@/components/SEO";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PasswordStrength } from "@/components/PasswordStrength";
 import { lovable } from "@/integrations/lovable";
+import { previewInvitation } from "@/lib/invitations";
 import { resolveSignInDestination } from "@/lib/membershipSync";
 import {
   syncUserProfile,
@@ -117,34 +118,14 @@ const Auth = () => {
   }, [navigate, redirectUrl]);
 
   const checkPendingInvitation = async () => {
-    // Check if redirect contains invitation token
-    if (redirectUrl.includes("accept-invitation") && redirectUrl.includes("token=")) {
-      const tokenMatch = redirectUrl.match(/token=([^&]+)/);
-      if (tokenMatch) {
-        try {
-          const { data } = await supabase
-            .from("invitations")
-            .select(`
-              role,
-              families:family_id (name),
-              profiles:invited_by (full_name)
-            `)
-            .eq("token", tokenMatch[1])
-            .eq("status", "pending")
-            .single();
-
-          if (data) {
-            setPendingInvitation({
-              familyName: (data.families as any)?.name || "the family",
-              inviterName: (data.profiles as any)?.full_name,
-              role: data.role,
-            });
-          }
-        } catch (error) {
-          // Invitation lookup failed - continue without context
-        }
-      }
-    }
+    const destination = new URL(redirectUrl, window.location.origin);
+    const token = destination.searchParams.get("token");
+    const code = destination.searchParams.get("code");
+    if (!token && !code) return;
+    try {
+      const data = await previewInvitation(code, token);
+      if (data) setPendingInvitation({ familyName: data.name, role: data.role });
+    } catch { /* Auth remains available when a preview cannot be loaded. */ }
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -290,7 +271,7 @@ const Auth = () => {
         email: result.data.email,
         password: result.data.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/auth?redirect=${encodeURIComponent(redirectUrl)}`,
           data: {
             full_name: result.data.fullName,
             phone: result.data.phone,
@@ -456,7 +437,7 @@ const Auth = () => {
               <span className="bg-card px-2 text-muted-foreground">{t("auth.ui.orEmail")}</span>
             </div>
           </div>
-          <Tabs defaultValue="login" className="w-full">
+          <Tabs defaultValue={searchParams.get("mode") === "signup" ? "signup" : "login"} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="login">{t("auth.ui.login")}</TabsTrigger>
               <TabsTrigger value="signup">{t("auth.ui.signup")}</TabsTrigger>

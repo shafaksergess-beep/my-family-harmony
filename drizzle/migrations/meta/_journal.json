@@ -64,6 +64,13 @@
       "when": 1792796455230,
       "tag": "0008_entity_types_support_admin_module_toggles",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792846713020,
+      "tag": "0009_secure_invitation_preview_and_acceptance",
+      "breakpoints": true
     }
   ]
 }
