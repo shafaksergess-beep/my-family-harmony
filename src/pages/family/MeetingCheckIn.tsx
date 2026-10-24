@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, QrCode, Camera, CheckCircle } from "lucide-react";
+import { Loader2, ArrowLeft, QrCode, Camera, CheckCircle, Users, ExternalLink } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { QRCodeSVG } from "qrcode.react";
 import { Html5Qrcode } from "html5-qrcode";
@@ -24,6 +25,8 @@ const MeetingCheckIn = () => {
   const [userMember, setUserMember] = useState<any>(null);
   const [attendance, setAttendance] = useState<any[]>([]);
   const [hasCheckedIn, setHasCheckedIn] = useState(false);
+  const [totalMembers, setTotalMembers] = useState(0);
+  const detailUrl = `${window.location.origin}/family/${familySlug}/meetings/${meetingId}`;
 
   useEffect(() => {
     loadData();
@@ -68,6 +71,12 @@ const MeetingCheckIn = () => {
       }
 
       setMeeting(meetingData);
+
+      const { count } = await supabase
+        .from("family_members")
+        .select("id", { count: "exact", head: true })
+        .eq("family_id", familyData.id);
+      setTotalMembers(count || 0);
 
       // Load user's member record
       const { data: memberData } = await supabase
@@ -120,13 +129,20 @@ const MeetingCheckIn = () => {
     setAttendance(attendanceData || []);
   };
 
-  const generateQRData = () => {
-    return JSON.stringify({
-      meetingId,
-      familyId: family.id,
-      familySlug,
-    });
-  };
+  useEffect(() => {
+    if (!meetingId) return;
+    const channel = supabase
+      .channel(`checkin-${meetingId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "attendance", filter: `meeting_id=eq.${meetingId}` }, () => { void loadAttendance(); })
+      .subscribe();
+    const poll = window.setInterval(() => { void loadAttendance(); }, 15000);
+    return () => { window.clearInterval(poll); void supabase.removeChannel(channel); };
+  }, [meetingId]);
+
+  const generateQRData = () => detailUrl;
+  const presentCount = attendance.filter((a) => a.status !== "late").length;
+  const lateCount = attendance.filter((a) => a.status === "late").length;
+  const percent = totalMembers ? Math.min(100, Math.round((attendance.length / totalMembers) * 100)) : 0;
 
   const handleCheckIn = async () => {
     try {
@@ -239,8 +255,13 @@ const MeetingCheckIn = () => {
           
           // Process QR code
           try {
-            const data = JSON.parse(decodedText);
-            if (data.meetingId === meetingId) {
+            let scannedId: string | undefined;
+            if (decodedText.includes("/meetings/")) {
+              scannedId = /\/meetings\/([^/?#]+)/.exec(decodedText)?.[1];
+            } else {
+              scannedId = JSON.parse(decodedText).meetingId;
+            }
+            if (scannedId === meetingId) {
               await handleCheckIn();
             } else {
               toast({
@@ -305,12 +326,35 @@ const MeetingCheckIn = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
+      <main className="container mx-auto px-4 py-6 max-w-4xl space-y-4 pb-safe">
+        <Card className="rounded-2xl border-primary/30" aria-live="polite">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <Users className="h-5 w-5 shrink-0 text-primary" />
+                <span className="font-semibold truncate">{t("famMeetingCheckIn.liveAttendance")}</span>
+              </div>
+              <Badge variant="secondary" className="gap-1 shrink-0">
+                <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                {t("famMeetingCheckIn.live")}
+              </Badge>
+            </div>
+            <div className="text-4xl font-bold text-primary tabular-nums">
+              {attendance.length}<span className="text-lg text-muted-foreground"> / {totalMembers}</span>
+            </div>
+            <Progress value={percent} className="h-2" />
+            <p className="text-sm text-muted-foreground">{t("famMeetingCheckIn.checkedInOf", { count: attendance.length, total: totalMembers })}</p>
+            <div className="flex gap-2 text-sm">
+              <Badge variant="outline">{t("famMeetingCheckIn.present")}: {presentCount}</Badge>
+              <Badge variant="outline">{t("famMeetingCheckIn.late")}: {lateCount}</Badge>
+            </div>
+          </CardContent>
+        </Card>
         <Tabs defaultValue="checkin">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="checkin">{t("famMeetingCheckIn.checkIn")}</TabsTrigger>
             <TabsTrigger value="qr">{t("famMeetingCheckIn.qrCode")}</TabsTrigger>
-            <TabsTrigger value="attendance">Attendance ({attendance.length})</TabsTrigger>
+            <TabsTrigger value="attendance">{t("famMeetingCheckIn.attendanceTab", { count: attendance.length })}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="checkin" className="space-y-4">
@@ -385,7 +429,7 @@ const MeetingCheckIn = () => {
                   <div className="bg-white p-4 rounded-lg">
                     <QRCodeSVG 
                       value={generateQRData()}
-                      size={256}
+                      size={220}
                       level="H"
                       includeMargin={true}
                     />
@@ -393,6 +437,11 @@ const MeetingCheckIn = () => {
                   <p className="text-sm text-muted-foreground mt-4 text-center">
                     {t("famMeetingCheckIn.displayThisQrCodeFor")}
                   </p>
+                  <p className="text-xs text-muted-foreground mt-1 text-center">{t("famMeetingCheckIn.qrOpensDetail")}</p>
+                  <Button variant="outline" className="mt-3" onClick={() => navigate(`/family/${familySlug}/meetings/${meetingId}`)}>
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    {t("famMeetingCheckIn.meetingDetails")}
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -419,7 +468,7 @@ const MeetingCheckIn = () => {
                               ? 'bg-green-500/10 text-green-500 border-green-500/20'
                               : 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'}
                           >
-                            {record.status}
+                            {record.status === "late" ? t("famMeetingCheckIn.late") : t("famMeetingCheckIn.present")}
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
