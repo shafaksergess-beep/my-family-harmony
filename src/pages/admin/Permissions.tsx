@@ -91,9 +91,9 @@ const Permissions = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      <ManagementHeader title={t("admPermissions.permissionsOverview")} as="header" className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <ManagementHeader className="flex items-center justify-between" title={t("admPermissions.permissionsOverview")} as="div">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate("/admin/families")}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -109,9 +109,9 @@ const Permissions = () => {
             </div>
             
             <LanguageSwitcher />
-          </ManagementHeader>
+          </div>
         </div>
-      </header>
+      </ManagementHeader>
 
       <main className="container mx-auto px-4 py-8">
         {/* Role Legend */}

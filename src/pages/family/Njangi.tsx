@@ -357,7 +357,7 @@ export default function FamilyNjangi() {
       <SEO title={t("famNjangi.njangiCycles")} description={t("famNjangi.manageNjangiRotatingSavingsCycles")} />
       <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <ManagementHeader className="flex items-center justify-between" title={"Njangi (Rotating Savings)"} as="div">
+        <ManagementHeader className="flex items-center justify-between" title={"Njangi (Rotating Savings)"} onCreate={canManageFinances ? () => setIsCycleDialogOpen(true) : undefined} createLabel={t("famNjangi.newCycle")} as="div">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="h-5 w-5" />

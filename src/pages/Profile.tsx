@@ -153,9 +153,9 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO title={t("profile.myProfile")} description={t("profile.manageYourKinsrootProfileLanguage")} />
-      <header className="border-b border-border bg-card">
+      <ManagementHeader title={t("profile.userProfile")} as="header" className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <ManagementHeader className="flex items-center justify-between" title={t("profile.userProfile")} as="div">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate("/dashboard")}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -171,9 +171,9 @@ const Profile = () => {
             </div>
             
             <LanguageSwitcher />
-          </ManagementHeader>
+          </div>
         </div>
-      </header>
+      </ManagementHeader>
 
       <main className="container mx-auto px-4 py-8 max-w-2xl space-y-6">
         <Card>

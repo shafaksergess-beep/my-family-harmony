@@ -418,9 +418,9 @@ export default function Contributions() {
     <>
       <SEO title={t("famContributions.contributions")} description={t("famContributions.trackMemberAndHouseContributions")} />
       <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      <ManagementHeader title={t("famContributions.contributions")} onCreate={canManageFinances ? () => setIsDialogOpen(true) : undefined} createLabel={t("famContributions.addContribution")} as="header" className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <ManagementHeader className="flex flex-wrap items-center justify-between gap-3" title={t("famContributions.contributions")} onCreate={canManageFinances ? () => setIsDialogOpen(true) : undefined} createLabel={t("famContributions.addContribution")} as="div">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -435,7 +435,7 @@ export default function Contributions() {
               <LanguageSwitcher />
               <CurrencySelector />
             </div>
-          </ManagementHeader>
+          </div>
           <div className="flex flex-wrap items-center justify-end gap-2 mt-4 border-t pt-4 border-border">
             {canManageFinances && (
               <BulkPaymentMenu
@@ -614,7 +614,7 @@ export default function Contributions() {
               )}
             </div>
         </div>
-      </header>
+      </ManagementHeader>
 
       <main className="container mx-auto px-4 py-8 space-y-6">
         <div className="grid gap-4 md:grid-cols-3">

@@ -288,9 +288,9 @@ const AdminFamilies = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      <ManagementHeader title={t("admin.familyManagement")} as="header" className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <ManagementHeader className="flex items-center justify-between" title={t("admin.familyManagement")} as="div">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate("/dashboard")}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -379,9 +379,9 @@ const AdminFamilies = () => {
                 </DialogContent>
               </Dialog>
             </div>
-          </ManagementHeader>
+          </div>
         </div>
-      </header>
+      </ManagementHeader>
 
       <main className="container mx-auto px-4 py-8">
         {families.length === 0 ? (

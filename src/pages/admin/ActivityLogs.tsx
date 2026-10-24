@@ -233,9 +233,9 @@ const ActivityLogs = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      <ManagementHeader title={t("admActivityLogs.adminActivityLogs")} as="header" className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <ManagementHeader className="flex items-center justify-between" title={t("admActivityLogs.adminActivityLogs")} as="div">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate("/admin/families")}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -259,9 +259,9 @@ const ActivityLogs = () => {
               )}
               <LanguageSwitcher />
             </div>
-          </ManagementHeader>
+          </div>
         </div>
-      </header>
+      </ManagementHeader>
 
       <main className="container mx-auto px-4 py-8">
         {/* Filters */}

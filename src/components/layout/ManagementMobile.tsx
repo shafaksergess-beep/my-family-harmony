@@ -56,7 +56,7 @@ export function ManagementHeader({ title, children, onCreate, createLabel, class
   if (!isMobile) return <Tag className={className}>{children}</Tag>;
   return <>
     <PageHeader title={title} backTo={true} actions={[{ key: "controls", label: t("foundation.moreActions"), icon: MoreVertical, onClick: () => setOpen(true) }]} />
-    {!open && <div className="hidden">{children}</div>}
+    {!open && <div className="hidden" aria-hidden="true">{children}</div>}
     <ResponsiveDialog open={open} onOpenChange={setOpen}><ResponsiveDialogContent><ResponsiveDialogHeader><ResponsiveDialogTitle>{t("foundation.moreActions")}</ResponsiveDialogTitle></ResponsiveDialogHeader><div className="management-header-controls space-y-4 py-4">{children}</div></ResponsiveDialogContent></ResponsiveDialog>
     {onCreate && createLabel && <BottomActionBar className="management-create-bar"><Button onClick={onCreate}><Plus className="h-5 w-5" />{createLabel}</Button></BottomActionBar>}
   </>;

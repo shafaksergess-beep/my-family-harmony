@@ -356,9 +356,9 @@ const FamilyMeetings = () => {
     <>
       <SEO title={t("famMeetings.familyMeetings")} description={t("famMeetings.scheduleViewAndManageYour")} />
       <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      <ManagementHeader title={t("phase3b.meetingTitle")} onCreate={canScheduleMeetings ? () => setIsDialogOpen(true) : undefined} createLabel={t("famMeetings.scheduleMeeting")} as="header" className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <ManagementHeader className="flex flex-wrap items-center justify-between gap-3" title={t("phase3b.meetingTitle")} onCreate={canScheduleMeetings ? () => setIsDialogOpen(true) : undefined} createLabel={t("famMeetings.scheduleMeeting")} as="div">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -580,9 +580,9 @@ const FamilyMeetings = () => {
             </Dialog>
               </div>
             )}
-          </ManagementHeader>
+          </div>
         </div>
-      </header>
+      </ManagementHeader>
 
       <main className="container mx-auto px-4 py-8">
         {meetings.length === 0 ? (
