@@ -103,7 +103,7 @@ export default function Index() {
   const lang = (i18n.language || "en").split("-")[0];
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => { if (session) navigate("/dashboard"); });
+    // AuthBootstrap owns signed-in landing navigation, including invitations and setup.
     supabase.rpc("get_platform_stats").then(({ data }) => {
       if (data && typeof data === "object" && !Array.isArray(data)) {
         const d = data as Record<string, number>;

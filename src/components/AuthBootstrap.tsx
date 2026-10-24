@@ -56,7 +56,7 @@ export function AuthBootstrap() {
       if (!mounted || !session) return;
       await handleSession(session.user);
 
-      await routeAfterSignIn(session.user.id, false);
+      await routeAfterSignIn(session.user.id, true);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
