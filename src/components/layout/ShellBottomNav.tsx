@@ -10,6 +10,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '
 import { cn } from '@/lib/utils';
 import { haptics } from '@/lib/haptics';
 import { NotificationInbox } from '@/components/NotificationInbox';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 type Item = { key: string; label: string; icon: ComponentType<{ className?: string }>; path?: string; module?: string; onClick?: () => void; inbox?: boolean };
 function NavBar({ items, quickActions = [] }: { items: Item[]; quickActions?: Item[] }) {
   const { t } = useTranslation(); const navigate = useNavigate(); const location = useLocation(); const [open, setOpen] = useState(false);
@@ -27,7 +29,14 @@ function NavBar({ items, quickActions = [] }: { items: Item[]; quickActions?: It
   </>;
 }
 function FamilyNav({ slug }: { slug: string }) {
-  const { t } = useTranslation(); const { family } = useFamilyAuth(slug); const { isModuleEnabled, loading } = useFamilyModules(family?.id);
+  const { t } = useTranslation(); const navigate = useNavigate(); const { family } = useFamilyAuth(slug); const { isModuleEnabled, loading } = useFamilyModules(family?.id);
+  const openCheckIn = async () => {
+    if (!family?.id) return;
+    const today = new Date().toISOString().slice(0, 10);
+    const { data } = await supabase.from('meetings').select('id').eq('family_id', family.id).gte('meeting_date', today).eq('is_completed', false).order('meeting_date', { ascending: true }).limit(1).maybeSingle();
+    if (data?.id) navigate(`/family/${slug}/meetings/${data.id}/checkin`);
+    else { toast({ title: t('mobileHome.noUpcomingMeeting') }); navigate(`/family/${slug}/meetings`); }
+  };
   const base = `/family/${slug}`;
   const enabled = (i: Item) => !i.module || (!loading && isModuleEnabled(i.module));
   const items: Item[] = [
@@ -39,7 +48,7 @@ function FamilyNav({ slug }: { slug: string }) {
   ];
   const actions: Item[] = [
     { key: 'proof', label: t('mobileHome.submitProof'), icon: Receipt, path: `${base}/payment-proofs` },
-    { key: 'qr', label: t('mobileHome.scanQr'), icon: QrCode, path: `${base}/meetings`, module: 'meetings' },
+    { key: 'qr', label: t('mobileHome.checkIn'), icon: QrCode, module: 'meetings', onClick: () => { void openCheckIn(); } },
     { key: 'loan', label: t('mobileHome.requestLoan'), icon: HandCoins, path: `${base}/loans`, module: 'loans' },
     { key: 'aid', label: t('mobileHome.requestAssistance'), icon: Heart, path: `${base}/assistance`, module: 'assistance' },
   ];
