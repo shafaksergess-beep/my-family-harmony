@@ -1,4 +1,16 @@
 {
+  "phase3b": {
+  "management": "Management",
+  "meetingTitle": "Meetings",
+  "shareNumber": "Share number",
+  "hostHouse": "Host house (optional)",
+  "remindEveryone": "Remind everyone",
+  "amountSent": "Amount sent",
+  "reference": "Transaction ID (optional)",
+  "proofTitle": "Proof of payment ({{provider}})",
+  "term": "{{months}} months at {{rate}}%",
+  "paidRemaining": "Paid: {{paid}} | Remaining: {{remaining}}"
+},
   "phase3": {
   "refresh": "Refresh",
   "houses": "Houses",

@@ -64,3 +64,7 @@
 - [ ] Platform administration and profile area
 - [x] Document this increment and validate member screens at nine widths and 60 regression tests
 - [ ] Complete remaining Phase 3 screens and their validation
+
+## Phase 3b remaining mobile management
+- [ ] Migrate requested family, administration and profile/settings presentation without data changes
+- [ ] Validate each migrated screen at five sizes and document remaining gaps

@@ -193,7 +193,7 @@ const PaymentProofs = () => {
 
           {provider && (
             <Card>
-              <CardHeader><CardTitle>Proof of payment ({provider.toUpperCase()})</CardTitle>
+              <CardHeader><CardTitle>{t("phase3b.proofTitle", { provider: provider.toUpperCase() })}</CardTitle>
                 <CardDescription>{t("famPaymentProofs.uploadAClearPhotoOr")}</CardDescription></CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
@@ -202,8 +202,8 @@ const PaymentProofs = () => {
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>{Object.entries(CATEGORIES).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent>
                     </Select></div>
-                  <div><Label>Amount sent (FCFA)</Label><Input type="number" inputMode="numeric" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></div>
-                  <div><Label>Transaction ID (optional)</Label><Input value={form.reference} maxLength={64} onChange={(e) => setForm({ ...form, reference: e.target.value })} /></div>
+                  <div><Label>{t("phase3b.amountSent")}</Label><Input type="number" inputMode="numeric" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></div>
+                  <div><Label>{t("phase3b.reference")}</Label><Input value={form.reference} maxLength={64} onChange={(e) => setForm({ ...form, reference: e.target.value })} /></div>
                   <div><Label>{t("famPaymentProofs.receiptImage")}</Label><Input type="file" accept="image/*" capture="environment" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></div>
                 </div>
                 <div><Label>{t("famPaymentProofs.details")}</Label><Textarea maxLength={500} placeholder="e.g. October 2026 contribution" value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} /></div>

@@ -1,4 +1,16 @@
 {
+  "phase3b": {
+  "management": "Gestion",
+  "meetingTitle": "Réunions",
+  "shareNumber": "Numéro de part",
+  "hostHouse": "Maison hôte (facultatif)",
+  "remindEveryone": "Rappeler à tous",
+  "amountSent": "Montant envoyé",
+  "reference": "Référence de transaction (facultatif)",
+  "proofTitle": "Justificatif de paiement ({{provider}})",
+  "term": "{{months}} mois à {{rate}} %",
+  "paidRemaining": "Payé : {{paid}} | Restant : {{remaining}}"
+},
   "phase3": {
   "refresh": "Actualiser",
   "houses": "Maisons",

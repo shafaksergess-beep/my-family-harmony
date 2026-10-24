@@ -387,7 +387,7 @@ export default function FamilyAssistance() {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <ManagementHeader className="flex items-center justify-between" title={t("famAssistance.assistanceEvents")} as="div">
+        <ManagementHeader className="flex items-center justify-between" title={t("famAssistance.assistanceEvents")} onCreate={canManageFinances ? () => setIsDialogOpen(true) : undefined} createLabel={t("famAssistance.recordEvent")} as="div">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="h-5 w-5" />

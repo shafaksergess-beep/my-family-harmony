@@ -439,7 +439,7 @@ export default function FamilyShares() {
                 <ManagementTable className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left p-4">Share #</th>
+                      <th className="text-left p-4">{t("phase3b.shareNumber")}</th>
                       <th className="text-left p-4">{t("famShares.member")}</th>
                       <th className="text-right p-4">{t("famShares.qty")}</th>
                       <th className="text-left p-4">{t("famShares.purchaseDate")}</th>

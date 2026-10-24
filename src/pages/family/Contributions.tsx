@@ -420,7 +420,7 @@ export default function Contributions() {
       <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <ManagementHeader className="flex flex-wrap items-center justify-between gap-3" title={t("famContributions.contributions")} as="div">
+          <ManagementHeader className="flex flex-wrap items-center justify-between gap-3" title={t("famContributions.contributions")} onCreate={canManageFinances ? () => setIsDialogOpen(true) : undefined} createLabel={t("famContributions.addContribution")} as="div">
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -456,7 +456,7 @@ export default function Contributions() {
                   ) : (
                     <Bell className="w-4 h-4 mr-2" />
                   )}
-                  Remind everyone
+                  {t("phase3b.remindEveryone")}
                 </Button>
               )}
               {canManageFinances && (

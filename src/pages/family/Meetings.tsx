@@ -358,7 +358,7 @@ const FamilyMeetings = () => {
       <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <ManagementHeader className="flex flex-wrap items-center justify-between gap-3" title={t("phase3b.management")} as="div">
+          <ManagementHeader className="flex flex-wrap items-center justify-between gap-3" title={t("phase3b.meetingTitle")} onCreate={canScheduleMeetings ? () => setIsDialogOpen(true) : undefined} createLabel={t("famMeetings.scheduleMeeting")} as="div">
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -535,7 +535,7 @@ const FamilyMeetings = () => {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="host">Host House (optional)</Label>
+                    <Label htmlFor="host">{t("phase3b.hostHouse")}</Label>
                     <Input
                       id="host"
                       value={formData.host_house}
