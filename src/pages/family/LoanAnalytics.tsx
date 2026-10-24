@@ -1,3 +1,7 @@
+import { useDevice } from "@/hooks/useDevice";
+import { AnalyticsKpis, AnalyticsSummary, AnalyticsFilters, MobileChart } from "@/components/analytics/MobileAnalytics";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { useCurrency } from "@/context/CurrencyContext";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -26,6 +30,8 @@ interface Loan {
 
 export default function LoanAnalytics() {
   const { t } = useTranslation();
+  const { isMobile } = useDevice();
+  const { formatAmount } = useCurrency();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -149,9 +155,9 @@ export default function LoanAnalytics() {
   const analytics = calculateAnalytics();
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
+        {isMobile ? <PageHeader title={t("famLoanAnalytics.loanAnalytics")} backTo={`/family/${familySlug}`} /> : (<div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}/loans`)}>
               <ArrowLeft className="h-5 w-5" />
@@ -159,16 +165,16 @@ export default function LoanAnalytics() {
             <h1 className="text-3xl font-bold">{t("famLoanAnalytics.loanAnalytics")}</h1>
           </div>
           <LanguageSwitcher />
-        </div>
+        </div>)}
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <AnalyticsKpis className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="p-6">
             <div className="flex items-center justify-between mb-2">
               <div className="text-sm text-muted-foreground">{t("famLoanAnalytics.totalDisbursed")}</div>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </div>
-            <div className="text-2xl font-bold">{analytics.totalDisbursed.toLocaleString()} FCFA</div>
+            <div className="text-2xl font-bold">{formatAmount(analytics.totalDisbursed)}</div>
             <p className="text-xs text-muted-foreground mt-1">{analytics.disbursedCount} active loans</p>
           </Card>
 
@@ -177,7 +183,7 @@ export default function LoanAnalytics() {
               <div className="text-sm text-muted-foreground">{t("famLoanAnalytics.outstanding")}</div>
               <AlertTriangle className="h-4 w-4 text-orange-500" />
             </div>
-            <div className="text-2xl font-bold text-orange-600">{analytics.totalOutstanding.toLocaleString()} FCFA</div>
+            <div className="text-2xl font-bold text-orange-600">{formatAmount(analytics.totalOutstanding)}</div>
             <p className="text-xs text-muted-foreground mt-1">{analytics.disbursedCount - analytics.repaidLoans} unpaid</p>
           </Card>
 
@@ -186,7 +192,7 @@ export default function LoanAnalytics() {
               <div className="text-sm text-muted-foreground">{t("famLoanAnalytics.interestRevenue")}</div>
               <TrendingUp className="h-4 w-4 text-green-500" />
             </div>
-            <div className="text-2xl font-bold text-green-600">{analytics.totalInterestCollected.toLocaleString()} FCFA</div>
+            <div className="text-2xl font-bold text-green-600">{formatAmount(analytics.totalInterestCollected)}</div>
             <p className="text-xs text-muted-foreground mt-1">
               {analytics.interestCollectionRate.toFixed(1)}% of expected
             </p>
@@ -200,7 +206,7 @@ export default function LoanAnalytics() {
             <div className="text-2xl font-bold">{analytics.repaymentRate.toFixed(1)}%</div>
             <p className="text-xs text-muted-foreground mt-1">{analytics.repaidLoans} fully repaid</p>
           </Card>
-        </div>
+        </AnalyticsKpis>
 
         {/* Status Overview */}
         <Card className="p-6">
@@ -260,11 +266,11 @@ export default function LoanAnalytics() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span>{t("famLoanAnalytics.principalRecovered")}</span>
-                  <span className="font-mono text-xs">{analytics.totalPrincipalRepaid.toLocaleString()} FCFA</span>
+                  <span className="font-mono text-xs">{formatAmount(analytics.totalPrincipalRepaid)}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span>{t("famLoanAnalytics.interestEarned")}</span>
-                  <span className="font-mono text-xs text-green-600">{analytics.totalInterestCollected.toLocaleString()} FCFA</span>
+                  <span className="font-mono text-xs text-green-600">{formatAmount(analytics.totalInterestCollected)}</span>
                 </div>
               </div>
             </div>
@@ -279,18 +285,18 @@ export default function LoanAnalytics() {
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>{t("famLoanAnalytics.collected")}</span>
-                  <span className="font-mono">{analytics.totalInterestCollected.toLocaleString()} FCFA</span>
+                  <span className="font-mono">{formatAmount(analytics.totalInterestCollected)}</span>
                 </div>
                 <Progress value={analytics.interestCollectionRate} className="h-2" />
                 <div className="flex justify-between text-xs text-muted-foreground mt-1">
                   <span>{analytics.interestCollectionRate.toFixed(1)}% of expected</span>
-                  <span>Target: {analytics.totalExpectedInterest.toLocaleString()} FCFA</span>
+                  <span>Target: {formatAmount(analytics.totalExpectedInterest)}</span>
                 </div>
               </div>
               <div className="pt-4 border-t">
                 <div className="text-sm text-muted-foreground mb-1">{t("famLoanAnalytics.uncollectedInterest")}</div>
                 <div className="text-xl font-bold text-orange-600">
-                  {(analytics.totalExpectedInterest - analytics.totalInterestCollected).toLocaleString()} FCFA
+                  {formatAmount((analytics.totalExpectedInterest - analytics.totalInterestCollected))}
                 </div>
               </div>
             </div>

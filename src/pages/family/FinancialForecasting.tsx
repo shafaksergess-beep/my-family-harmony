@@ -1,3 +1,7 @@
+import { useDevice } from "@/hooks/useDevice";
+import { AnalyticsKpis, AnalyticsSummary, AnalyticsFilters, MobileChart } from "@/components/analytics/MobileAnalytics";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { useCurrency } from "@/context/CurrencyContext";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -19,6 +23,8 @@ interface ForecastData {
 
 export default function FinancialForecasting() {
   const { t } = useTranslation();
+  const { isMobile } = useDevice();
+  const { formatAmount } = useCurrency();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -128,13 +134,7 @@ export default function FinancialForecasting() {
     loadForecastData();
   }, [loadForecastData]);
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "XAF",
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
+  const formatCurrency = formatAmount;
 
   const [generatingInsight, setGeneratingInsight] = useState(false);
   const [aiInsight, setAiInsight] = useState<{ summary: string; risks: string; recommendations: string[] } | null>(null);
@@ -175,8 +175,8 @@ export default function FinancialForecasting() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="container mx-auto p-4 md:p-6 space-y-6">
+      {isMobile ? <PageHeader title={t("famFinancialForecasting.financialForecasting")} backTo={`/family/${familySlug}`} actions={[{ key: "insight", label: t("phase2.aiInsight"), icon: TrendingUp, onClick: generateAiInsight, primary: true, disabled: generatingInsight || !forecast }]} /> : (<div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <Button variant="outline" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
             <ArrowLeft className="h-4 w-4" />
@@ -194,7 +194,7 @@ export default function FinancialForecasting() {
           {generatingInsight ? <Loader2 className="h-4 w-4 animate-spin" /> : <TrendingUp className="h-4 w-4" />}
           AI Financial Insight
         </Button>
-      </div>
+      </div>)}
 
       {/* AI Insight Section */}
       {aiInsight && (
@@ -228,13 +228,13 @@ export default function FinancialForecasting() {
       )}
 
       {/* KPI Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <AnalyticsKpis className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Expected Income (6 months)</CardTitle>
             <TrendingUp className="h-4 w-4 text-green-600" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="min-w-0">
             <div className="text-2xl font-bold text-green-600">{formatCurrency(forecast?.expectedIncome || 0)}</div>
           </CardContent>
         </Card>
@@ -244,7 +244,7 @@ export default function FinancialForecasting() {
             <CardTitle className="text-sm font-medium">Expected Expenses (6 months)</CardTitle>
             <TrendingDown className="h-4 w-4 text-red-600" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="min-w-0">
             <div className="text-2xl font-bold text-red-600">{formatCurrency(forecast?.expectedExpenses || 0)}</div>
           </CardContent>
         </Card>
@@ -254,11 +254,11 @@ export default function FinancialForecasting() {
             <CardTitle className="text-sm font-medium">{t("famFinancialForecasting.projectedNetBalance")}</CardTitle>
             <DollarSign className="h-4 w-4 text-blue-600" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="min-w-0">
             <div className="text-2xl font-bold text-blue-600">{formatCurrency(forecast?.projectedBalance || 0)}</div>
           </CardContent>
         </Card>
-      </div>
+      </AnalyticsKpis>
 
       {/* Monthly Projections Chart */}
       <Card>
@@ -266,8 +266,8 @@ export default function FinancialForecasting() {
           <CardTitle>6-Month Cash Flow Projection</CardTitle>
           <CardDescription>{t("famFinancialForecasting.expectedIncomeAndExpensesBy")}</CardDescription>
         </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
+        <CardContent className="min-w-0">
+          <MobileChart><ResponsiveContainer width="100%" height={300}>
             <LineChart data={forecast?.monthlyProjections}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
@@ -278,7 +278,7 @@ export default function FinancialForecasting() {
               <Line type="monotone" dataKey="expectedExpenses" stroke="hsl(var(--chart-2))" name="Expected Expenses" strokeWidth={2} />
               <Line type="monotone" dataKey="projectedBalance" stroke="hsl(var(--chart-3))" name="Net Balance" strokeWidth={2} />
             </LineChart>
-          </ResponsiveContainer>
+          </ResponsiveContainer></MobileChart>
         </CardContent>
       </Card>
 
@@ -288,8 +288,8 @@ export default function FinancialForecasting() {
           <CardTitle>{t("famFinancialForecasting.historicalContributionTrends")}</CardTitle>
           <CardDescription>{t("famFinancialForecasting.past12MonthsActualContributions")}</CardDescription>
         </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={250}>
+        <CardContent className="min-w-0">
+          <MobileChart><ResponsiveContainer width="100%" height={250}>
             <BarChart data={forecast?.contributionTrends}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
@@ -297,7 +297,7 @@ export default function FinancialForecasting() {
               <Tooltip formatter={(value) => formatCurrency(Number(value))} />
               <Bar dataKey="amount" fill="hsl(var(--chart-1))" name="Contributions" />
             </BarChart>
-          </ResponsiveContainer>
+          </ResponsiveContainer></MobileChart>
         </CardContent>
       </Card>
 
@@ -308,7 +308,7 @@ export default function FinancialForecasting() {
             <CardTitle>{t("famFinancialForecasting.upcomingLoanRepayments")}</CardTitle>
             <CardDescription>{t("famFinancialForecasting.expectedLoanRepaymentsByDue")}</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="min-w-0">
             <div className="space-y-3">
               {forecast.loanRepaymentsForecast.map((loan: any, idx: number) => (
                 <div key={idx} className="flex items-center justify-between p-3 border rounded-lg">

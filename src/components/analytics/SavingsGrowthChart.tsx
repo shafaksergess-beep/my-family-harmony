@@ -1,3 +1,7 @@
+import { useTranslation } from "react-i18next";
+import { useDevice } from "@/hooks/useDevice";
+import { useCurrency } from "@/context/CurrencyContext";
+import { MobileChart } from "./MobileAnalytics";
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
@@ -16,6 +20,7 @@ interface ChartDataPoint {
 }
 
 export function SavingsGrowthChart({ familyId }: SavingsGrowthChartProps) {
+  const { t } = useTranslation(); const { isMobile } = useDevice(); const { formatAmount } = useCurrency();
   const [data, setData] = useState<ChartDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -88,13 +93,13 @@ export function SavingsGrowthChart({ familyId }: SavingsGrowthChartProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-emerald-600" />
-          Family Savings Growth
+          {t("phase2.savingsGrowth")}
         </CardTitle>
-        <CardDescription>Monthly savings and cumulative total over the past year</CardDescription>
+        <CardDescription>{t("phase2.savingsDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className={isMobile ? "min-w-0" : "h-[300px]"}>
+          <MobileChart><ResponsiveContainer width="100%" height="100%">
             <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
               <XAxis 
@@ -107,14 +112,14 @@ export function SavingsGrowthChart({ familyId }: SavingsGrowthChartProps) {
                 tick={{ fontSize: 12 }}
               />
               <Tooltip 
-                formatter={(value: number) => [`${value.toLocaleString()} FCFA`, '']}
+                formatter={(value: number) => [`${formatAmount(value)}`, '']}
                 labelStyle={{ fontWeight: 'bold' }}
               />
               <Legend />
               <Line 
                 type="monotone" 
                 dataKey="savings" 
-                name="Monthly Savings"
+                name={t("phase2.monthlySavings")}
                 stroke="hsl(var(--primary))" 
                 strokeWidth={2}
                 dot={{ fill: 'hsl(var(--primary))' }}
@@ -122,14 +127,14 @@ export function SavingsGrowthChart({ familyId }: SavingsGrowthChartProps) {
               <Line 
                 type="monotone" 
                 dataKey="cumulative" 
-                name="Cumulative Total"
+                name={t("phase2.cumulative")}
                 stroke="hsl(142, 76%, 36%)" 
                 strokeWidth={2}
                 strokeDasharray="5 5"
                 dot={false}
               />
             </LineChart>
-          </ResponsiveContainer>
+          </ResponsiveContainer></MobileChart>
         </div>
       </CardContent>
     </Card>

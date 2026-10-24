@@ -1,3 +1,5 @@
+import { useDevice } from "@/hooks/useDevice";
+import { AnalyticsKpis, AnalyticsSummary, AnalyticsFilters, MobileChart } from "@/components/analytics/MobileAnalytics";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
@@ -36,6 +38,7 @@ interface MemberOption {
 
 const FamilyAnalytics = () => {
   const { t } = useTranslation();
+  const { isMobile } = useDevice();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -313,7 +316,7 @@ const FamilyAnalytics = () => {
         )}
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <AnalyticsKpis className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {kpiCards.map((kpi, index) => (
             <Card key={index} className={glassCardStyle}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -322,13 +325,13 @@ const FamilyAnalytics = () => {
                   <kpi.icon className="h-4 w-4" />
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="min-w-0">
                 <div className="text-2xl font-black tracking-tighter">{kpi.value}</div>
                 <p className="text-[10px] text-muted-foreground mt-1 font-medium uppercase tracking-wider">{kpi.description}</p>
               </CardContent>
             </Card>
           ))}
-        </div>
+        </AnalyticsKpis>
 
         {/* Charts - only in family view */}
         {viewMode === "family" && (
@@ -348,7 +351,7 @@ const FamilyAnalytics = () => {
             <CardTitle>{t("famAnalytics.meetingStatistics")}</CardTitle>
             <CardDescription>{t("famAnalytics.overviewOfFamilyMeetings")}</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="min-w-0">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">{t("famAnalytics.completedMeetings")}</span>
               <span className="text-2xl font-bold text-primary">{kpis.completedMeetings}</span>
