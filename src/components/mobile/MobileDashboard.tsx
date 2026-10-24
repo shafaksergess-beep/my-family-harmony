@@ -42,6 +42,7 @@ import { StatCarousel } from '@/components/layout/StatCarousel';
 import { useFamilyAuth } from '@/hooks/useFamilyAuth';
 import { useFamilyModules } from '@/hooks/useFamilyModules';
 import { JoinFamilyCard } from '@/components/dashboard/JoinFamilyCard';
+import { CreateGroupButton } from '@/components/dashboard/CreateGroupButton';
 import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogHeader, ResponsiveDialogTitle, ResponsiveDialogDescription } from '@/components/ui/responsive-dialog';
 
 interface UserFamily {
@@ -418,7 +419,7 @@ export function MobileDashboard() {
             { key: 'meeting', label: t('mobileHome.nextMeeting'), value: stats.nextMeetingDate ? format(new Date(stats.nextMeetingDate), 'dd MMM', { locale: dateLocale }) : t('mobileHome.noneScheduled'), icon: Calendar, onClick: () => go(`/family/${slug}/meetings`) },
           ].filter(item => isModuleEnabled(item.key === 'dues' ? 'contributions' : item.key === 'meeting' ? 'meetings' : item.key))} />}
           {attention.length > 0 && <section><h2 className="mb-3 text-lg font-semibold">{t('phase2.attention')}</h2><div className="space-y-2">{attention.map(item => <Button variant="outline" key={item.key} className="h-auto w-full justify-between gap-2 rounded-2xl py-3" onClick={() => go(`/family/${slug}/${item.path}`)}><span className="min-w-0 text-left">{t(`phase2.${item.key}`)}</span><Badge variant="secondary">{item.count}</Badge><ChevronRight className="h-4 w-4 shrink-0" /></Button>)}</div></section>}
-          {!userFamilies.length && <><p className="text-sm text-muted-foreground">{t(isOnline ? 'phase2.noFamily' : 'phase2.offlineEmpty')}</p>{isOnline && <JoinFamilyCard />}</>}
+          {!userFamilies.length && <><p className="text-sm text-muted-foreground">{t(isOnline ? 'phase2.noFamily' : 'phase2.offlineEmpty')}</p>{isOnline && <><CreateGroupButton /><JoinFamilyCard /></>}</>}
           {/* Quick actions */}
           <section>
             <h2 className="mb-3 px-1 text-xl font-bold text-foreground">{t('mobileHome.quickActions')}</h2>

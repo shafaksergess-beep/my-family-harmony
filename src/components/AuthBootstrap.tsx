@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { syncUserProfile, consumeOAuthRedirect } from "@/lib/authSync";
-import { needsFamilyOnboarding } from "@/lib/membershipSync";
+import { resolveSignInDestination } from "@/lib/membershipSync";
 import { sessionManager } from "@/lib/sessionManager";
 
 /**
@@ -21,10 +21,24 @@ import { sessionManager } from "@/lib/sessionManager";
  */
 export function AuthBootstrap() {
   const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
     let mounted = true;
+    let routing = false;
+
+    const routeAfterSignIn = async (userId: string, freshSignIn: boolean) => {
+      const currentPath = window.location.pathname;
+      if (routing || (currentPath !== "/" && currentPath !== "/install")) return;
+      const stashed = consumeOAuthRedirect();
+      if (!stashed && !freshSignIn) return;
+      routing = true;
+      try {
+        const target = await resolveSignInDestination(userId, stashed);
+        if (mounted && (window.location.pathname === "/" || window.location.pathname === "/install")) {
+          navigate(target, { replace: true });
+        }
+      } finally { routing = false; }
+    };
 
     const handleSession = async (user: Parameters<typeof syncUserProfile>[0]) => {
       try {
@@ -42,18 +56,7 @@ export function AuthBootstrap() {
       if (!mounted || !session) return;
       await handleSession(session.user);
 
-      const stashed = consumeOAuthRedirect();
-      if (stashed && stashed !== location.pathname) {
-        navigate(stashed, { replace: true });
-      } else if (
-        location.pathname === "/" &&
-        location.hash === "" &&
-        stashed === null &&
-        sessionStorage.getItem("kinsroot:oauth:handled") !== "1"
-      ) {
-        // First landing after OAuth returns to origin — send to dashboard.
-        // Only when we can attribute it to a fresh sign-in.
-      }
+      await routeAfterSignIn(session.user.id, false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -66,32 +69,7 @@ export function AuthBootstrap() {
           await handleSession(session.user);
           // Record device metadata after the auth storage lock is released.
           sessionManager.recordCurrent().catch(() => {});
-          const stashed = consumeOAuthRedirect();
-          // Read the pathname at handler time — the effect deps are [], so
-          // `location` from useLocation is stale after client-side navigation.
-          const currentPath = window.location.pathname;
-          // Only handle the OAuth full-page-redirect case where the provider
-          // lands the user back on `/` or `/install`. In every other case
-          // (including `/auth`), the sign-in page's own listener owns routing.
-          if (currentPath !== "/" && currentPath !== "/install") {
-            return;
-          }
-          let target = stashed || "/dashboard";
-          if (!stashed) {
-            try {
-              if (await needsFamilyOnboarding(session.user.id)) {
-                target = "/onboarding/join-family";
-              }
-            } catch { /* fall through to dashboard */ }
-          }
-          // Re-check path after async work — user may have been navigated away
-          // by another listener (e.g. Auth.tsx handling ?redirect=...).
-          if (
-            window.location.pathname === "/" ||
-            window.location.pathname === "/install"
-          ) {
-            navigate(target, { replace: true });
-          }
+          await routeAfterSignIn(session.user.id, true);
         }
         }, 0);
       }

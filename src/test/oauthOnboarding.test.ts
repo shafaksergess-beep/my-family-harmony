@@ -12,13 +12,15 @@ const { authState, fromMock } = vi.hoisted(() => ({
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
+    rpc: vi.fn().mockResolvedValue({ data: false, error: null }),
     auth: authState,
     from: fromMock,
   },
 }));
 
 import { syncUserProfile, stashOAuthRedirect, consumeOAuthRedirect, describeOAuthError } from "@/lib/authSync";
-import { needsFamilyOnboarding } from "@/lib/membershipSync";
+import { needsFamilyOnboarding, resolveSignInDestination } from "@/lib/membershipSync";
+import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
 const googleUser = {
@@ -124,6 +126,32 @@ describe("needsFamilyOnboarding — membership sync check", () => {
   it("returns false (safe default) on query error", async () => {
     mockFamilyMembersCount(0, { message: "boom" });
     expect(await needsFamilyOnboarding("user-1")).toBe(false);
+  });
+});
+
+describe("Sign-in destination", () => {
+  beforeEach(() => vi.mocked(supabase.rpc).mockResolvedValue({ data: false, error: null } as any));
+
+  it("routes Google users without memberships to setup even with a stashed dashboard", async () => {
+    mockFamilyMembersCount(0);
+    expect(await resolveSignInDestination("user-1", "/dashboard")).toBe("/onboarding/join-family");
+  });
+
+  it("preserves invitation acceptance for unassigned users", async () => {
+    fromMock.mockReset();
+    expect(await resolveSignInDestination("user-1", "/accept-invitation?token=invite123")).toBe("/accept-invitation?token=invite123");
+    expect(fromMock).not.toHaveBeenCalled();
+  });
+
+  it("keeps existing members on their dashboard", async () => {
+    mockFamilyMembersCount(1);
+    expect(await resolveSignInDestination("user-1", "/dashboard")).toBe("/dashboard");
+  });
+
+  it("keeps unassigned superadmins on their dashboard", async () => {
+    mockFamilyMembersCount(0);
+    vi.mocked(supabase.rpc).mockResolvedValue({ data: true, error: null } as any);
+    expect(await resolveSignInDestination("admin-1", "/dashboard")).toBe("/dashboard");
   });
 });
 

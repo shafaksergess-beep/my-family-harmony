@@ -44,6 +44,7 @@ const FamilyMembers = () => {
   const [family, setFamily] = useState<any>(null);
   const [members, setMembers] = useState<FamilyMember[]>([]);
   const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [userSearch, setUserSearch] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editMemberId, setEditMemberId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -396,7 +397,7 @@ const FamilyMembers = () => {
               )}
               <LanguageSwitcher />
             
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setUserSearch(""); }}>
                 <DialogTrigger asChild>
                   <Button>
                     <Plus className="w-4 h-4 mr-2" />
@@ -413,12 +414,13 @@ const FamilyMembers = () => {
                   <form onSubmit={handleAddMember} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="user">{t("admin.selectUser")}</Label>
+                      <Input aria-label={t("admUsers.searchUsers")} placeholder={t("admUsers.searchUsers")} value={userSearch} onChange={e => setUserSearch(e.target.value)} />
                       <Select value={formData.user_id} onValueChange={(value) => setFormData({ ...formData, user_id: value })}>
                         <SelectTrigger>
                           <SelectValue placeholder={t("admin.selectUser")} />
                         </SelectTrigger>
                         <SelectContent>
-                          {allUsers.map((user) => (
+                          {allUsers.filter(user => user.id === formData.user_id || [user.full_name, user.email].some(value => (value ?? "").toLocaleLowerCase().includes(userSearch.trim().toLocaleLowerCase()))).map((user) => (
                             <SelectItem key={user.id} value={user.id}>
                               {user.full_name} ({user.email})
                             </SelectItem>

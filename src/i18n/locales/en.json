@@ -3008,6 +3008,7 @@
     "failed": "Your account could not be deleted. Please try again or contact support."
   },
   "familySetup": {
+    "createGroup": "Create a family, association or tontine",
     "title": "Create Your Family",
     "subtitle": "Set up your family profile and default settings",
     "name": "Family Name",
