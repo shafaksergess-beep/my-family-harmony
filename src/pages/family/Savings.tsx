@@ -392,7 +392,7 @@ export default function FamilySavings() {
                 <DialogHeader>
                   <DialogTitle>{editingSaving ? "Edit Savings Record" : (canManageFinances ? "Add Savings Record" : "Record My Savings")}</DialogTitle>
                 </DialogHeader>
-                <form onSubmit={editingSaving ? handleEditSave : handleSubmit} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields">
+                <form onSubmit={editingSaving ? handleEditSave : handleSubmit} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields space-y-4">
                   {canManageFinances && (
                     <div>
                       <Label htmlFor="member">{t("famSavings.member")}</Label>

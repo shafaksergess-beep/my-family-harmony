@@ -410,7 +410,7 @@ const FamilyMembers = () => {
                       {t("admin.addExistingUser")}
                     </DialogDescription>
                   </DialogHeader>
-                  <form onSubmit={handleAddMember} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields">
+                  <form onSubmit={handleAddMember} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="user">{t("admin.selectUser")}</Label>
                       <Select value={formData.user_id} onValueChange={(value) => setFormData({ ...formData, user_id: value })}>

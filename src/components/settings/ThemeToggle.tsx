@@ -1,9 +1,11 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from 'react';
 import { Sun, Moon } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 
 export function ThemeToggle() {
+  const { t } = useTranslation();
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -27,7 +29,7 @@ export function ThemeToggle() {
     <div className="flex items-center justify-between p-2">
       <div className="flex items-center gap-2">
         {isDark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-        <Label htmlFor="dark-mode">Dark Mode</Label>
+        <Label htmlFor="dark-mode">{t("phase4.darkMode")}</Label>
       </div>
       <Switch
         id="dark-mode"

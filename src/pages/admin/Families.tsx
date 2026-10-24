@@ -337,7 +337,7 @@ const AdminFamilies = () => {
                       {editingFamily ? t("admin.updateFamilyInfo") : t("admin.addNewFamily")}
                     </DialogDescription>
                   </DialogHeader>
-                  <form onSubmit={handleSubmit} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields">
+                  <form onSubmit={handleSubmit} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">{t("admin.familyName")}</Label>
                       <Input

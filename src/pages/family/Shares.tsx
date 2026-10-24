@@ -354,7 +354,7 @@ export default function FamilyShares() {
                   <DialogHeader>
                     <DialogTitle>{editingShare ? "Edit Share" : "Issue New Share"}</DialogTitle>
                   </DialogHeader>
-                  <form onSubmit={handleCreateOrUpdateShare} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields">
+                  <form onSubmit={handleCreateOrUpdateShare} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields space-y-4">
                     <div>
                       <Label htmlFor="member">{t("famShares.member")}</Label>
                       <Select
@@ -513,7 +513,7 @@ export default function FamilyShares() {
                   <DialogHeader>
                     <DialogTitle>{t("famShares.declareDividend")}</DialogTitle>
                   </DialogHeader>
-                  <form onSubmit={handleCreateDividend} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields">
+                  <form onSubmit={handleCreateDividend} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="period_year">{t("famShares.year")}</Label>

@@ -359,3 +359,6 @@ html[data-device="mobile"] .responsive-dialog-scroll:has(.responsive-dialog-form
 html[data-device="mobile"] .responsive-dialog-form { display: flex; flex-direction: column; min-height: 0; overflow: hidden; flex: 1; }
 html[data-device="mobile"] .responsive-dialog-fields { overflow-y: auto; min-height: 0; overscroll-behavior: contain; flex: 1; padding-bottom: 1rem; }
 html[data-device="mobile"] .responsive-dialog-fields > * + * { margin-top: 1rem; }
+
+html[data-device="mobile"] :where(button[role="checkbox"], button[role="switch"]) { position: relative; }
+html[data-device="mobile"] :where(button[role="checkbox"], button[role="switch"])::after { content: ""; position: absolute; width: max(100%, 44px); height: max(100%, 44px); top: 50%; left: 50%; transform: translate(-50%, -50%); }

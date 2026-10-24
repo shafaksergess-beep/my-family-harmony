@@ -387,7 +387,7 @@ const FamilyMeetings = () => {
                         {t("famMeetings.scheduleMonthlyMeetingsForThe")}
                       </DialogDescription>
                     </DialogHeader>
-                    <form onSubmit={handleBulkSchedule} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields">
+                    <form onSubmit={handleBulkSchedule} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="bulk-start-date">{t("famMeetings.startDate")}</Label>
                         <Input
@@ -459,7 +459,7 @@ const FamilyMeetings = () => {
                     {t("famMeetings.createANewFamilyMeeting")}
                   </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields">
+                <form onSubmit={handleSubmit} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="date">{t("famMeetings.meetingDate")}</Label>

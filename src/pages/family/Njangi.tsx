@@ -396,7 +396,7 @@ export default function FamilyNjangi() {
                 <DialogHeader>
                   <DialogTitle>{t("famNjangi.createNjangiCycle")}</DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleCreateCycle} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields">
+                <form onSubmit={handleCreateCycle} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields space-y-4">
                   <div>
                     <Label htmlFor="name">{t("famNjangi.cycleName")}</Label>
                     <Input

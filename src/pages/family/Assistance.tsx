@@ -427,7 +427,7 @@ export default function FamilyAssistance() {
                 <DialogHeader>
                   <DialogTitle>{t("famAssistance.recordAssistanceEvent")}</DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields">
+                <form onSubmit={handleSubmit} className="space-y-4 responsive-dialog-form"><div className="responsive-dialog-fields space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="member">{t("famAssistance.member")}</Label>
