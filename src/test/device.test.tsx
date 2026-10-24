@@ -4,6 +4,7 @@ import { DeviceProvider, readDevice } from '@/contexts/DeviceContext';
 import { useDevice } from '@/hooks/useDevice';
 import { usePlatform } from '@/hooks/usePlatform';
 import { useIsMobile } from '@/hooks/use-mobile';
+vi.mock('@/lib/natively', () => ({ checkIsNativelyApp: () => false }));
 
 let width = 1280;
 let portrait = true;
