@@ -383,7 +383,7 @@ export function MobileDashboard() {
           <div aria-hidden className="pointer-events-none absolute right-16 top-20 h-24 w-24 rounded-full bg-accent/20" />
           </div>
 
-          <div className="relative flex items-center justify-between">
+          <div className="relative flex !flex-nowrap items-center justify-between">
             <h1 className="text-3xl font-bold tracking-tight">Kinsroot</h1>
             <Button variant="ghost"
               aria-label={alertCount > 0 ? t('mobileSearch.bellUnread', { count: alertCount }) : t('mobileHome.notifications')}

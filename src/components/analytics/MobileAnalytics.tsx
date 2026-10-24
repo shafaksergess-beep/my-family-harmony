@@ -71,7 +71,8 @@ export function MobileChart({ children, summary }: { children: ReactElement<any>
     }
     return node;
   });
-  const recordData = Array.isArray(data) ? data : nested.filter(isValidElement).find((n: any) => nameOf(n) === 'Pie')?.props.data;
+  const pieNode = nested.find((node): node is ReactElement<any> => isValidElement(node) && nameOf(node) === 'Pie');
+  const recordData = Array.isArray(data) ? data : pieNode?.props.data;
   const fallbackSummary = categorical || hasRecordCategories(nested) ? t('phase2.recordsSummary', { count: recordData?.length ?? 0 }) : undefined;
   const last = Array.isArray(data) ? data[data.length - 1] : null; const prior = Array.isArray(data) ? data[data.length - 2] : null;
   const hasLegend = nested.some(node => isValidElement(node) && nameOf(node) === 'Legend');
