@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { usePlatform } from '@/hooks/usePlatform';
 import { MobileHeader } from './MobileHeader';
 import { MobileBottomNav } from './MobileBottomNav';
+import { useShellConfig } from '@/hooks/useShellConfig';
 import { MobileMenuContent } from './MobileMenuContent';
 
 interface MobileLayoutProps {
@@ -34,7 +35,9 @@ export function MobileLayout({
   contentClassName,
 }: MobileLayoutProps) {
   const navigate = useNavigate();
-  const { isMobile, safeAreaTop, safeAreaBottom } = usePlatform();
+  const { isMobile } = usePlatform();
+  const shell = useShellConfig();
+  const ownNav = showBottomNav && !shell?.insideShell;
 
   // Only render mobile layout on mobile devices
   if (!isMobile) {
@@ -53,9 +56,7 @@ export function MobileLayout({
         'min-h-dvh min-w-0 bg-background flex flex-col',
         className
       )}
-      style={{
-        paddingTop: showHeader && safeAreaTop > 0 ? `${safeAreaTop}px` : undefined,
-      }}
+
     >
       {showHeader && (
         <MobileHeader
@@ -72,21 +73,14 @@ export function MobileLayout({
       <main
         className={cn(
           'flex-1 min-w-0 max-w-full',
-          showBottomNav && 'pb-20',
+          ownNav && 'pb-[calc(4rem+env(safe-area-inset-bottom))]',
           contentClassName
         )}
-        style={{
-          paddingBottom: showBottomNav
-            ? `calc(6rem + ${safeAreaBottom}px)`
-            : safeAreaBottom > 0
-            ? `${safeAreaBottom}px`
-            : undefined,
-        }}
       >
         {children}
       </main>
 
-      {showBottomNav && <MobileBottomNav familySlug={familySlug} />}
+      {ownNav && <MobileBottomNav familySlug={familySlug} />}
     </div>
   );
 }

@@ -18,6 +18,9 @@ import { PWAUpdatePrompt } from "@/components/PWAUpdatePrompt";
 import { AuthBootstrap } from "@/components/AuthBootstrap";
 import { IdleWarningDialog } from "@/components/IdleWarningDialog";
 import { ModuleGate } from "@/components/family/ModuleGate";
+import { DeviceProvider } from "@/contexts/DeviceContext";
+import { AppShell } from "@/components/layout/AppShell";
+import { ShellRouteConfig } from "@/hooks/useShellConfig";
 const SessionManagementPage = lazy(() => import("./pages/SessionManagement"));
 // Lazy load core pages
 const Index = lazy(() => import("./pages/Index"));
@@ -144,6 +147,7 @@ const FamilyModule = ({ children }: { children: ReactNode }) => (
 );
 
 const App = () => (
+  <DeviceProvider>
   <ErrorBoundary>
     <HelmetProvider>
     <QueryClientProvider client={queryClient}>
@@ -168,13 +172,18 @@ const App = () => (
             <Route path="/blog/what-is-njangi" element={<WhatIsNjangi />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/admin" element={<AdminModule><AdminDashboard /></AdminModule>} />
             <Route path="/install" element={<Install />} />
+            <Route path="/onboarding/join-family" element={<JoinFamilyOnboarding />} />
+          
+          {/* Family Role Management */}
+          
+
+          <Route element={<AppShell />}>
+            <Route path="/admin" element={<AdminModule><AdminDashboard /></AdminModule>} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/linked-accounts" element={<LinkedAccounts />} />
             <Route path="/profile/sessions" element={<SessionManagementPage />} />
-            <Route path="/onboarding/join-family" element={<JoinFamilyOnboarding />} />
             <Route path="/admin/dashboard" element={<AdminModule><AdminDashboard /></AdminModule>} />
             <Route path="/admin/families" element={<AdminModule><AdminFamilies /></AdminModule>} />
           <Route path="/admin/families/:familyId/members" element={<AdminModule><FamilyMembers /></AdminModule>} />
@@ -195,11 +204,8 @@ const App = () => (
         <Route path="/admin/announcements" element={<AdminModule><AdminAnnouncements /></AdminModule>} />
         <Route path="/admin/languages" element={<AdminModule><AdminLanguages /></AdminModule>} />
         <Route path="/admin/system-health" element={<AdminModule><SystemHealth /></AdminModule>} />
-          
-          {/* Family Role Management */}
           <Route path="/family/:familySlug/role-management" element={<FamilyModule><RoleManagement /></FamilyModule>} />
           <Route path="/family/:familySlug/module-settings" element={<FamilyModule><FamilyModuleSettings /></FamilyModule>} />
-          
           <Route path="/family/:familySlug" element={<FamilyModule><FamilyDetail /></FamilyModule>} />
           <Route path="/family/:familySlug/audit-trail-enhanced" element={<FamilyModule><AuditTrailEnhanced /></FamilyModule>} />
           <Route path="/family/:familySlug/analytics" element={<FamilyModule><ModuleGate moduleSlug="analytics"><FamilyAnalytics /></ModuleGate></FamilyModule>} />
@@ -211,7 +217,7 @@ const App = () => (
           <Route path="/family/:familySlug/email-settings" element={<FamilyModule><EmailSettings /></FamilyModule>} />
           <Route path="/family/:familySlug/pdf-reports" element={<FamilyModule><PDFReports /></FamilyModule>} />
           <Route path="/family/:familySlug/meetings/:meetingId" element={<FamilyModule><MeetingDetail /></FamilyModule>} />
-          <Route path="/family/:familySlug/meetings/:meetingId/checkin" element={<FamilyModule><MeetingCheckIn /></FamilyModule>} />
+          <Route path="/family/:familySlug/meetings/:meetingId/checkin" element={<FamilyModule><ShellRouteConfig hideBottomNav><MeetingCheckIn /></ShellRouteConfig></FamilyModule>} />
           <Route path="/family/:familySlug/meetings" element={<FamilyModule><ModuleGate moduleSlug="meetings"><FamilyMeetings /></ModuleGate></FamilyModule>} />
           <Route path="/family/:familySlug/contributions" element={<FamilyModule><ModuleGate moduleSlug="contributions"><FamilyContributions /></ModuleGate></FamilyModule>} />
           <Route path="/family/:familySlug/contribution-settings" element={<FamilyModule><ContributionSettings /></FamilyModule>} />
@@ -248,11 +254,11 @@ const App = () => (
           <Route path="/family/:familySlug/backup-restore" element={<FamilyModule><BackupRestore /></FamilyModule>} />
           <Route path="/family/:familySlug/notification-settings" element={<FamilyModule><NotificationSettings /></FamilyModule>} />
           <Route path="/settings/notifications" element={<Suspense fallback={<PageLoadingSkeleton />}><NotificationSettings /></Suspense>} />
-
           <Route path="/family/:familySlug/more" element={<FamilyModule><FamilyMore /></FamilyModule>} />
           <Route path="/family/:familySlug/chat" element={<FamilyModule><ModuleGate moduleSlug="chat"><FamilyChat /></ModuleGate></FamilyModule>} />
           <Route path="/family/:familySlug/calendar" element={<FamilyModule><ModuleGate moduleSlug="calendar"><FamilyCalendar /></ModuleGate></FamilyModule>} />
           <Route path="/family/:familySlug/pending-approvals" element={<FamilyModule><PendingApprovals /></FamilyModule>} />
+          </Route>
           <Route path="/accept-invitation" element={<AcceptInvitation />} />
           <Route path="/join" element={<JoinFamily />} />
           <Route path="/join/:familySlug" element={<JoinFamily />} />
@@ -270,6 +276,7 @@ const App = () => (
     </QueryClientProvider>
     </HelmetProvider>
   </ErrorBoundary>
+  </DeviceProvider>
 );
 
 export default App;

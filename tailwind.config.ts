@@ -13,6 +13,7 @@ export default {
       },
     },
     extend: {
+      minHeight: { screen: ["100vh", "100dvh"] },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

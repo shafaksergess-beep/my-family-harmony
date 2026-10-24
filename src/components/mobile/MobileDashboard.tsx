@@ -370,7 +370,7 @@ export function MobileDashboard() {
           {userFamilies.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="relative mt-4 flex w-full items-center gap-2 text-left">
+                <button id="families" className="relative mt-4 flex w-full items-center gap-2 text-left">
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-lg font-semibold">
                       {selectedFamily?.family_name || t('mobileHome.selectFamily')}
@@ -471,7 +471,7 @@ export function MobileDashboard() {
           </Card>
 
           {/* Recent activity */}
-          <section>
+          <section id="notifications">
             <div className="mb-3 flex items-center justify-between px-1">
               <h2 className="text-xl font-bold text-foreground">{t('mobileHome.recentActivity')}</h2>
               <button

@@ -1,4 +1,22 @@
 {
+  "foundation": {
+    "back": "Back",
+    "moreActions": "More actions",
+    "navigation": "Navigation",
+    "quickActions": "Quick actions",
+    "more": "More",
+    "overview": "Overview",
+    "families": "Families",
+    "users": "Users",
+    "analytics": "Analytics",
+    "notifications": "Notifications",
+    "profile": "Profile",
+    "noRecords": "No records yet",
+    "actions": "Actions",
+    "openRecord": "Open record",
+    "familyMembers": "{{name}} Members",
+    "familyAnalytics": "{{name}} Analytics"
+},
   "mobilePolish": {
     "memberTab": "Members",
     "members": "Family Members",

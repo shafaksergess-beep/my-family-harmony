@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/layout/PageHeader";
 import i18n from "@/i18n/config";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
@@ -317,38 +318,16 @@ const Members = () => {
       <SEO title={t("famMembers.familyMembers")} description={t("famMembers.manageFamilyMembersRolesAnd")} />
       <div className="min-h-screen bg-background p-6">
       <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold">{family?.name} Members</h1>
-              <p className="text-muted-foreground">
-                {filteredMembers.length} member{filteredMembers.length !== 1 ? "s" : ""}
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="outline" onClick={() => exportMembersToCSV(filteredMembers)} disabled={filteredMembers.length === 0}>
-              <Download className="h-4 w-4 mr-2" />
-              {t("famMembers.export")}
-            </Button>
-            {canManageMembers && (
-              <>
-                <Button variant="outline" onClick={() => navigate(`/family/${familySlug}/role-management`)}>
-                  <Shield className="h-4 w-4 mr-2" />
-                  {t("famMembers.roleManagement")}
-                </Button>
-                <Button onClick={() => { setIsAddOpen(true); loadAvailableUsers(); }}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  {t("famMembers.addMember")}
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
+        <PageHeader
+          title={t('foundation.familyMembers', { name: family?.name ?? '' })}
+          subtitle={t('mobilePolish.memberCount', { count: filteredMembers.length })}
+          backTo={`/family/${familySlug}`}
+          actions={[
+            { key: 'export', label: t('famMembers.export'), icon: Download, variant: 'outline', disabled: filteredMembers.length === 0, onClick: () => exportMembersToCSV(filteredMembers) },
+            { key: 'roles', label: t('famMembers.roleManagement'), icon: Shield, variant: 'outline', hidden: !canManageMembers, onClick: () => navigate(`/family/${familySlug}/role-management`) },
+            { key: 'add', label: t('famMembers.addMember'), icon: Plus, primary: true, hidden: !canManageMembers, onClick: () => { setIsAddOpen(true); loadAvailableUsers(); } },
+          ]}
+        />
 
         {/* Search & Filters */}
         <div className="flex flex-col gap-4 sm:flex-row">
