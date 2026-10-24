@@ -226,11 +226,11 @@ const FamilyAnalytics = () => {
         <div className="container mx-auto py-4 space-y-3">
           <PageHeader title={t('foundation.familyAnalytics', { name: family?.name ?? '' })} subtitle={t('famAnalytics.keyPerformanceIndicatorsAndInsights')} backTo={`/family/${familySlug}`} />
 <AnalyticsFilters chips={viewMode === "member" ? [{ key: "mode", label: t("famAnalytics.myStats"), clear: () => { setViewMode("family"); setSelectedMemberId(""); } }, ...(selectedMemberId ? [{ key: "member", label: memberOptions.find(m => m.memberId === selectedMemberId)?.name ?? t("famAnalytics.myStats"), clear: () => setSelectedMemberId(memberId) }] : [])] : []}>          <div className="flex min-w-0 flex-wrap items-center gap-3">
-            <Select value={viewMode} onValueChange={v => { setViewMode(v as 'family' | 'member'); setLoading(true); }}>
+            <Select value={viewMode} onValueChange={v => { setViewMode(v as 'family' | 'member'); }}>
               <SelectTrigger className="w-full min-w-0 md:w-auto"><SelectValue /></SelectTrigger>
               <SelectContent><SelectItem value="family">{t('famAnalytics.familyOverview')}</SelectItem><SelectItem value="member">{t('famAnalytics.myStats')}</SelectItem></SelectContent>
             </Select>
-            {viewMode === 'member' && canManageFinances && <Select value={selectedMemberId} onValueChange={v => { setSelectedMemberId(v); setLoading(true); }}>
+            {viewMode === 'member' && canManageFinances && <Select value={selectedMemberId} onValueChange={v => { setSelectedMemberId(v); }}>
               <SelectTrigger className="w-full min-w-0 md:w-auto"><SelectValue placeholder={t('famAnalytics.selectMember')} /></SelectTrigger>
               <SelectContent>{memberOptions.map(m => <SelectItem key={m.memberId} value={m.memberId}>{m.name}</SelectItem>)}</SelectContent>
             </Select>}
