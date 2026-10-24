@@ -1,3 +1,6 @@
+import { useTranslation } from 'react-i18next';
+import { useDevice } from '@/hooks/useDevice';
+import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogHeader, ResponsiveDialogTitle, ResponsiveDialogDescription } from '@/components/ui/responsive-dialog';
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +27,7 @@ interface Props {
  */
 export const FamilyHealthWidget = ({ familyId }: Props) => {
   const { toast } = useToast();
+  const { t } = useTranslation(); const { isMobile } = useDevice(); const [detailsOpen, setDetailsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<HealthData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -58,6 +62,12 @@ export const FamilyHealthWidget = ({ familyId }: Props) => {
     : data.score >= 75 ? "default"
     : data.score >= 50 ? "secondary"
     : "destructive";
+
+  if (isMobile) return <>
+    <Card className="flex min-w-0 items-center gap-3 rounded-2xl p-4">
+      <div className="relative h-16 w-16 shrink-0"><svg viewBox="0 0 64 64" className="h-16 w-16 -rotate-90" aria-label={t('phase2.familyHealth')}><circle cx="32" cy="32" r="27" fill="none" stroke="hsl(var(--muted))" strokeWidth="5" /><circle cx="32" cy="32" r="27" fill="none" stroke="hsl(var(--primary))" strokeWidth="5" pathLength="100" strokeDasharray={`${Math.max(0, Math.min(100, data?.score ?? 0))} 100`} /></svg><span className="absolute inset-0 flex items-center justify-center text-lg font-bold">{loading ? '…' : data?.score ?? '—'}</span></div>
+      <div className="min-w-0 flex-1"><h2 className="text-sm font-semibold">{t('phase2.familyHealth')}</h2><p className="text-xs text-muted-foreground">{t(loading ? 'phase2.analyzing' : data ? 'phase2.healthSnapshot' : 'phase2.unavailable')}</p></div><Button variant="outline" size="sm" onClick={() => setDetailsOpen(true)}>{t('phase2.details')}</Button>
+    </Card><ResponsiveDialog open={detailsOpen} onOpenChange={setDetailsOpen}><ResponsiveDialogContent><ResponsiveDialogHeader><ResponsiveDialogTitle>{t('phase2.familyHealth')}</ResponsiveDialogTitle><ResponsiveDialogDescription>{t('phase2.healthSnapshot')}</ResponsiveDialogDescription></ResponsiveDialogHeader><div className="space-y-4 py-4"><p className="text-sm">{data?.analysis || t('phase2.unavailable')}</p>{data?.improvements?.map((tip, i) => <p key={i} className="text-sm text-muted-foreground">{tip}</p>)}<Button variant="outline" onClick={fetch} disabled={loading}><RefreshCw className="h-4 w-4" />{t('phase2.refresh')}</Button></div></ResponsiveDialogContent></ResponsiveDialog></>;
 
   return (
     <Card className="border-primary/20">
