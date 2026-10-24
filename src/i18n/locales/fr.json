@@ -2037,6 +2037,7 @@
     "youReAllCaughtUp": "Vous êtes à jour!"
   },
   "famInvitations": {
+    "outsiderFlow": "Inscription sur invitation",
     "accepted": "Accepté",
     "accessDenied": "Accès refusé",
     "back": "Retour",

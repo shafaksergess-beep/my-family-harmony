@@ -1,5 +1,10 @@
 # Roadmap
 
+## Outsider invitation repair
+- [x] Add private-record-safe code/token previews and atomic authenticated acceptance
+- [x] Preserve invitations through signup and use shared lookup across entry points
+- [ ] Verify public previews, real signup return, membership read-back and denial cases
+
 ## Signup and unassigned user recovery
 - [x] Share membership-aware sign-in destinations while preserving invitations and platform-admin access
 - [x] Expose the existing creation wizard on empty desktop/mobile dashboards

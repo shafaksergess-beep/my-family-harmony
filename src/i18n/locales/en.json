@@ -2037,6 +2037,7 @@
     "youReAllCaughtUp": "You're all caught up!"
   },
   "famInvitations": {
+    "outsiderFlow": "Invitation signup",
     "accepted": "Accepted",
     "accessDenied": "Access Denied",
     "back": "Back",
