@@ -43,7 +43,7 @@ export const JoinFamilyCard = () => {
 
       // Navigate to join page with code
       setOpen(false);
-      navigate(`/join?code=${code.toUpperCase()}`);
+      navigate(`/join/family?code=${code.toUpperCase()}`);
     } catch (error) {
       toast({
         title: "Error",
