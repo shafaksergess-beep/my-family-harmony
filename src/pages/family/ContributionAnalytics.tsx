@@ -1,3 +1,8 @@
+import { DataCards } from "@/components/layout/DataCards";
+import { useDevice } from "@/hooks/useDevice";
+import { AnalyticsKpis, AnalyticsSummary, AnalyticsFilters, MobileChart } from "@/components/analytics/MobileAnalytics";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { useCurrency } from "@/context/CurrencyContext";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -9,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, ArrowLeft, TrendingUp, AlertTriangle, Clock, DollarSign, Award } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SegmentedTabs as Tabs, SegmentedTabsContent as TabsContent, SegmentedTabsList as TabsList, SegmentedTabsTrigger as TabsTrigger } from "@/components/layout/SegmentedTabs";
 import { calculateCreditScore, getCreditScoreColor, getCreditScoreBadgeVariant } from "@/lib/creditScoring";
 
 interface Contribution {
@@ -39,6 +44,8 @@ interface MemberSummary {
 
 const ContributionAnalytics = () => {
   const { t } = useTranslation();
+  const { isMobile } = useDevice();
+  const { formatAmount } = useCurrency();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { family, canManageFinances, isLoading } = useFamilyAuth(familySlug);
@@ -108,7 +115,8 @@ const ContributionAnalytics = () => {
           monthlyMap.set(month, { month, paid: 0, outstanding: 0 });
         }
         
-        const data = monthlyMap.get(month)!;
+        const data = monthlyMap.get(month);
+        if (!data) return;
         if (contribution.status === "paid") {
           data.paid += contribution.amount;
         } else {
@@ -136,7 +144,8 @@ const ContributionAnalytics = () => {
           });
         }
 
-        const summary = memberMap.get(contribution.member_id)!;
+        const summary = memberMap.get(contribution.member_id);
+        if (!summary) return;
         if (contribution.status === "paid") {
           summary.total_paid += contribution.amount;
           const contributionDate = new Date(contribution.contribution_date);
@@ -225,7 +234,7 @@ const ContributionAnalytics = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      {isMobile ? <PageHeader title={t("famContributionAnalytics.contributionAnalytics")} backTo={`/family/${familySlug}`} /> : (<header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
@@ -238,19 +247,19 @@ const ContributionAnalytics = () => {
             </div>
           </div>
         </div>
-      </header>
+      </header>)}
 
       <main className="container mx-auto px-4 py-8">
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <AnalyticsKpis className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">{t("famContributionAnalytics.totalCollected")}</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="flex items-center">
                 <DollarSign className="w-4 h-4 text-green-500 mr-2" />
-                <span className="text-2xl font-bold">{totalPaid.toLocaleString()} FCFA</span>
+                <span className="text-2xl font-bold">{formatAmount(totalPaid)}</span>
               </div>
             </CardContent>
           </Card>
@@ -259,10 +268,10 @@ const ContributionAnalytics = () => {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">{t("famContributionAnalytics.outstanding")}</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="flex items-center">
                 <Clock className="w-4 h-4 text-orange-500 mr-2" />
-                <span className="text-2xl font-bold">{totalOutstanding.toLocaleString()} FCFA</span>
+                <span className="text-2xl font-bold">{formatAmount(totalOutstanding)}</span>
               </div>
             </CardContent>
           </Card>
@@ -271,7 +280,7 @@ const ContributionAnalytics = () => {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">{t("famContributionAnalytics.latePayments")}</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="flex items-center">
                 <AlertTriangle className="w-4 h-4 text-red-500 mr-2" />
                 <span className="text-2xl font-bold">{latePayments.length}</span>
@@ -283,14 +292,14 @@ const ContributionAnalytics = () => {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">{t("famContributionAnalytics.lateFines")}</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="flex items-center">
                 <TrendingUp className="w-4 h-4 text-blue-500 mr-2" />
-                <span className="text-2xl font-bold">{totalLateFines.toLocaleString()} FCFA</span>
+                <span className="text-2xl font-bold">{formatAmount(totalLateFines)}</span>
               </div>
             </CardContent>
           </Card>
-        </div>
+        </AnalyticsKpis>
 
         <Tabs defaultValue="trends" className="space-y-6">
           <TabsList>
@@ -305,18 +314,18 @@ const ContributionAnalytics = () => {
                 <CardTitle>{t("famContributionAnalytics.monthlyPaymentTrends")}</CardTitle>
                 <CardDescription>{t("famContributionAnalytics.trackContributionsCollectedVsOutstanding")}</CardDescription>
               </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={400}>
+              <CardContent className="min-w-0">
+                <MobileChart><ResponsiveContainer width="100%" height={400}>
                   <LineChart data={monthlyData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" />
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="paid" stroke="#22c55e" name="Paid" strokeWidth={2} />
-                    <Line type="monotone" dataKey="outstanding" stroke="#f97316" name="Outstanding" strokeWidth={2} />
+                    <Line type="monotone" dataKey="paid" stroke="#22c55e" name={t("phase2.paid")} strokeWidth={2} />
+                    <Line type="monotone" dataKey="outstanding" stroke="#f97316" name={t("phase2.outstanding")} strokeWidth={2} />
                   </LineChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer></MobileChart>
               </CardContent>
             </Card>
           </TabsContent>
@@ -327,8 +336,8 @@ const ContributionAnalytics = () => {
                 <CardTitle>{t("famContributionAnalytics.memberPaymentAnalysisWithCredit")}</CardTitle>
                 <CardDescription>{t("famContributionAnalytics.individualContributionTrackingAndCreditworthiness")}</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardContent className="min-w-0">
+                {isMobile ? <DataCards rows={memberSummaries} getRowKey={row => row.member_id} title={row => row.member_name} amount={row => row.total_paid} columns={[{ key: "0", label: t("phase2.outstanding"), render: row => formatAmount(row.total_outstanding) }, { key: "1", label: t("phase2.onTime"), render: row => row.on_time_count }, { key: "2", label: t("phase2.late"), render: row => row.late_count }, { key: "3", label: t("phase2.creditScore"), render: row => row.credit_score ?? 0 }]} /> : (<div className="space-y-4">
                   {memberSummaries.map(summary => (
                     <div key={summary.member_id} className="flex items-center justify-between p-4 border border-border rounded-lg">
                       <div className="flex-1">
@@ -349,25 +358,25 @@ const ContributionAnalytics = () => {
                           )}
                         </div>
                         <div className="flex gap-4 mt-1 text-sm text-muted-foreground">
-                          <span>Paid: {summary.total_paid.toLocaleString()} FCFA</span>
+                          <span>{t("phase2.paidLabel", { amount: formatAmount(summary.total_paid) })}</span>
                           {summary.total_outstanding > 0 && (
-                            <span className="text-orange-500">Outstanding: {summary.total_outstanding.toLocaleString()} FCFA</span>
+                            <span className="text-orange-500">{t("phase2.outstandingLabel", { amount: formatAmount(summary.total_outstanding) })}</span>
                           )}
                         </div>
                       </div>
                       <div className="flex gap-2">
                         <Badge variant="outline" className="bg-green-50 text-green-700">
-                          {summary.on_time_count} on time
+                          {t("phase2.onTimeCount", { count: summary.on_time_count })}
                         </Badge>
                         {summary.late_count > 0 && (
                           <Badge variant="outline" className="bg-red-50 text-red-700">
-                            {summary.late_count} late
+                            {t("phase2.lateCount", { count: summary.late_count })}
                           </Badge>
                         )}
                       </div>
                     </div>
                   ))}
-                </div>
+                </div>)}
               </CardContent>
             </Card>
           </TabsContent>
@@ -378,11 +387,11 @@ const ContributionAnalytics = () => {
                 <CardTitle>{t("famContributionAnalytics.latePayments")}</CardTitle>
                 <CardDescription>{t("famContributionAnalytics.overdueContributionsRequiringAttention")}</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="min-w-0">
                 {latePayments.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">{t("famContributionAnalytics.noLatePayments")}</p>
                 ) : (
-                  <div className="space-y-4">
+                  isMobile ? <DataCards rows={latePayments} getRowKey={row => row.id} title={row => row.family_members?.profiles?.full_name ?? t("phase2.unknown")} amount={row => row.amount} columns={[{ key: "0", label: t("phase2.dueDate"), render: row => new Date(row.contribution_date).toLocaleDateString() }]} /> : (<div className="space-y-4">
                   {latePayments.map(contribution => {
                       const daysLate = Math.ceil(
                         (new Date().getTime() - new Date(contribution.contribution_date).getTime()) / (1000 * 60 * 60 * 24)
@@ -394,20 +403,20 @@ const ContributionAnalytics = () => {
                           <div>
                             <p className="font-medium">{memberName}</p>
                             <p className="text-sm text-muted-foreground">
-                              Due: {new Date(contribution.contribution_date).toLocaleDateString()}
+                              {t("phase2.due", { date: new Date(contribution.contribution_date).toLocaleDateString() })}
                             </p>
                             <p className="text-sm font-medium text-red-600 mt-1">
-                              {daysLate} days overdue
+                              {t("phase2.daysOverdue", { count: daysLate })}
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="font-bold text-lg">{contribution.amount.toLocaleString()} FCFA</p>
+                            <p className="font-bold text-lg">{formatAmount(contribution.amount)}</p>
                             <Badge variant="destructive">{t("famContributionAnalytics.overdue")}</Badge>
                           </div>
                         </div>
                       );
                     })}
-                  </div>
+                  </div>)
                 )}
               </CardContent>
             </Card>

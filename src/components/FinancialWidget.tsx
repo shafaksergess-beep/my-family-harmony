@@ -1,3 +1,6 @@
+import { useTranslation } from 'react-i18next';
+import { useDevice } from '@/hooks/useDevice';
+import { StatCarousel } from '@/components/layout/StatCarousel';
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -13,6 +16,9 @@ interface FinancialSummary {
   outstandingLoans: number;
   recentTransactionsCount: number;
   monthlyChange: number;
+  monthContributions: number;
+  activeLoans: number;
+  attendanceRate: number | null;
 }
 
 interface FinancialWidgetProps {
@@ -21,6 +27,7 @@ interface FinancialWidgetProps {
 }
 
 const FinancialWidget = ({ familyId, className = "" }: FinancialWidgetProps) => {
+  const { t } = useTranslation(); const { isMobile } = useDevice();
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<FinancialSummary | null>(null);
 
@@ -103,6 +110,9 @@ const FinancialWidget = ({ familyId, className = "" }: FinancialWidgetProps) => 
         ? ((thisMonthTotal - lastMonthTotal) / lastMonthTotal) * 100
         : 0;
 
+      const { data: meetingRows } = await supabase.from('meetings').select('id').eq('family_id', familyId).eq('is_completed', true);
+      const { data: attendanceRows } = meetingRows?.length ? await supabase.from('attendance').select('status').in('meeting_id', meetingRows.map(m => m.id)) : { data: [] };
+      const attendanceRate = attendanceRows?.length ? attendanceRows.filter(a => a.status === 'present').length / attendanceRows.length * 100 : null;
       setSummary({
         totalContributions,
         totalLoans,
@@ -110,6 +120,7 @@ const FinancialWidget = ({ familyId, className = "" }: FinancialWidgetProps) => 
         outstandingLoans,
         recentTransactionsCount,
         monthlyChange,
+        monthContributions: thisMonthTotal, activeLoans: loans?.length || 0, attendanceRate,
       });
     } catch (error) {
       console.error("Error loading financial summary:", error);
@@ -136,6 +147,13 @@ const FinancialWidget = ({ familyId, className = "" }: FinancialWidgetProps) => 
   }
 
   if (!summary) return null;
+
+  if (isMobile) return <StatCarousel items={[
+    { key: 'cash', label: t('famAnalytics.cashAtHand'), value: formatAmount(summary.totalContributions - summary.totalLoans), icon: Wallet },
+    { key: 'contributions', label: t('phase2.monthContributions'), value: formatAmount(summary.monthContributions), icon: DollarSign },
+    { key: 'loans', label: t('mobileHome.activeLoans'), value: summary.activeLoans, icon: CreditCard },
+    { key: 'attendance', label: t('phase2.attendanceRate'), value: summary.attendanceRate === null ? t('phase2.unavailable') : `${summary.attendanceRate.toFixed(1)}%` },
+  ]} />;
 
   const metrics = [
     {

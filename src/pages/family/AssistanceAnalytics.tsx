@@ -1,3 +1,8 @@
+import { DataCards } from "@/components/layout/DataCards";
+import { useDevice } from "@/hooks/useDevice";
+import { AnalyticsKpis, AnalyticsSummary, AnalyticsFilters, MobileChart } from "@/components/analytics/MobileAnalytics";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { useCurrency } from "@/context/CurrencyContext";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -7,7 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { ArrowLeft, Loader2, TrendingUp, Users, DollarSign, Calendar } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Legend } from "recharts";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SegmentedTabs as Tabs, SegmentedTabsContent as TabsContent, SegmentedTabsList as TabsList, SegmentedTabsTrigger as TabsTrigger } from "@/components/layout/SegmentedTabs";
 
 interface AssistanceEvent {
   id: string;
@@ -39,6 +44,8 @@ const COLORS = ['#8b5cf6', '#ec4899', '#06b6d4', '#f59e0b', '#10b981', '#ef4444'
 
 export default function AssistanceAnalytics() {
   const { t } = useTranslation();
+  const { isMobile } = useDevice();
+  const { formatAmount } = useCurrency();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { family, isLoading: authLoading } = useFamilyAuth(familySlug);
@@ -100,7 +107,7 @@ export default function AssistanceAnalytics() {
       return acc;
     }, {} as Record<string, { count: number; total: number }>)
   ).map(([type, data]) => ({
-    name: EVENT_TYPE_LABELS[type] || type,
+    name: t(`phase2.eventTypes.${type}`, { defaultValue: t("phase2.other") }),
     count: data.count,
     amount: data.total,
   }));
@@ -119,7 +126,7 @@ export default function AssistanceAnalytics() {
   // Member-level statistics
   const memberStats = Object.entries(
     events.reduce((acc, event) => {
-      const name = event.family_members.profiles.full_name;
+      const name = event.family_members?.profiles?.full_name || t("phase2.unknown");
       if (!acc[name]) acc[name] = { name, count: 0, total: 0 };
       acc[name].count++;
       acc[name].total += event.amount;
@@ -134,13 +141,13 @@ export default function AssistanceAnalytics() {
   const pendingAmount = events.filter(e => !e.is_paid).reduce((sum, e) => sum + e.amount, 0);
 
   const paymentStatusData = [
-    { name: "Paid", value: paidCount, amount: paidAmount },
-    { name: "Pending", value: pendingCount, amount: pendingAmount },
+    { name: t("phase2.paid"), value: paidCount, amount: paidAmount },
+    { name: t("phase2.pending"), value: pendingCount, amount: pendingAmount },
   ];
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      {isMobile ? <PageHeader title={t("famAssistanceAnalytics.assistanceAnalytics")} backTo={`/family/${familySlug}`} /> : (<header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
@@ -153,17 +160,17 @@ export default function AssistanceAnalytics() {
             </div>
           </div>
         </div>
-      </header>
+      </header>)}
 
       <main className="container mx-auto px-4 py-8 space-y-6">
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <AnalyticsKpis className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">{t("famAssistanceAnalytics.totalEvents")}</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="text-2xl font-bold">{events.length}</div>
             </CardContent>
           </Card>
@@ -172,8 +179,8 @@ export default function AssistanceAnalytics() {
               <CardTitle className="text-sm font-medium">{t("famAssistanceAnalytics.totalSpent")}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{paidAmount.toLocaleString()} FCFA</div>
+            <CardContent className="min-w-0">
+              <div className="text-2xl font-bold">{formatAmount(paidAmount)}</div>
               <p className="text-xs text-muted-foreground">{t("famAssistanceAnalytics.paidAssistance")}</p>
             </CardContent>
           </Card>
@@ -182,10 +189,10 @@ export default function AssistanceAnalytics() {
               <CardTitle className="text-sm font-medium">{t("famAssistanceAnalytics.budgetRemaining")}</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{(budget.allocated - budget.spent).toLocaleString()} FCFA</div>
+            <CardContent className="min-w-0">
+              <div className="text-2xl font-bold">{formatAmount((budget.allocated - budget.spent))}</div>
               <p className="text-xs text-muted-foreground">
-                {((budget.spent / budget.allocated) * 100).toFixed(1)}% used
+                {t("phase2.percentUsed", { percent: ((budget.spent / budget.allocated) * 100).toFixed(1) })}
               </p>
             </CardContent>
           </Card>
@@ -194,12 +201,12 @@ export default function AssistanceAnalytics() {
               <CardTitle className="text-sm font-medium">{t("famAssistanceAnalytics.pendingAmount")}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{pendingAmount.toLocaleString()} FCFA</div>
-              <p className="text-xs text-muted-foreground">{pendingCount} pending events</p>
+            <CardContent className="min-w-0">
+              <div className="text-2xl font-bold">{formatAmount(pendingAmount)}</div>
+              <p className="text-xs text-muted-foreground">{t("phase2.pendingEvents", { count: pendingCount })}</p>
             </CardContent>
           </Card>
-        </div>
+        </AnalyticsKpis>
 
         {/* Budget Monitor */}
         <Card>
@@ -207,23 +214,23 @@ export default function AssistanceAnalytics() {
             <CardTitle>{t("famAssistanceAnalytics.budgetMonitor")}</CardTitle>
             <CardDescription>{t("famAssistanceAnalytics.annualAssistanceBudgetTracking")}</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="min-w-0">
             <div className="space-y-4">
               <div className="flex justify-between text-sm">
                 <span>{t("famAssistanceAnalytics.allocatedBudget")}</span>
-                <span className="font-semibold">{budget.allocated.toLocaleString()} FCFA</span>
+                <span className="font-semibold">{formatAmount(budget.allocated)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Spent (Paid):</span>
-                <span className="font-semibold text-red-600">{budget.spent.toLocaleString()} FCFA</span>
+                <span>{t("phase2.spentPaid")}</span>
+                <span className="font-semibold text-red-600">{formatAmount(budget.spent)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>{t("famAssistanceAnalytics.pending")}</span>
-                <span className="font-semibold text-orange-600">{pendingAmount.toLocaleString()} FCFA</span>
+                <span className="font-semibold text-orange-600">{formatAmount(pendingAmount)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>{t("famAssistanceAnalytics.remaining")}</span>
-                <span className="font-semibold text-green-600">{(budget.allocated - budget.spent).toLocaleString()} FCFA</span>
+                <span className="font-semibold text-green-600">{formatAmount((budget.allocated - budget.spent))}</span>
               </div>
               <div className="w-full bg-muted rounded-full h-4">
                 <div 
@@ -249,8 +256,8 @@ export default function AssistanceAnalytics() {
                 <CardTitle>{t("famAssistanceAnalytics.assistanceByEventType")}</CardTitle>
                 <CardDescription>{t("famAssistanceAnalytics.distributionOfAssistanceEventsAnd")}</CardDescription>
               </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={400}>
+              <CardContent className="min-w-0">
+                <MobileChart><ResponsiveContainer width="100%" height={400}>
                   <BarChart data={eventTypeData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
@@ -258,10 +265,10 @@ export default function AssistanceAnalytics() {
                     <YAxis yAxisId="right" orientation="right" />
                     <Tooltip />
                     <Legend />
-                    <Bar yAxisId="left" dataKey="count" fill="#8b5cf6" name="Event Count" />
-                    <Bar yAxisId="right" dataKey="amount" fill="#ec4899" name="Total Amount (FCFA)" />
+                    <Bar yAxisId="left" dataKey="count" fill="#8b5cf6" name={t("phase2.eventCount")} />
+                    <Bar yAxisId="right" dataKey="amount" fill="#ec4899" name={t("phase2.totalAmount")} />
                   </BarChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer></MobileChart>
               </CardContent>
             </Card>
           </TabsContent>
@@ -272,8 +279,8 @@ export default function AssistanceAnalytics() {
                 <CardTitle>{t("famAssistanceAnalytics.monthlyAssistanceTrends")}</CardTitle>
                 <CardDescription>{t("famAssistanceAnalytics.eventsAndSpendingOverThe")}</CardDescription>
               </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={400}>
+              <CardContent className="min-w-0">
+                <MobileChart><ResponsiveContainer width="100%" height={400}>
                   <LineChart data={monthlyTrends}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" />
@@ -281,10 +288,10 @@ export default function AssistanceAnalytics() {
                     <YAxis yAxisId="right" orientation="right" />
                     <Tooltip />
                     <Legend />
-                    <Line yAxisId="left" type="monotone" dataKey="count" stroke="#8b5cf6" name="Event Count" />
-                    <Line yAxisId="right" type="monotone" dataKey="amount" stroke="#ec4899" name="Total Amount (FCFA)" />
+                    <Line yAxisId="left" type="monotone" dataKey="count" stroke="#8b5cf6" name={t("phase2.eventCount")} />
+                    <Line yAxisId="right" type="monotone" dataKey="amount" stroke="#ec4899" name={t("phase2.totalAmount")} />
                   </LineChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer></MobileChart>
               </CardContent>
             </Card>
           </TabsContent>
@@ -295,23 +302,23 @@ export default function AssistanceAnalytics() {
                 <CardTitle>{t("famAssistanceAnalytics.memberLevelStatistics")}</CardTitle>
                 <CardDescription>{t("famAssistanceAnalytics.assistanceReceivedByFamilyMembers")}</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardContent className="min-w-0">
+                {isMobile ? <DataCards rows={memberStats} getRowKey={row => row.name} title={row => row.name} amount={row => row.total} columns={[{ key: "0", label: t("famAssistanceAnalytics.totalEvents"), render: row => row.count }]} /> : (<div className="space-y-4">
                   {memberStats.map((stat, index) => (
                     <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                       <div>
                         <p className="font-semibold">{stat.name}</p>
-                        <p className="text-sm text-muted-foreground">{stat.count} event{stat.count !== 1 ? 's' : ''}</p>
+                        <p className="text-sm text-muted-foreground">{t("phase2.eventsCount", { count: stat.count })}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold">{stat.total.toLocaleString()} FCFA</p>
+                        <p className="font-bold">{formatAmount(stat.total)}</p>
                       </div>
                     </div>
                   ))}
                   {memberStats.length === 0 && (
                     <p className="text-center text-muted-foreground py-8">{t("famAssistanceAnalytics.noAssistanceEventsRecorded")}</p>
                   )}
-                </div>
+                </div>)}
               </CardContent>
             </Card>
           </TabsContent>
@@ -322,16 +329,16 @@ export default function AssistanceAnalytics() {
                 <CardTitle>{t("famAssistanceAnalytics.paymentStatusDistribution")}</CardTitle>
                 <CardDescription>{t("famAssistanceAnalytics.paidVsPendingAssistanceEvents")}</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="min-w-0">
                 <div className="flex justify-center">
-                  <ResponsiveContainer width="100%" height={400}>
+                  <MobileChart><ResponsiveContainer width="100%" height={400}>
                     <PieChart>
                       <Pie
                         data={paymentStatusData}
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={({ name, value, amount }) => `${name}: ${value} (${amount.toLocaleString()} FCFA)`}
+                        label={({ name, value, amount }) => `${name}: ${value} (${formatAmount(amount)})`}
                         outerRadius={120}
                         fill="#8884d8"
                         dataKey="value"
@@ -342,7 +349,7 @@ export default function AssistanceAnalytics() {
                       </Pie>
                       <Tooltip />
                     </PieChart>
-                  </ResponsiveContainer>
+                  </ResponsiveContainer></MobileChart>
                 </div>
               </CardContent>
             </Card>

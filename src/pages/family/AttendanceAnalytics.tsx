@@ -1,3 +1,8 @@
+import { DataCards } from "@/components/layout/DataCards";
+import { useDevice } from "@/hooks/useDevice";
+import { AnalyticsKpis, AnalyticsSummary, AnalyticsFilters, MobileChart } from "@/components/analytics/MobileAnalytics";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { useCurrency } from "@/context/CurrencyContext";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -23,6 +28,8 @@ interface MemberStats {
 
 const AttendanceAnalytics = () => {
   const { t } = useTranslation();
+  const { isMobile } = useDevice();
+  const { formatAmount } = useCurrency();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -106,7 +113,8 @@ const AttendanceAnalytics = () => {
           });
         }
 
-        const stats = membersMap.get(memberId)!;
+        const stats = membersMap.get(memberId);
+        if (!stats) return;
         stats.total_meetings++;
         
         if (record.status === "present") stats.present++;
@@ -171,7 +179,7 @@ const AttendanceAnalytics = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      {isMobile ? <PageHeader title={t("phase2.attendanceTitle")} backTo={`/family/${familySlug}`} /> : (<header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
@@ -184,17 +192,17 @@ const AttendanceAnalytics = () => {
             </div>
           </div>
         </div>
-      </header>
+      </header>)}
 
       <main className="container mx-auto px-4 py-8 space-y-6">
         {/* Overview Stats */}
-        <div className="grid gap-4 md:grid-cols-4">
+        <AnalyticsKpis className="grid gap-4 md:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{t("famAttendanceAnalytics.totalMeetings")}</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="text-2xl font-bold">{overallStats.totalMeetings}</div>
             </CardContent>
           </Card>
@@ -204,7 +212,7 @@ const AttendanceAnalytics = () => {
               <CardTitle className="text-sm font-medium">{t("famAttendanceAnalytics.averageAttendance")}</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="text-2xl font-bold">{overallStats.averageAttendance}%</div>
             </CardContent>
           </Card>
@@ -214,8 +222,8 @@ const AttendanceAnalytics = () => {
               <CardTitle className="text-sm font-medium">{t("famAttendanceAnalytics.totalFines")}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{overallStats.totalFines} FCFA</div>
+            <CardContent className="min-w-0">
+              <div className="text-2xl font-bold">{formatAmount(overallStats.totalFines)}</div>
             </CardContent>
           </Card>
 
@@ -224,19 +232,19 @@ const AttendanceAnalytics = () => {
               <CardTitle className="text-sm font-medium">{t("famAttendanceAnalytics.bestAttender")}</CardTitle>
               <TrendingUp className="h-4 w-4 text-green-600" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="text-sm font-bold truncate">{overallStats.bestAttender}</div>
             </CardContent>
           </Card>
-        </div>
+        </AnalyticsKpis>
 
         {/* Attendance Rate Chart */}
         <Card>
           <CardHeader>
             <CardTitle>{t("famAttendanceAnalytics.attendanceRatesByMember")}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={400}>
+          <CardContent className="min-w-0">
+            <MobileChart><ResponsiveContainer width="100%" height={400}>
               <BarChart data={memberStats}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
@@ -248,9 +256,9 @@ const AttendanceAnalytics = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="attendance_rate" fill="hsl(var(--primary))" name="Attendance Rate %" />
+                <Bar dataKey="attendance_rate" fill="hsl(var(--primary))" name={t("phase2.attendancePercent")} />
               </BarChart>
-            </ResponsiveContainer>
+            </ResponsiveContainer></MobileChart>
           </CardContent>
         </Card>
 
@@ -259,8 +267,8 @@ const AttendanceAnalytics = () => {
           <CardHeader>
             <CardTitle>{t("famAttendanceAnalytics.detailedMemberStatistics")}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
+          <CardContent className="min-w-0">
+{isMobile ? <DataCards rows={memberStats} getRowKey={row => row.member_id} title={row => row.member_name} columns={[{ key: "0", label: t("famAttendanceAnalytics.meetings"), render: row => row.total_meetings }, { key: "1", label: t("famAttendanceAnalytics.rate"), render: row => <strong className="text-lg text-primary">{row.attendance_rate}%</strong> }, { key: "2", label: t("famAttendanceAnalytics.present"), render: row => row.present }, { key: "3", label: t("famAttendanceAnalytics.absent"), render: row => row.absent }, { key: "4", label: t("famAttendanceAnalytics.excused"), render: row => row.excused }, { key: "5", label: t("phase2.averageLate"), render: row => row.average_lateness }, { key: "6", label: t("famAttendanceAnalytics.fines"), render: row => formatAmount(row.total_fines) }]} /> : (            <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
@@ -270,7 +278,7 @@ const AttendanceAnalytics = () => {
                     <th className="text-center p-2">{t("famAttendanceAnalytics.absent")}</th>
                     <th className="text-center p-2">{t("famAttendanceAnalytics.excused")}</th>
                     <th className="text-center p-2">{t("famAttendanceAnalytics.rate")}</th>
-                    <th className="text-center p-2">Avg Late (min)</th>
+                    <th className="text-center p-2">{t("phase2.averageLate")}</th>
                     <th className="text-right p-2">{t("famAttendanceAnalytics.fines")}</th>
                   </tr>
                 </thead>
@@ -288,12 +296,12 @@ const AttendanceAnalytics = () => {
                         </span>
                       </td>
                       <td className="text-center p-2">{stats.average_lateness}</td>
-                      <td className="text-right p-2 font-medium">{stats.total_fines} FCFA</td>
+                      <td className="text-right p-2 font-medium">{formatAmount(stats.total_fines)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-            </div>
+            </div>)}
           </CardContent>
         </Card>
 
@@ -302,8 +310,8 @@ const AttendanceAnalytics = () => {
           <CardHeader>
             <CardTitle>{t("famAttendanceAnalytics.finesDistribution")}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+          <CardContent className="min-w-0">
+            <MobileChart><ResponsiveContainer width="100%" height={300}>
               <BarChart data={memberStats.filter(s => s.total_fines > 0)}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
@@ -315,9 +323,9 @@ const AttendanceAnalytics = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="total_fines" fill="#ef4444" name="Total Fines (FCFA)" />
+                <Bar dataKey="total_fines" fill="#ef4444" name={t("phase2.fines")} />
               </BarChart>
-            </ResponsiveContainer>
+            </ResponsiveContainer></MobileChart>
           </CardContent>
         </Card>
       </main>

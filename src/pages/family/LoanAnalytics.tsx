@@ -1,3 +1,7 @@
+import { useDevice } from "@/hooks/useDevice";
+import { AnalyticsKpis, AnalyticsSummary, AnalyticsFilters, MobileChart } from "@/components/analytics/MobileAnalytics";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { useCurrency } from "@/context/CurrencyContext";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -26,6 +30,8 @@ interface Loan {
 
 export default function LoanAnalytics() {
   const { t } = useTranslation();
+  const { isMobile } = useDevice();
+  const { formatAmount } = useCurrency();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -149,9 +155,9 @@ export default function LoanAnalytics() {
   const analytics = calculateAnalytics();
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
+        {isMobile ? <PageHeader title={t("famLoanAnalytics.loanAnalytics")} backTo={`/family/${familySlug}`} /> : (<div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}/loans`)}>
               <ArrowLeft className="h-5 w-5" />
@@ -159,17 +165,17 @@ export default function LoanAnalytics() {
             <h1 className="text-3xl font-bold">{t("famLoanAnalytics.loanAnalytics")}</h1>
           </div>
           <LanguageSwitcher />
-        </div>
+        </div>)}
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <AnalyticsKpis className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="p-6">
             <div className="flex items-center justify-between mb-2">
               <div className="text-sm text-muted-foreground">{t("famLoanAnalytics.totalDisbursed")}</div>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </div>
-            <div className="text-2xl font-bold">{analytics.totalDisbursed.toLocaleString()} FCFA</div>
-            <p className="text-xs text-muted-foreground mt-1">{analytics.disbursedCount} active loans</p>
+            <div className="text-2xl font-bold">{formatAmount(analytics.totalDisbursed)}</div>
+            <p className="text-xs text-muted-foreground mt-1">{t("phase2.activeLoanCount", { count: analytics.disbursedCount })}</p>
           </Card>
 
           <Card className="p-6">
@@ -177,8 +183,8 @@ export default function LoanAnalytics() {
               <div className="text-sm text-muted-foreground">{t("famLoanAnalytics.outstanding")}</div>
               <AlertTriangle className="h-4 w-4 text-orange-500" />
             </div>
-            <div className="text-2xl font-bold text-orange-600">{analytics.totalOutstanding.toLocaleString()} FCFA</div>
-            <p className="text-xs text-muted-foreground mt-1">{analytics.disbursedCount - analytics.repaidLoans} unpaid</p>
+            <div className="text-2xl font-bold text-orange-600">{formatAmount(analytics.totalOutstanding)}</div>
+            <p className="text-xs text-muted-foreground mt-1">{t("phase2.unpaidCount", { count: analytics.disbursedCount - analytics.repaidLoans })}</p>
           </Card>
 
           <Card className="p-6">
@@ -186,9 +192,9 @@ export default function LoanAnalytics() {
               <div className="text-sm text-muted-foreground">{t("famLoanAnalytics.interestRevenue")}</div>
               <TrendingUp className="h-4 w-4 text-green-500" />
             </div>
-            <div className="text-2xl font-bold text-green-600">{analytics.totalInterestCollected.toLocaleString()} FCFA</div>
+            <div className="text-2xl font-bold text-green-600">{formatAmount(analytics.totalInterestCollected)}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              {analytics.interestCollectionRate.toFixed(1)}% of expected
+              {t("phase2.expectedPercent", { percent: analytics.interestCollectionRate.toFixed(1) })}
             </p>
           </Card>
 
@@ -198,9 +204,9 @@ export default function LoanAnalytics() {
               <CheckCircle2 className="h-4 w-4 text-blue-500" />
             </div>
             <div className="text-2xl font-bold">{analytics.repaymentRate.toFixed(1)}%</div>
-            <p className="text-xs text-muted-foreground mt-1">{analytics.repaidLoans} fully repaid</p>
+            <p className="text-xs text-muted-foreground mt-1">{t("phase2.repaidCount", { count: analytics.repaidLoans })}</p>
           </Card>
-        </div>
+        </AnalyticsKpis>
 
         {/* Status Overview */}
         <Card className="p-6">
@@ -209,7 +215,7 @@ export default function LoanAnalytics() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium">{t("famLoanAnalytics.processingPipeline")}</span>
-                <span className="text-xs text-muted-foreground">{analytics.pendingLoans + analytics.approvedLoans} loans</span>
+                <span className="text-xs text-muted-foreground">{t("phase2.loanCount", { count: analytics.pendingLoans + analytics.approvedLoans })}</span>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
@@ -232,7 +238,7 @@ export default function LoanAnalytics() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium">{t("famLoanAnalytics.activeLoans")}</span>
-                <span className="text-xs text-muted-foreground">{analytics.disbursedCount} loans</span>
+                <span className="text-xs text-muted-foreground">{t("phase2.loanCount", { count: analytics.disbursedCount })}</span>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
@@ -255,16 +261,16 @@ export default function LoanAnalytics() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium">{t("famLoanAnalytics.completed")}</span>
-                <span className="text-xs text-muted-foreground">{analytics.repaidLoans} loans</span>
+                <span className="text-xs text-muted-foreground">{t("phase2.loanCount", { count: analytics.repaidLoans })}</span>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span>{t("famLoanAnalytics.principalRecovered")}</span>
-                  <span className="font-mono text-xs">{analytics.totalPrincipalRepaid.toLocaleString()} FCFA</span>
+                  <span className="font-mono text-xs">{formatAmount(analytics.totalPrincipalRepaid)}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span>{t("famLoanAnalytics.interestEarned")}</span>
-                  <span className="font-mono text-xs text-green-600">{analytics.totalInterestCollected.toLocaleString()} FCFA</span>
+                  <span className="font-mono text-xs text-green-600">{formatAmount(analytics.totalInterestCollected)}</span>
                 </div>
               </div>
             </div>
@@ -279,18 +285,18 @@ export default function LoanAnalytics() {
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>{t("famLoanAnalytics.collected")}</span>
-                  <span className="font-mono">{analytics.totalInterestCollected.toLocaleString()} FCFA</span>
+                  <span className="font-mono">{formatAmount(analytics.totalInterestCollected)}</span>
                 </div>
                 <Progress value={analytics.interestCollectionRate} className="h-2" />
                 <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                  <span>{analytics.interestCollectionRate.toFixed(1)}% of expected</span>
-                  <span>Target: {analytics.totalExpectedInterest.toLocaleString()} FCFA</span>
+                  <span>{t("phase2.expectedPercent", { percent: analytics.interestCollectionRate.toFixed(1) })}</span>
+                  <span>{t("phase2.target", { amount: formatAmount(analytics.totalExpectedInterest) })}</span>
                 </div>
               </div>
               <div className="pt-4 border-t">
                 <div className="text-sm text-muted-foreground mb-1">{t("famLoanAnalytics.uncollectedInterest")}</div>
                 <div className="text-xl font-bold text-orange-600">
-                  {(analytics.totalExpectedInterest - analytics.totalInterestCollected).toLocaleString()} FCFA
+                  {formatAmount((analytics.totalExpectedInterest - analytics.totalInterestCollected))}
                 </div>
               </div>
             </div>
@@ -303,7 +309,7 @@ export default function LoanAnalytics() {
                 <div className="flex justify-between text-sm mb-2">
                   <span>{t("famLoanAnalytics.riskLevel")}</span>
                   <Badge variant={analytics.defaultRisk > 30 ? "destructive" : analytics.defaultRisk > 15 ? "default" : "secondary"}>
-                    {analytics.defaultRisk > 30 ? "High" : analytics.defaultRisk > 15 ? "Medium" : "Low"}
+                    {t(analytics.defaultRisk > 30 ? "phase2.riskHigh" : analytics.defaultRisk > 15 ? "phase2.riskMedium" : "phase2.riskLow")}
                   </Badge>
                 </div>
                 <Progress 
@@ -311,17 +317,17 @@ export default function LoanAnalytics() {
                   className="h-2"
                 />
                 <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                  <span>{analytics.defaultRisk.toFixed(1)}% of active loans overdue</span>
+                  <span>{t("phase2.overduePercent", { percent: analytics.defaultRisk.toFixed(1) })}</span>
                   <span>{analytics.overdueLoans} / {analytics.disbursedCount}</span>
                 </div>
               </div>
               <div className="pt-4 border-t">
                 <div className="text-sm text-muted-foreground mb-1">{t("famLoanAnalytics.deadline")}</div>
                 <div className="text-lg font-semibold">
-                  November 30, {analytics.deadline.getFullYear()}
+                  {analytics.deadline.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {Math.ceil((analytics.deadline.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days remaining
+                  {t("phase2.daysRemaining", { count: Math.ceil((analytics.deadline.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) })}
                 </p>
               </div>
             </div>
@@ -338,12 +344,12 @@ export default function LoanAnalytics() {
             </div>
             <div>
               <div className="text-muted-foreground mb-1">{t("famLoanAnalytics.capitalDeployed")}</div>
-              <div className="text-xl font-semibold">{analytics.totalDisbursed.toLocaleString()}</div>
+              <div className="text-xl font-semibold">{formatAmount(analytics.totalDisbursed)}</div>
             </div>
             <div>
               <div className="text-muted-foreground mb-1">{t("famLoanAnalytics.expectedReturn")}</div>
               <div className="text-xl font-semibold text-green-600">
-                +{analytics.totalExpectedInterest.toLocaleString()}
+                {formatAmount(analytics.totalExpectedInterest)}
               </div>
             </div>
             <div>

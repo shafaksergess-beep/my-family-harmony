@@ -1,3 +1,7 @@
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { StatCarousel } from "@/components/layout/StatCarousel";
+import { useDevice } from "@/hooks/useDevice";
+import { AnalyticsKpis, AnalyticsSummary, AnalyticsFilters, MobileChart } from "@/components/analytics/MobileAnalytics";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
@@ -36,6 +40,7 @@ interface MemberOption {
 
 const FamilyAnalytics = () => {
   const { t } = useTranslation();
+  const { isMobile } = useDevice();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -178,7 +183,7 @@ const FamilyAnalytics = () => {
   }, [family?.id, loadMembers, loadHealthScore]);
 
   useEffect(() => {
-    if (family?.id && memberOptions.length > 0) {
+    if (family?.id) {
       loadAnalytics();
     }
   }, [family?.id, loadAnalytics, memberOptions]);
@@ -201,9 +206,9 @@ const FamilyAnalytics = () => {
   const currentMemberName = memberOptions.find((m) => m.memberId === selectedMemberId)?.name || "My";
 
   const kpiCards = [
-    { title: viewMode === "member" ? `${currentMemberName}'s Contributions` : "Total Contributions", value: formatAmount(kpis.totalContributions), icon: TrendingUp, description: viewMode === "member" ? "Member contributions" : "All-time contributions", color: "text-purple-600" },
+    { title: t("phase2.contribution"), value: formatAmount(kpis.totalContributions), icon: TrendingUp, description: viewMode === "member" ? "Member contributions" : "All-time contributions", color: "text-purple-600" },
     { title: t("famAnalytics.cashAtHand"), value: formatAmount(kpis.cashAtHand), icon: DollarSign, description: t("famAnalytics.availableFunds"), color: "text-emerald-600" },
-    { title: viewMode === "member" ? `${currentMemberName}'s Savings` : "Total Savings", value: formatAmount(kpis.totalSavings), icon: PiggyBank, description: t("famAnalytics.savingsTotal"), color: "text-blue-600" },
+    { title: t("mobileHome.mySavings"), value: formatAmount(kpis.totalSavings), icon: PiggyBank, description: t("famAnalytics.savingsTotal"), color: "text-blue-600" },
     { title: t("famAnalytics.activeLoans"), value: String(kpis.activeLoans), icon: CreditCard, description: `${formatAmount(kpis.totalLoansAmount)} outstanding`, color: "text-orange-600" },
     ...(viewMode === "family" ? [
       { title: t("famAnalytics.totalMembers"), value: String(kpis.totalMembers), icon: Users, description: t("famAnalytics.activeFamilyMembers"), color: "text-primary" },
@@ -220,17 +225,17 @@ const FamilyAnalytics = () => {
       <div className="border-b border-border bg-background">
         <div className="container mx-auto py-4 space-y-3">
           <PageHeader title={t('foundation.familyAnalytics', { name: family?.name ?? '' })} subtitle={t('famAnalytics.keyPerformanceIndicatorsAndInsights')} backTo={`/family/${familySlug}`} />
-          <div className="flex min-w-0 flex-wrap items-center gap-3">
-            <Select value={viewMode} onValueChange={v => { setViewMode(v as 'family' | 'member'); setLoading(true); }}>
+<AnalyticsFilters chips={viewMode === "member" ? [{ key: "mode", label: t("famAnalytics.myStats"), clear: () => { setViewMode("family"); setSelectedMemberId(""); } }, ...(selectedMemberId ? [{ key: "member", label: memberOptions.find(m => m.memberId === selectedMemberId)?.name ?? t("famAnalytics.myStats"), clear: () => setSelectedMemberId(memberId) }] : [])] : []}>          <div className="flex min-w-0 flex-wrap items-center gap-3">
+            <Select value={viewMode} onValueChange={v => { setViewMode(v as 'family' | 'member'); }}>
               <SelectTrigger className="w-full min-w-0 md:w-auto"><SelectValue /></SelectTrigger>
               <SelectContent><SelectItem value="family">{t('famAnalytics.familyOverview')}</SelectItem><SelectItem value="member">{t('famAnalytics.myStats')}</SelectItem></SelectContent>
             </Select>
-            {viewMode === 'member' && canManageFinances && <Select value={selectedMemberId} onValueChange={v => { setSelectedMemberId(v); setLoading(true); }}>
+            {viewMode === 'member' && canManageFinances && <Select value={selectedMemberId} onValueChange={v => { setSelectedMemberId(v); }}>
               <SelectTrigger className="w-full min-w-0 md:w-auto"><SelectValue placeholder={t('famAnalytics.selectMember')} /></SelectTrigger>
               <SelectContent>{memberOptions.map(m => <SelectItem key={m.memberId} value={m.memberId}>{m.name}</SelectItem>)}</SelectContent>
             </Select>}
             <LanguageSwitcher />
-          </div>
+          </div></AnalyticsFilters>
         </div>
       </div>
 
@@ -238,7 +243,7 @@ const FamilyAnalytics = () => {
         {/* AI Health Score - only in family view */}
         {viewMode === "family" && (
           <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <Card className={`${glassCardStyle} border-primary/30 dark:border-primary/20 overflow-hidden relative`}>
+{isMobile ? <Card className="rounded-2xl p-4"><div className="flex items-center justify-between gap-3"><h2 className="text-sm font-semibold">{t('famAnalytics.familyHealthScore')}</h2><span className="text-2xl font-bold text-primary">{healthScore?.score ?? t('phase2.unavailable')}</span></div>{fetchingHealth ? <p className="text-sm text-muted-foreground">{t('phase2.analyzing')}</p> : healthScore ? <><p className="mt-2 text-sm text-muted-foreground">{healthScore.analysis}</p><Accordion type="single" collapsible><AccordionItem value="recommendations"><AccordionTrigger>{t('famAnalytics.keyRecommendations')}</AccordionTrigger><AccordionContent><ul className="space-y-2">{healthScore.improvements?.map((tip,i) => <li key={i} className="text-sm">{tip}</li>)}</ul></AccordionContent></AccordionItem></Accordion></> : <p className="text-sm text-muted-foreground">{t('famAnalytics.noHealthAnalysisAvailable')}</p>}</Card> : (            <Card className={`${glassCardStyle} border-primary/30 dark:border-primary/20 overflow-hidden relative`}>
               <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -mr-20 -mt-20 z-0"></div>
               <CardHeader className="relative z-10">
                 <div className="flex items-center justify-between">
@@ -308,12 +313,12 @@ const FamilyAnalytics = () => {
                   <div className="p-8 text-center text-muted-foreground">{t("famAnalytics.noHealthAnalysisAvailable")}</div>
                 )}
               </CardContent>
-            </Card>
+            </Card>)}
           </section>
         )}
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {isMobile ? <StatCarousel items={kpiCards.map((k, i) => ({ key: String(i), label: k.title, value: k.value, icon: k.icon }))} /> : (<AnalyticsKpis className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {kpiCards.map((kpi, index) => (
             <Card key={index} className={glassCardStyle}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -322,13 +327,13 @@ const FamilyAnalytics = () => {
                   <kpi.icon className="h-4 w-4" />
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="min-w-0">
                 <div className="text-2xl font-black tracking-tighter">{kpi.value}</div>
                 <p className="text-[10px] text-muted-foreground mt-1 font-medium uppercase tracking-wider">{kpi.description}</p>
               </CardContent>
             </Card>
           ))}
-        </div>
+        </AnalyticsKpis>)}
 
         {/* Charts - only in family view */}
         {viewMode === "family" && (
@@ -348,7 +353,7 @@ const FamilyAnalytics = () => {
             <CardTitle>{t("famAnalytics.meetingStatistics")}</CardTitle>
             <CardDescription>{t("famAnalytics.overviewOfFamilyMeetings")}</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="min-w-0">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">{t("famAnalytics.completedMeetings")}</span>
               <span className="text-2xl font-bold text-primary">{kpis.completedMeetings}</span>

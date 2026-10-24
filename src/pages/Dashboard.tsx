@@ -18,6 +18,7 @@ import { PendingActionsWidget } from "@/components/dashboard/PendingActionsWidge
 import { FinancialOverviewWidget } from "@/components/dashboard/FinancialOverviewWidget";
 import { FamilyChatbot } from "@/components/chat/FamilyChatbot";
 import { NotificationInbox } from "@/components/NotificationInbox";
+import { MobileAdminHome } from "@/components/mobile/MobileAdminHome";
 import SEO from "@/components/SEO";
 
 interface UserFamily {
@@ -126,8 +127,8 @@ const Dashboard = () => {
   }
 
   // Show mobile dashboard on mobile devices (for non-super-admins)
-  if (isMobile && !isSuperAdmin) {
-    return <MobileDashboard />;
+  if (isMobile) {
+    return isSuperAdmin ? <MobileAdminHome /> : <MobileDashboard />;
   }
 
   return (

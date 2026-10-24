@@ -1,3 +1,8 @@
+import { DataCards } from "@/components/layout/DataCards";
+import { useDevice } from "@/hooks/useDevice";
+import { AnalyticsKpis, AnalyticsSummary, AnalyticsFilters, MobileChart } from "@/components/analytics/MobileAnalytics";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { useCurrency } from "@/context/CurrencyContext";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -39,6 +44,8 @@ interface FamilyStats {
 
 const GlobalAnalytics = () => {
   const { t } = useTranslation();
+  const { isMobile } = useDevice();
+  const { formatAmount } = useCurrency();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -188,13 +195,7 @@ const GlobalAnalytics = () => {
     }
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "XAF",
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
+  const formatCurrency = formatAmount;
 
   const COLORS = ["#8b5cf6", "#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
 
@@ -207,10 +208,10 @@ const GlobalAnalytics = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
+        {isMobile ? <PageHeader title={t("admGlobalAnalytics.globalAnalytics")} backTo={"/admin/dashboard"} /> : (<div className="flex items-center gap-4">
           <Button
             variant="ghost"
             size="icon"
@@ -224,10 +225,10 @@ const GlobalAnalytics = () => {
               {t("admGlobalAnalytics.overviewOfAllFamiliesIn")}
             </p>
           </div>
-        </div>
+        </div>)}
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <AnalyticsKpis className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">
@@ -235,7 +236,7 @@ const GlobalAnalytics = () => {
               </CardTitle>
               <Building2 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="text-2xl font-bold">{totalStats.totalFamilies}</div>
             </CardContent>
           </Card>
@@ -247,7 +248,7 @@ const GlobalAnalytics = () => {
               </CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="text-2xl font-bold">{totalStats.totalMembers}</div>
             </CardContent>
           </Card>
@@ -259,7 +260,7 @@ const GlobalAnalytics = () => {
               </CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="text-2xl font-bold">
                 {formatCurrency(totalStats.totalContributions)}
               </div>
@@ -271,7 +272,7 @@ const GlobalAnalytics = () => {
               <CardTitle className="text-sm font-medium">{t("admGlobalAnalytics.totalLoans")}</CardTitle>
               <CreditCard className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="text-2xl font-bold">
                 {formatCurrency(totalStats.totalLoans)}
               </div>
@@ -285,7 +286,7 @@ const GlobalAnalytics = () => {
               </CardTitle>
               <PiggyBank className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="text-2xl font-bold">
                 {formatCurrency(totalStats.totalSavings)}
               </div>
@@ -299,13 +300,13 @@ const GlobalAnalytics = () => {
               </CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="text-2xl font-bold">
                 {formatCurrency(totalStats.totalShares)}
               </div>
             </CardContent>
           </Card>
-        </div>
+        </AnalyticsKpis>
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -314,8 +315,8 @@ const GlobalAnalytics = () => {
             <CardHeader>
               <CardTitle>{t("admGlobalAnalytics.contributionsByFamily")}</CardTitle>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+            <CardContent className="min-w-0">
+              <MobileChart><ResponsiveContainer width="100%" height={300}>
                 <BarChart data={familyStats}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
@@ -328,7 +329,7 @@ const GlobalAnalytics = () => {
                   <Tooltip formatter={(value) => formatCurrency(Number(value))} />
                   <Bar dataKey="totalContributions" fill="#8b5cf6" />
                 </BarChart>
-              </ResponsiveContainer>
+              </ResponsiveContainer></MobileChart>
             </CardContent>
           </Card>
 
@@ -337,8 +338,8 @@ const GlobalAnalytics = () => {
             <CardHeader>
               <CardTitle>{t("admGlobalAnalytics.memberDistribution")}</CardTitle>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+            <CardContent className="min-w-0">
+              <MobileChart><ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
                     data={familyStats}
@@ -359,7 +360,7 @@ const GlobalAnalytics = () => {
                   <Tooltip />
                   <Legend />
                 </PieChart>
-              </ResponsiveContainer>
+              </ResponsiveContainer></MobileChart>
             </CardContent>
           </Card>
         </div>
@@ -369,8 +370,8 @@ const GlobalAnalytics = () => {
           <CardHeader>
             <CardTitle>{t("admGlobalAnalytics.familyDetails")}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
+          <CardContent className="min-w-0">
+{isMobile ? <DataCards rows={familyStats} getRowKey={row => row.id} title={row => row.name} amount={row => row.totalContributions} columns={[{ key: "0", label: t("admGlobalAnalytics.members"), render: row => row.memberCount }, { key: "1", label: t("admGlobalAnalytics.loans"), render: row => formatAmount(row.totalLoans) }, { key: "2", label: t("admGlobalAnalytics.savings"), render: row => formatAmount(row.totalSavings) }]} /> : (            <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
@@ -401,7 +402,7 @@ const GlobalAnalytics = () => {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </div>)}
           </CardContent>
         </Card>
       </div>

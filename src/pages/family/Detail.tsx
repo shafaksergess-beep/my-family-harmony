@@ -1,3 +1,5 @@
+import { PageHeader } from '@/components/layout/PageHeader';
+import { SegmentedTabs, SegmentedTabsList, SegmentedTabsTrigger, SegmentedTabsContent } from '@/components/layout/SegmentedTabs';
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -49,14 +51,15 @@ const FamilyDetail = () => {
   const { t } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
-  const { family, userRole, userRoles, userId, isLoading, isFamilyHead, isFamilyAdmin, isSuperAdmin } = useFamilyAuth(familySlug);
+  const { family, userRole, userRoles, userId, isLoading, isFamilyHead, isFamilyAdmin, isSuperAdmin, canManageFinances } = useFamilyAuth(familySlug);
   const { isMobile } = usePlatform();
   const [categories, setCategories] = useState<ModuleCategory[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [loadingModules, setLoadingModules] = useState(true);
   const [pendingApprovalsCount, setPendingApprovalsCount] = useState(0);
+  const [pendingProofsCount, setPendingProofsCount] = useState(0);
   const [modulesError, setModulesError] = useState<string | null>(null);
-  const { isModuleEnabled } = useFamilyModules(family?.id);
+  const { isModuleEnabled, disabledSlugs } = useFamilyModules(family?.id);
 
   
   const canManageInvitations = isFamilyHead || isFamilyAdmin;
@@ -85,6 +88,13 @@ const FamilyDetail = () => {
   }, [family, canManageInvitations]);
 
   useEffect(() => {
+    if (!family?.id || !canManageFinances) return;
+    let active = true;
+    supabase.from('payment_proofs').select('id', { count: 'exact', head: true }).eq('family_id', family.id).in('status', ['pending', 'partially_approved']).then(({ count }) => { if (active) setPendingProofsCount(count || 0); });
+    return () => { active = false; };
+  }, [family?.id, canManageFinances]);
+
+  useEffect(() => {
     const requestNotificationPermission = async () => {
       await notificationManager.requestPermission();
     };
@@ -109,7 +119,7 @@ const FamilyDetail = () => {
     if (isLoading) return;
     loadModulesAndCategories();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading, userRole]);
+  }, [isLoading, userRole, disabledSlugs]);
 
   const loadModulesAndCategories = async () => {
     try {
@@ -196,73 +206,65 @@ const FamilyDetail = () => {
   // Mobile layout
   if (isMobile) {
     return (
-      <MobileLayout
-        title={family?.name || 'Family'}
-        familySlug={familySlug}
-        showSearch={true}
-      >
+      <MobileLayout showHeader={false} familySlug={familySlug}>
+        <PageHeader title={family.name} backTo="/dashboard" badge={<Badge variant="secondary" className="max-w-20 truncate text-xs">{entityTerm(family.entity_type, t, 'singular')}</Badge>} actions={[
+          { key: 'invite', label: t('famDetail.inviteMembers'), icon: UserPlus, primary: true, hidden: !canManageInvitations, onClick: () => navigate(`/family/${familySlug}/invitations`) },
+          { key: 'approvals', label: t('phase2.pendingApprovals'), hidden: !canManageInvitations, onClick: () => navigate(`/family/${familySlug}/pending-approvals`) },
+          { key: 'modules', label: t('phase2.admin.modules'), hidden: !canManageInvitations && !isSuperAdmin, onClick: () => navigate(`/family/${familySlug}/module-settings`) },
+        ]} />
         <div className="p-4 space-y-6">
-          {/* Invite Members Button for Family Heads/Admins */}
-          {canManageInvitations && (
-            <Button 
-              onClick={() => navigate(`/family/${familySlug}/invitations`)}
-              className="w-full"
-              size="lg"
-            >
-              <UserPlus className="w-5 h-5 mr-2" />
-              {t("famDetail.inviteMembers")}
-            </Button>
-          )}
-          
+          {canManageInvitations && <><FamilyHealthWidget familyId={family.id} /><Button variant="outline" className="w-full justify-between" onClick={() => navigate(`/family/${familySlug}/pending-approvals`)}>{t('phase2.pendingApprovals')}<Badge variant="secondary">{pendingApprovalsCount}</Badge></Button></>}
           {family && canManageInvitations && <FamilyLifecycleBanner familyId={family.id} familySlug={familySlug} />}
-          {family && <FinancialWidget familyId={family.id} />}
+          {family && canManageFinances && <FinancialWidget familyId={family.id} />}
           
-          <Tabs defaultValue={categories[0]?.slug || "meetings"} className="space-y-4">
+          <SegmentedTabs defaultValue={categories[0]?.slug || "meetings"} className="space-y-4">
             <div className="overflow-x-auto pb-2 -mx-4 px-4 hide-scrollbar">
-              <TabsList className="inline-flex w-auto gap-1 bg-muted/50 p-1">
+              <SegmentedTabsList className="inline-flex w-auto gap-1 bg-muted/50 p-1">
                 {categories.map((category) => {
                   const Icon = getIconComponent(category.icon);
                   return (
-                    <TabsTrigger 
+                    <SegmentedTabsTrigger 
                       key={category.id} 
                       value={category.slug}
                       className="whitespace-nowrap px-3 py-2 data-[state=active]:bg-card"
                     >
                       <Icon className="w-4 h-4 mr-1.5" />
-                      <span className="text-xs">{category.name}</span>
-                    </TabsTrigger>
+                      <span className="text-xs">{t(`phase2.categories.${category.slug}`, { defaultValue: category.name })}</span>
+                    </SegmentedTabsTrigger>
                   );
                 })}
-              </TabsList>
+              </SegmentedTabsList>
             </div>
 
             {categories.map((category) => {
               const categoryModules = modules.filter(m => m.category_id === category.id);
               
               return (
-                <TabsContent key={category.id} value={category.slug} className="space-y-3 mt-0">
+                <SegmentedTabsContent key={category.id} value={category.slug} className="space-y-3 mt-0">
                   {categoryModules.map((module) => {
                     const Icon = getIconComponent(module.icon);
                     const path = module.route_path.replace(':familySlug', familySlug || '');
                     return (
-                      <Card 
+                      <Button variant="outline"
                         key={module.id} 
-                        className="p-4 active:bg-muted/50 transition-colors cursor-pointer"
+                        className="h-auto w-full justify-start rounded-2xl p-3 text-left"
                         onClick={() => handleModuleClick(path)}
                       >
-                        <div className="flex items-center gap-4">
+                        <div className="flex w-full min-w-0 items-center gap-3">
                           <div className={`p-3 rounded-xl bg-primary/10`}>
                             <Icon className="w-5 h-5 text-primary" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-sm">{module.name}</h3>
+                            <h3 className="font-semibold text-sm">{t(`phase2.modules.${module.slug}`, { defaultValue: module.name })}</h3>
                             <p className="text-xs text-muted-foreground truncate">
-                              {module.description}
+                              {t(`phase2.moduleDescriptions.${module.slug}`, { defaultValue: module.description ?? '' })}
                             </p>
                           </div>
+                          {module.slug === 'payment-proofs' && pendingProofsCount > 0 && <Badge variant="secondary">{pendingProofsCount}</Badge>}
+                          {module.slug === 'pending-approvals' && pendingApprovalsCount > 0 && <Badge variant="secondary">{pendingApprovalsCount}</Badge>}
                           <LucideIcons.ChevronRight className="w-5 h-5 text-muted-foreground" />
                         </div>
-                      </Card>
+                      </Button>
                     );
                   })}
                   {categoryModules.length === 0 && (
@@ -271,10 +273,10 @@ const FamilyDetail = () => {
                       <p className="text-sm">{t("famDetail.noModulesInThisCategory")}</p>
                     </div>
                   )}
-                </TabsContent>
+                </SegmentedTabsContent>
               );
             })}
-          </Tabs>
+          </SegmentedTabs>
         </div>
       </MobileLayout>
     );
@@ -329,7 +331,7 @@ const FamilyDetail = () => {
                 size="sm"
                 onClick={() => navigate(`/family/${family.slug}/pending-approvals`)}
               >
-                Pending approvals
+                {t("phase2.pendingApprovals")}
                 {pendingApprovalsCount > 0 && (
                   <span className="ml-2 inline-flex items-center justify-center rounded-full bg-background/20 px-2 py-0.5 text-xs font-semibold">
                     {pendingApprovalsCount}

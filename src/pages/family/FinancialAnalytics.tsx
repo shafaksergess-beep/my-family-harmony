@@ -1,3 +1,7 @@
+import { useDevice } from "@/hooks/useDevice";
+import { AnalyticsKpis, AnalyticsSummary, AnalyticsFilters, MobileChart } from "@/components/analytics/MobileAnalytics";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { useCurrency } from "@/context/CurrencyContext";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -26,6 +30,8 @@ const FinancialAnalytics = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { isMobile } = useDevice();
+  const { formatAmount } = useCurrency();
   const [loading, setLoading] = useState(true);
   const [family, setFamily] = useState<any>(null);
   const [metrics, setMetrics] = useState<FinancialMetrics>({
@@ -182,13 +188,7 @@ const FinancialAnalytics = () => {
     }
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'XAF',
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
+  const formatCurrency = formatAmount;
 
   if (loading) {
     return (
@@ -200,7 +200,7 @@ const FinancialAnalytics = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      {isMobile ? <PageHeader title={t("famFinancialAnalytics.financialAnalytics")} backTo={`/family/${familySlug}`} /> : (<header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -219,17 +219,17 @@ const FinancialAnalytics = () => {
             <LanguageSwitcher />
           </div>
         </div>
-      </header>
+      </header>)}
 
       <main className="container mx-auto px-4 py-8">
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <AnalyticsKpis className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{t("famFinancialAnalytics.totalContributions")}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="text-2xl font-bold">{formatCurrency(metrics.totalContributions)}</div>
             </CardContent>
           </Card>
@@ -239,7 +239,7 @@ const FinancialAnalytics = () => {
               <CardTitle className="text-sm font-medium">{t("famFinancialAnalytics.totalLoans")}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="text-2xl font-bold">{formatCurrency(metrics.totalLoans)}</div>
             </CardContent>
           </Card>
@@ -249,7 +249,7 @@ const FinancialAnalytics = () => {
               <CardTitle className="text-sm font-medium">{t("famFinancialAnalytics.loansOutstanding")}</CardTitle>
               <DollarSign className="h-4 w-4 text-red-500" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="text-2xl font-bold">{formatCurrency(metrics.loansOutstanding)}</div>
             </CardContent>
           </Card>
@@ -259,7 +259,7 @@ const FinancialAnalytics = () => {
               <CardTitle className="text-sm font-medium">{t("famFinancialAnalytics.totalSavings")}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="text-2xl font-bold">{formatCurrency(metrics.totalSavings)}</div>
             </CardContent>
           </Card>
@@ -269,11 +269,11 @@ const FinancialAnalytics = () => {
               <CardTitle className="text-sm font-medium">{t("famFinancialAnalytics.totalShares")}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="text-2xl font-bold">{formatCurrency(metrics.totalShares)}</div>
             </CardContent>
           </Card>
-        </div>
+        </AnalyticsKpis>
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -286,27 +286,27 @@ const FinancialAnalytics = () => {
               </CardTitle>
               <CardDescription>{t("famFinancialAnalytics.last6MonthsOverview")}</CardDescription>
             </CardHeader>
-            <CardContent>
-              <ChartContainer
+            <CardContent className="min-w-0">
+              <ChartContainer responsive={!isMobile}
                 config={{
                   contributions: { label: t("famFinancialAnalytics.contributions"), color: "hsl(var(--primary))" },
                   loans: { label: t("famFinancialAnalytics.loans"), color: "#3b82f6" },
                   savings: { label: t("famFinancialAnalytics.savings"), color: "#10b981" },
                 }}
-                className="h-[300px]"
+                className={isMobile ? "min-w-0 !block !aspect-auto" : "h-[300px]"}
               >
-                <ResponsiveContainer width="100%" height="100%">
+                <MobileChart><ResponsiveContainer width="100%" height="100%">
                   <LineChart data={metrics.monthlyTrend}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
                     <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <Legend />
-                    <Line type="monotone" dataKey="contributions" stroke="hsl(var(--primary))" strokeWidth={2} />
-                    <Line type="monotone" dataKey="loans" stroke="#3b82f6" strokeWidth={2} />
-                    <Line type="monotone" dataKey="savings" stroke="#10b981" strokeWidth={2} />
+                    <Line type="monotone" dataKey="contributions" name={t("famFinancialAnalytics.contributions")} stroke="hsl(var(--primary))" strokeWidth={2} />
+                    <Line type="monotone" dataKey="loans" name={t("famFinancialAnalytics.loans")} stroke="#3b82f6" strokeWidth={2} />
+                    <Line type="monotone" dataKey="savings" name={t("famFinancialAnalytics.savings")} stroke="#10b981" strokeWidth={2} />
                   </LineChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer></MobileChart>
               </ChartContainer>
             </CardContent>
           </Card>
@@ -320,15 +320,15 @@ const FinancialAnalytics = () => {
               </CardTitle>
               <CardDescription>{t("famFinancialAnalytics.distributionByStatus")}</CardDescription>
             </CardHeader>
-            <CardContent>
-              <ChartContainer
+            <CardContent className="min-w-0">
+              <ChartContainer responsive={!isMobile}
                 config={metrics.contributionStatus.reduce((acc, item) => ({
                   ...acc,
                   [item.status]: { label: item.status, color: item.fill },
                 }), {})}
-                className="h-[300px]"
+                className={isMobile ? "min-w-0 !block !aspect-auto" : "h-[300px]"}
               >
-                <ResponsiveContainer width="100%" height="100%">
+                <MobileChart><ResponsiveContainer width="100%" height="100%">
                   <RechartsPie>
                     <Pie
                       data={metrics.contributionStatus}
@@ -345,7 +345,7 @@ const FinancialAnalytics = () => {
                     </Pie>
                     <ChartTooltip content={<ChartTooltipContent />} />
                   </RechartsPie>
-                </ResponsiveContainer>
+                </ResponsiveContainer></MobileChart>
               </ChartContainer>
             </CardContent>
           </Card>
@@ -359,15 +359,15 @@ const FinancialAnalytics = () => {
               </CardTitle>
               <CardDescription>{t("famFinancialAnalytics.outstandingAmountsByStatus")}</CardDescription>
             </CardHeader>
-            <CardContent>
-              <ChartContainer
+            <CardContent className="min-w-0">
+              <ChartContainer responsive={!isMobile}
                 config={metrics.loanStatus.reduce((acc, item) => ({
                   ...acc,
                   [item.status]: { label: item.status, color: item.fill },
                 }), {})}
-                className="h-[300px]"
+                className={isMobile ? "min-w-0 !block !aspect-auto" : "h-[300px]"}
               >
-                <ResponsiveContainer width="100%" height="100%">
+                <MobileChart><ResponsiveContainer width="100%" height="100%">
                   <BarChart data={metrics.loanStatus}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="status" stroke="hsl(var(--muted-foreground))" fontSize={12} />
@@ -379,7 +379,7 @@ const FinancialAnalytics = () => {
                       ))}
                     </Bar>
                   </BarChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer></MobileChart>
               </ChartContainer>
             </CardContent>
           </Card>

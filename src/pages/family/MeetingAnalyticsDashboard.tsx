@@ -1,3 +1,7 @@
+import { useDevice } from "@/hooks/useDevice";
+import { AnalyticsKpis, AnalyticsSummary, AnalyticsFilters, MobileChart } from "@/components/analytics/MobileAnalytics";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { useCurrency } from "@/context/CurrencyContext";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -25,6 +29,8 @@ interface MeetingTypeStats {
 
 const MeetingAnalyticsDashboard = () => {
   const { t } = useTranslation();
+  const { isMobile } = useDevice();
+  const { formatAmount } = useCurrency();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -118,7 +124,7 @@ const MeetingAnalyticsDashboard = () => {
 
       const totalMeetings = meetingsData?.length || 0;
       const typeStatsArray: MeetingTypeStats[] = Array.from(typeMap.entries()).map(([type, count]) => ({
-        type: type.charAt(0).toUpperCase() + type.slice(1),
+        type: t(`phase2.meetingTypes.${type}`, { defaultValue: t("phase2.meeting") }),
         count,
         percentage: totalMeetings > 0 ? Math.round((count / totalMeetings) * 100) : 0,
       }));
@@ -162,7 +168,7 @@ const MeetingAnalyticsDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      {isMobile ? <PageHeader title={t("famMeetingAnalyticsDashboard.meetingAnalytics")} backTo={`/family/${familySlug}`} /> : (<header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
@@ -175,18 +181,18 @@ const MeetingAnalyticsDashboard = () => {
             </div>
           </div>
         </div>
-      </header>
+      </header>)}
 
       <main className="container mx-auto px-4 py-8 space-y-6">
         {/* Overview Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <AnalyticsKpis className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {t("famMeetingAnalyticsDashboard.totalMeetings")}
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-primary" />
                 <div className="text-3xl font-bold">{overallStats.totalMeetings}</div>
@@ -201,7 +207,7 @@ const MeetingAnalyticsDashboard = () => {
                 {t("famMeetingAnalyticsDashboard.avgAttendanceRate")}
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-green-500" />
                 <div className="text-3xl font-bold">{overallStats.avgAttendanceRate}%</div>
@@ -216,7 +222,7 @@ const MeetingAnalyticsDashboard = () => {
                 {t("famMeetingAnalyticsDashboard.totalMembers")}
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-blue-500" />
                 <div className="text-3xl font-bold">{overallStats.totalMembers}</div>
@@ -231,7 +237,7 @@ const MeetingAnalyticsDashboard = () => {
                 {t("famMeetingAnalyticsDashboard.completionRate")}
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
               <div className="flex items-center gap-2">
                 <Clock className="w-5 h-5 text-purple-500" />
                 <div className="text-3xl font-bold">{overallStats.completionRate}%</div>
@@ -239,7 +245,7 @@ const MeetingAnalyticsDashboard = () => {
               <p className="text-xs text-muted-foreground mt-1">{t("famMeetingAnalyticsDashboard.meetingsCompleted")}</p>
             </CardContent>
           </Card>
-        </div>
+        </AnalyticsKpis>
 
         {/* Monthly Trends */}
         <Card>
@@ -247,8 +253,8 @@ const MeetingAnalyticsDashboard = () => {
             <CardTitle>{t("famMeetingAnalyticsDashboard.meetingFrequencyAttendanceTrends")}</CardTitle>
             <CardDescription>{t("famMeetingAnalyticsDashboard.monthlyMeetingCountAndAttendance")}</CardDescription>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+          <CardContent className="min-w-0">
+            <MobileChart><ResponsiveContainer width="100%" height={300}>
               <LineChart data={monthlyStats}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
@@ -261,7 +267,7 @@ const MeetingAnalyticsDashboard = () => {
                   type="monotone"
                   dataKey="meetings"
                   stroke="#10b981"
-                  name="Meetings"
+                  name={t("phase2.meeting")}
                   strokeWidth={2}
                 />
                 <Line
@@ -269,11 +275,11 @@ const MeetingAnalyticsDashboard = () => {
                   type="monotone"
                   dataKey="avgAttendance"
                   stroke="#3b82f6"
-                  name="Avg Attendance %"
+                  name={t("phase2.avgAttendance")}
                   strokeWidth={2}
                 />
               </LineChart>
-            </ResponsiveContainer>
+            </ResponsiveContainer></MobileChart>
           </CardContent>
         </Card>
 
@@ -284,8 +290,8 @@ const MeetingAnalyticsDashboard = () => {
               <CardTitle>{t("famMeetingAnalyticsDashboard.meetingTypeDistribution")}</CardTitle>
               <CardDescription>{t("famMeetingAnalyticsDashboard.breakdownOfMeetingsByType")}</CardDescription>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+            <CardContent className="min-w-0">
+              <MobileChart><ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
                     data={meetingTypeStats}
@@ -302,7 +308,7 @@ const MeetingAnalyticsDashboard = () => {
                   </Pie>
                   <Tooltip />
                 </PieChart>
-              </ResponsiveContainer>
+              </ResponsiveContainer></MobileChart>
             </CardContent>
           </Card>
 
@@ -312,16 +318,16 @@ const MeetingAnalyticsDashboard = () => {
               <CardTitle>{t("famMeetingAnalyticsDashboard.monthlyMeetingCount")}</CardTitle>
               <CardDescription>{t("famMeetingAnalyticsDashboard.numberOfMeetingsHeldEach")}</CardDescription>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+            <CardContent className="min-w-0">
+              <MobileChart><ResponsiveContainer width="100%" height={300}>
                 <BarChart data={monthlyStats}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
                   <YAxis />
                   <Tooltip />
-                  <Bar dataKey="meetings" fill="#10b981" name="Meetings" />
+                  <Bar dataKey="meetings" fill="#10b981" name={t("phase2.meeting")} />
                 </BarChart>
-              </ResponsiveContainer>
+              </ResponsiveContainer></MobileChart>
             </CardContent>
           </Card>
         </div>

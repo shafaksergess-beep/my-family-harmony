@@ -36,12 +36,13 @@ import { OfflineIndicator } from './OfflineIndicator';
 import { DashboardSkeleton } from './SkeletonCard';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { useCurrency } from '@/context/CurrencyContext';
+import { fr, enUS } from 'date-fns/locale';
+import { StatCarousel } from '@/components/layout/StatCarousel';
+import { useFamilyAuth } from '@/hooks/useFamilyAuth';
+import { useFamilyModules } from '@/hooks/useFamilyModules';
+import { JoinFamilyCard } from '@/components/dashboard/JoinFamilyCard';
+import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogHeader, ResponsiveDialogTitle, ResponsiveDialogDescription } from '@/components/ui/responsive-dialog';
 
 interface UserFamily {
   family_id: string;
@@ -70,7 +71,11 @@ interface ActivityItem {
 
 export function MobileDashboard() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { formatAmount } = useCurrency();
+  const dateLocale = i18n.language.startsWith('fr') ? fr : enUS;
+  const [switcherOpen, setSwitcherOpen] = useState(false);
+  const [attention, setAttention] = useState<{ key: string; count: number; path: string }[]>([]);
   const { isOnline } = useOnlineStatus();
   const [loading, setLoading] = useState(true);
   const [userFamilies, setUserFamilies] = useState<UserFamily[]>([]);
@@ -109,7 +114,7 @@ export function MobileDashboard() {
       setUserFamilies(familiesData || []);
 
       if (familiesData && familiesData.length > 0) {
-        const family = selectedFamily || familiesData[0];
+        const family = familiesData.find(f => f.family_id === (selectedFamily?.family_id || localStorage.getItem('kinsroot-last-family'))) || familiesData[0];
         setSelectedFamily(family);
         await loadFamilyStats(family.family_id, session.user.id);
       }
@@ -121,6 +126,10 @@ export function MobileDashboard() {
   }, [navigate, selectedFamily]);
 
   const loadFamilyStats = async (familyId: string, userId: string) => {
+    setStats({ pendingContributions: 0, totalSavings: 0, activeLoans: 0, upcomingMeetings: 0, nextMeetingDate: null });
+    setActivities([]);
+    setAttention([]);
+    setMemberId(null);
     try {
       // Get member ID
       const { data: memberData } = await supabase
@@ -199,11 +208,11 @@ export function MobileDashboard() {
         activityItems.push({
           id: `contrib-${c.id}`,
           type: 'contribution',
-          title: `${c.type} Contribution`,
-          description: `${c.status === 'paid' ? 'Paid' : 'Pending'} - ${c.amount.toLocaleString()} FCFA`,
+          title: t('phase2.contribution'),
+          description: `${t(c.status === 'paid' ? 'phase2.paid' : 'phase2.pending')} · ${formatAmount(Number(c.amount))}`,
           timestamp: c.created_at,
           icon: c.status === 'paid' ? CheckCircle : Clock,
-          iconBg: c.status === 'paid' ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600',
+          iconBg: c.status === 'paid' ? 'bg-primary/10 text-primary' : 'bg-amber-100 text-amber-600',
         });
       });
 
@@ -219,11 +228,11 @@ export function MobileDashboard() {
         activityItems.push({
           id: `loan-${l.id}`,
           type: 'loan',
-          title: 'Loan Request',
-          description: `${l.status} - ${l.amount.toLocaleString()} FCFA`,
+          title: t('phase2.loanRequest'),
+          description: `${t(`phase2.status.${l.status}`, { defaultValue: t('phase2.loanRequest') })} · ${formatAmount(Number(l.amount))}`,
           timestamp: l.created_at,
           icon: HandCoins,
-          iconBg: 'bg-blue-100 text-blue-600',
+          iconBg: 'bg-secondary/20 text-foreground',
         });
       });
 
@@ -240,11 +249,11 @@ export function MobileDashboard() {
         activityItems.push({
           id: `meeting-${m.id}`,
           type: 'meeting',
-          title: `${m.meeting_type} Meeting`,
-          description: format(new Date(m.meeting_date), 'EEEE, MMM d'),
+          title: t('phase2.meeting'),
+          description: format(new Date(m.meeting_date), 'EEEE, MMM d', { locale: dateLocale }),
           timestamp: m.meeting_date,
           icon: Calendar,
-          iconBg: 'bg-purple-100 text-purple-600',
+          iconBg: 'bg-accent/20 text-accent-foreground',
         });
       });
 
@@ -266,6 +275,8 @@ export function MobileDashboard() {
   const handleFamilyChange = async (family: UserFamily) => {
     await haptics.selection();
     setSelectedFamily(family);
+    localStorage.setItem('kinsroot-last-family', family.family_id);
+    setSwitcherOpen(false);
     setLoading(true);
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
@@ -306,6 +317,26 @@ export function MobileDashboard() {
   const alertCount = alertCounts ? totalAlerts(alertCounts) : 0;
 
   const slug = selectedFamily?.family_slug;
+  const { canManageLoans, canManageMembers } = useFamilyAuth(slug);
+  const { isModuleEnabled, disabledSlugs } = useFamilyModules(selectedFamily?.family_id);
+  useEffect(() => {
+    if (!selectedFamily?.family_id) return;
+    let active = true;
+    const load = async () => {
+      const items = [{ key: 'dues', count: stats.pendingContributions, path: 'contributions' }];
+      if (canManageLoans && isModuleEnabled('loans')) {
+        const { count } = await supabase.from('loans').select('id', { count: 'exact', head: true }).eq('family_id', selectedFamily.family_id).eq('status', 'pending');
+        items.push({ key: 'loanReview', count: count || 0, path: 'loan-committee' });
+      }
+      if (canManageMembers) {
+        const { count } = await supabase.from('join_requests').select('id', { count: 'exact', head: true }).eq('family_id', selectedFamily.family_id).eq('status', 'pending');
+        items.push({ key: 'joinReview', count: count || 0, path: 'pending-approvals' });
+      }
+      if (active) setAttention(items.filter(i => i.count > 0 && (i.key !== 'dues' || isModuleEnabled('contributions'))));
+    };
+    load(); return () => { active = false; };
+  }, [selectedFamily?.family_id, canManageLoans, canManageMembers, stats.pendingContributions, disabledSlugs]);
+  useEffect(() => { if (selectedFamily) loadActivities(selectedFamily.family_id); }, [selectedFamily?.family_id, i18n.language, formatAmount]);
   const go = async (path: string) => {
     await haptics.light();
     navigate(path);
@@ -353,9 +384,9 @@ export function MobileDashboard() {
           <div aria-hidden className="pointer-events-none absolute right-16 top-20 h-24 w-24 rounded-full bg-accent/20" />
           </div>
 
-          <div className="relative flex items-center justify-between">
+          <div className="relative flex !flex-nowrap items-center justify-between">
             <h1 className="text-3xl font-bold tracking-tight">Kinsroot</h1>
-            <button
+            <Button variant="ghost"
               aria-label={alertCount > 0 ? t('mobileSearch.bellUnread', { count: alertCount }) : t('mobileHome.notifications')}
               onClick={() => slug && go(alertCounts && alertCounts.unreadNotifications === 0 && alertCounts.newMessages > 0 ? `/family/${slug}/chat` : alertCounts && alertCounts.unreadNotifications === 0 && alertCounts.pendingDues > 0 ? `/family/${slug}/contributions` : `/family/${slug}/notifications`)}
               className="relative flex h-11 w-11 items-center justify-center rounded-full bg-primary-foreground/10 active:scale-95 transition-transform"
@@ -364,62 +395,47 @@ export function MobileDashboard() {
               {alertCount > 0 && (
                 <span data-testid="bell-dot" className="absolute right-2.5 top-2.5 h-2.5 w-2.5 rounded-full bg-destructive ring-2 ring-primary" />
               )}
-            </button>
+            </Button>
           </div>
 
           {userFamilies.length > 0 && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button id="families" className="relative mt-4 flex w-full items-center gap-2 text-left">
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-lg font-semibold">
-                      {selectedFamily?.family_name || t('mobileHome.selectFamily')}
-                    </span>
-                    <span className="block text-xs capitalize opacity-80">
-                      {selectedFamily?.user_role.replace(/_/g, ' ')}
-                    </span>
-                  </span>
-                  {userFamilies.length > 1 && <ChevronDown className="h-5 w-5 shrink-0" />}
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-72">
-                {userFamilies.map((family) => (
-                  <DropdownMenuItem key={family.family_id} onClick={() => handleFamilyChange(family)} className="py-3">
-                    <div className="flex w-full items-center gap-3">
-                      <Building2 className="h-5 w-5 text-primary" />
-                      <div className="flex-1">
-                        <p className="font-medium">{family.family_name}</p>
-                        <p className="text-xs capitalize text-muted-foreground">{family.user_role.replace(/_/g, ' ')}</p>
-                      </div>
-                      {selectedFamily?.family_id === family.family_id && <CheckCircle className="h-4 w-4 text-primary" />}
-                    </div>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <>
+              <Button variant="ghost" id="families" onClick={() => setSwitcherOpen(true)} className="relative mt-4 h-auto w-full justify-start gap-2 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
+                <span className="min-w-0 flex-1 text-left"><span className="block truncate text-lg font-semibold">{selectedFamily?.family_name || t('mobileHome.selectFamily')}</span><span className="block text-xs opacity-80">{t(`roles.${selectedFamily?.user_role}`, { defaultValue: t('roles.member') })}</span></span><ChevronDown className="h-5 w-5 shrink-0" />
+              </Button>
+              <ResponsiveDialog open={switcherOpen} onOpenChange={setSwitcherOpen}><ResponsiveDialogContent><ResponsiveDialogHeader><ResponsiveDialogTitle>{t('mobileHome.selectFamily')}</ResponsiveDialogTitle><ResponsiveDialogDescription>{t('phase2.switchFamily')}</ResponsiveDialogDescription></ResponsiveDialogHeader><div className="space-y-2 py-4">{userFamilies.map(family => <Button variant="ghost" key={family.family_id} onClick={() => handleFamilyChange(family)} className="h-auto w-full justify-start gap-3 py-3"><Building2 className="h-5 w-5 shrink-0 text-primary" /><span className="min-w-0 flex-1 truncate text-left">{family.family_name}</span><Badge variant="secondary" className="max-w-[45%] whitespace-normal">{t(`roles.${family.user_role}`, { defaultValue: t('roles.member') })}</Badge>{selectedFamily?.family_id === family.family_id && <CheckCircle className="h-4 w-4 shrink-0 text-primary" />}</Button>)}</div></ResponsiveDialogContent></ResponsiveDialog>
+            </>
           )}
 
           <MobileSearch familyId={selectedFamily?.family_id} familySlug={slug} />
         </header>
 
         <div className="space-y-7 px-4 pt-6 pb-4">
+          {slug && <StatCarousel items={[
+            { key: 'savings', label: t('mobileHome.mySavings'), value: formatAmount(stats.totalSavings), icon: PiggyBank, onClick: () => go(`/family/${slug}/savings`) },
+            { key: 'loans', label: t('mobileHome.activeLoans'), value: stats.activeLoans, icon: HandCoins, onClick: () => go(`/family/${slug}/loans`) },
+            { key: 'dues', label: t('mobileHome.dues'), value: stats.pendingContributions, icon: Wallet, onClick: () => go(`/family/${slug}/contributions`) },
+            { key: 'meeting', label: t('mobileHome.nextMeeting'), value: stats.nextMeetingDate ? format(new Date(stats.nextMeetingDate), 'dd MMM', { locale: dateLocale }) : t('mobileHome.noneScheduled'), icon: Calendar, onClick: () => go(`/family/${slug}/meetings`) },
+          ].filter(item => isModuleEnabled(item.key === 'dues' ? 'contributions' : item.key === 'meeting' ? 'meetings' : item.key))} />}
+          {attention.length > 0 && <section><h2 className="mb-3 text-lg font-semibold">{t('phase2.attention')}</h2><div className="space-y-2">{attention.map(item => <Button variant="outline" key={item.key} className="h-auto w-full justify-between gap-2 rounded-2xl py-3" onClick={() => go(`/family/${slug}/${item.path}`)}><span className="min-w-0 text-left">{t(`phase2.${item.key}`)}</span><Badge variant="secondary">{item.count}</Badge><ChevronRight className="h-4 w-4 shrink-0" /></Button>)}</div></section>}
+          {!userFamilies.length && <><p className="text-sm text-muted-foreground">{t(isOnline ? 'phase2.noFamily' : 'phase2.offlineEmpty')}</p>{isOnline && <JoinFamilyCard />}</>}
           {/* Quick actions */}
           <section>
             <h2 className="mb-3 px-1 text-xl font-bold text-foreground">{t('mobileHome.quickActions')}</h2>
             <div className="grid grid-cols-4 gap-x-2 gap-y-4">
-              {tiles.map((tile) => {
+              {tiles.filter(tile => isModuleEnabled(tile.path.split('/').pop() ?? '')).map((tile) => {
                 const Icon = tile.icon;
                 return (
-                  <button
+                  <Button variant="ghost"
                     key={tile.label}
                     onClick={() => go(tile.path)}
-                    className="flex min-h-[88px] flex-col items-center gap-2 active:scale-95 transition-transform"
+                    className="h-auto p-0 hover:bg-transparent flex min-h-[88px] flex-col items-center gap-2 active:scale-95 transition-transform"
                   >
                     <span className={cn('flex h-16 w-16 items-center justify-center rounded-2xl shadow-sm', tile.tone)}>
                       <Icon className="h-7 w-7" />
                     </span>
                     <span className="text-center text-xs font-medium leading-tight text-foreground">{tile.label}</span>
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -451,7 +467,7 @@ export function MobileDashboard() {
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-foreground">{t('mobileHome.nextMeeting')}</p>
                 <p className="truncate text-xs text-muted-foreground">
-                  {stats.nextMeetingDate ? format(new Date(stats.nextMeetingDate), 'EEE, MMM d') : t('mobileHome.noneScheduled')}
+                  {stats.nextMeetingDate ? format(new Date(stats.nextMeetingDate), 'EEE, MMM d', { locale: dateLocale }) : t('mobileHome.noneScheduled')}
                 </p>
               </div>
               <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -462,7 +478,7 @@ export function MobileDashboard() {
           <Card className="flex items-center justify-between rounded-2xl bg-secondary/20 p-4">
             <div>
               <p className="text-xs text-muted-foreground">{t('mobileHome.mySavings')}</p>
-              <p className="text-2xl font-bold text-foreground">{stats.totalSavings.toLocaleString()} FCFA</p>
+              <p className="text-2xl font-bold text-foreground">{formatAmount(stats.totalSavings)}</p>
             </div>
             <div className="text-right">
               <p className="text-xs text-muted-foreground">{t('mobileHome.activeLoans')}</p>
@@ -474,12 +490,12 @@ export function MobileDashboard() {
           <section id="notifications">
             <div className="mb-3 flex items-center justify-between px-1">
               <h2 className="text-xl font-bold text-foreground">{t('mobileHome.recentActivity')}</h2>
-              <button
+              <Button variant="ghost"
                 onClick={() => slug && go(`/family/${slug}/notifications`)}
                 className="min-h-[44px] px-2 text-sm font-semibold text-primary"
               >
                 {t('mobileHome.seeAll')}
-              </button>
+              </Button>
             </div>
             {activities.length > 0 ? (
               <div className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2 scrollbar-hide">
@@ -494,7 +510,7 @@ export function MobileDashboard() {
                         <p className="truncate text-sm font-semibold capitalize text-foreground">{activity.title}</p>
                         <p className="truncate text-xs text-muted-foreground">{activity.description}</p>
                         <p className="mt-1 text-[11px] text-muted-foreground">
-                          {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })}
+                          {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true, locale: dateLocale })}
                         </p>
                       </div>
                     </Card>
@@ -504,7 +520,7 @@ export function MobileDashboard() {
             ) : (
               <Card className="rounded-2xl p-8 text-center text-muted-foreground">
                 <Clock className="mx-auto mb-2 h-8 w-8 opacity-50" />
-                <p className="text-sm">{t('mobileHome.noActivity')}</p>
+                <p className="text-sm">{t(isOnline ? 'mobileHome.noActivity' : 'phase2.offlineEmpty')}</p>
               </Card>
             )}
           </section>

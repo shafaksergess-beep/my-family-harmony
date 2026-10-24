@@ -1,3 +1,7 @@
+import { useTranslation } from "react-i18next";
+import { useDevice } from "@/hooks/useDevice";
+import { useCurrency } from "@/context/CurrencyContext";
+import { MobileChart } from "./MobileAnalytics";
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
@@ -16,6 +20,7 @@ interface ChartDataPoint {
 }
 
 export function LoanRepaymentChart({ familyId }: LoanRepaymentChartProps) {
+  const { t } = useTranslation(); const { isMobile } = useDevice(); const { formatAmount } = useCurrency();
   const [data, setData] = useState<ChartDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalOutstanding, setTotalOutstanding] = useState(0);
@@ -102,25 +107,25 @@ export function LoanRepaymentChart({ familyId }: LoanRepaymentChartProps) {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <CardTitle className="flex items-center gap-2">
               <CreditCard className="h-5 w-5 text-orange-600" />
-              Loan Repayment History
+              {t("phase2.repaymentHistory")}
             </CardTitle>
-            <CardDescription>Monthly loan repayments over the past year</CardDescription>
+            <CardDescription>{t("phase2.repaymentDescription")}</CardDescription>
           </div>
           <div className="text-right">
-            <p className="text-sm text-muted-foreground">Outstanding</p>
+            <p className="text-sm text-muted-foreground">{t("phase2.outstanding")}</p>
             <p className="text-lg font-bold text-orange-600">
-              {totalOutstanding.toLocaleString()} FCFA
+              {formatAmount(totalOutstanding)}
             </p>
           </div>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className={isMobile ? "min-w-0" : "h-[300px]"}>
+          <MobileChart><ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
               <XAxis 
@@ -133,24 +138,24 @@ export function LoanRepaymentChart({ familyId }: LoanRepaymentChartProps) {
                 tick={{ fontSize: 12 }}
               />
               <Tooltip 
-                formatter={(value: number) => [`${value.toLocaleString()} FCFA`, 'Repaid']}
+                formatter={(value: number) => [`${formatAmount(value)}`, t('phase2.amountRepaid')]}
                 labelStyle={{ fontWeight: 'bold' }}
               />
               <Legend />
               <Bar 
                 dataKey="repaid" 
-                name="Amount Repaid"
+                name={t("phase2.amountRepaid")}
                 fill="hsl(var(--primary))"
                 radius={[4, 4, 0, 0]}
               />
             </BarChart>
-          </ResponsiveContainer>
+          </ResponsiveContainer></MobileChart>
         </div>
         <div className="mt-4 flex justify-center gap-8 text-sm">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded bg-primary" />
             <span className="text-muted-foreground">
-              Total Repaid: <span className="font-medium text-foreground">{totalRepaid.toLocaleString()} FCFA</span>
+              {t("phase2.totalRepaid")} <span className="font-medium text-foreground">{formatAmount(totalRepaid)}</span>
             </span>
           </div>
         </div>

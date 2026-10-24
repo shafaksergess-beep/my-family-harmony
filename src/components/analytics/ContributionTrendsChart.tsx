@@ -1,3 +1,7 @@
+import { useTranslation } from "react-i18next";
+import { useDevice } from "@/hooks/useDevice";
+import { useCurrency } from "@/context/CurrencyContext";
+import { MobileChart } from "./MobileAnalytics";
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
@@ -18,6 +22,7 @@ interface ChartDataPoint {
 }
 
 export function ContributionTrendsChart({ familyId }: ContributionTrendsChartProps) {
+  const { t } = useTranslation(); const { isMobile } = useDevice(); const { formatAmount } = useCurrency();
   const [data, setData] = useState<ChartDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -104,25 +109,25 @@ export function ContributionTrendsChart({ familyId }: ContributionTrendsChartPro
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-purple-600" />
-              Contribution Trends
+              {t("phase2.contributionTrends")}
             </CardTitle>
-            <CardDescription>Monthly contribution patterns by type</CardDescription>
+            <CardDescription>{t("phase2.contributionDescription")}</CardDescription>
           </div>
           <div className="text-right">
-            <p className="text-sm text-muted-foreground">12-Month Total</p>
+            <p className="text-sm text-muted-foreground">{t("phase2.yearTotal")}</p>
             <p className="text-lg font-bold text-primary">
-              {totalContributions.toLocaleString()} FCFA
+              {formatAmount(totalContributions)}
             </p>
           </div>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className={isMobile ? "min-w-0" : "h-[300px]"}>
+          <MobileChart><ResponsiveContainer width="100%" height="100%">
             <AreaChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
               <defs>
                 <linearGradient id="colorMonthly" x1="0" y1="0" x2="0" y2="1">
@@ -130,12 +135,12 @@ export function ContributionTrendsChart({ familyId }: ContributionTrendsChartPro
                   <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
                 </linearGradient>
                 <linearGradient id="colorSpecial" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(262, 83%, 58%)" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="hsl(262, 83%, 58%)" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="hsl(var(--secondary))" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="hsl(var(--secondary))" stopOpacity={0}/>
                 </linearGradient>
                 <linearGradient id="colorFines" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(0, 84%, 60%)" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="hsl(0, 84%, 60%)" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0}/>
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
@@ -150,7 +155,7 @@ export function ContributionTrendsChart({ familyId }: ContributionTrendsChartPro
               />
               <Tooltip 
                 formatter={(value: number, name: string) => [
-                  `${value.toLocaleString()} FCFA`, 
+                  `${formatAmount(value)}`, 
                   name.charAt(0).toUpperCase() + name.slice(1)
                 ]}
                 labelStyle={{ fontWeight: 'bold' }}
@@ -159,7 +164,7 @@ export function ContributionTrendsChart({ familyId }: ContributionTrendsChartPro
               <Area 
                 type="monotone" 
                 dataKey="monthly" 
-                name="Monthly"
+                name={t("phase2.monthly")}
                 stroke="hsl(var(--primary))"
                 fillOpacity={1}
                 fill="url(#colorMonthly)"
@@ -168,8 +173,8 @@ export function ContributionTrendsChart({ familyId }: ContributionTrendsChartPro
               <Area 
                 type="monotone" 
                 dataKey="special" 
-                name="Special"
-                stroke="hsl(262, 83%, 58%)"
+                name={t("phase2.special")}
+                stroke="hsl(var(--secondary))"
                 fillOpacity={1}
                 fill="url(#colorSpecial)"
                 stackId="1"
@@ -177,14 +182,14 @@ export function ContributionTrendsChart({ familyId }: ContributionTrendsChartPro
               <Area 
                 type="monotone" 
                 dataKey="fines" 
-                name="Fines"
-                stroke="hsl(0, 84%, 60%)"
+                name={t("phase2.fines")}
+                stroke="hsl(var(--accent))"
                 fillOpacity={1}
                 fill="url(#colorFines)"
                 stackId="1"
               />
             </AreaChart>
-          </ResponsiveContainer>
+          </ResponsiveContainer></MobileChart>
         </div>
       </CardContent>
     </Card>
