@@ -45,3 +45,9 @@
 - [x] Scope touch targets and add safe-area, overflow and dvh utilities with EN/FR labels
 - [x] Validate foundation tests (53 pass), signed-in navigation, EN/FR, 54 route/viewport checks and clean preview build
 - [ ] Validate physical-device keyboard, safe areas and native orientation (requires Natively iOS/Android builds)
+
+## Phase 2 dashboards and analytics
+- [ ] Member dashboard currency, attention list, family sheet and mobile super-admin home
+- [ ] Family home header, KPIs, modules and compact health details
+- [ ] Mobile analytics headers, filter sheets, KPIs, charts, summaries and data cards
+- [ ] Verify signed-in mobile/landscape and desktop screens, regression tests and document caveats
