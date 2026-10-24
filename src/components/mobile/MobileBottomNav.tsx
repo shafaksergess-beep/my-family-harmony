@@ -60,12 +60,12 @@ export function MobileBottomNav({ familySlug, className }: MobileBottomNavProps)
         onClick={() => go(item.path)}
         aria-current={active ? 'page' : undefined}
         className={cn(
-          'relative flex h-14 flex-1 flex-col items-center justify-center gap-1 transition-colors',
+          'relative flex min-w-0 h-14 flex-1 flex-col items-center justify-center gap-1 transition-colors',
           active ? 'text-primary' : 'text-muted-foreground'
         )}
       >
         <Icon className="h-6 w-6" />
-        <span className={cn('text-[11px]', active ? 'font-semibold' : 'font-medium')}>{item.label}</span>
+        <span className={cn('max-w-full px-1 text-center text-[11px] leading-tight', active ? 'font-semibold' : 'font-medium')}>{item.label}</span>
         {active && <span className="absolute bottom-0 h-1 w-6 rounded-full bg-primary" />}
       </button>
     );

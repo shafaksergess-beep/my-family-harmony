@@ -3,6 +3,7 @@ import { AlertCircle, RefreshCw, Home, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { errorLogger } from '@/lib/errorLogger';
+import i18n from '@/i18n/config';
 
 interface Props {
   children: ReactNode;
@@ -15,37 +16,6 @@ interface State {
   error: Error | null;
   errorInfo: ErrorInfo | null;
 }
-
-const moduleConfig = {
-  admin: {
-    title: 'Admin Module Error',
-    description: 'Something went wrong in the admin section.',
-    icon: '🔧',
-    color: 'text-orange-600',
-    bgColor: 'bg-orange-50',
-  },
-  family: {
-    title: 'Family Module Error',
-    description: 'Something went wrong in the family section.',
-    icon: '👨‍👩‍👧‍👦',
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50',
-  },
-  auth: {
-    title: 'Authentication Error',
-    description: 'Something went wrong with authentication.',
-    icon: '🔐',
-    color: 'text-red-600',
-    bgColor: 'bg-red-50',
-  },
-  general: {
-    title: 'Something Went Wrong',
-    description: 'An unexpected error occurred.',
-    icon: '⚠️',
-    color: 'text-gray-600',
-    bgColor: 'bg-gray-50',
-  },
-};
 
 export class ModuleErrorBoundary extends Component<Props, State> {
   public state: State = {
@@ -90,31 +60,31 @@ export class ModuleErrorBoundary extends Component<Props, State> {
 
   public render() {
     const { moduleName, children } = this.props;
-    const config = moduleConfig[moduleName];
+    const t = i18n.t.bind(i18n);
 
     if (this.state.hasError) {
       return (
-        <div className={`min-h-screen flex items-center justify-center p-4 ${config.bgColor}`}>
+        <div className="min-h-dvh flex items-center justify-center p-4 bg-background">
           <Card className="max-w-lg w-full shadow-lg">
             <CardHeader className="text-center">
-              <div className="text-4xl mb-3">{config.icon}</div>
-              <div className="flex items-center justify-center gap-2">
-                <AlertCircle className={`h-6 w-6 ${config.color}`} />
-                <CardTitle className={config.color}>{config.title}</CardTitle>
+              
+              <div className="flex flex-col items-center justify-center gap-3">
+                <AlertCircle className="h-8 w-8 shrink-0 text-destructive" />
+                <CardTitle>{t("screenRecovery.title")}</CardTitle>
               </div>
               <CardDescription className="mt-2">
-                {config.description} The rest of the application should still work normally.
+                {t("screenRecovery.description")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {import.meta.env.DEV && this.state.error && (
                 <div className="bg-muted p-4 rounded-md">
-                  <p className="font-mono text-sm text-destructive mb-2">
+                  <p className="font-mono break-words text-sm text-destructive mb-2">
                     {this.state.error.message}
                   </p>
                   <details className="text-xs">
                     <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
-                      View error details
+                      {t("screenRecovery.details")}
                     </summary>
                     <pre className="mt-2 text-xs overflow-auto max-h-40 p-2 bg-background rounded">
                       {this.state.error.stack}
@@ -124,22 +94,22 @@ export class ModuleErrorBoundary extends Component<Props, State> {
               )}
               
               <div className="flex flex-col sm:flex-row gap-3">
-                <Button onClick={this.handleReset} variant="outline" className="flex-1">
+                <Button onClick={this.handleReset} variant="outline" className="min-w-0 flex-1">
                   <RefreshCw className="mr-2 h-4 w-4" />
-                  Try Again
+                  {t("screenRecovery.retry")}
                 </Button>
-                <Button onClick={this.handleGoBack} variant="outline" className="flex-1">
+                <Button onClick={this.handleGoBack} variant="outline" className="min-w-0 flex-1">
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Go Back
+                  {t("screenRecovery.back")}
                 </Button>
-                <Button onClick={this.handleGoHome} className="flex-1">
+                <Button onClick={this.handleGoHome} className="min-w-0 flex-1">
                   <Home className="mr-2 h-4 w-4" />
-                  Dashboard
+                  {t("screenRecovery.dashboard")}
                 </Button>
               </div>
 
               <p className="text-xs text-muted-foreground text-center">
-                If this problem persists, please contact support with error reference: {' '}
+                {t("screenRecovery.reference")} 
                 <code className="bg-muted px-1 rounded">
                   {new Date().toISOString().slice(0, 10)}-{moduleName.toUpperCase()}
                 </code>

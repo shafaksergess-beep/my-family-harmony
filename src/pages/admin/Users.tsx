@@ -475,8 +475,8 @@ export default function Users() {
               <h1 className="text-3xl font-bold">{t('admDashboard.userManagement')}</h1>
               <p className="text-muted-foreground">
                 {userRole === "super_admin" 
-                  ? "Manage all users across the system"
-                  : "Manage users in your families"}
+                  ? t("screenRecovery.manageAll")
+                  : t("screenRecovery.manageFamily")}
               </p>
             </div>
           </div>
@@ -588,7 +588,7 @@ export default function Users() {
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="full_name">Full Name *</Label>
+                  <Label htmlFor="full_name">{t("auth.fullName")} *</Label>
                   <Input
                     id="full_name"
                     value={newUser.full_name}
@@ -597,7 +597,7 @@ export default function Users() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email *</Label>
+                  <Label htmlFor="email">{t("auth.email")} *</Label>
                   <Input
                     id="email"
                     type="email"
@@ -607,7 +607,7 @@ export default function Users() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password *</Label>
+                  <Label htmlFor="password">{t("auth.password")} *</Label>
                   <Input
                     id="password"
                     type="password"
@@ -627,7 +627,7 @@ export default function Users() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="family">
-                    Assign to Family {userRole !== "super_admin" ? "*" : "(Optional)"}
+                    {t("screenRecovery.assignFamily")} {userRole !== "super_admin" ? "*" : `(${t("screenRecovery.optional")})`}
                   </Label>
                   <Select
                     value={newUser.family_id || "none"}
@@ -692,7 +692,7 @@ export default function Users() {
                 />
               </div>
               <Badge variant="secondary">
-                {filteredUsers.length} {filteredUsers.length === 1 ? "user" : "users"}
+                {t("screenRecovery.users", { count: filteredUsers.length })}
               </Badge>
             </div>
           </CardHeader>

@@ -191,7 +191,7 @@ export function MobileMeetings() {
   };
 
   const handleViewMeeting = (meetingId: string) => {
-    navigate(`/family/${familySlug}/meetings/${meetingId}/check-in`);
+    navigate(`/family/${familySlug}/meetings/${meetingId}`);
   };
 
   // Filter meetings

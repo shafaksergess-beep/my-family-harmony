@@ -1,4 +1,21 @@
 {
+  "screenRecovery": {
+    "title": "This screen could not load",
+    "description": "Please try again, or return to your dashboard.",
+    "details": "View error details",
+    "retry": "Try again",
+    "back": "Go back",
+    "dashboard": "Dashboard",
+    "reload": "Reload page",
+    "reference": "If the problem continues, share this reference with support:",
+    "close": "Close",
+    "manageAll": "Manage all users across the system",
+    "manageFamily": "Manage users in your families",
+    "users": "{{count}} users",
+    "assignFamily": "Assign to family",
+    "optional": "Optional",
+    "removeMember": "Remove this user from {{family}}?"
+},
   "deviceSessions": {
     "title": "Active sessions",
     "description": "Devices signed into your Kinsroot account.",
