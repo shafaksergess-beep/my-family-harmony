@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, Plus, Search, UserPlus, Edit, Trash2, Download, MoreVertical } from "lucide-react";
 import { exportToCSV } from "@/lib/export";
 import { useTranslation } from "react-i18next";
-import { UserAdminActions, useSuspendedUsers } from "@/components/admin/UserAdminActions";
+import { UserAdminActions, UserAdminDialogs, useSuspendedUsers } from "@/components/admin/UserAdminActions";
 
 interface UserProfile {
   id: string;
@@ -777,6 +777,7 @@ export default function Users() {
           </CardContent>
         </Card>
       </div>
+      <UserAdminDialogs />
     </div>
   );
 }

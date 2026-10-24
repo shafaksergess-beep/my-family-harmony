@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ArrowLeft, QrCode, Camera, CheckCircle, Users, ExternalLink } from "lucide-react";
+import { useCurrency } from "@/context/CurrencyContext";
 import { Progress } from "@/components/ui/progress";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { QRCodeSVG } from "qrcode.react";
@@ -17,7 +18,8 @@ const MeetingCheckIn = () => {
   const { familySlug, meetingId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { formatAmount } = useCurrency();
   const [loading, setLoading] = useState(true);
   const [scanning, setScanning] = useState(false);
   const [meeting, setMeeting] = useState<any>(null);
@@ -209,7 +211,7 @@ const MeetingCheckIn = () => {
               wallet_id: walletId,
               amount: -fineAmount,
               transaction_type: "fine",
-              description: `Lateness fine: ${latenessMinutes} minutes late`,
+              description: t("famMeetingCheckIn.latenessFine", { minutes: latenessMinutes }),
               reference_id: attendanceRecord.id,
               reference_type: "attendance",
             });
@@ -224,14 +226,14 @@ const MeetingCheckIn = () => {
       toast({
         title: t("famMeetingCheckIn.success"),
         description: latenessMinutes > toleranceMinutes
-          ? `Checked in (${latenessMinutes} min late). Fine: ${fineAmount} FCFA`
-          : "Checked in successfully!",
+          ? t("famMeetingCheckIn.checkedInLate", { minutes: latenessMinutes, fine: formatAmount(fineAmount) })
+          : t("famMeetingCheckIn.checkedInOk"),
       });
     } catch (error: any) {
       console.error("Error checking in:", error);
       toast({
         title: t("famMeetingCheckIn.error"),
-        description: error.message || "Failed to check in",
+        description: t("famMeetingCheckIn.failedToCheckIn"),
         variant: "destructive",
       });
     }
@@ -376,9 +378,9 @@ const MeetingCheckIn = () => {
                   <>
                     <div className="bg-muted p-4 rounded-lg">
                       <h3 className="font-semibold mb-2">{t("famMeetingCheckIn.meetingDetails")}</h3>
-                      <p className="text-sm">Date: {new Date(meeting.meeting_date).toLocaleDateString()}</p>
-                      <p className="text-sm">Time: {meeting.meeting_time}</p>
-                      <p className="text-sm">Type: {meeting.meeting_type}</p>
+                      <p className="text-sm">{t("famMeetingCheckIn.dateLabel")}: {new Date(meeting.meeting_date).toLocaleDateString(i18n.language)}</p>
+                      <p className="text-sm">{t("famMeetingCheckIn.timeLabel")}: {meeting.meeting_time?.slice(0, 5)}</p>
+                      <p className="text-sm">{t("famMeetingCheckIn.typeLabel")}: {t(`meetingTypes.${meeting.meeting_type}`, { defaultValue: meeting.meeting_type })}</p>
                     </div>
 
                     <Button onClick={handleCheckIn} className="w-full" size="lg">
@@ -472,11 +474,11 @@ const MeetingCheckIn = () => {
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          {new Date(record.check_in_time).toLocaleTimeString()}
+                          {new Date(record.check_in_time).toLocaleTimeString(i18n.language)}
                         </p>
                         {record.lateness_minutes > 0 && (
                           <p className="text-sm text-yellow-600">
-                            Late by {record.lateness_minutes} minutes • Fine: {record.fine_amount} FCFA
+                            {t("famMeetingCheckIn.lateBy", { minutes: record.lateness_minutes, fine: formatAmount(record.fine_amount || 0) })}
                           </p>
                         )}
                       </div>
