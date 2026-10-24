@@ -319,7 +319,7 @@ const MeetingCheckIn = () => {
                   {t("famMeetingCheckIn.meetingCheckIn")}
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  {family?.name} • {new Date(meeting?.meeting_date).toLocaleDateString()}
+                  {family?.name} • {new Date(meeting?.meeting_date).toLocaleDateString(i18n.language)}
                 </p>
               </div>
             </div>
