@@ -46,4 +46,4 @@ Validated 24 October 2026. Preview edits only; no publishing, dependencies, sche
 - src/pages/family/FinancialForecasting.tsx, src/pages/admin/GlobalAnalytics.tsx
 - src/i18n/locales/en.json, src/i18n/locales/fr.json
 
-Phase 3 has not started.
+Phase 3 progress is tracked separately in MOBILE_PHASE3_VALIDATION.md; the checks above cover Phase 2 only.

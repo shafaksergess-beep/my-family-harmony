@@ -1,4 +1,19 @@
 {
+  "phase3": {
+  "refresh": "Refresh",
+  "houses": "Houses",
+  "notAssigned": "Not assigned",
+  "clearFilters": "Clear filters",
+  "retry": "Try again",
+  "optionalHouse": "House name (optional)",
+  "assignRoles": "Assign or remove roles for {{name}}",
+  "editDetails": "Update details for {{name}}",
+  "addFailed": "Could not add member",
+  "roleRemoved": "Role removed",
+  "roleAssigned": "Role assigned",
+  "roleFailed": "Could not update role",
+  "memberRemoved": "{{name}} has been removed"
+},
   "phase2": {
 "eventTypes": {"birth": "Birth", "member_death": "Member death", "spouse_death": "Spouse death", "child_death": "Child death", "external_wonya": "External Wonya Kotto", "external_other": "External assistance", "sickness": "Sickness", "wedding": "Wedding", "ceremony_invitation": "Other ceremony"},
 "meetingTypes": {"regular": "Regular", "monthly": "Monthly", "special": "Special", "emergency": "Emergency", "annual": "Annual"},
