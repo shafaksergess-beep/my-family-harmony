@@ -15,3 +15,5 @@
 - Shared PageHeader and responsive primitives live in components/layout and responsive-dialog; Phase 2 dashboards and analytics reuse these controls with mobile-only branches. Why: desktop composition and existing permissions stay independent of mobile presentation.
 - Mobile analytics adapters reuse each report's existing computed values and chronological series; categorical compaction is presentation-only and preserves totals. Why: mobile readability must not change financial calculations or data access.
 - BrowserRouter route shell options are registered via ShellRouteConfig/useShellConfig, including check-in hiding. Why: declarative Routes cannot expose data-router useMatches handles.
+
+- MobileMembers is presentation-only and receives the parent Members records and callbacks; shared responsive dialogs live in Members. Why: desktop and mobile must use identical multi-role mutations, self-action restrictions and authorization.

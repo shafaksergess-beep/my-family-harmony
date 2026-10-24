@@ -23,6 +23,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useDevice } from "@/hooks/useDevice";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BottomActionBar } from "@/components/layout/BottomActionBar";
 import { MobileMembers } from "@/components/mobile";
@@ -72,6 +73,7 @@ const Members = () => {
     canManageMembers, family, isLoading: authLoading, userId, isFamilyHead, isFamilyAdmin
   } = useFamilyAuth(familySlug);
   const { isMobile } = useDevice();
+  const { isOnline } = useOnlineStatus();
   const [loadError, setLoadError] = useState(false);
   const [view, setView] = useState<"list" | "org">("list");
 
@@ -318,7 +320,7 @@ const Members = () => {
         onRoles={member => { setSelectedMember(member as Member); setIsRoleOpen(true); }}
         onEdit={member => { setSelectedMember(member as Member); setEditForm({ house_name: member.house_name || "", is_house_representative: member.is_house_representative }); setIsEditOpen(true); }}
         onRemove={member => setRemoveTarget(member as Member)}
-        error={loadError ? <div role="alert" className="space-y-2 rounded-2xl border border-destructive p-4"><p>{t("famMembers.failedToLoadMembers")}</p><Button variant="outline" onClick={loadMembers}>{t("phase3.retry")}</Button></div> : undefined}
+        error={loadError || (!isOnline && !members.length) ? <div role="alert" className="space-y-2 rounded-2xl border border-destructive p-4"><p>{t(isOnline ? "famMembers.failedToLoadMembers" : "phase2.offlineEmpty")}</p><Button variant="outline" onClick={loadMembers}>{t("phase3.retry")}</Button></div> : undefined}
       /> : (
       <div className="max-w-6xl mx-auto space-y-6">
         <PageHeader
@@ -473,6 +475,7 @@ const Members = () => {
 
       )}
 
+      {canManageMembers && <>
       {/* Add Member Dialog */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
         <DialogContent>
@@ -517,13 +520,13 @@ const Members = () => {
                 placeholder={t("famMembers.houseName")}
               />
             </div>
-            <BottomActionBar className={isMobile ? "sticky bottom-0 pb-safe" : "border-0 p-0"}>
+            <div className={isMobile ? "bottom-action-bar border-t border-border bg-background p-4 pb-safe" : "flex justify-end gap-2"}>
               <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>{t("famMembers.cancel")}</Button>
               <Button type="submit" disabled={!addForm.user_id || adding}>
                 {adding && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 {t("famMembers.addMember")}
               </Button>
-            </BottomActionBar>
+            </div>
           </form>
         </DialogContent>
       </Dialog>
@@ -560,6 +563,7 @@ const Members = () => {
               })}
             </div>
           )}
+          {isMobile && <BottomActionBar><Button variant="outline" onClick={() => setIsRoleOpen(false)}>{t("phase2.done")}</Button></BottomActionBar>}
         </DialogContent>
       </Dialog>
 
@@ -579,17 +583,18 @@ const Members = () => {
                 placeholder={t("famMembers.houseName")}
               />
             </div>
-            <div className="flex items-center gap-2">
+            <div className={isMobile ? "flex items-center justify-between gap-3" : "flex items-center gap-2"}>
+              {isMobile && <Label>{t("famMembers.houseRepresentative")}</Label>}
               <Checkbox
                 checked={editForm.is_house_representative}
                 onCheckedChange={v => setEditForm(f => ({ ...f, is_house_representative: !!v }))}
               />
-              <Label>{t("famMembers.houseRepresentative")}</Label>
+              {!isMobile && <Label>{t("famMembers.houseRepresentative")}</Label>}
             </div>
-            <BottomActionBar className={isMobile ? "sticky bottom-0 pb-safe" : "border-0 p-0"}>
+            <div className={isMobile ? "bottom-action-bar border-t border-border bg-background p-4 pb-safe" : "flex justify-end gap-2"}>
               <Button variant="outline" onClick={() => setIsEditOpen(false)}>{t("famMembers.cancel")}</Button>
               <Button onClick={handleEditMember}>{t("famMembers.saveChanges")}</Button>
-            </BottomActionBar>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -611,6 +616,7 @@ const Members = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>}
+      </>}
     </div>
     </>
   );
