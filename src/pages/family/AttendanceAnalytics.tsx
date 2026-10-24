@@ -113,7 +113,8 @@ const AttendanceAnalytics = () => {
           });
         }
 
-        const stats = membersMap.get(memberId)!;
+        const stats = membersMap.get(memberId);
+        if (!stats) return;
         stats.total_meetings++;
         
         if (record.status === "present") stats.present++;
@@ -255,7 +256,7 @@ const AttendanceAnalytics = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="attendance_rate" fill="hsl(var(--primary))" name="Attendance Rate %" />
+                <Bar dataKey="attendance_rate" fill="hsl(var(--primary))" name={t("phase2.attendancePercent")} />
               </BarChart>
             </ResponsiveContainer></MobileChart>
           </CardContent>
@@ -277,7 +278,7 @@ const AttendanceAnalytics = () => {
                     <th className="text-center p-2">{t("famAttendanceAnalytics.absent")}</th>
                     <th className="text-center p-2">{t("famAttendanceAnalytics.excused")}</th>
                     <th className="text-center p-2">{t("famAttendanceAnalytics.rate")}</th>
-                    <th className="text-center p-2">Avg Late (min)</th>
+                    <th className="text-center p-2">{t("phase2.averageLate")}</th>
                     <th className="text-right p-2">{t("famAttendanceAnalytics.fines")}</th>
                   </tr>
                 </thead>
@@ -322,7 +323,7 @@ const AttendanceAnalytics = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="total_fines" fill="#ef4444" name="Total Fines (FCFA)" />
+                <Bar dataKey="total_fines" fill="#ef4444" name={t("phase2.fines")} />
               </BarChart>
             </ResponsiveContainer></MobileChart>
           </CardContent>

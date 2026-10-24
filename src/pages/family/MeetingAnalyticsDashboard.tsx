@@ -124,7 +124,7 @@ const MeetingAnalyticsDashboard = () => {
 
       const totalMeetings = meetingsData?.length || 0;
       const typeStatsArray: MeetingTypeStats[] = Array.from(typeMap.entries()).map(([type, count]) => ({
-        type: type.charAt(0).toUpperCase() + type.slice(1),
+        type: t(`phase2.meetingTypes.${type}`, { defaultValue: t("phase2.meeting") }),
         count,
         percentage: totalMeetings > 0 ? Math.round((count / totalMeetings) * 100) : 0,
       }));
@@ -267,7 +267,7 @@ const MeetingAnalyticsDashboard = () => {
                   type="monotone"
                   dataKey="meetings"
                   stroke="#10b981"
-                  name="Meetings"
+                  name={t("phase2.meeting")}
                   strokeWidth={2}
                 />
                 <Line
@@ -275,7 +275,7 @@ const MeetingAnalyticsDashboard = () => {
                   type="monotone"
                   dataKey="avgAttendance"
                   stroke="#3b82f6"
-                  name="Avg Attendance %"
+                  name={t("phase2.avgAttendance")}
                   strokeWidth={2}
                 />
               </LineChart>
@@ -325,7 +325,7 @@ const MeetingAnalyticsDashboard = () => {
                   <XAxis dataKey="month" />
                   <YAxis />
                   <Tooltip />
-                  <Bar dataKey="meetings" fill="#10b981" name="Meetings" />
+                  <Bar dataKey="meetings" fill="#10b981" name={t("phase2.meeting")} />
                 </BarChart>
               </ResponsiveContainer></MobileChart>
             </CardContent>

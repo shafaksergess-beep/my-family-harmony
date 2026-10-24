@@ -115,7 +115,8 @@ const ContributionAnalytics = () => {
           monthlyMap.set(month, { month, paid: 0, outstanding: 0 });
         }
         
-        const data = monthlyMap.get(month)!;
+        const data = monthlyMap.get(month);
+        if (!data) return;
         if (contribution.status === "paid") {
           data.paid += contribution.amount;
         } else {
@@ -143,7 +144,8 @@ const ContributionAnalytics = () => {
           });
         }
 
-        const summary = memberMap.get(contribution.member_id)!;
+        const summary = memberMap.get(contribution.member_id);
+        if (!summary) return;
         if (contribution.status === "paid") {
           summary.total_paid += contribution.amount;
           const contributionDate = new Date(contribution.contribution_date);
@@ -320,8 +322,8 @@ const ContributionAnalytics = () => {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="paid" stroke="#22c55e" name="Paid" strokeWidth={2} />
-                    <Line type="monotone" dataKey="outstanding" stroke="#f97316" name="Outstanding" strokeWidth={2} />
+                    <Line type="monotone" dataKey="paid" stroke="#22c55e" name={t("phase2.paid")} strokeWidth={2} />
+                    <Line type="monotone" dataKey="outstanding" stroke="#f97316" name={t("phase2.outstanding")} strokeWidth={2} />
                   </LineChart>
                 </ResponsiveContainer></MobileChart>
               </CardContent>
@@ -356,19 +358,19 @@ const ContributionAnalytics = () => {
                           )}
                         </div>
                         <div className="flex gap-4 mt-1 text-sm text-muted-foreground">
-                          <span>Paid: {formatAmount(summary.total_paid)}</span>
+                          <span>{t("phase2.paidLabel", { amount: formatAmount(summary.total_paid) })}</span>
                           {summary.total_outstanding > 0 && (
-                            <span className="text-orange-500">Outstanding: {formatAmount(summary.total_outstanding)}</span>
+                            <span className="text-orange-500">{t("phase2.outstandingLabel", { amount: formatAmount(summary.total_outstanding) })}</span>
                           )}
                         </div>
                       </div>
                       <div className="flex gap-2">
                         <Badge variant="outline" className="bg-green-50 text-green-700">
-                          {summary.on_time_count} on time
+                          {t("phase2.onTimeCount", { count: summary.on_time_count })}
                         </Badge>
                         {summary.late_count > 0 && (
                           <Badge variant="outline" className="bg-red-50 text-red-700">
-                            {summary.late_count} late
+                            {t("phase2.lateCount", { count: summary.late_count })}
                           </Badge>
                         )}
                       </div>
@@ -401,10 +403,10 @@ const ContributionAnalytics = () => {
                           <div>
                             <p className="font-medium">{memberName}</p>
                             <p className="text-sm text-muted-foreground">
-                              Due: {new Date(contribution.contribution_date).toLocaleDateString()}
+                              {t("phase2.due", { date: new Date(contribution.contribution_date).toLocaleDateString() })}
                             </p>
                             <p className="text-sm font-medium text-red-600 mt-1">
-                              {daysLate} days overdue
+                              {t("phase2.daysOverdue", { count: daysLate })}
                             </p>
                           </div>
                           <div className="text-right">

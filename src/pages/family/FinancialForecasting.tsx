@@ -184,7 +184,7 @@ export default function FinancialForecasting() {
           </Button>
           <div>
             <h1 className="text-3xl font-bold">{t("famFinancialForecasting.financialForecasting")}</h1>
-            <p className="text-muted-foreground">6-month financial projections based on historical trends</p>
+            <p className="text-muted-foreground">{t("phase2.forecastDescription")}</p>
           </div>
         </div>
         <Button 
@@ -232,7 +232,7 @@ export default function FinancialForecasting() {
       <AnalyticsKpis className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Expected Income (6 months)</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("phase2.expectedIncome")}</CardTitle>
             <TrendingUp className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent className="min-w-0">
@@ -242,7 +242,7 @@ export default function FinancialForecasting() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Expected Expenses (6 months)</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("phase2.expectedExpenses")}</CardTitle>
             <TrendingDown className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent className="min-w-0">
@@ -264,7 +264,7 @@ export default function FinancialForecasting() {
       {/* Monthly Projections Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>6-Month Cash Flow Projection</CardTitle>
+          <CardTitle>{t("phase2.projectionTitle")}</CardTitle>
           <CardDescription>{t("famFinancialForecasting.expectedIncomeAndExpensesBy")}</CardDescription>
         </CardHeader>
         <CardContent className="min-w-0">
@@ -275,9 +275,9 @@ export default function FinancialForecasting() {
               <YAxis />
               <Tooltip formatter={(value) => formatCurrency(Number(value))} />
               <Legend />
-              <Line type="monotone" dataKey="expectedIncome" stroke="hsl(var(--chart-1))" name="Expected Income" strokeWidth={2} />
-              <Line type="monotone" dataKey="expectedExpenses" stroke="hsl(var(--chart-2))" name="Expected Expenses" strokeWidth={2} />
-              <Line type="monotone" dataKey="projectedBalance" stroke="hsl(var(--chart-3))" name="Net Balance" strokeWidth={2} />
+              <Line type="monotone" dataKey="expectedIncome" stroke="hsl(var(--chart-1))" name={t("phase2.expectedIncome")} strokeWidth={2} />
+              <Line type="monotone" dataKey="expectedExpenses" stroke="hsl(var(--chart-2))" name={t("phase2.expectedExpenses")} strokeWidth={2} />
+              <Line type="monotone" dataKey="projectedBalance" stroke="hsl(var(--chart-3))" name={t("phase2.netBalance")} strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer></MobileChart>
         </CardContent>
@@ -296,7 +296,7 @@ export default function FinancialForecasting() {
               <XAxis dataKey="month" />
               <YAxis />
               <Tooltip formatter={(value) => formatCurrency(Number(value))} />
-              <Bar dataKey="amount" fill="hsl(var(--chart-1))" name="Contributions" />
+              <Bar dataKey="amount" fill="hsl(var(--chart-1))" name={t("phase2.contribution")} />
             </BarChart>
           </ResponsiveContainer></MobileChart>
         </CardContent>
@@ -316,7 +316,7 @@ export default function FinancialForecasting() {
                   <div className="flex items-center gap-3">
                     <Calendar className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <p className="font-medium">Due: {new Date(loan.dueDate).toLocaleDateString()}</p>
+                      <p className="font-medium">{t("phase2.due", { date: new Date(loan.dueDate).toLocaleDateString() })}</p>
                       <p className="text-sm text-muted-foreground">{t("famFinancialForecasting.expectedRepayment")}</p>
                     </div>
                   </div>

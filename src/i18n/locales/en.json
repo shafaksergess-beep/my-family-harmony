@@ -1,5 +1,8 @@
 {
   "phase2": {
+"eventTypes": {"birth": "Birth", "member_death": "Member death", "spouse_death": "Spouse death", "child_death": "Child death", "external_wonya": "External Wonya Kotto", "external_other": "External assistance", "sickness": "Sickness", "wedding": "Wedding", "ceremony_invitation": "Other ceremony"},
+"meetingTypes": {"regular": "Regular", "monthly": "Monthly", "special": "Special", "emergency": "Emergency", "annual": "Annual"},
+"recordsSummary": "{{count}} records in this breakdown.",
   "filters": "Filters",
   "filterDescription": "Choose which records to include.",
   "done": "Done",

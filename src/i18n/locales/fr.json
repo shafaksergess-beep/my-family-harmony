@@ -1,5 +1,8 @@
 {
   "phase2": {
+"eventTypes": {"birth": "Naissance", "member_death": "Décès du membre", "spouse_death": "Décès du conjoint", "child_death": "Décès d’un enfant", "external_wonya": "Wonya Kotto externe", "external_other": "Assistance externe", "sickness": "Maladie", "wedding": "Mariage", "ceremony_invitation": "Autre cérémonie"},
+"meetingTypes": {"regular": "Ordinaire", "monthly": "Mensuelle", "special": "Spéciale", "emergency": "Urgence", "annual": "Annuelle"},
+"recordsSummary": "{{count}} enregistrements dans cette répartition.",
   "filters": "Filtres",
   "filterDescription": "Choisissez les enregistrements à inclure.",
   "done": "Terminé",

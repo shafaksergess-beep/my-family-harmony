@@ -107,7 +107,7 @@ export default function AssistanceAnalytics() {
       return acc;
     }, {} as Record<string, { count: number; total: number }>)
   ).map(([type, data]) => ({
-    name: EVENT_TYPE_LABELS[type] || type,
+    name: t(`phase2.eventTypes.${type}`, { defaultValue: t("phase2.other") }),
     count: data.count,
     amount: data.total,
   }));
@@ -126,7 +126,7 @@ export default function AssistanceAnalytics() {
   // Member-level statistics
   const memberStats = Object.entries(
     events.reduce((acc, event) => {
-      const name = event.family_members.profiles.full_name;
+      const name = event.family_members?.profiles?.full_name || t("phase2.unknown");
       if (!acc[name]) acc[name] = { name, count: 0, total: 0 };
       acc[name].count++;
       acc[name].total += event.amount;
@@ -141,8 +141,8 @@ export default function AssistanceAnalytics() {
   const pendingAmount = events.filter(e => !e.is_paid).reduce((sum, e) => sum + e.amount, 0);
 
   const paymentStatusData = [
-    { name: "Paid", value: paidCount, amount: paidAmount },
-    { name: "Pending", value: pendingCount, amount: pendingAmount },
+    { name: t("phase2.paid"), value: paidCount, amount: paidAmount },
+    { name: t("phase2.pending"), value: pendingCount, amount: pendingAmount },
   ];
 
   return (
@@ -192,7 +192,7 @@ export default function AssistanceAnalytics() {
             <CardContent className="min-w-0">
               <div className="text-2xl font-bold">{formatAmount((budget.allocated - budget.spent))}</div>
               <p className="text-xs text-muted-foreground">
-                {((budget.spent / budget.allocated) * 100).toFixed(1)}% used
+                {t("phase2.percentUsed", { percent: ((budget.spent / budget.allocated) * 100).toFixed(1) })}
               </p>
             </CardContent>
           </Card>
@@ -203,7 +203,7 @@ export default function AssistanceAnalytics() {
             </CardHeader>
             <CardContent className="min-w-0">
               <div className="text-2xl font-bold">{formatAmount(pendingAmount)}</div>
-              <p className="text-xs text-muted-foreground">{pendingCount} pending events</p>
+              <p className="text-xs text-muted-foreground">{t("phase2.pendingEvents", { count: pendingCount })}</p>
             </CardContent>
           </Card>
         </AnalyticsKpis>
@@ -221,7 +221,7 @@ export default function AssistanceAnalytics() {
                 <span className="font-semibold">{formatAmount(budget.allocated)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Spent (Paid):</span>
+                <span>{t("phase2.spentPaid")}</span>
                 <span className="font-semibold text-red-600">{formatAmount(budget.spent)}</span>
               </div>
               <div className="flex justify-between text-sm">
@@ -265,8 +265,8 @@ export default function AssistanceAnalytics() {
                     <YAxis yAxisId="right" orientation="right" />
                     <Tooltip />
                     <Legend />
-                    <Bar yAxisId="left" dataKey="count" fill="#8b5cf6" name="Event Count" />
-                    <Bar yAxisId="right" dataKey="amount" fill="#ec4899" name="Total Amount (FCFA)" />
+                    <Bar yAxisId="left" dataKey="count" fill="#8b5cf6" name={t("phase2.eventCount")} />
+                    <Bar yAxisId="right" dataKey="amount" fill="#ec4899" name={t("phase2.totalAmount")} />
                   </BarChart>
                 </ResponsiveContainer></MobileChart>
               </CardContent>
@@ -288,8 +288,8 @@ export default function AssistanceAnalytics() {
                     <YAxis yAxisId="right" orientation="right" />
                     <Tooltip />
                     <Legend />
-                    <Line yAxisId="left" type="monotone" dataKey="count" stroke="#8b5cf6" name="Event Count" />
-                    <Line yAxisId="right" type="monotone" dataKey="amount" stroke="#ec4899" name="Total Amount (FCFA)" />
+                    <Line yAxisId="left" type="monotone" dataKey="count" stroke="#8b5cf6" name={t("phase2.eventCount")} />
+                    <Line yAxisId="right" type="monotone" dataKey="amount" stroke="#ec4899" name={t("phase2.totalAmount")} />
                   </LineChart>
                 </ResponsiveContainer></MobileChart>
               </CardContent>
@@ -308,7 +308,7 @@ export default function AssistanceAnalytics() {
                     <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                       <div>
                         <p className="font-semibold">{stat.name}</p>
-                        <p className="text-sm text-muted-foreground">{stat.count} event{stat.count !== 1 ? 's' : ''}</p>
+                        <p className="text-sm text-muted-foreground">{t("phase2.eventsCount", { count: stat.count })}</p>
                       </div>
                       <div className="text-right">
                         <p className="font-bold">{formatAmount(stat.total)}</p>
