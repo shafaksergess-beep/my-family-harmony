@@ -313,7 +313,7 @@ All colors MUST be HSL.
 [data-sonner-toast] { touch-action: pan-y; }
 .snap-row::-webkit-scrollbar { display: none; }
 .fade-edges { mask-image: linear-gradient(to right, transparent, black 1rem, black calc(100% - 1rem), transparent); }
-.app-shell { padding-inline: env(safe-area-inset-left, 0px) env(safe-area-inset-right, 0px); --shell-nav-height: 4rem; }
+.app-shell { padding-inline: env(safe-area-inset-left, 0px) env(safe-area-inset-right, 0px); --shell-nav-height: calc(4rem + 12px); --shell-nav-offset: 0px; }
 .app-shell .shell-content { padding-bottom: env(safe-area-inset-bottom, 0px); }
 .app-shell[data-nav-visible="true"] .shell-content { padding-bottom: calc(var(--shell-nav-height) + env(safe-area-inset-bottom, 0px)); }
 .bottom-action-bar { position: sticky; bottom: var(--keyboard-inset, 0px); z-index: 30; padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px)); }
