@@ -318,7 +318,7 @@ const Members = () => {
       <div className="min-h-screen bg-background p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="h-5 w-5" />
@@ -330,7 +330,7 @@ const Members = () => {
               </p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={() => exportMembersToCSV(filteredMembers)} disabled={filteredMembers.length === 0}>
               <Download className="h-4 w-4 mr-2" />
               {t("famMembers.export")}
@@ -351,7 +351,7 @@ const Members = () => {
         </div>
 
         {/* Search & Filters */}
-        <div className="flex gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
@@ -362,7 +362,7 @@ const Members = () => {
             />
           </div>
           <Select value={roleFilter} onValueChange={setRoleFilter}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-full sm:w-48">
               <SelectValue placeholder={t("famMembers.filterByRole")} />
             </SelectTrigger>
             <SelectContent>

@@ -97,7 +97,7 @@ const FamilyMeetings = () => {
   const MeetingCard = ({ meeting, isPast = false }: { meeting: Meeting; isPast?: boolean }) => (
     <Card className={`hover:shadow-lg transition-all ${isPast ? 'opacity-80' : ''}`}>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <CardTitle className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-primary" />
             {new Date(meeting.meeting_date).toLocaleDateString('en-US', { 
@@ -359,7 +359,7 @@ const FamilyMeetings = () => {
       <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -372,7 +372,7 @@ const FamilyMeetings = () => {
             </div>
             
             {canScheduleMeetings && (
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Dialog open={isBulkDialogOpen} onOpenChange={setIsBulkDialogOpen}>
                   <DialogTrigger asChild>
                     <Button variant="outline">
@@ -460,7 +460,7 @@ const FamilyMeetings = () => {
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="date">{t("famMeetings.meetingDate")}</Label>
                       <Input
