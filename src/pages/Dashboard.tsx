@@ -12,6 +12,7 @@ import { CurrencySelector } from "@/components/CurrencySelector";
 import { usePlatform } from "@/hooks/usePlatform";
 import { MobileDashboard } from "@/components/mobile/MobileDashboard";
 import { JoinFamilyCard } from "@/components/dashboard/JoinFamilyCard";
+import { tourSeen, markTourSeen, isFinanceTour } from "@/lib/mobileExperience";
 import { NewUserOnboarding } from "@/components/onboarding/NewUserOnboarding";
 import { NotificationsFeed } from "@/components/dashboard/NotificationsFeed";
 import { PendingActionsWidget } from "@/components/dashboard/PendingActionsWidget";
@@ -91,12 +92,12 @@ const Dashboard = () => {
       } else {
         setUserFamilies(familiesData || []);
       }
-      // Check for first-time user onboarding
-      const isFirstLogin = localStorage.getItem("family-together-first-login");
-      if (isFirstLogin) {
-        setShowOnboarding(true);
-        localStorage.removeItem("family-together-first-login");
-      }
+      // Per-user, per-device preference; storage failure never prevents sign-in.
+      try {
+        const legacyFirstLogin = localStorage.getItem("family-together-first-login");
+        setShowOnboarding(isMobile ? !tourSeen(localStorage, session.user.id) : !!legacyFirstLogin);
+        if (legacyFirstLogin) localStorage.removeItem("family-together-first-login");
+      } catch { setShowOnboarding(isMobile); }
     } catch (error) {
       console.error("Auth check error:", error);
       navigate("/auth");
@@ -128,7 +129,13 @@ const Dashboard = () => {
 
   // Show mobile dashboard on mobile devices (for non-super-admins)
   if (isMobile) {
-    return isSuperAdmin ? <MobileAdminHome /> : <MobileDashboard />;
+    return <>
+      {isSuperAdmin ? <MobileAdminHome /> : <MobileDashboard />}
+      <NewUserOnboarding open={showOnboarding} financeRole={isFinanceTour(userFamilies.map(f => f.user_role))} onComplete={() => {
+        setShowOnboarding(false);
+        try { markTourSeen(localStorage, userId); } catch { /* Storage unavailable. */ }
+      }} />
+    </>;
   }
 
   return (
@@ -136,7 +143,7 @@ const Dashboard = () => {
     <SEO title={t("dash.myFamilyTree")} description={t("dash.yourKinsrootDashboardViewYour")} />
     <NewUserOnboarding
       open={showOnboarding}
-      onComplete={() => setShowOnboarding(false)}
+      onComplete={() => { setShowOnboarding(false); try { markTourSeen(localStorage, userId); } catch { /* Storage unavailable. */ } }}
       userName={profile?.full_name}
     />
     <div className="min-h-screen bg-background">

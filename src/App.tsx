@@ -1,3 +1,4 @@
+import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -147,6 +148,7 @@ const FamilyModule = ({ children }: { children: ReactNode }) => (
 );
 
 const App = () => (
+  <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="theme" disableTransitionOnChange>
   <DeviceProvider>
   <ErrorBoundary>
     <HelmetProvider>
@@ -277,6 +279,7 @@ const App = () => (
     </HelmetProvider>
   </ErrorBoundary>
   </DeviceProvider>
+  </ThemeProvider>
 );
 
 export default App;
