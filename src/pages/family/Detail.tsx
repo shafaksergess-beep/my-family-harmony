@@ -90,7 +90,7 @@ const FamilyDetail = () => {
   useEffect(() => {
     if (!family?.id || !canManageFinances) return;
     let active = true;
-    supabase.from('payment_proofs').select('id', { count: 'exact', head: true }).eq('family_id', family.id).in('status', ['pending', 'awaiting_second_approval']).then(({ count }) => { if (active) setPendingProofsCount(count || 0); });
+    supabase.from('payment_proofs').select('id', { count: 'exact', head: true }).eq('family_id', family.id).in('status', ['pending', 'partially_approved']).then(({ count }) => { if (active) setPendingProofsCount(count || 0); });
     return () => { active = false; };
   }, [family?.id, canManageFinances]);
 

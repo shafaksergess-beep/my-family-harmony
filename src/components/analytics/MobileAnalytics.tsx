@@ -1,6 +1,7 @@
 import { Children, cloneElement, isValidElement, useState, type ReactNode, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Filter, X } from 'lucide-react';
+import { Legend, Cell } from 'recharts';
 import { useDevice } from '@/hooks/useDevice';
 import { Button } from '@/components/ui/button';
 import { StatCarousel } from '@/components/layout/StatCarousel';
@@ -64,12 +65,14 @@ export function MobileChart({ children, summary }: { children: ReactElement<any>
     if (name === 'Tooltip' || name === 'ChartTooltip') return cloneElement(node, { trigger: 'click', wrapperStyle: { maxWidth: '100%', zIndex: 20 } });
     if (name === 'Pie') {
       const pieData = node.props.data;
-      const key = node.props.nameKey ?? 'name';
+      const key = node.props.nameKey ?? (pieData?.[0]?.status !== undefined ? 'status' : pieData?.[0]?.type !== undefined ? 'type' : 'name');
       const pieReduced = Array.isArray(pieData) ? compactCategories(pieData, key, node.props.dataKey, t('phase2.other')) : pieData;
-      return cloneElement(node, { data: pieReduced, label: false, labelLine: false, outerRadius: 65, innerRadius: node.props.innerRadius ? 35 : undefined });
+      return cloneElement(node, { data: pieReduced, nameKey: key, label: false, labelLine: false, outerRadius: 65, innerRadius: node.props.innerRadius ? 35 : undefined }, pieReduced?.map((_: unknown, index: number) => <Cell key={index} fill={`hsl(var(--chart-${index % 5 + 1}))`} />));
     }
     return node;
   });
   const last = Array.isArray(data) ? data[data.length - 1] : null; const prior = Array.isArray(data) ? data[data.length - 2] : null;
-  return <div className="min-w-0"><AnalyticsSummary current={metric && last ? Number(last[metric]) : undefined} previous={metric && prior ? Number(prior[metric]) : undefined}>{summary}</AnalyticsSummary>{cloneElement(children, { height: 230, minWidth: 0 }, cloneElement(chart, { data: reduced, accessibilityLayer: true, margin: { top: 8, right: 4, bottom: 4, left: 0 } }, adapted))}</div>;
+  const hasLegend = nested.some(node => isValidElement(node) && nameOf(node) === 'Legend');
+  const hasPie = nested.some(node => isValidElement(node) && nameOf(node) === 'Pie');
+  return <div className="w-full min-w-0"><AnalyticsSummary current={metric && last && !categorical ? Number(last[metric]) : undefined} previous={metric && prior && !categorical ? Number(prior[metric]) : undefined}>{summary}</AnalyticsSummary>{cloneElement(children, { height: 230, minWidth: 0 }, cloneElement(chart, { data: reduced, accessibilityLayer: true, margin: { top: 8, right: 4, bottom: 4, left: 0 } }, [...adapted, ...(!hasLegend && hasPie ? [<Legend key="mobile-legend" verticalAlign="bottom" wrapperStyle={{ fontSize: 11 }} />] : [])]))}</div>;
 }
