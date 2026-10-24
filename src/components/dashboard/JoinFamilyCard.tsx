@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { UserPlus, QrCode, Hash, ArrowRight, Loader2 } from "lucide-react";
+import { previewInvitation } from "@/lib/invitations";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -29,15 +30,9 @@ export const JoinFamilyCard = () => {
 
     try {
       // Validate the code exists
-      const { data: invitation, error } = await supabase
-        .from("invitations")
-        .select("id, family_id, families:family_id(slug)")
-        .eq("reference_code", code.toUpperCase())
-        .eq("status", "pending")
-        .gt("expires_at", new Date().toISOString())
-        .single();
+      const invitation = await previewInvitation(code);
 
-      if (error || !invitation) {
+      if (!invitation) {
         toast({
           title: "Invalid code",
           description: "This code is invalid or has expired",

@@ -10,6 +10,7 @@ import {
   Users, Hash, Search, Mail, ArrowRight, Loader2, 
   CheckCircle, AlertCircle, QrCode
 } from "lucide-react";
+import { previewInvitation } from "@/lib/invitations";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -45,13 +46,7 @@ export const JoinFamilyOptions = ({ open, onOpenChange }: JoinFamilyOptionsProps
 
     setValidating(true);
     try {
-      const { data } = await supabase
-        .from("invitations")
-        .select("id, families:family_id(name)")
-        .eq("reference_code", value.toUpperCase())
-        .eq("status", "pending")
-        .gt("expires_at", new Date().toISOString())
-        .single();
+      const data = await previewInvitation(value);
 
       setCodeValid(!!data);
     } catch {
