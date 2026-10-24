@@ -31,8 +31,9 @@ function NavBar({ items, quickActions = [] }: { items: Item[]; quickActions?: It
       requestAnimationFrame(() => {
         ticking = false;
         const y = window.scrollY;
-        setHidden(prev => nextNavHidden(prev, y, lastY.current, document.documentElement.scrollHeight, window.innerHeight));
+        const prevLast = lastY.current;
         lastY.current = y;
+        setHidden(prev => nextNavHidden(prev, y, prevLast, document.documentElement.scrollHeight, window.innerHeight));
       });
     };
     window.addEventListener('scroll', onScroll, { passive: true });
