@@ -145,7 +145,16 @@ export function NotificationInbox({ familySlug, trigger }: { familySlug?: string
   return (
     <Popover>
       <PopoverTrigger asChild>
-        {trigger ?? <Button variant="ghost" size="icon" className="relative" aria-label={t("notif.notifications")}>
+        {trigger ? (
+          <span className="relative flex min-w-0 flex-1">
+            {trigger}
+            {unread > 0 && (
+              <Badge variant="destructive" className="pointer-events-none absolute right-1.5 top-1.5 h-4 min-w-4 px-1 text-[10px]">
+                {unread > 9 ? "9+" : unread}
+              </Badge>
+            )}
+          </span>
+        ) : <Button variant="ghost" size="icon" className="relative" aria-label={t("notif.notifications")}>
           <Bell className="h-5 w-5" />
           {unread > 0 && (
             <Badge
