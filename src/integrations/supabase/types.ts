@@ -3189,6 +3189,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_family_invitation: {
+        Args: { p_code?: string; p_token?: string }
+        Returns: Json
+      }
       account_owned_files: {
         Args: { p_user_id: string }
         Returns: {
@@ -3346,6 +3350,10 @@ export type Database = {
       prepare_account_deletion: {
         Args: { p_user_id: string }
         Returns: undefined
+      }
+      preview_family_invitation: {
+        Args: { p_code?: string; p_token?: string }
+        Returns: Json
       }
       review_payment_proof: {
         Args: { p_decision: string; p_notes?: string; p_proof_id: string }
