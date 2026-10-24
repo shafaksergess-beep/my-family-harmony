@@ -72,8 +72,23 @@ measurement, so family home was measured through the dashboard shell it renders.
   contract, no extra button node per card, no active-state flash during swipes.
 
 ### Re-measurement (after)
-- Same six screens, same script: scroll containers with the overflow-y-auto side effect now
-  report `overflow-y: hidden`; toast `touch-action` is `pan-y`. Before/after numbers below.
+Same screens, same script, 390x844:
+- Horizontal scroll containers: before `overflow-y: auto` (computed) with `snap: x mandatory`;
+  after `overflow-y: hidden` with `snap: x proximity` on every `.snap-row`, tab strip and table
+  wrapper (dashboard 1/1, members 3/3, analytics 2/2, contributions 0, admin 1/1).
+- Vertical scroll containers inside the page: 0 before, 0 after (root scroller unchanged).
+- Toast `touch-action`: `none` before, `pan-y` after.
+- Long tasks during 80-frame scroll: 0 before, 0 after (Chromium).
+- Viewport overflow re-check after the dock redesign: scrollWidth == innerWidth at 320x700,
+  360x700, 390x844, 430x900 and 640x360 landscape (5/5 pass).
+- Dock behavior verified in browser: visible at top, `translateY(90px)` when scrolled down,
+  returns to `translateY(0)` on scroll up and at the top; `--shell-nav-offset` switches to
+  `var(--shell-nav-height)` while hidden. A state-updater bug (lastY ref mutated before the
+  updater ran, so reveal never triggered) was found by measurement and fixed.
+- Visual checks (screenshots): portrait dock with active pill and gold FAB; French labels
+  (Accueil, Membres, Reunions, Finances, Plus) untruncated at 390px; dark mode dock correct;
+  landscape 640x360 shows icons only; admin dock shows Overview/Families/Users/Analytics/More;
+  quick-action sheet opens with the gold tiles in French.
 
 ## Issue 2: Bottom navigation redesign (floating dock)
 
@@ -114,4 +129,9 @@ Implemented in `src/components/layout/ShellBottomNav.tsx` + `src/index.css`:
 - The programmatic scroll test measures main-thread cost, not touch momentum.
 - Family home (`/family/:slug`) redirected to `/dashboard` during measurement; the redirect
   itself was not investigated (routes must not change in this phase).
-- Typecheck: see final section below for whether a standalone run completed.
+- Standalone typecheck: **ran** — `tsgo --noEmit -p tsconfig.app.json` exits clean.
+- Tests: **ran** — `vitest run` 69/69 pass, including the new `shellBottomNav.test.ts`
+  (9 tests: active-state, hide/show, module gating).
+- Build: harness build log shows `build OK` after the changes.
+- Physical iOS Safari, Android Chrome, the Capacitor wrapper, real touch momentum, safe-area
+  insets on notched devices and keyboard behavior remain unverified — they need a real phone.
