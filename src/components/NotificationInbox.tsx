@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useId, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -59,11 +59,12 @@ interface InboxItem {
  * In-app notification bell. Subscribes to in_app_notifications via realtime,
  * shows unread count, and lets the user mark items as read or navigate.
  */
-export function NotificationInbox({ familySlug, trigger }: { familySlug?: string; trigger?: React.ReactNode }) {
+export function NotificationInbox({ familySlug, trigger }: { familySlug?: string; trigger?: ReactNode }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [items, setItems] = useState<InboxItem[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
+  const instanceId = useId();
 
   useEffect(() => {
     let mounted = true;
@@ -83,7 +84,7 @@ export function NotificationInbox({ familySlug, trigger }: { familySlug?: string
   useEffect(() => {
     if (!userId) return;
     const channel = supabase
-      .channel(`inbox-${userId}`)
+      .channel(`inbox-${userId}-${instanceId}`)
       .on(
         "postgres_changes",
         {
@@ -100,7 +101,7 @@ export function NotificationInbox({ familySlug, trigger }: { familySlug?: string
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userId]);
+  }, [userId, instanceId]);
 
   const refresh = async (uid: string) => {
     const { data } = await supabase
