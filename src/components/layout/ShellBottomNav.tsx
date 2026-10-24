@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ComponentType } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Home, Users, Calendar, Wallet, Plus, Receipt, QrCode, HandCoins, Heart, MoreHorizontal, Bell, User, Building2, BarChart3, type LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
