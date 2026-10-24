@@ -3,7 +3,8 @@
 ## Outsider invitation repair
 - [x] Add private-record-safe code/token previews and atomic authenticated acceptance
 - [x] Preserve invitations through signup and use shared lookup across entry points
-- [ ] Verify public previews, real signup return, membership read-back and denial cases
+- [x] Verify public code/token previews, real authenticated return and Treasurer membership read-back, privacy/expired/wrong-email rejection, and phone widths
+- [ ] Fresh signup and confirmation-email end-to-end check (email sending rate limit returned HTTP 429; requires limit to clear and an accessible test inbox)
 
 ## Signup and unassigned user recovery
 - [x] Share membership-aware sign-in destinations while preserving invitations and platform-admin access
