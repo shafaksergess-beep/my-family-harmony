@@ -126,6 +126,9 @@ export function MobileDashboard() {
   }, [navigate, selectedFamily]);
 
   const loadFamilyStats = async (familyId: string, userId: string) => {
+    setStats({ pendingContributions: 0, totalSavings: 0, activeLoans: 0, upcomingMeetings: 0, nextMeetingDate: null });
+    setActivities([]);
+    setAttention([]);
     try {
       // Get member ID
       const { data: memberData } = await supabase
