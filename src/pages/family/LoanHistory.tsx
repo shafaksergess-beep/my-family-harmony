@@ -1,3 +1,4 @@
+import { ManagementTable, ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -174,7 +175,7 @@ export default function LoanHistory() {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
+        <ManagementHeader className="flex items-center justify-between" title={t("famLoanHistory.loanHistoryTransactions")} as="div">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}/loans`)}>
               <ArrowLeft className="h-5 w-5" />
@@ -182,7 +183,7 @@ export default function LoanHistory() {
             <h1 className="text-3xl font-bold">{t("famLoanHistory.loanHistoryTransactions")}</h1>
           </div>
           <LanguageSwitcher />
-        </div>
+        </ManagementHeader>
 
         {/* Filters */}
         <Card className="p-4">
@@ -269,7 +270,7 @@ export default function LoanHistory() {
             </p>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <ManagementTable className="w-full">
               <thead>
                 <tr className="border-b bg-muted/50">
                   <th className="text-left p-4 font-medium">{t("famLoanHistory.date")}</th>
@@ -338,7 +339,7 @@ export default function LoanHistory() {
                   })
                 )}
               </tbody>
-            </table>
+            </ManagementTable>
           </div>
         </Card>
       </div>

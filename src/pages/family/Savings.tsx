@@ -1,3 +1,4 @@
+import { ManagementTable, ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -8,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { ArrowLeft, Plus, Download, DollarSign, Check, X, Pencil, Trash2 } from "lucide-react";
 import { exportToCSV, formatSavingsForExport } from "@/lib/export";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ResponsiveDialog as Dialog, ResponsiveDialogContent as DialogContent, ResponsiveDialogHeader as DialogHeader, ResponsiveDialogTitle as DialogTitle, ResponsiveDialogTrigger as DialogTrigger } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,7 +45,7 @@ interface FamilyMember {
 }
 
 export default function FamilySavings() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -321,7 +322,7 @@ export default function FamilySavings() {
       <SEO title={t("famSavings.familySavings")} description={t("famSavings.recordAndReviewMonthlySavings")} />
       <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
+        <ManagementHeader className="flex items-center justify-between" title={t("famSavings.individualSavings")} onCreate={canManageFinances ? () => setIsDialogOpen(true) : undefined} createLabel={t("famSavings.addSavings")} as="div">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="h-5 w-5" />
@@ -329,12 +330,12 @@ export default function FamilySavings() {
             <h1 className="text-3xl font-bold">{t("famSavings.individualSavings")}</h1>
           </div>
           <LanguageSwitcher />
-        </div>
+        </ManagementHeader>
 
         <Card className="p-6 bg-primary/5 border-primary/20">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Recommended Monthly Savings (Optional)</p>
+              <p className="text-sm text-muted-foreground mb-1">{t("phase3b.recommendedSavings")}</p>
               <p className="text-2xl font-bold text-primary">{formatAmount(family?.min_savings_amount || 5000)}</p>
             </div>
             <DollarSign className="h-8 w-8 text-primary opacity-50" />
@@ -414,10 +415,10 @@ export default function FamilySavings() {
                   <div>
                     <Label htmlFor="amount">Amount (recommended: {(family?.min_savings_amount || 5000).toLocaleString()})</Label>
                     <Input id="amount" type="number" min="0" step="1000" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: e.target.value })} required />
-                    <p className="text-xs text-muted-foreground mt-1">Any amount is acceptable; this is optional</p>
+                    <p className="text-xs text-muted-foreground mt-1">{t("phase3b.optionalAmount")}</p>
                   </div>
                   <div>
-                    <Label htmlFor="notes">Notes (optional)</Label>
+                    <Label htmlFor="notes">{t("phase3b.optionalNotes")}</Label>
                     <Textarea id="notes" value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} />
                   </div>
                   <Button type="submit" className="w-full">{editingSaving ? "Save Changes" : (canManageFinances ? "Add Savings" : "Submit for Approval")}</Button>
@@ -459,7 +460,7 @@ export default function FamilySavings() {
         ) : (
         <Card>
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <ManagementTable className="w-full">
               <thead>
                 <tr className="border-b">
                   <th className="text-left p-4">{t("famSavings.member")}</th>
@@ -479,7 +480,7 @@ export default function FamilySavings() {
                   savings.map((saving) => (
                     <tr key={saving.id} className="border-b hover:bg-muted/50">
                       <td className="p-4">{saving.family_members.profiles.full_name}</td>
-                      <td className="p-4">{new Date(saving.month).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}</td>
+                      <td className="p-4">{new Date(saving.month).toLocaleDateString(i18n.language, { year: 'numeric', month: 'long' })}</td>
                       <td className="p-4 text-right font-mono">{formatAmount(parseFloat(saving.amount.toString()))}</td>
                       <td className="p-4">
                         {statusBadge(saving.status)}
@@ -514,7 +515,7 @@ export default function FamilySavings() {
                   ))
                 )}
               </tbody>
-            </table>
+            </ManagementTable>
           </div>
         </Card>
         )}

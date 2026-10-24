@@ -1,3 +1,4 @@
+import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -5,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ResponsiveDialog as Dialog, ResponsiveDialogContent as DialogContent, ResponsiveDialogHeader as DialogHeader, ResponsiveDialogTitle as DialogTitle, ResponsiveDialogTrigger as DialogTrigger } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -411,15 +412,13 @@ export default function Contributions() {
   }
 
   // Use mobile-optimized view on mobile devices
-  if (isMobile) {
-    return <MobileContributions />;
-  }
+  
 
   return (
     <>
       <SEO title={t("famContributions.contributions")} description={t("famContributions.trackMemberAndHouseContributions")} />
       <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      <ManagementHeader title={t("famContributions.contributions")} onCreate={canManageFinances ? () => setIsDialogOpen(true) : undefined} createLabel={t("famContributions.addContribution")} as="header" className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-4">
@@ -457,7 +456,7 @@ export default function Contributions() {
                   ) : (
                     <Bell className="w-4 h-4 mr-2" />
                   )}
-                  Remind everyone
+                  {t("phase3b.remindEveryone")}
                 </Button>
               )}
               {canManageFinances && (
@@ -615,7 +614,7 @@ export default function Contributions() {
               )}
             </div>
         </div>
-      </header>
+      </ManagementHeader>
 
       <main className="container mx-auto px-4 py-8 space-y-6">
         <div className="grid gap-4 md:grid-cols-3">

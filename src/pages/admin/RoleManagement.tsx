@@ -1,3 +1,4 @@
+import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import i18n from "@/i18n/config";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
@@ -188,7 +189,7 @@ export default function RoleManagement() {
 
   return (
     <div className="container mx-auto py-8 space-y-6">
-      <div className="flex items-center gap-4">
+      <ManagementHeader className="flex items-center gap-4" title={t("admRoleManagement.roleManagement")} as="div">
         <Button variant="outline" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
@@ -201,7 +202,7 @@ export default function RoleManagement() {
             {t("admRoleManagement.assignMultipleRolesToFamily")}
           </p>
         </div>
-      </div>
+      </ManagementHeader>
 
       <Card>
         <CardHeader>
@@ -248,7 +249,7 @@ export default function RoleManagement() {
                     ))}
                   </div>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                   {Object.entries(ROLE_INFO).map(([key, info]) => {
                     const isChecked = member.assignedRoles.includes(key);
                     const isDisabled = updating === member.id;

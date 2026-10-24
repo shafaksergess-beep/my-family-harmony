@@ -1,3 +1,4 @@
+import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -7,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { ArrowLeft, Plus, CheckCircle2, XCircle, DollarSign, AlertTriangle, TrendingUp, Clock } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ResponsiveDialog as Dialog, ResponsiveDialogContent as DialogContent, ResponsiveDialogHeader as DialogHeader, ResponsiveDialogTitle as DialogTitle, ResponsiveDialogTrigger as DialogTrigger } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -334,15 +335,13 @@ export default function Loans() {
   }
 
   // Render mobile version on mobile devices
-  if (isMobile) {
-    return <MobileLoans />;
-  }
+  
 
   return (
     <>
       <SEO title={t("famLoans.familyLoans")} description={t("famLoans.applyForApproveAndTrack")} />
       <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
+      <ManagementHeader className="flex items-center justify-between" title={t("famLoans.loanManagement")} onCreate={true ? () => setIsDialogOpen(true) : undefined} createLabel={t("famLoans.requestLoan")} as="div">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${family?.id}`)}>
             <ArrowLeft className="h-5 w-5" />
@@ -474,7 +473,7 @@ export default function Loans() {
             </div>
           </DialogContent>
         </Dialog>
-      </div>
+      </ManagementHeader>
 
       <Alert variant="default" className="border-orange-500">
         <AlertTriangle className="h-4 w-4 text-orange-500" />
@@ -493,7 +492,7 @@ export default function Loans() {
               <div className="text-sm text-muted-foreground">{t("famLoans.activeLoans")}</div>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </div>
-            <div className="text-2xl font-bold mt-2">{totalLoansOut.toLocaleString()} FCFA</div>
+            <div className="text-2xl font-bold mt-2">{formatAmount(totalLoansOut)}</div>
             <p className="text-xs text-muted-foreground mt-1">{loans.filter((l) => l.status === "disbursed").length} loans</p>
           </div>
         </Card>
@@ -503,7 +502,7 @@ export default function Loans() {
               <div className="text-sm text-muted-foreground">{t("famLoans.expectedInterest")}</div>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </div>
-            <div className="text-2xl font-bold mt-2">{totalInterestExpected.toLocaleString()} FCFA</div>
+            <div className="text-2xl font-bold mt-2">{formatAmount(totalInterestExpected)}</div>
           </div>
         </Card>
         <Card>
@@ -570,18 +569,18 @@ export default function Loans() {
                       </Badge>
                     )}
                   </div>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div>
                       <p className="text-muted-foreground">{t("famLoans.principal")}</p>
-                      <p className="font-medium">{loan.amount.toLocaleString()} FCFA</p>
+                      <p className="font-medium">{formatAmount(loan.amount)}</p>
                     </div>
                     <div>
                       <p className="text-muted-foreground">{t("famLoans.totalOwed")}</p>
-                      <p className="font-medium">{totalOwed.toLocaleString()} FCFA</p>
+                      <p className="font-medium">{formatAmount(totalOwed)}</p>
                     </div>
                     <div>
                       <p className="text-muted-foreground">{t("famLoans.term")}</p>
-                      <p className="font-medium">{loan.term_months} months @ {loan.interest_rate}%</p>
+                      <p className="font-medium">{t("phase3b.term", { months: loan.term_months, rate: loan.interest_rate })}</p>
                     </div>
                     {loan.due_date && (
                       <div>
@@ -593,7 +592,7 @@ export default function Loans() {
                    {loan.status === "disbursed" && (
                     <div className="space-y-2">
                       <div className="bg-muted p-2 rounded text-sm">
-                        <p>Paid: {totalPaid.toLocaleString()} FCFA | Remaining: {remaining.toLocaleString()} FCFA</p>
+                        <p>{t("phase3b.paidRemaining", { paid: formatAmount(totalPaid), remaining: formatAmount(remaining) })}</p>
                       </div>
                       <Dialog>
                         <DialogTrigger asChild>

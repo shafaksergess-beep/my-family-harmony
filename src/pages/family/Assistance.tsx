@@ -1,3 +1,4 @@
+import { ManagementTable, ManagementHeader } from "@/components/layout/ManagementMobile";
 import i18n from "@/i18n/config";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
@@ -8,7 +9,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { ArrowLeft, Plus, CheckCircle2 } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ResponsiveDialog as Dialog, ResponsiveDialogContent as DialogContent, ResponsiveDialogHeader as DialogHeader, ResponsiveDialogTitle as DialogTitle, ResponsiveDialogTrigger as DialogTrigger } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -386,7 +387,7 @@ export default function FamilyAssistance() {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
+        <ManagementHeader className="flex items-center justify-between" title={t("famAssistance.assistanceEvents")} onCreate={canManageFinances ? () => setIsDialogOpen(true) : undefined} createLabel={t("famAssistance.recordEvent")} as="div">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="h-5 w-5" />
@@ -394,7 +395,7 @@ export default function FamilyAssistance() {
             <h1 className="text-3xl font-bold">{t("famAssistance.assistanceEvents")}</h1>
           </div>
           <LanguageSwitcher />
-        </div>
+        </ManagementHeader>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="p-6">
@@ -426,7 +427,7 @@ export default function FamilyAssistance() {
                   <DialogTitle>{t("famAssistance.recordAssistanceEvent")}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="member">{t("famAssistance.member")}</Label>
                       <Select
@@ -476,7 +477,7 @@ export default function FamilyAssistance() {
                       )}
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="event_date">{t("famAssistance.eventDate")}</Label>
                       <Input
@@ -589,7 +590,7 @@ export default function FamilyAssistance() {
 
         <Card>
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <ManagementTable className="w-full">
               <thead>
                 <tr className="border-b">
                   <th className="text-left p-4">{t("famAssistance.date")}</th>
@@ -672,7 +673,7 @@ export default function FamilyAssistance() {
                   })
                 )}
               </tbody>
-            </table>
+            </ManagementTable>
           </div>
         </Card>
 

@@ -1,3 +1,4 @@
+import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -125,7 +126,7 @@ export default function FinancialSettings() {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-2xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
+        <ManagementHeader className="flex items-center justify-between" title={t("famFinancialSettings.financialSettings")} as="div">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="h-5 w-5" />
@@ -136,7 +137,7 @@ export default function FinancialSettings() {
             </div>
           </div>
           <LanguageSwitcher />
-        </div>
+        </ManagementHeader>
 
         <form onSubmit={handleSave} className="space-y-6">
           <Card className="p-6 space-y-6">
@@ -290,7 +291,7 @@ export default function FinancialSettings() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="birth_assistance_amount">Birth Assistance (FCFA)</Label>
                 <Input

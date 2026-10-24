@@ -1,3 +1,4 @@
+import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -8,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus, ArrowLeft, Building2, Users, Edit, Trash2, Shield, FileText, Download, RotateCcw, AlertTriangle } from "lucide-react";
 import { logAdminActivity } from "@/lib/adminLogger";
 import { exportToCSV, formatFamiliesForExport } from "@/lib/export";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ResponsiveDialog as Dialog, ResponsiveDialogContent as DialogContent, ResponsiveDialogDescription as DialogDescription, ResponsiveDialogHeader as DialogHeader, ResponsiveDialogTitle as DialogTitle, ResponsiveDialogTrigger as DialogTrigger } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -287,7 +288,7 @@ const AdminFamilies = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      <ManagementHeader title={t("admin.familyManagement")} as="header" className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -380,7 +381,7 @@ const AdminFamilies = () => {
             </div>
           </div>
         </div>
-      </header>
+      </ManagementHeader>
 
       <main className="container mx-auto px-4 py-8">
         {families.length === 0 ? (

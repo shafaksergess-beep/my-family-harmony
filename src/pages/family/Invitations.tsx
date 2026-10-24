@@ -1,3 +1,4 @@
+import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -240,7 +241,7 @@ const Invitations = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      <ManagementHeader title={t("famInvitations.invitationsJoinRequests")} as="header" className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -259,7 +260,7 @@ const Invitations = () => {
             </Button>
           </div>
         </div>
-      </header>
+      </ManagementHeader>
 
       <main className="container mx-auto px-4 py-8 space-y-8">
         {/* Join Requests Section */}

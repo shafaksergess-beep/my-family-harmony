@@ -1,3 +1,4 @@
+import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -232,7 +233,7 @@ const ActivityLogs = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      <ManagementHeader title={t("admActivityLogs.adminActivityLogs")} as="header" className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -260,7 +261,7 @@ const ActivityLogs = () => {
             </div>
           </div>
         </div>
-      </header>
+      </ManagementHeader>
 
       <main className="container mx-auto px-4 py-8">
         {/* Filters */}

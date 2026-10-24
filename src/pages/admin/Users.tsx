@@ -1,3 +1,4 @@
+import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ResponsiveDialog as Dialog, ResponsiveDialogContent as DialogContent, ResponsiveDialogHeader as DialogHeader, ResponsiveDialogTitle as DialogTitle, ResponsiveDialogTrigger as DialogTrigger } from "@/components/ui/responsive-dialog";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Plus, Search, UserPlus, Edit, Trash2, Download } from "lucide-react";
 import { exportToCSV } from "@/lib/export";
@@ -462,7 +463,7 @@ export default function Users() {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <ManagementHeader className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-center lg:justify-between" title={t('admDashboard.userManagement')} as="div">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
@@ -677,7 +678,7 @@ export default function Users() {
             </DialogContent>
           </Dialog>
           </div>
-        </div>
+        </ManagementHeader>
 
         <Card>
           <CardHeader>

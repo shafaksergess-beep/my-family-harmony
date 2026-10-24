@@ -1,3 +1,4 @@
+import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -8,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { usePlatform } from "@/hooks/usePlatform";
 import { Loader2, ArrowLeft, Plus, Calendar, MapPin, Clock, QrCode, CalendarRange } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ResponsiveDialog as Dialog, ResponsiveDialogContent as DialogContent, ResponsiveDialogDescription as DialogDescription, ResponsiveDialogHeader as DialogHeader, ResponsiveDialogTitle as DialogTitle, ResponsiveDialogTrigger as DialogTrigger } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -349,15 +350,13 @@ const FamilyMeetings = () => {
   }
 
   // Use mobile-optimized view on mobile devices
-  if (isMobile) {
-    return <MobileMeetings />;
-  }
+  
 
   return (
     <>
       <SEO title={t("famMeetings.familyMeetings")} description={t("famMeetings.scheduleViewAndManageYour")} />
       <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      <ManagementHeader title={t("phase3b.meetingTitle")} onCreate={canScheduleMeetings ? () => setIsDialogOpen(true) : undefined} createLabel={t("famMeetings.scheduleMeeting")} as="header" className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-4">
@@ -536,7 +535,7 @@ const FamilyMeetings = () => {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="host">Host House (optional)</Label>
+                    <Label htmlFor="host">{t("phase3b.hostHouse")}</Label>
                     <Input
                       id="host"
                       value={formData.host_house}
@@ -583,7 +582,7 @@ const FamilyMeetings = () => {
             )}
           </div>
         </div>
-      </header>
+      </ManagementHeader>
 
       <main className="container mx-auto px-4 py-8">
         {meetings.length === 0 ? (

@@ -1,3 +1,4 @@
+import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -152,7 +153,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO title={t("profile.myProfile")} description={t("profile.manageYourKinsrootProfileLanguage")} />
-      <header className="border-b border-border bg-card">
+      <ManagementHeader title={t("profile.userProfile")} as="header" className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -172,7 +173,7 @@ const Profile = () => {
             <LanguageSwitcher />
           </div>
         </div>
-      </header>
+      </ManagementHeader>
 
       <main className="container mx-auto px-4 py-8 max-w-2xl space-y-6">
         <Card>

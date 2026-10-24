@@ -336,3 +336,13 @@ html[data-device="mobile"] .app-shell [data-shell-nav] { padding-inline: env(saf
   .app-screens .page-header > div { flex-wrap: nowrap; }
   .app-shell .shell-content .min-h-screen { min-height: calc(100dvh - var(--shell-nav-height) - env(safe-area-inset-bottom, 0px)); }
 }
+
+/* Phase 3b adapters only: existing desktop layouts are untouched. */
+html[data-device="mobile"] .management-header-controls :where(h1, header) { display: none; }
+html[data-device="mobile"] .management-header-controls .flex { flex-wrap: wrap; }
+html[data-device="mobile"] .management-header-controls > div { min-width: 0; }
+html[data-device="mobile"] .management-create-bar { position: fixed; inset-inline: 0; bottom: calc(4rem + env(safe-area-inset-bottom, 0px)); z-index: 40; }
+html[data-device="mobile"] .shell-content:has(.management-create-bar) { padding-bottom: calc(9rem + env(safe-area-inset-bottom, 0px)); }
+html[data-device="mobile"] .app-shell[data-nav-visible="false"] .management-create-bar { bottom: var(--keyboard-inset, 0px); }
+.management-row-actions :where(.flex) { flex-wrap: wrap; gap: 0.5rem; }
+html[data-device="mobile"] .responsive-dialog .bottom-action-bar { bottom: 0; }

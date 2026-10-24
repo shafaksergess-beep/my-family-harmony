@@ -17,3 +17,5 @@
 - BrowserRouter route shell options are registered via ShellRouteConfig/useShellConfig, including check-in hiding. Why: declarative Routes cannot expose data-router useMatches handles.
 
 - MobileMembers is presentation-only and receives the parent Members records and callbacks; shared responsive dialogs live in Members. Why: desktop and mobile must use identical multi-role mutations, self-action restrictions and authorization.
+
+- ManagementHeader and ManagementTable adapt existing rendered controls and rows for mobile; parent pages retain all data and mutations. Why: prevent parallel mobile authorization or accounting logic while preserving desktop markup.

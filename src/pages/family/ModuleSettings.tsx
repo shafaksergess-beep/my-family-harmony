@@ -1,3 +1,4 @@
+import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -157,7 +158,7 @@ export default function ModuleSettings() {
         description={t("moduleSettings.seoDescription")}
       />
       <div className="max-w-3xl mx-auto p-4 md:p-6 space-y-6">
-        <div className="flex items-center gap-3">
+        <ManagementHeader className="flex items-center gap-3" title={t("moduleSettings.title")} as="div">
           <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
             <LucideIcons.ArrowLeft className="h-5 w-5" />
           </Button>
@@ -169,7 +170,7 @@ export default function ModuleSettings() {
               {t("moduleSettings.subtitle", { name: family?.name })}
             </p>
           </div>
-        </div>
+        </ManagementHeader>
 
         {categories.map((category) => {
           const categoryModules = modules.filter(
