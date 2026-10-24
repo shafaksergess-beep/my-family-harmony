@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, Plus, Search, UserPlus, Edit, Trash2, Download, MoreVertical } from "lucide-react";
 import { exportToCSV } from "@/lib/export";
 import { useTranslation } from "react-i18next";
+import { UserAdminActions, useSuspendedUsers } from "@/components/admin/UserAdminActions";
 
 interface UserProfile {
   id: string;
@@ -63,6 +64,7 @@ export default function Users() {
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [userRole, setUserRole] = useState<"super_admin" | "family_head" | "family_admin" | null>(null);
   const [managedFamilies, setManagedFamilies] = useState<string[]>([]);
+  const { suspended, refresh: refreshSuspended } = useSuspendedUsers(userRole === "super_admin" ? users.map((u) => u.id) : []);
   
   // New user form state
   const [newUser, setNewUser] = useState({
@@ -721,6 +723,9 @@ export default function Users() {
                             {user.is_support_admin && (
                               <Badge variant="secondary">{t("admUsers.supportAdmin")}</Badge>
                             )}
+                            {suspended.has(user.id) && (
+                              <Badge variant="destructive">{t("userAdmin.suspended")}</Badge>
+                            )}
                           </div>
                           <div className="space-y-1 text-sm text-muted-foreground">
                             <p>{user.email}</p>
@@ -741,6 +746,7 @@ export default function Users() {
                         {isMobile ? <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="icon" className="text-foreground" aria-label={t("foundation.moreActions")}><MoreVertical className="h-5 w-5" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end">
                           {userRole === "super_admin" && !user.is_super_admin && <DropdownMenuItem onClick={() => handleToggleSupportAdmin(user)}>{user.is_support_admin ? t("admUsers.removeSupportAdmin") : t("admUsers.makeSupportAdmin")}</DropdownMenuItem>}
                           <DropdownMenuItem onClick={() => navigate(`/admin/users/${user.id}`)}><Edit className="h-4 w-4" />{t("famMembers.edit")}</DropdownMenuItem>
+                          <UserAdminActions variant="menu" user={user} isSuperAdminViewer={userRole === "super_admin"} isSelf={user.id === currentUserId} isSuspended={suspended.has(user.id)} onChanged={refreshSuspended} />
                         </DropdownMenuContent></DropdownMenu> : (                        <div className="flex flex-wrap items-center gap-2">
                           {userRole === "super_admin" && !user.is_super_admin && (
                             <Button
@@ -760,6 +766,7 @@ export default function Users() {
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
+                          <UserAdminActions variant="buttons" user={user} isSuperAdminViewer={userRole === "super_admin"} isSelf={user.id === currentUserId} isSuspended={suspended.has(user.id)} onChanged={refreshSuspended} />
                         </div>) }
                       </div>
                     </CardContent>

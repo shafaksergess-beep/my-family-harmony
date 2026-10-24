@@ -63,7 +63,7 @@ Deno.serve(async (req) => {
       if (error) return reply({ error: "Could not send reset email" }, 500);
     }
 
-    await sb.from("admin_logs").insert({ admin_id: callerId, action_type: action.toUpperCase().replace("-", "_"), entity_type: "user", entity_id: userId, details: {} } as never);
+    await sb.from("admin_logs").insert({ admin_user_id: callerId, action_type: action.toUpperCase().replace("-", "_"), entity_type: "user", entity_id: userId, details: {} } as never);
     return reply({ ok: true });
   } catch (_e) {
     return reply({ error: "Server error" }, 500);
