@@ -66,5 +66,6 @@
 - [ ] Complete remaining Phase 3 screens and their validation
 
 ## Phase 3b remaining mobile management
-- [ ] Migrate requested family, administration and profile/settings presentation without data changes
-- [ ] Validate each migrated screen at five sizes and document remaining gaps
+- [x] Adapt requested primary family, administration and profile/settings presentation without data changes (remaining gaps in docs/MOBILE_PHASE3B_VALIDATION.md)
+- [x] Validate 24 routes at six sizes and document remaining gaps (144 checks; 60 tests pass)
+- [ ] Populated meeting-detail, role-specific financial actions and physical-device validation (requires designated disposable records/native builds)
