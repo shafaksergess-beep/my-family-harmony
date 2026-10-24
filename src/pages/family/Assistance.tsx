@@ -1,3 +1,4 @@
+import { ResponsiveDialogFooter } from "@/components/ui/responsive-dialog";
 import { ManagementTable, ManagementHeader } from "@/components/layout/ManagementMobile";
 import i18n from "@/i18n/config";
 import { useTranslation } from "react-i18next";
@@ -581,7 +582,7 @@ export default function FamilyAssistance() {
                       <p className="text-sm text-red-500 mt-1">{validationErrors.notes}</p>
                     )}
                   </div>
-                  <Button type="submit" className="w-full">{t("famAssistance.recordEvent")}</Button>
+                  <ResponsiveDialogFooter><Button type="submit" className="w-full">{t("famAssistance.recordEvent")}</Button></ResponsiveDialogFooter>
                 </form>
               </DialogContent>
             </Dialog>

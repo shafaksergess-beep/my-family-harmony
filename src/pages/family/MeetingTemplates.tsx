@@ -1,3 +1,6 @@
+import { PageHeader } from "@/components/layout/PageHeader";
+import { BottomActionBar } from "@/components/layout/BottomActionBar";
+import { useDevice } from "@/hooks/useDevice";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -21,6 +24,7 @@ interface Template {
 
 const MeetingTemplates = () => {
   const { t } = useTranslation();
+  const { isMobile } = useDevice();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -150,7 +154,7 @@ const MeetingTemplates = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      {isMobile ? <PageHeader title={t("famMeetingTemplates.meetingTemplates")} subtitle={family?.name} backTo={`/family/${familySlug}`} actions={[{key:"create", label:t("famMeetingTemplates.newTemplate"), icon:Plus, primary:true, onClick:()=>setShowForm(!showForm)}]} /> : <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
@@ -167,7 +171,7 @@ const MeetingTemplates = () => {
             </Button>
           </div>
         </div>
-      </header>
+      </header>}
 
       <main className="container mx-auto px-4 py-8 space-y-6">
         {showForm && (
@@ -182,7 +186,7 @@ const MeetingTemplates = () => {
                   id="name"
                   value={newTemplate.name}
                   onChange={(e) => setNewTemplate({ ...newTemplate, name: e.target.value })}
-                  placeholder="e.g., Standard Monthly Meeting"
+                  placeholder={t("phase4.templateExample")}
                 />
               </div>
               <div>
@@ -195,7 +199,7 @@ const MeetingTemplates = () => {
                   rows={3}
                 />
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row">
                 <Button onClick={handleCreateTemplate}>{t("famMeetingTemplates.createTemplate")}</Button>
                 <Button variant="outline" onClick={() => setShowForm(false)}>{t("famMeetingTemplates.cancel")}</Button>
               </div>
@@ -215,8 +219,8 @@ const MeetingTemplates = () => {
             {templates.map((template) => (
               <Card key={template.id}>
                 <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
                       <CardTitle>{template.name}</CardTitle>
                       {template.description && (
                         <p className="text-sm text-muted-foreground mt-1">{template.description}</p>
@@ -224,16 +228,17 @@ const MeetingTemplates = () => {
                     </div>
                     <Button
                       variant="ghost"
-                      size="sm"
+                      size="icon"
+                      aria-label={t("phase4.deleteTemplate")}
                       onClick={() => handleDeleteTemplate(template.id)}
                     >
-                      <Trash2 className="w-4 h-4 text-red-600" />
+                      <Trash2 className="w-4 h-4 text-destructive" />
                     </Button>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <Badge variant="outline">
-                    {template.agenda_items?.length || 0} agenda items
+                    {t("phase4.agendaCount", {count: template.agenda_items?.length || 0})}
                   </Badge>
                 </CardContent>
               </Card>
@@ -241,6 +246,7 @@ const MeetingTemplates = () => {
           </div>
         )}
       </main>
+      {isMobile && showForm && <BottomActionBar><Button onClick={handleCreateTemplate}>{t("famMeetingTemplates.createTemplate")}</Button></BottomActionBar>}
     </div>
   );
 };

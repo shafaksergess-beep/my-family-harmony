@@ -1,5 +1,6 @@
 {
   "phase4": {
+    "deleteTemplate": "Supprimer le modèle",
   "completed": "Terminée",
   "upcoming": "À venir",
   "loadingPage": "Chargement de la page",

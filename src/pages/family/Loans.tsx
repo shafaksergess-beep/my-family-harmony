@@ -1,3 +1,4 @@
+import { ResponsiveDialogFooter } from "@/components/ui/responsive-dialog";
 import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
@@ -467,9 +468,9 @@ export default function Loans() {
                   )}
                 </p>
               </div>
-              <Button onClick={handleRequestLoan} className="w-full">
+              <ResponsiveDialogFooter><Button onClick={handleRequestLoan} className="w-full">
                 {t("famLoans.submitLoanRequest")}
-              </Button>
+              </Button></ResponsiveDialogFooter>
             </div>
           </DialogContent>
         </Dialog>

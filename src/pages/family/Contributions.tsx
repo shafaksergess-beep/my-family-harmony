@@ -1,3 +1,4 @@
+import { ResponsiveDialogFooter } from "@/components/ui/responsive-dialog";
 import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
@@ -605,9 +606,9 @@ export default function Contributions() {
                           <p className="text-sm text-red-500 mt-1">{validationErrors.notes}</p>
                         )}
                       </div>
-                      <Button onClick={handleAddContribution} className="w-full">
+                      <ResponsiveDialogFooter><Button onClick={handleAddContribution} className="w-full">
                         {t("famContributions.addContribution")}
-                      </Button>
+                      </Button></ResponsiveDialogFooter>
                     </div>
                   </DialogContent>
                 </Dialog>

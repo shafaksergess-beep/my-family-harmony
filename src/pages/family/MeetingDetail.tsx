@@ -1,3 +1,5 @@
+import { PageHeader } from "@/components/layout/PageHeader";
+import { useDevice } from "@/hooks/useDevice";
 import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
@@ -29,6 +31,7 @@ interface Meeting {
 
 const MeetingDetail = () => {
   const { t, i18n } = useTranslation();
+  const { isMobile } = useDevice();
   const { familySlug, meetingId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -105,7 +108,7 @@ const MeetingDetail = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <ManagementHeader title={t("famMeetingDetail.meetingDetails")} as="header" className="border-b border-border bg-card">
+      {isMobile ? <PageHeader title={t("famMeetingDetail.meetingDetails")} subtitle={family?.name} backTo={`/family/${familySlug}/meetings`} badge={<Badge variant="outline">{meeting.is_completed ? t("phase4.completed") : t("phase4.upcoming")}</Badge>} /> : <ManagementHeader title={t("famMeetingDetail.meetingDetails")} as="header" className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}/meetings`)}>
@@ -121,7 +124,7 @@ const MeetingDetail = () => {
             </Badge>
           </div>
         </div>
-      </ManagementHeader>
+      </ManagementHeader>}
 
       <main className="container mx-auto px-4 py-8 space-y-6">
         {/* Meeting Info Card */}
@@ -135,7 +138,7 @@ const MeetingDetail = () => {
                 <Calendar className="w-5 h-5 text-muted-foreground" />
                 <div>
                   <p className="text-sm text-muted-foreground">{t("famMeetingDetail.date")}</p>
-                  <p className="font-medium">
+                  <p className="font-medium break-words">
                     {new Date(meeting.meeting_date).toLocaleDateString(i18n.language, {
                       weekday: 'long',
                       year: 'numeric',
@@ -150,7 +153,7 @@ const MeetingDetail = () => {
                 <Clock className="w-5 h-5 text-muted-foreground" />
                 <div>
                   <p className="text-sm text-muted-foreground">{t("famMeetingDetail.time")}</p>
-                  <p className="font-medium">{meeting.meeting_time}</p>
+                  <p className="font-medium break-words">{meeting.meeting_time}</p>
                 </div>
               </div>
 
@@ -159,7 +162,7 @@ const MeetingDetail = () => {
                   <MapPin className="w-5 h-5 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">{t("famMeetingDetail.location")}</p>
-                    <p className="font-medium">{meeting.location}</p>
+                    <p className="font-medium break-words">{meeting.location}</p>
                   </div>
                 </div>
               )}
@@ -169,7 +172,7 @@ const MeetingDetail = () => {
                   <Users className="w-5 h-5 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">{t("famMeetingDetail.hostHouse")}</p>
-                    <p className="font-medium">{meeting.host_house}</p>
+                    <p className="font-medium break-words">{meeting.host_house}</p>
                   </div>
                 </div>
               )}

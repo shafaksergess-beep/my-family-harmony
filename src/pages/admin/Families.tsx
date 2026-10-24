@@ -1,3 +1,4 @@
+import { ResponsiveDialogFooter } from "@/components/ui/responsive-dialog";
 import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -367,14 +368,14 @@ const AdminFamilies = () => {
                         rows={3}
                       />
                     </div>
-                    <div className="flex justify-end gap-2">
+                    <ResponsiveDialogFooter className="flex justify-end gap-2">
                       <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                         {t("common.cancel")}
                       </Button>
                       <Button type="submit">
                         {editingFamily ? t("common.edit") : t("common.create")}
                       </Button>
-                    </div>
+                    </ResponsiveDialogFooter>
                   </form>
                 </DialogContent>
               </Dialog>

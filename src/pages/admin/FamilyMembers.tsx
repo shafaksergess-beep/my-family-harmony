@@ -1,3 +1,5 @@
+import { ManagementHeader } from "@/components/layout/ManagementMobile";
+import { ResponsiveDialogFooter } from "@/components/ui/responsive-dialog";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -8,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, ArrowLeft, Plus, Trash2, Shield, Download, Edit, Phone, Calendar, Briefcase, Home, User, Search, Filter, Eye, CheckSquare, Square } from "lucide-react";
 import { logAdminActivity } from "@/lib/adminLogger";
 import { exportToCSV, formatMembersForExport } from "@/lib/export";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ResponsiveDialog as Dialog, ResponsiveDialogContent as DialogContent, ResponsiveDialogDescription as DialogDescription, ResponsiveDialogHeader as DialogHeader, ResponsiveDialogTitle as DialogTitle, ResponsiveDialogTrigger as DialogTrigger } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -368,9 +370,9 @@ const FamilyMembers = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      <ManagementHeader title={t("admFamilyMembers.familyMembers")} as="header" className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate("/admin/families")}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -450,19 +452,19 @@ const FamilyMembers = () => {
                         placeholder={t("admin.houseNamePlaceholder")}
                       />
                     </div>
-                    <div className="flex justify-end gap-2">
+                    <ResponsiveDialogFooter className="flex justify-end gap-2">
                       <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                         {t("common.cancel")}
                       </Button>
                       <Button type="submit">{t("admin.addMember")}</Button>
-                    </div>
+                    </ResponsiveDialogFooter>
                   </form>
                 </DialogContent>
               </Dialog>
             </div>
           </div>
         </div>
-      </header>
+      </ManagementHeader>
 
       <main className="container mx-auto px-4 py-8">
         {/* Search and Filters */}
@@ -507,7 +509,7 @@ const FamilyMembers = () => {
             </Select>
           </div>
           
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Checkbox
                 checked={selectedMembers.size === filteredMembers.length && filteredMembers.length > 0}
@@ -521,7 +523,7 @@ const FamilyMembers = () => {
             {selectedMembers.size > 0 && (
               <div className="flex items-center gap-2">
                 <Select value={bulkAction} onValueChange={setBulkAction}>
-                  <SelectTrigger className="w-40">
+                  <SelectTrigger className="w-full sm:w-40">
                     <SelectValue placeholder={t("admFamilyMembers.bulkAction")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -533,7 +535,7 @@ const FamilyMembers = () => {
                 
                 {bulkAction === "role" && (
                   <Select value={bulkRole} onValueChange={setBulkRole}>
-                    <SelectTrigger className="w-40">
+                    <SelectTrigger className="w-full sm:w-40">
                       <SelectValue placeholder={t("admFamilyMembers.selectRole")} />
                     </SelectTrigger>
                     <SelectContent>
@@ -551,7 +553,7 @@ const FamilyMembers = () => {
                     placeholder={t("admFamilyMembers.houseName")}
                     value={bulkHouse}
                     onChange={(e) => setBulkHouse(e.target.value)}
-                    className="w-40"
+                    className="w-full sm:w-40"
                   />
                 )}
                 
@@ -567,7 +569,7 @@ const FamilyMembers = () => {
             {filteredMembers.map((member) => (
               <Card key={member.id}>
                 <CardHeader>
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <Checkbox
                         checked={selectedMembers.has(member.id)}
@@ -581,7 +583,7 @@ const FamilyMembers = () => {
                         />
                       )}
                       <div>
-                        <CardTitle className="text-lg flex items-center gap-2">
+                        <CardTitle className="text-lg flex flex-wrap items-center gap-2">
                           {member.profiles?.full_name || 'Unknown'}
                           {member.is_house_representative && (
                             <Badge variant="secondary" className="text-xs">

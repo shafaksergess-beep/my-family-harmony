@@ -1,3 +1,4 @@
+import { ResponsiveDialogFooter } from "@/components/ui/responsive-dialog";
 import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
@@ -434,12 +435,12 @@ const FamilyMeetings = () => {
                           placeholder={t("famMeetings.meetingLocation")}
                         />
                       </div>
-                      <div className="flex justify-end gap-2">
+                      <ResponsiveDialogFooter className="flex justify-end gap-2">
                         <Button type="button" variant="outline" onClick={() => setIsBulkDialogOpen(false)}>
                           {t("famMeetings.cancel")}
                         </Button>
                         <Button type="submit">{t("famMeetings.scheduleMeetings")}</Button>
-                      </div>
+                      </ResponsiveDialogFooter>
                     </form>
                   </DialogContent>
                 </Dialog>
@@ -569,12 +570,12 @@ const FamilyMeetings = () => {
                       <p className="text-sm text-red-500">{validationErrors.agenda}</p>
                     )}
                   </div>
-                  <div className="flex justify-end gap-2">
+                  <ResponsiveDialogFooter className="flex justify-end gap-2">
                     <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                       {t("famMeetings.cancel")}
                     </Button>
                     <Button type="submit">{t("famMeetings.createMeeting")}</Button>
-                  </div>
+                  </ResponsiveDialogFooter>
                 </form>
               </DialogContent>
             </Dialog>

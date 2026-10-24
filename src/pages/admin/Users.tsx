@@ -1,3 +1,4 @@
+import { ResponsiveDialogFooter } from "@/components/ui/responsive-dialog";
 import { useDevice } from "@/hooks/useDevice";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { ManagementHeader } from "@/components/layout/ManagementMobile";
@@ -546,10 +547,10 @@ export default function Users() {
                   {importResults && (
                     <div className="space-y-2">
                       <div className="flex items-center gap-4">
-                        <Badge className="bg-green-500">
+                        <Badge variant="outline" className="text-foreground">
                           {importResults.success} Successful
                         </Badge>
-                        <Badge className="bg-red-500">
+                        <Badge variant="destructive">
                           {importResults.failed} Failed
                         </Badge>
                       </div>
@@ -563,7 +564,7 @@ export default function Users() {
                     </div>
                   )}
                 </div>
-                <div className="flex justify-end gap-2">
+                <ResponsiveDialogFooter className="flex justify-end gap-2">
                   <Button
                     variant="outline"
                     onClick={() => {
@@ -575,7 +576,7 @@ export default function Users() {
                     {t("admUsers.cancel")}
                   </Button>
                   <Button onClick={handleBulkImport}>{t("admUsers.importUsers")}</Button>
-                </div>
+                </ResponsiveDialogFooter>
               </DialogContent>
             </Dialog>
 
@@ -670,14 +671,14 @@ export default function Users() {
                   </div>
                 )}
               </div>
-              <div className="flex justify-end gap-2">
+              <ResponsiveDialogFooter className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setIsAddUserOpen(false)}>
                   {t("admUsers.cancel")}
                 </Button>
                 <Button onClick={handleCreateUser}>
                   {t("admUsers.createUser")}
                 </Button>
-              </div>
+              </ResponsiveDialogFooter>
             </DialogContent>
           </Dialog>
           </div>

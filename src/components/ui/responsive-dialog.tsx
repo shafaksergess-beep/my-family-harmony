@@ -13,6 +13,24 @@ export const ResponsiveDialogTitle = DialogTitle;
 export const ResponsiveDialogDescription = DialogDescription;
 export const ResponsiveDialogContent = React.forwardRef<React.ElementRef<typeof DialogContent>, React.ComponentPropsWithoutRef<typeof DialogContent>>(({ children, className, ...props }, ref) => {
   const { isMobile } = useDevice();
+  React.useEffect(() => {
+    if (!isMobile || !window.visualViewport) return;
+    const viewport = window.visualViewport;
+    const update = () => {
+      const inset = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
+      document.documentElement.style.setProperty('--dialog-keyboard-inset', `${inset}px`);
+      document.documentElement.style.setProperty('--dialog-viewport-height', `${viewport.height}px`);
+    };
+    update();
+    viewport.addEventListener('resize', update);
+    viewport.addEventListener('scroll', update);
+    return () => {
+      viewport.removeEventListener('resize', update);
+      viewport.removeEventListener('scroll', update);
+      document.documentElement.style.removeProperty('--dialog-keyboard-inset');
+      document.documentElement.style.removeProperty('--dialog-viewport-height');
+    };
+  }, [isMobile]);
   if (!isMobile) return <DialogContent ref={ref} className={className} {...props}>{children}</DialogContent>;
   return <SheetContent ref={ref} side="bottom" className={cn('responsive-dialog !max-w-full !max-h-[90dvh] !overflow-hidden rounded-t-2xl p-0', className)} {...props}>
     <div className="mx-auto mt-3 h-1 w-10 shrink-0 rounded-full bg-border" aria-hidden="true" />

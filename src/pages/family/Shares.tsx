@@ -1,3 +1,4 @@
+import { ResponsiveDialogFooter } from "@/components/ui/responsive-dialog";
 import { ManagementTable, ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
@@ -427,7 +428,7 @@ export default function FamilyShares() {
                         onChange={(e) => setShareFormData({ ...shareFormData, notes: e.target.value })}
                       />
                     </div>
-                    <Button type="submit" className="w-full">{editingShare ? "Update Share" : "Issue Share"}</Button>
+                    <ResponsiveDialogFooter><Button type="submit" className="w-full">{editingShare ? "Update Share" : "Issue Share"}</Button></ResponsiveDialogFooter>
                   </form>
                 </DialogContent>
               </Dialog>
@@ -574,7 +575,7 @@ export default function FamilyShares() {
                         onChange={(e) => setDividendFormData({ ...dividendFormData, notes: e.target.value })}
                       />
                     </div>
-                    <Button type="submit" className="w-full">{t("famShares.declareDividend")}</Button>
+                    <ResponsiveDialogFooter><Button type="submit" className="w-full">{t("famShares.declareDividend")}</Button></ResponsiveDialogFooter>
                   </form>
                 </DialogContent>
               </Dialog>

@@ -1,5 +1,6 @@
 {
   "phase4": {
+    "deleteTemplate": "Delete template",
   "completed": "Completed",
   "upcoming": "Upcoming",
   "loadingPage": "Loading page",

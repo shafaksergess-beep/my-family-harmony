@@ -346,3 +346,11 @@ html[data-device="mobile"] .shell-content:has(.management-create-bar) { padding-
 html[data-device="mobile"] .app-shell[data-nav-visible="false"] .management-create-bar { bottom: var(--keyboard-inset, 0px); }
 .management-row-actions :where(.flex) { flex-wrap: wrap; gap: 0.5rem; }
 html[data-device="mobile"] .responsive-dialog .bottom-action-bar { bottom: 0; }
+
+/* Phase 4: nested form footers and keyboard-visible mobile sheets. */
+html[data-device="mobile"] .responsive-dialog-footer { flex-shrink: 0; padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px)); }
+html[data-device="mobile"] .responsive-dialog { bottom: var(--dialog-keyboard-inset, 0px); max-height: min(90dvh, var(--dialog-viewport-height, 90dvh)) !important; }
+html[data-device="mobile"] .responsive-dialog-scroll { max-height: min(calc(90dvh - 1rem), calc(var(--dialog-viewport-height, 90dvh) - 1rem)); }
+html[data-device="mobile"] .responsive-dialog-scroll > form { flex: 1; }
+html[data-device="mobile"] .responsive-dialog-scroll :where(.responsive-dialog-footer) { margin-top: 1rem; }
+@media (prefers-reduced-motion: reduce) { #ks-boot .ks-bar::after { animation: none; } }
