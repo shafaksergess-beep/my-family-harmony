@@ -18,11 +18,13 @@ import { exportMembersToCSV } from "@/lib/export";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription
-} from "@/components/ui/dialog";
+  ResponsiveDialog as Dialog, ResponsiveDialogContent as DialogContent, ResponsiveDialogHeader as DialogHeader, ResponsiveDialogTitle as DialogTitle, ResponsiveDialogDescription as DialogDescription
+} from "@/components/ui/responsive-dialog";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useDevice } from "@/hooks/useDevice";
+import { Skeleton } from "@/components/ui/skeleton";
+import { BottomActionBar } from "@/components/layout/BottomActionBar";
 import { MobileMembers } from "@/components/mobile";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -69,7 +71,8 @@ const Members = () => {
   const {
     canManageMembers, family, isLoading: authLoading, userId, isFamilyHead, isFamilyAdmin
   } = useFamilyAuth(familySlug);
-  const isMobile = useIsMobile();
+  const { isMobile } = useDevice();
+  const [loadError, setLoadError] = useState(false);
   const [view, setView] = useState<"list" | "org">("list");
 
   const [loading, setLoading] = useState(true);
@@ -103,6 +106,7 @@ const Members = () => {
     if (!family) return;
     try {
       setLoading(true);
+      setLoadError(false);
 
       const { data: membersData, error: membersError } = await supabase
         .from("family_members")
@@ -137,12 +141,13 @@ const Members = () => {
         ...m,
         assignedRoles: rolesByMember[m.id] || [m.role],
         profiles: profilesMap.get(m.user_id) || {
-          full_name: "Unknown", email: null, phone: null, avatar_url: null, is_working: false,
+          full_name: t("phase2.unknown"), email: null, phone: null, avatar_url: null, is_working: false,
         },
       })) as Member[];
 
       setMembers(merged);
     } catch (error: any) {
+      setLoadError(true);
       console.error("Error loading members:", error);
       toast({ title: t("famMembers.error"), description: t("famMembers.failedToLoadMembers"), variant: "destructive" });
     } finally {
@@ -199,7 +204,7 @@ const Members = () => {
       setAddForm({ user_id: "", role: "member", house_name: "" });
       loadMembers();
     } catch (error: any) {
-      toast({ title: t("famMembers.error"), description: error.message || "Failed to add member", variant: "destructive" });
+      toast({ title: t("famMembers.error"), description: error.message || t("phase3.addFailed"), variant: "destructive" });
     } finally {
       setAdding(false);
     }
@@ -230,7 +235,7 @@ const Members = () => {
           await supabase.from("family_members").update({ role: role as any }).eq("id", memberId);
         }
       }
-      toast({ title: t("famMembers.success"), description: hasRole ? "Role removed" : "Role assigned" });
+      toast({ title: t("famMembers.success"), description: t(hasRole ? "phase3.roleRemoved" : "phase3.roleAssigned") });
       loadMembers();
       // Refresh selected member
       if (selectedMember?.id === memberId) {
@@ -243,7 +248,7 @@ const Members = () => {
         }
       }
     } catch (error: any) {
-      toast({ title: t("famMembers.error"), description: error.message || "Failed to update role", variant: "destructive" });
+      toast({ title: t("famMembers.error"), description: error.message || t("phase3.roleFailed"), variant: "destructive" });
     } finally {
       setUpdatingRole(false);
     }
@@ -276,7 +281,7 @@ const Members = () => {
       await supabase.from("member_roles").delete().eq("member_id", removeTarget.id);
       const { error } = await supabase.from("family_members").delete().eq("id", removeTarget.id);
       if (error) throw error;
-      toast({ title: t("famMembers.success"), description: `${removeTarget.profiles.full_name} has been removed` });
+      toast({ title: t("famMembers.success"), description: t("phase3.memberRemoved", { name: removeTarget.profiles.full_name }) });
       setRemoveTarget(null);
       loadMembers();
     } catch (error: any) {
@@ -294,6 +299,7 @@ const Members = () => {
   });
 
   if (authLoading || loading) {
+    if (isMobile) return <div className="space-y-4 p-4" aria-busy="true"><Skeleton className="h-12 w-full" /><Skeleton className="h-24 w-full" />{[0, 1, 2].map(key => <Skeleton key={key} className="h-36 w-full rounded-2xl" />)}</div>;
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -301,22 +307,19 @@ const Members = () => {
     );
   }
 
-  if (isMobile) {
-    return (
-      <>
-        <MobileMembers />
-        <section className="px-4 pb-28 pt-2" aria-label={t("organigram.orgView")}>
-          <h2 className="mb-3 text-lg font-semibold">{t("organigram.orgView")}</h2>
-          <GovernanceOrganigram members={filteredMembers} roleLabel={getRoleLabel} />
-        </section>
-      </>
-    );
-  }
 
   return (
     <>
       <SEO title={t("famMembers.familyMembers")} description={t("famMembers.manageFamilyMembersRolesAnd")} />
-      <div className="min-h-screen bg-background p-6">
+      <div className={isMobile ? "min-w-0 bg-background" : "min-h-screen bg-background p-6"}>
+      {isMobile ? <MobileMembers members={filteredMembers} allMembers={members} familyName={family?.name ?? ""} userId={userId} canManageMembers={canManageMembers}
+        search={searchQuery} onSearch={setSearchQuery} roleFilter={roleFilter} onRoleFilter={setRoleFilter} roles={Object.entries(ROLE_INFO).map(([key, info]) => ({ key, label: info.label }))} roleLabel={getRoleLabel} view={view} onView={setView}
+        onAdd={() => { setIsAddOpen(true); loadAvailableUsers(); }} onExport={() => exportMembersToCSV(filteredMembers)} onRefresh={loadMembers}
+        onRoles={member => { setSelectedMember(member as Member); setIsRoleOpen(true); }}
+        onEdit={member => { setSelectedMember(member as Member); setEditForm({ house_name: member.house_name || "", is_house_representative: member.is_house_representative }); setIsEditOpen(true); }}
+        onRemove={member => setRemoveTarget(member as Member)}
+        error={loadError ? <div role="alert" className="space-y-2 rounded-2xl border border-destructive p-4"><p>{t("famMembers.failedToLoadMembers")}</p><Button variant="outline" onClick={loadMembers}>{t("phase3.retry")}</Button></div> : undefined}
+      /> : (
       <div className="max-w-6xl mx-auto space-y-6">
         <PageHeader
           title={t('foundation.familyMembers', { name: family?.name ?? '' })}
@@ -468,6 +471,8 @@ const Members = () => {
         )}
       </div>
 
+      )}
+
       {/* Add Member Dialog */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
         <DialogContent>
@@ -505,20 +510,20 @@ const Members = () => {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>House Name (optional)</Label>
+              <Label>{t("phase3.optionalHouse")}</Label>
               <Input
                 value={addForm.house_name}
                 onChange={e => setAddForm(f => ({ ...f, house_name: e.target.value }))}
-                placeholder="e.g. House of Elders"
+                placeholder={t("famMembers.houseName")}
               />
             </div>
-            <div className="flex justify-end gap-2">
+            <BottomActionBar className={isMobile ? "sticky bottom-0 pb-safe" : "border-0 p-0"}>
               <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>{t("famMembers.cancel")}</Button>
               <Button type="submit" disabled={!addForm.user_id || adding}>
                 {adding && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                Add Member
+                {t("famMembers.addMember")}
               </Button>
-            </div>
+            </BottomActionBar>
           </form>
         </DialogContent>
       </Dialog>
@@ -529,7 +534,7 @@ const Members = () => {
           <DialogHeader>
             <DialogTitle>{t("famMembers.manageRoles")}</DialogTitle>
             <DialogDescription>
-              {selectedMember?.profiles.full_name} — assign or remove roles
+              {t("phase3.assignRoles", { name: selectedMember?.profiles.full_name })}
             </DialogDescription>
           </DialogHeader>
           {selectedMember && (
@@ -563,7 +568,7 @@ const Members = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t("famMembers.editMember")}</DialogTitle>
-            <DialogDescription>Update {selectedMember?.profiles.full_name}'s details</DialogDescription>
+            <DialogDescription>{t("phase3.editDetails", { name: selectedMember?.profiles.full_name })}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
@@ -581,16 +586,16 @@ const Members = () => {
               />
               <Label>{t("famMembers.houseRepresentative")}</Label>
             </div>
-            <div className="flex justify-end gap-2">
+            <BottomActionBar className={isMobile ? "sticky bottom-0 pb-safe" : "border-0 p-0"}>
               <Button variant="outline" onClick={() => setIsEditOpen(false)}>{t("famMembers.cancel")}</Button>
               <Button onClick={handleEditMember}>{t("famMembers.saveChanges")}</Button>
-            </div>
+            </BottomActionBar>
           </div>
         </DialogContent>
       </Dialog>
 
       {/* Remove Confirmation */}
-      <AlertDialog open={!!removeTarget} onOpenChange={open => !open && setRemoveTarget(null)}>
+      {isMobile ? <Dialog open={!!removeTarget} onOpenChange={open => !open && setRemoveTarget(null)}><DialogContent><DialogHeader><DialogTitle>{t("famMembers.removeMember")}</DialogTitle><DialogDescription>{t("famMembers.areYouSureYouWant")} {removeTarget?.profiles.full_name} {t("famMembers.fromThisFamilyThisWill")}</DialogDescription></DialogHeader><BottomActionBar className="sticky bottom-0 pb-safe"><Button variant="outline" onClick={() => setRemoveTarget(null)}>{t("famMembers.cancel")}</Button><Button variant="destructive" onClick={handleRemoveMember}>{t("famMembers.remove")}</Button></BottomActionBar></DialogContent></Dialog> : <AlertDialog open={!!removeTarget} onOpenChange={open => !open && setRemoveTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t("famMembers.removeMember")}</AlertDialogTitle>
@@ -605,7 +610,7 @@ const Members = () => {
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog>}
     </div>
     </>
   );

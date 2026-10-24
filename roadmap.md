@@ -52,3 +52,13 @@
 - [x] Mobile analytics headers, existing filter sheet, KPIs, charts, summaries and data cards
 - [x] Verify signed-in mobile/landscape and desktop screens, regression tests and document caveats (57 tests; see docs/MOBILE_PHASE2_VALIDATION.md)
 - [ ] Physical native/offline and populated role-specific approval validation (requires native builds and designated populated test records)
+
+
+## Phase 3 management screens
+- [ ] 1. Mobile member-management parity and shared dialogs
+- [ ] 2. Contributions, settings, payments, proofs and plans
+- [ ] 3. Loans, history and committee
+- [ ] 4. Savings, Njangi, shares, balloting and assistance
+- [ ] 5-8. Meetings, invitations, family settings and More
+- [ ] Platform administration and profile area
+- [ ] Validation and documentation

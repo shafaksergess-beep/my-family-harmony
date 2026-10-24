@@ -1,655 +1,80 @@
-import { useShellConfig } from '@/hooks/useShellConfig';
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { useNavigate, useParams } from "react-router-dom";
+import { Search, Plus, Download, Shield, RefreshCw, Users, User } from "lucide-react";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { DataCards } from "@/components/layout/DataCards";
+import { StatCarousel } from "@/components/layout/StatCarousel";
+import { SegmentedTabs, SegmentedTabsList, SegmentedTabsTrigger, SegmentedTabsContent } from "@/components/layout/SegmentedTabs";
+import { AnalyticsFilters } from "@/components/analytics/MobileAnalytics";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
-import { useFamilyAuth } from "@/hooks/useFamilyAuth";
-import { haptics } from "@/lib/haptics";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { OfflineIndicator } from "./OfflineIndicator";
-import { MemberCard } from "./MemberCard";
-import { FamilyStatsCard } from "./FamilyStatsCard";
-import {
-  ArrowLeft,
-  Search,
-  Users,
-  UserPlus,
-  Filter,
-  RefreshCw,
-  Crown,
-  Shield,
-  Wallet,
-  User,
-  Info,
-  Settings,
-  BookOpen,
-} from "lucide-react";
-import { format } from "date-fns";
+import { GovernanceOrganigram } from "@/components/family/GovernanceOrganigram";
 
-interface Member {
-  id: string;
-  user_id: string;
-  role: string;
-  house_name: string | null;
-  is_house_representative: boolean;
-  profiles: {
-    full_name: string;
-    email: string | null;
-    phone: string | null;
-    avatar_url: string | null;
-    is_working: boolean;
-  };
+export interface ManagementMember {
+  id: string; user_id: string; role: string; house_name: string | null; is_house_representative: boolean;
+  assignedRoles: string[];
+  profiles: { full_name: string; email: string | null; phone: string | null; avatar_url: string | null; is_working: boolean };
 }
-
-export function MobileMembers() {
-  const { t } = useTranslation();
-  const shell = useShellConfig();
-  const { familySlug } = useParams();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const { family, canManageMembers, isFamilyHead, isLoading: authLoading } = useFamilyAuth(familySlug);
-
-  const [members, setMembers] = useState<Member[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterRole, setFilterRole] = useState("all");
-  const [activeTab, setActiveTab] = useState("members");
-
-  // Sheets
-  const [showInviteSheet, setShowInviteSheet] = useState(false);
-  const [showRoleSheet, setShowRoleSheet] = useState(false);
-  const [showInfoSheet, setShowInfoSheet] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-  const [newRole, setNewRole] = useState("");
-
-  // Invite form
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteRole, setInviteRole] = useState("member");
-  const [sending, setSending] = useState(false);
-
-  // Stats
-  const [stats, setStats] = useState({
-    totalMembers: 0,
-    workingMembers: 0,
-    totalHouses: 0,
-    totalContributions: 0,
-    totalLoansActive: 0,
-    totalSavings: 0,
-    nextMeetingDate: "",
-  });
-
-  useEffect(() => {
-    if (family?.id) {
-      loadMembers();
-      loadStats();
-    }
-  }, [family?.id]);
-
-  const loadMembers = async () => {
-    if (!family) return;
-    try {
-      const { data: membersData, error: membersError } = await supabase
-        .from("family_members")
-        .select("id, user_id, role, house_name, is_house_representative")
-        .eq("family_id", family.id)
-        .order("role");
-
-      if (membersError) throw membersError;
-
-      const userIds = membersData?.map((m) => m.user_id) || [];
-      const { data: profilesData, error: profilesError } = await supabase
-        .from("profiles")
-        .select("id, full_name, email, phone, avatar_url, is_working")
-        .in("id", userIds);
-
-      if (profilesError) throw profilesError;
-
-      const profilesMap = new Map(profilesData?.map((p) => [p.id, p]) || []);
-      const mergedData = membersData?.map((member) => ({
-        ...member,
-        profiles: profilesMap.get(member.user_id) || {
-          full_name: "Unknown",
-          email: null,
-          phone: null,
-          avatar_url: null,
-          is_working: false,
-        },
-      })) || [];
-
-      setMembers(mergedData as any);
-    } catch (error: any) {
-      toast({ variant: "destructive", title: "Error", description: error.message });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadStats = async () => {
-    if (!family) return;
-    try {
-      // Get contributions total
-      const { data: contributions } = await supabase
-        .from("contributions")
-        .select("amount")
-        .eq("family_id", family.id)
-        .eq("status", "paid");
-
-      // Get active loans
-      const { data: loans } = await supabase
-        .from("loans")
-        .select("amount")
-        .eq("family_id", family.id)
-        .eq("status", "disbursed");
-
-      // Get next meeting
-      const { data: meeting } = await supabase
-        .from("meetings")
-        .select("meeting_date")
-        .eq("family_id", family.id)
-        .gte("meeting_date", new Date().toISOString().split("T")[0])
-        .order("meeting_date")
-        .limit(1)
-        .single();
-
-      const houses = new Set(members.filter((m) => m.house_name).map((m) => m.house_name));
-
-      setStats({
-        totalMembers: members.length,
-        workingMembers: members.filter((m) => m.profiles.is_working).length,
-        totalHouses: houses.size,
-        totalContributions: contributions?.reduce((sum, c) => sum + c.amount, 0) || 0,
-        totalLoansActive: loans?.reduce((sum, l) => sum + l.amount, 0) || 0,
-        totalSavings: 0, // Would need savings table query
-        nextMeetingDate: meeting?.meeting_date
-          ? format(new Date(meeting.meeting_date), "MMM dd, yyyy")
-          : "",
-      });
-    } catch (error) {
-      console.error("Error loading stats:", error);
-    }
-  };
-
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    haptics.light();
-    await loadMembers();
-    await loadStats();
-    setRefreshing(false);
-    haptics.success();
-  };
-
-  const handleInvite = async () => {
-    if (!inviteEmail || !family) return;
-    setSending(true);
-    haptics.light();
-
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      const token = crypto.randomUUID();
-      const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 7);
-
-      const { error: inviteError } = await supabase.from("invitations").insert({
-        email: inviteEmail,
-        family_id: family.id,
-        role: inviteRole as "family_admin" | "family_head" | "guest" | "loan_committee" | "member" | "secretary" | "treasurer",
-        invited_by: user.id,
-        token,
-        expires_at: expiresAt.toISOString(),
-      });
-
-      if (inviteError) throw inviteError;
-
-      // Send invitation email
-      await supabase.functions.invoke("send-invitation", {
-        body: {
-          email: inviteEmail,
-          familyName: family.name,
-          token,
-          role: inviteRole,
-        },
-      });
-
-      toast({ title: "Invitation Sent", description: `Invitation sent to ${inviteEmail}` });
-      haptics.success();
-      setShowInviteSheet(false);
-      setInviteEmail("");
-      setInviteRole("member");
-    } catch (error: any) {
-      toast({ variant: "destructive", title: "Error", description: error.message });
-      haptics.error();
-    } finally {
-      setSending(false);
-    }
-  };
-
-  const handleRoleChange = async () => {
-    if (!selectedMember || !newRole) return;
-    haptics.light();
-
-    try {
-      const { error } = await supabase
-        .from("family_members")
-        .update({ role: newRole as "family_admin" | "family_head" | "guest" | "loan_committee" | "member" | "secretary" | "treasurer" })
-        .eq("id", selectedMember.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Role Updated",
-        description: `${selectedMember.profiles.full_name}'s role has been updated`,
-      });
-      haptics.success();
-      setShowRoleSheet(false);
-      setSelectedMember(null);
-      loadMembers();
-    } catch (error: any) {
-      toast({ variant: "destructive", title: "Error", description: error.message });
-      haptics.error();
-    }
-  };
-
-  const filteredMembers = members.filter((member) => {
-    const matchesSearch =
-      !searchQuery ||
-      member.profiles.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      member.profiles.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      member.house_name?.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesRole = filterRole === "all" || member.role === filterRole;
-
-    return matchesSearch && matchesRole;
-  });
-
-  const roleGroups = {
-    leadership: filteredMembers.filter((m) =>
-      ["family_head", "family_admin", "treasurer", "secretary"].includes(m.role)
-    ),
-    committee: filteredMembers.filter((m) => m.role === "loan_committee"),
-    members: filteredMembers.filter((m) => m.role === "member"),
-    guests: filteredMembers.filter((m) => m.role === "guest"),
-  };
-
-  if (authLoading || loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-      </div>
-    );
-  }
-
-  return (
-    <div className={shell?.insideShell ? 'min-h-screen bg-background' : 'min-h-screen bg-background pb-20'}>
-      <OfflineIndicator />
-
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-background border-b px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => {
-                haptics.light();
-                navigate(`/family/${familySlug}`);
-              }}
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div>
-              <h1 className="text-xl font-bold">{t("mobilePolish.members")}</h1>
-              <p className="text-xs text-muted-foreground">{t("mobilePolish.memberCount", { count: members.length })}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleRefresh}
-              disabled={refreshing}
-            >
-              <RefreshCw className={`h-5 w-5 ${refreshing ? "animate-spin" : ""}`} />
-            </Button>
-            {isFamilyHead && (
-              <Button
-                size="sm"
-                onClick={() => {
-                  haptics.light();
-                  setShowInviteSheet(true);
-                }}
-              >
-                <UserPlus className="h-4 w-4 mr-1" />
-                {t("mobilePolish.invite")}
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {/* Search */}
-        <div className="mt-3 flex flex-col gap-2 min-[480px]:flex-row">
-          <div className="relative min-w-0 flex-1">
-            <Search className="pointer-events-none absolute left-3 top-3.5 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder={t("mobilePolish.search")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-          <Select value={filterRole} onValueChange={setFilterRole}>
-            <SelectTrigger className="w-full min-[480px]:w-40 [&>span]:flex-1">
-              <Filter className="h-4 w-4 mr-1" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t("mobilePolish.roles")}</SelectItem>
-              <SelectItem value="family_head">Head</SelectItem>
-              <SelectItem value="family_admin">Admin</SelectItem>
-              <SelectItem value="treasurer">Treasurer</SelectItem>
-              <SelectItem value="loan_committee">Committee</SelectItem>
-              <SelectItem value="member">Member</SelectItem>
-              <SelectItem value="guest">Guest</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="px-4 pt-4">
-        <TabsList className="w-full grid grid-cols-3">
-          <TabsTrigger value="members" className="text-xs">
-            <Users className="h-4 w-4 mr-1" />
-            {t("mobilePolish.memberTab")}
-          </TabsTrigger>
-          <TabsTrigger value="stats" className="text-xs">
-            <Info className="h-4 w-4 mr-1" />
-            {t("mobilePolish.stats")}
-          </TabsTrigger>
-          <TabsTrigger value="info" className="text-xs">
-            <BookOpen className="h-4 w-4 mr-1" />
-            {t("mobilePolish.heritage")}
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="members" className="space-y-4 mt-4">
-          {/* Leadership */}
-          {roleGroups.leadership.length > 0 && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                <Crown className="h-4 w-4" />
-                {t("mobilePolish.leadership")} ({roleGroups.leadership.length})
-              </div>
-              {roleGroups.leadership.map((member) => (
-                <MemberCard
-                  key={member.id}
-                  member={member}
-                  onClick={() => {
-                    haptics.light();
-                    if (canManageMembers) {
-                      setSelectedMember(member);
-                      setNewRole(member.role);
-                      setShowRoleSheet(true);
-                    } else {
-                      navigate(`/family/${familySlug}/members/${member.id}`);
-                    }
-                  }}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Committee */}
-          {roleGroups.committee.length > 0 && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                <Shield className="h-4 w-4" />
-                Loan Committee ({roleGroups.committee.length})
-              </div>
-              {roleGroups.committee.map((member) => (
-                <MemberCard
-                  key={member.id}
-                  member={member}
-                  onClick={() => {
-                    haptics.light();
-                    if (canManageMembers) {
-                      setSelectedMember(member);
-                      setNewRole(member.role);
-                      setShowRoleSheet(true);
-                    } else {
-                      navigate(`/family/${familySlug}/members/${member.id}`);
-                    }
-                  }}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Members */}
-          {roleGroups.members.length > 0 && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                <User className="h-4 w-4" />
-                Members ({roleGroups.members.length})
-              </div>
-              {roleGroups.members.map((member) => (
-                <MemberCard
-                  key={member.id}
-                  member={member}
-                  onClick={() => {
-                    haptics.light();
-                    if (canManageMembers) {
-                      setSelectedMember(member);
-                      setNewRole(member.role);
-                      setShowRoleSheet(true);
-                    } else {
-                      navigate(`/family/${familySlug}/members/${member.id}`);
-                    }
-                  }}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Guests */}
-          {roleGroups.guests.length > 0 && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                <User className="h-4 w-4" />
-                Guests ({roleGroups.guests.length})
-              </div>
-              {roleGroups.guests.map((member) => (
-                <MemberCard
-                  key={member.id}
-                  member={member}
-                  showContact={false}
-                  onClick={() => {
-                    haptics.light();
-                    if (canManageMembers) {
-                      setSelectedMember(member);
-                      setNewRole(member.role);
-                      setShowRoleSheet(true);
-                    }
-                  }}
-                />
-              ))}
-            </div>
-          )}
-
-          {filteredMembers.length === 0 && (
-            <Card>
-              <CardContent className="p-8 text-center text-muted-foreground">
-                <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p>No members found</p>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        <TabsContent value="stats" className="mt-4">
-          <FamilyStatsCard stats={stats} familyName={family?.name || ""} />
-
-          {/* Quick Settings Links */}
-          {isFamilyHead && (
-            <div className="mt-4 space-y-2">
-              <Button
-                variant="outline"
-                className="w-full justify-start"
-                onClick={() => navigate(`/family/${familySlug}/invitations`)}
-              >
-                <UserPlus className="h-4 w-4 mr-2" />
-                Manage Invitations
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full justify-start"
-                onClick={() => navigate(`/family/${familySlug}/financial-settings`)}
-              >
-                <Settings className="h-4 w-4 mr-2" />
-                Family Settings
-              </Button>
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="info" className="mt-4 space-y-4">
-          <Card>
-            <CardContent className="p-4 space-y-4">
-              <div>
-                <h3 className="font-semibold text-lg flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-primary" />
-                  Heritage & Culture
-                </h3>
-                <p className="text-sm text-muted-foreground mt-2">
-                  {family?.heritage_info || "No heritage information has been added yet."}
-                </p>
-              </div>
-
-              {family?.description && (
-                <div>
-                  <h4 className="font-medium">About</h4>
-                  <p className="text-sm text-muted-foreground mt-1">{family.description}</p>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-3 pt-2">
-                <div className="p-3 bg-muted/50 rounded-lg">
-                  <div className="text-xs text-muted-foreground">Meeting Day</div>
-                  <div className="font-medium capitalize">
-                    {family?.meeting_day?.replace("_", " ") || "Last Saturday"}
-                  </div>
-                </div>
-                <div className="p-3 bg-muted/50 rounded-lg">
-                  <div className="text-xs text-muted-foreground">Meeting Time</div>
-                  <div className="font-medium">{family?.meeting_time || "13:00"}</div>
-                </div>
-                <div className="p-3 bg-muted/50 rounded-lg">
-                  <div className="text-xs text-muted-foreground">Contribution</div>
-                  <div className="font-medium">
-                    {family?.mandatory_contribution?.toLocaleString() || "25,000"} FCFA
-                  </div>
-                </div>
-                <div className="p-3 bg-muted/50 rounded-lg">
-                  <div className="text-xs text-muted-foreground">Language</div>
-                  <div className="font-medium capitalize">
-                    {family?.primary_language || "English"}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      {/* Invite Sheet */}
-      <Sheet open={showInviteSheet} onOpenChange={setShowInviteSheet}>
-        <SheetContent side="bottom" className="h-[60vh]">
-          <SheetHeader>
-            <SheetTitle>Invite New Member</SheetTitle>
-          </SheetHeader>
-          <div className="space-y-4 mt-4">
-            <div>
-              <Label>Email Address</Label>
-              <Input
-                type="email"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-                placeholder="member@example.com"
-              />
-            </div>
-            <div>
-              <Label>Role</Label>
-              <Select value={inviteRole} onValueChange={setInviteRole}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="member">Member</SelectItem>
-                  <SelectItem value="treasurer">Treasurer</SelectItem>
-                  <SelectItem value="secretary">Secretary</SelectItem>
-                  <SelectItem value="loan_committee">Loan Committee</SelectItem>
-                  <SelectItem value="family_admin">Family Admin</SelectItem>
-                  <SelectItem value="guest">Guest (Read-only)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Button className="w-full" onClick={handleInvite} disabled={sending || !inviteEmail}>
-              {sending ? "Sending..." : "Send Invitation"}
-            </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
-
-      {/* Role Change Sheet */}
-      <Sheet open={showRoleSheet} onOpenChange={setShowRoleSheet}>
-        <SheetContent side="bottom" className="h-[50vh]">
-          <SheetHeader>
-            <SheetTitle>Change Role</SheetTitle>
-          </SheetHeader>
-          {selectedMember && (
-            <div className="space-y-4 mt-4">
-              <Card>
-                <CardContent className="p-4">
-                  <div className="font-medium">{selectedMember.profiles.full_name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    Current: {selectedMember.role.replace("_", " ")}
-                  </div>
-                </CardContent>
-              </Card>
-              <div>
-                <Label>New Role</Label>
-                <Select value={newRole} onValueChange={setNewRole}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="family_head">Family Head</SelectItem>
-                    <SelectItem value="family_admin">Family Admin</SelectItem>
-                    <SelectItem value="treasurer">Treasurer</SelectItem>
-                    <SelectItem value="secretary">Secretary</SelectItem>
-                    <SelectItem value="loan_committee">Loan Committee</SelectItem>
-                    <SelectItem value="member">Member</SelectItem>
-                    <SelectItem value="guest">Guest</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button className="w-full" onClick={handleRoleChange}>
-                Update Role
-              </Button>
-            </div>
-          )}
-        </SheetContent>
-      </Sheet>
-    </div>
-  );
+interface Props {
+  members: ManagementMember[]; allMembers: ManagementMember[]; familyName: string; userId: string | null;
+  canManageMembers: boolean; search: string; onSearch: (value: string) => void;
+  roleFilter: string; onRoleFilter: (value: string) => void; roles: { key: string; label: string }[];
+  roleLabel: (role: string) => string; view: "list" | "org"; onView: (view: "list" | "org") => void;
+  onAdd: () => void; onExport: () => void; onRefresh: () => void;
+  onRoles: (member: ManagementMember) => void; onEdit: (member: ManagementMember) => void; onRemove: (member: ManagementMember) => void;
+  error?: ReactNode;
+}
+/** Presentation only: Members owns all reads, authorization and mutations. */
+export function MobileMembers(props: Props) {
+  const { t } = useTranslation(); const navigate = useNavigate(); const { familySlug } = useParams();
+  const { members, allMembers, roleLabel, canManageMembers } = props;
+  const houses = new Set(allMembers.map(m => m.house_name).filter(Boolean)).size;
+  return <div className="min-w-0 bg-background">
+    <OfflineIndicator />
+    <PageHeader title={t("famMembers.familyMembers")} subtitle={props.familyName} backTo={`/family/${familySlug}`} actions={[
+      { key: "add", label: t("famMembers.addMember"), icon: Plus, primary: true, hidden: !canManageMembers, onClick: props.onAdd },
+      { key: "export", label: t("famMembers.export"), icon: Download, disabled: !members.length, onClick: props.onExport },
+      { key: "roles", label: t("famMembers.roleManagement"), icon: Shield, hidden: !canManageMembers, onClick: () => navigate(`/family/${familySlug}/role-management`) },
+      { key: "refresh", label: t("phase3.refresh"), icon: RefreshCw, onClick: props.onRefresh },
+    ]} />
+    <main className="space-y-4 p-4">
+      <StatCarousel items={[
+        { key: "members", label: t("mobilePolish.members"), value: allMembers.length, icon: Users },
+        { key: "houses", label: t("phase3.houses"), value: houses },
+        { key: "representatives", label: t("famMembers.houseRepresentative"), value: allMembers.filter(m => m.is_house_representative).length },
+      ]} />
+      {props.error}
+      <div className="relative min-w-0"><Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" /><Input className="pl-10 text-base" aria-label={t("famMembers.searchByNameEmailOr")} placeholder={t("famMembers.searchByNameEmailOr")} value={props.search} onChange={e => props.onSearch(e.target.value)} autoComplete="off" /></div>
+      <AnalyticsFilters chips={[
+        ...(props.roleFilter !== "all" ? [{ key: "role", label: roleLabel(props.roleFilter), clear: () => props.onRoleFilter("all") }] : []),
+        ...(props.search ? [{ key: "search", label: props.search, clear: () => props.onSearch("") }] : []),
+      ]}>
+        <label className="space-y-2"><span className="text-sm font-medium">{t("famMembers.filterByRole")}</span><Select value={props.roleFilter} onValueChange={props.onRoleFilter}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">{t("famMembers.allRoles")}</SelectItem>{props.roles.map(role => <SelectItem key={role.key} value={role.key}>{role.label}</SelectItem>)}</SelectContent></Select></label>
+      </AnalyticsFilters>
+      <SegmentedTabs value={props.view} onValueChange={value => props.onView(value === "org" ? "org" : "list")}>
+        <SegmentedTabsList><SegmentedTabsTrigger value="list">{t("organigram.listView")}</SegmentedTabsTrigger><SegmentedTabsTrigger value="org">{t("organigram.orgView")}</SegmentedTabsTrigger></SegmentedTabsList>
+        <SegmentedTabsContent value="list">
+          <DataCards rows={members} getRowKey={m => m.id}
+            title={m => <span className="flex min-w-0 items-center gap-2"><Avatar className="h-10 w-10 shrink-0"><AvatarImage src={m.profiles.avatar_url ?? undefined} /><AvatarFallback><User className="h-5 w-5" /></AvatarFallback></Avatar><span className="truncate">{m.profiles.full_name}</span></span>}
+            subtitle={m => m.profiles.email || m.profiles.phone || ""}
+            status={m => <div className="flex flex-wrap gap-1">{m.assignedRoles.map(role => <Badge key={role} variant="outline">{roleLabel(role)}</Badge>)}{m.is_house_representative && <Badge variant="secondary">{t("famMembers.houseRep")}</Badge>}</div>}
+            columns={[{ key: "house", label: t("famMembers.houseName"), render: m => m.house_name || t("phase3.notAssigned") }]}
+            onRowClick={m => navigate(`/family/${familySlug}/members/${m.id}`)}
+            actions={m => canManageMembers && m.user_id !== props.userId ? [
+              { key: "roles", label: t("famMembers.roles"), onClick: () => props.onRoles(m) },
+              { key: "edit", label: t("famMembers.edit"), onClick: () => props.onEdit(m) },
+              { key: "remove", label: t("famMembers.remove"), onClick: () => props.onRemove(m) },
+            ] : []}
+            emptyState={<div className="space-y-3"><Users className="mx-auto h-10 w-10 text-muted-foreground" /><p>{t("famMembers.noMembersFound")}</p>{(props.search || props.roleFilter !== "all") && <Button variant="outline" onClick={() => { props.onSearch(""); props.onRoleFilter("all"); }}>{t("phase3.clearFilters")}</Button>}</div>}
+          />
+        </SegmentedTabsContent>
+        <SegmentedTabsContent value="org"><GovernanceOrganigram members={members} roleLabel={roleLabel} /></SegmentedTabsContent>
+      </SegmentedTabs>
+    </main>
+  </div>;
 }
