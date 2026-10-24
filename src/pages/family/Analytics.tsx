@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/layout/PageHeader";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -216,50 +217,22 @@ const FamilyAnalytics = () => {
     <>
       <SEO title={t("famAnalytics.familyAnalytics")} description={t("famAnalytics.insightsAndKpisAcrossContributions")} />
       <div className="min-h-screen bg-gradient-to-br from-background via-muted/50 to-background">
-      <header className="sticky top-0 z-50 border-b border-white/20 bg-white/10 backdrop-blur-md">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                {t("famAnalytics.back")}
-              </Button>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">{family?.name} - Analytics</h1>
-                <p className="text-sm text-muted-foreground">{t("famAnalytics.keyPerformanceIndicatorsAndInsights")}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              {/* View Mode Toggle */}
-              <Select value={viewMode} onValueChange={(v) => { setViewMode(v as "family" | "member"); setLoading(true); }}>
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="family">{t("famAnalytics.familyOverview")}</SelectItem>
-                  <SelectItem value="member">{t("famAnalytics.myStats")}</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Member Selector - only for leadership when in member view */}
-              {viewMode === "member" && canManageFinances && (
-                <Select value={selectedMemberId} onValueChange={(v) => { setSelectedMemberId(v); setLoading(true); }}>
-                  <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder={t("famAnalytics.selectMember")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {memberOptions.map((m) => (
-                      <SelectItem key={m.memberId} value={m.memberId}>{m.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-
-              <LanguageSwitcher />
-            </div>
+      <div className="border-b border-border bg-background">
+        <div className="container mx-auto py-4 space-y-3">
+          <PageHeader title={t('foundation.familyAnalytics', { name: family?.name ?? '' })} subtitle={t('famAnalytics.keyPerformanceIndicatorsAndInsights')} backTo={`/family/${familySlug}`} />
+          <div className="flex min-w-0 flex-wrap items-center gap-3">
+            <Select value={viewMode} onValueChange={v => { setViewMode(v as 'family' | 'member'); setLoading(true); }}>
+              <SelectTrigger className="w-full min-w-0 md:w-auto"><SelectValue /></SelectTrigger>
+              <SelectContent><SelectItem value="family">{t('famAnalytics.familyOverview')}</SelectItem><SelectItem value="member">{t('famAnalytics.myStats')}</SelectItem></SelectContent>
+            </Select>
+            {viewMode === 'member' && canManageFinances && <Select value={selectedMemberId} onValueChange={v => { setSelectedMemberId(v); setLoading(true); }}>
+              <SelectTrigger className="w-full min-w-0 md:w-auto"><SelectValue placeholder={t('famAnalytics.selectMember')} /></SelectTrigger>
+              <SelectContent>{memberOptions.map(m => <SelectItem key={m.memberId} value={m.memberId}>{m.name}</SelectItem>)}</SelectContent>
+            </Select>}
+            <LanguageSwitcher />
           </div>
         </div>
-      </header>
+      </div>
 
       <main className="container mx-auto px-4 py-8 space-y-8">
         {/* AI Health Score - only in family view */}

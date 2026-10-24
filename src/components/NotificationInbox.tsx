@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useId, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -59,11 +59,12 @@ interface InboxItem {
  * In-app notification bell. Subscribes to in_app_notifications via realtime,
  * shows unread count, and lets the user mark items as read or navigate.
  */
-export function NotificationInbox({ familySlug }: { familySlug?: string }) {
+export function NotificationInbox({ familySlug, trigger }: { familySlug?: string; trigger?: ReactNode }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [items, setItems] = useState<InboxItem[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
+  const instanceId = useId();
 
   useEffect(() => {
     let mounted = true;
@@ -83,7 +84,7 @@ export function NotificationInbox({ familySlug }: { familySlug?: string }) {
   useEffect(() => {
     if (!userId) return;
     const channel = supabase
-      .channel(`inbox-${userId}`)
+      .channel(`inbox-${userId}-${instanceId}`)
       .on(
         "postgres_changes",
         {
@@ -100,7 +101,7 @@ export function NotificationInbox({ familySlug }: { familySlug?: string }) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userId]);
+  }, [userId, instanceId]);
 
   const refresh = async (uid: string) => {
     const { data } = await supabase
@@ -144,7 +145,7 @@ export function NotificationInbox({ familySlug }: { familySlug?: string }) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative" aria-label={t("notif.notifications")}>
+        {trigger ?? <Button variant="ghost" size="icon" className="relative" aria-label={t("notif.notifications")}>
           <Bell className="h-5 w-5" />
           {unread > 0 && (
             <Badge
@@ -154,7 +155,7 @@ export function NotificationInbox({ familySlug }: { familySlug?: string }) {
               {unread > 9 ? "9+" : unread}
             </Badge>
           )}
-        </Button>
+        </Button>}
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0" align="end">
         <div className="flex items-center justify-between px-4 py-3 border-b">

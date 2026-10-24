@@ -286,7 +286,7 @@ const Dashboard = () => {
         )}
 
         {/* User's Families */}
-        <div>
+        <div id="families">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-foreground">{t("dash.yourFamilies")}</h2>
             {!isSuperAdmin && userFamilies.length === 0 && (
@@ -353,7 +353,7 @@ const Dashboard = () => {
           <div className="mt-8 space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <PendingActionsWidget userId={userId} families={userFamilies} />
-              <NotificationsFeed userId={userId} familyIds={userFamilies.map(f => f.family_id)} />
+              <div id="notifications"><NotificationsFeed userId={userId} familyIds={userFamilies.map(f => f.family_id)} /></div>
             </div>
             <FinancialOverviewWidget userId={userId} families={userFamilies} />
           </div>

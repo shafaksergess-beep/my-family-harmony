@@ -37,3 +37,11 @@
 - [x] 2. Per-family module activation toggles (family head/admin/superadmin) gating dashboard + More + routes (validated: Loans hidden + route bounce)
 - [x] 3. Support admin platform role (read-mostly, one step below super admin) (validated: grant + revoke in admin Users page)
 - [x] Tests + validation for all three (46 tests pass)
+
+## Phase 1 mobile foundation
+- [x] Unify device detection and compatibility hooks
+- [x] Add authenticated AppShell with context-aware navigation and keyboard handling
+- [x] Add PageHeader and responsive primitives; migrate Analytics and desktop Members headers only
+- [x] Scope touch targets and add safe-area, overflow and dvh utilities with EN/FR labels
+- [x] Validate foundation tests (53 pass), signed-in navigation, EN/FR, 54 route/viewport checks and clean preview build
+- [ ] Validate physical-device keyboard, safe areas and native orientation (requires Natively iOS/Android builds)

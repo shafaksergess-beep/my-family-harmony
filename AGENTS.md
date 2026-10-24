@@ -9,3 +9,8 @@
 - Platform roles: super admins in `super_admins`, support team in `support_admins` (read-mostly); check via `is_super_admin`/`is_support_admin` security-definer RPCs, never client storage.
 
 - Responsive sizing is owned by shared UI controls and the app-screens layout scope; wide data tables scroll locally and page headers wrap without hiding actions. Why: ensure consistent mobile, tablet and desktop behavior across modules without changing authorization.
+
+- DeviceProvider/useDevice is the single reactive device source; usePlatform/useIsMobile are compatibility adapters. Why: first-render mobile classification and breakpoint changes must agree everywhere.
+- AppShell owns authenticated mobile navigation, safe-area clearance and keyboard state; legacy MobileLayout defers nav ownership inside it. Why: prevent duplicate bars and bottom spacing without altering route permissions.
+- Shared PageHeader and responsive primitives live in components/layout and responsive-dialog; only Analytics and desktop Members use the new header in foundation phase. Why: later page migrations stay mechanical and out of this phase.
+- BrowserRouter route shell options are registered via ShellRouteConfig/useShellConfig, including check-in hiding. Why: declarative Routes cannot expose data-router useMatches handles.

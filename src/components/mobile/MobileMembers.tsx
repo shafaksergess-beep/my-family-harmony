@@ -1,3 +1,4 @@
+import { useShellConfig } from '@/hooks/useShellConfig';
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -50,6 +51,7 @@ interface Member {
 
 export function MobileMembers() {
   const { t } = useTranslation();
+  const shell = useShellConfig();
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -288,7 +290,7 @@ export function MobileMembers() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className={shell?.insideShell ? 'min-h-screen bg-background' : 'min-h-screen bg-background pb-20'}>
       <OfflineIndicator />
 
       {/* Header */}

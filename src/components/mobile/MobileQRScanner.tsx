@@ -1,3 +1,4 @@
+import { useShellConfig } from '@/hooks/useShellConfig';
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +14,7 @@ interface MobileQRScannerProps {
 }
 
 export function MobileQRScanner({ onScan, onClose, expectedMeetingId }: MobileQRScannerProps) {
+  useShellConfig({ hideBottomNav: true });
   const [isScanning, setIsScanning] = useState(false);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [torchOn, setTorchOn] = useState(false);
