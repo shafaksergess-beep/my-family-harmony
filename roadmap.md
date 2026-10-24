@@ -55,10 +55,12 @@
 
 
 ## Phase 3 management screens
-- [ ] 1. Mobile member-management parity and shared dialogs
+- [x] 1. Mobile member-management shared records/actions and responsive dialogs
+- [ ] Member-management destructive/new-member end-to-end checks (requires disposable test records); dark-mode contrast follow-up
 - [ ] 2. Contributions, settings, payments, proofs and plans
 - [ ] 3. Loans, history and committee
 - [ ] 4. Savings, Njangi, shares, balloting and assistance
 - [ ] 5-8. Meetings, invitations, family settings and More
 - [ ] Platform administration and profile area
-- [ ] Validation and documentation
+- [x] Document this increment and validate member screens at nine widths and 60 regression tests
+- [ ] Complete remaining Phase 3 screens and their validation
