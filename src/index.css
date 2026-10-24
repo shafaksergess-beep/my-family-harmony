@@ -317,7 +317,7 @@ All colors MUST be HSL.
 .app-shell .shell-content { padding-bottom: env(safe-area-inset-bottom, 0px); }
 .app-shell[data-nav-visible="true"] .shell-content { padding-bottom: calc(var(--shell-nav-height) + env(safe-area-inset-bottom, 0px)); }
 .bottom-action-bar { position: sticky; bottom: var(--keyboard-inset, 0px); z-index: 30; padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px)); }
-.app-shell[data-nav-visible="true"] .bottom-action-bar { bottom: calc(var(--shell-nav-height) + env(safe-area-inset-bottom, 0px)); }
+.app-shell[data-nav-visible="true"] .bottom-action-bar { bottom: calc(var(--shell-nav-height) - var(--shell-nav-offset, 0px) + env(safe-area-inset-bottom, 0px)); }
 .responsive-dialog { display: flex; flex-direction: column; }
 .responsive-dialog-scroll { max-height: calc(90dvh - 1rem); }
 @media (max-width: 767px) {
@@ -329,7 +329,10 @@ All colors MUST be HSL.
   a:is(p a, li a):not(.flex):not(.inline-flex):not(.touch-target), [data-compact] { min-height: 0; }
   [role="dialog"].responsive-dialog { max-width: 100%; padding: 0; }
 }
-html[data-device="mobile"] .app-shell [data-shell-nav] { padding-inline: env(safe-area-inset-left, 0px) env(safe-area-inset-right, 0px); }
+/* Floating dock: simplify in short landscape viewports instead of overflowing. */
+@media (max-height: 400px) {
+  [data-shell-nav] .shell-nav-label { display: none; }
+}
 
 .responsive-dialog-scroll { display: flex; flex-direction: column; }
 .responsive-dialog-scroll > .responsive-dialog-footer { margin-top: auto; padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px)); }
@@ -344,7 +347,7 @@ html[data-device="mobile"] .app-shell [data-shell-nav] { padding-inline: env(saf
 html[data-device="mobile"] .management-header-controls :where(h1, header) { display: none; }
 html[data-device="mobile"] .management-header-controls .flex { flex-wrap: wrap; }
 html[data-device="mobile"] .management-header-controls > div { min-width: 0; }
-html[data-device="mobile"] .management-create-bar { position: fixed; inset-inline: 0; bottom: calc(4rem + env(safe-area-inset-bottom, 0px)); z-index: 40; }
+html[data-device="mobile"] .management-create-bar { position: fixed; inset-inline: 0; bottom: calc(var(--shell-nav-height, 4rem) - var(--shell-nav-offset, 0px) + env(safe-area-inset-bottom, 0px)); z-index: 40; }
 html[data-device="mobile"] .shell-content:has(.management-create-bar) { padding-bottom: calc(9rem + env(safe-area-inset-bottom, 0px)); }
 html[data-device="mobile"] .app-shell[data-nav-visible="false"] .management-create-bar { bottom: var(--keyboard-inset, 0px); }
 .management-row-actions :where(.flex) { flex-wrap: wrap; gap: 0.5rem; }
