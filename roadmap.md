@@ -4,7 +4,7 @@
 - [x] Share membership-aware sign-in destinations while preserving invitations and platform-admin access
 - [x] Expose the existing creation wizard on empty desktop/mobile dashboards
 - [x] Add direct superadmin family assignment and search in the unassigned-member picker
-- [ ] Verify tests and signed-in setup/admin flows
+- [x] Verify 40 regression tests, signed-in setup routing, desktop/mobile creation entry points and superadmin discovery/assignment dialog
 
 ## App-wide UI/UX hardening
 - [x] Fix shared controls, dialogs, tables, tabs and mobile content sizing
