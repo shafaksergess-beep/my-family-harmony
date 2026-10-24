@@ -1,4 +1,5 @@
 import { createContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { checkIsNativelyApp } from '@/lib/natively';
 
 export interface DeviceInfo {
   isMobile: boolean; isTablet: boolean; isDesktop: boolean; isTouch: boolean;
@@ -8,7 +9,7 @@ type DeviceWindow = Window & { Capacitor?: { isNativePlatform?: () => boolean; g
 export function readDevice(): DeviceInfo {
   if (typeof window === 'undefined') return { isMobile: false, isTablet: false, isDesktop: true, isTouch: false, orientation: 'landscape', isStandalone: false, isNative: false, isIOS: false, isAndroid: false };
   const w = window as DeviceWindow;
-  const isNative = w.Capacitor?.isNativePlatform?.() === true;
+  const isNative = w.Capacitor?.isNativePlatform?.() === true || checkIsNativelyApp();
   const nativePlatform = w.Capacitor?.getPlatform?.();
   const ua = navigator.userAgent;
   const isMobile = isNative || window.matchMedia('(max-width: 767px)').matches;

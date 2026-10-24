@@ -28,8 +28,7 @@ const MeetingCheckIn = () => {
   useEffect(() => {
     loadData();
     return () => {
-      // Cleanup QR scanner on unmount
-      const html5QrCode = Html5Qrcode.getCameras();
+      // Scanner cleanup is handled by its scanning effect, not camera enumeration.
     };
   }, [familySlug, meetingId]);
 
