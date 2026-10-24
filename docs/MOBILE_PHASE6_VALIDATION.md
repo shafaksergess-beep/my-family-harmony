@@ -54,10 +54,10 @@ Cheap future options verified against installed `natively/dist/classes/Natively.
 
 ## Tests and build
 
-- Full regression suite: 80 tests passed across 16 files before the additional SDK store-link test; final counts recorded below after rerun.
+- Final full regression suite: **81 tests passed across 16 files** at 07:49 UTC, including the additional SDK store-link test.
 - Added 11 concrete tests covering per-user seen state, blocked storage, role-specific guidance, edited sharing, copy fallback, cancellation/error behavior, Android-only rating and exact package fallback. Added a mocked SDK store-launch allowlist test.
 - Standalone typecheck **not run**: sandbox instructions explicitly prohibit manually running project builds/typechecks; automatic preview validation is used instead. No claim that a standalone typecheck passed.
-- Latest automatic preview build before documentation finalization: build OK (07:48 UTC). Vitest emits an existing Vite optimizeDeps deprecation warning; an expected mocked membership-sync error is logged by its error-path test.
+- Latest automatic preview build before documentation finalization: build OK (07:49:37 UTC). Vitest emits an existing Vite optimizeDeps deprecation warning; an expected mocked membership-sync error is logged by its error-path test.
 
 ## Known remaining issues
 
