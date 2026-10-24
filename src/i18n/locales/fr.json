@@ -9,7 +9,39 @@
   "reference": "Référence de transaction (facultatif)",
   "proofTitle": "Justificatif de paiement ({{provider}})",
   "term": "{{months}} mois à {{rate}} %",
-  "paidRemaining": "Payé : {{paid}} | Restant : {{remaining}}"
+  "paidRemaining": "Payé : {{paid}} | Restant : {{remaining}}",
+  "njangiTitle": "Njangi (épargne rotative)",
+  "recommendedSavings": "Épargne mensuelle recommandée (facultative)",
+  "optionalAmount": "Tout montant est accepté ; ceci est facultatif",
+  "optionalNotes": "Notes (facultatives)",
+  "purchaseShares": "Acheter des parts",
+  "reviewers": "2 responsables de validation",
+  "submitProof": "Envoyer le justificatif",
+  "receiptAI": "Reçu (IA)",
+  "reasonExample": "Ex. cotisation mensuelle",
+  "duplicateReference": "Cette référence de transaction a déjà été envoyée",
+  "firstApproval": "Première validation enregistrée. Un deuxième responsable doit confirmer",
+  "paymentStatus": "Paiement : {{status}}",
+  "mtnNumber": "Numéro MTN",
+  "mtnName": "Nom du compte MTN",
+  "orangeNumber": "Numéro Orange",
+  "orangeName": "Nom du compte Orange",
+  "threshold": "Seuil de montant élevé (XAF, 2 validations requises)",
+  "category": {
+    "contribution": "Cotisation mensuelle",
+    "fine": "Amende",
+    "levy": "Cotisation de maison",
+    "loan_repayment": "Remboursement de prêt",
+    "savings": "Dépôt d’épargne",
+    "savings_withdrawal": "Retrait d’épargne",
+    "other": "Autre"
+  },
+  "status": {
+    "pending": "En attente de validation",
+    "partially_approved": "En attente de deuxième validation",
+    "approved": "Approuvé",
+    "rejected": "Rejeté"
+  }
 },
   "phase3": {
   "refresh": "Actualiser",

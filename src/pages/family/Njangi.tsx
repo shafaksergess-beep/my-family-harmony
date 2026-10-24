@@ -357,12 +357,12 @@ export default function FamilyNjangi() {
       <SEO title={t("famNjangi.njangiCycles")} description={t("famNjangi.manageNjangiRotatingSavingsCycles")} />
       <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <ManagementHeader className="flex items-center justify-between" title={"Njangi (Rotating Savings)"} onCreate={canManageFinances ? () => setIsCycleDialogOpen(true) : undefined} createLabel={t("famNjangi.newCycle")} as="div">
+        <ManagementHeader className="flex items-center justify-between" title={t("phase3b.njangiTitle")} onCreate={canManageFinances ? () => setIsCycleDialogOpen(true) : undefined} createLabel={t("famNjangi.newCycle")} as="div">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate(`/family/${familySlug}`)}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-3xl font-bold">Njangi (Rotating Savings)</h1>
+            <h1 className="text-3xl font-bold">{t("phase3b.njangiTitle")}</h1>
           </div>
           <div className="flex gap-2 items-center">
             <LanguageSwitcher />
@@ -429,7 +429,7 @@ export default function FamilyNjangi() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="notes">Notes (optional)</Label>
+                    <Label htmlFor="notes">{t("phase3b.optionalNotes")}</Label>
                     <Textarea
                       id="notes"
                       value={cycleFormData.notes}

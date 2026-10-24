@@ -9,7 +9,39 @@
   "reference": "Transaction ID (optional)",
   "proofTitle": "Proof of payment ({{provider}})",
   "term": "{{months}} months at {{rate}}%",
-  "paidRemaining": "Paid: {{paid}} | Remaining: {{remaining}}"
+  "paidRemaining": "Paid: {{paid}} | Remaining: {{remaining}}",
+  "njangiTitle": "Njangi (Rotating Savings)",
+  "recommendedSavings": "Recommended monthly savings (optional)",
+  "optionalAmount": "Any amount is acceptable; this is optional",
+  "optionalNotes": "Notes (optional)",
+  "purchaseShares": "Purchase shares",
+  "reviewers": "2 reviewers",
+  "submitProof": "Submit proof",
+  "receiptAI": "Receipt (AI)",
+  "reasonExample": "e.g. monthly contribution",
+  "duplicateReference": "This transaction reference was already submitted",
+  "firstApproval": "First approval recorded. A second reviewer must confirm",
+  "paymentStatus": "Payment: {{status}}",
+  "mtnNumber": "MTN number",
+  "mtnName": "MTN account name",
+  "orangeNumber": "Orange number",
+  "orangeName": "Orange account name",
+  "threshold": "High-value threshold (XAF, 2 reviewers required)",
+  "category": {
+    "contribution": "Monthly contribution",
+    "fine": "Fine",
+    "levy": "House levy",
+    "loan_repayment": "Loan repayment",
+    "savings": "Savings deposit",
+    "savings_withdrawal": "Savings withdrawal",
+    "other": "Other"
+  },
+  "status": {
+    "pending": "Pending review",
+    "partially_approved": "Awaiting second approval",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  }
 },
   "phase3": {
   "refresh": "Refresh",

@@ -1,4 +1,5 @@
 import { ManagementTable, ManagementHeader } from "@/components/layout/ManagementMobile";
+import { useCurrency } from "@/context/CurrencyContext";
 import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -24,16 +25,11 @@ interface Proof {
   requires_dual_review: boolean; status: string; first_reviewer: string | null; rejection_reason: string | null; created_at: string;
 }
 
-const CATEGORIES: Record<string, string> = {
-  contribution: "Monthly contribution", fine: "Fine", levy: "House levy", loan_repayment: "Loan repayment",
-  savings: "Savings deposit", savings_withdrawal: "Savings withdrawal", other: "Other",
-};
-const STATUS_LABEL: Record<string, string> = {
-  pending: "Pending review", partially_approved: "Awaiting 2nd approval", approved: "Approved", rejected: "Rejected",
-};
-
 const PaymentProofs = () => {
   const { t } = useTranslation();
+  const { formatAmount } = useCurrency();
+  const CATEGORIES: Record<string, string> = Object.fromEntries(["contribution", "fine", "levy", "loan_repayment", "savings", "savings_withdrawal", "other"].map(key => [key, t(`phase3b.category.${key}`)]));
+  const STATUS_LABEL: Record<string, string> = Object.fromEntries(["pending", "partially_approved", "approved", "rejected"].map(key => [key, t(`phase3b.status.${key}`)]));
   const { familySlug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -66,8 +62,8 @@ const PaymentProofs = () => {
   useEffect(() => { load(); }, [load]);
 
   const methods = [
-    { id: "mtn" as Provider, name: "MTN Mobile Money", ussd: "*126#", number: fam?.momo_mtn_number, holder: fam?.momo_mtn_name, cls: "bg-[hsl(48_96%_53%)] text-foreground" },
-    { id: "orange" as Provider, name: "Orange Money", ussd: "#150#", number: fam?.momo_orange_number, holder: fam?.momo_orange_name, cls: "bg-[hsl(25_95%_53%)] text-primary-foreground" },
+    { id: "mtn" as Provider, name: "MTN Mobile Money", ussd: "*126#", number: fam?.momo_mtn_number, holder: fam?.momo_mtn_name, cls: "bg-secondary text-secondary-foreground" },
+    { id: "orange" as Provider, name: "Orange Money", ussd: "#150#", number: fam?.momo_orange_number, holder: fam?.momo_orange_name, cls: "bg-accent text-accent-foreground" },
   ];
 
   const copy = (txt: string) => { navigator.clipboard.writeText(txt); toast({ title: t("famPaymentProofs.copied") }); };
@@ -91,7 +87,7 @@ const PaymentProofs = () => {
         family_id: family.id, member_id: memberId, submitted_by: userId, provider, category: form.category,
         reason: form.reason.trim(), claimed_amount: amount, claimed_reference: form.reference.trim() || null, image_path: path,
       }).select("id").single();
-      if (error) throw error.code === "23505" ? new Error("This transaction reference was already submitted") : error;
+      if (error) throw error.code === "23505" ? new Error(t("phase3b.duplicateReference")) : error;
       toast({ title: t("famPaymentProofs.proofSubmitted"), description: t("famPaymentProofs.readingYourReceipt") });
       const ai = await supabase.functions.invoke("extract-payment-proof", { body: { proof_id: data.id } });
       if (ai.error) toast({ title: t("famPaymentProofs.receiptCouldNotBeRead"), description: t("famPaymentProofs.reviewersWillCheckItManually") });
@@ -115,7 +111,7 @@ const PaymentProofs = () => {
     const { data, error } = await supabase.rpc("review_payment_proof", { p_proof_id: open.id, p_decision: decision, p_notes: notes || null });
     setBusy(false);
     if (error) { toast({ title: t("famPaymentProofs.actionFailed"), description: error.message, variant: "destructive" }); return; }
-    toast({ title: data === "partially_approved" ? "First approval recorded — a second reviewer must confirm" : `Payment ${data}` });
+    toast({ title: data === "partially_approved" ? t("phase3b.firstApproval") : t("phase3b.paymentStatus", { status: STATUS_LABEL[String(data)] ?? data }) });
     setOpen(null); load();
   };
 
@@ -133,17 +129,17 @@ const PaymentProofs = () => {
   const mine = proofs.filter((p) => p.submitted_by === userId);
   const queue = (s: string) => proofs.filter((p) => p.status === s);
   const ProofRow = ({ p }: { p: Proof }) => (
-    <button onClick={() => openProof(p)} className="flex w-full items-center justify-between rounded-lg border p-3 text-left hover:bg-muted/50">
+    <Button variant="outline" onClick={() => openProof(p)} className="flex h-auto w-full flex-wrap items-center justify-between gap-3 rounded-2xl p-3 text-left whitespace-normal">
       <div>
-        <div className="font-medium">{Number(p.claimed_amount).toLocaleString()} FCFA · {p.provider.toUpperCase()}</div>
-        <div className="text-sm text-muted-foreground">{names[p.submitted_by] ?? "Member"} · {CATEGORIES[p.category]} · {new Date(p.created_at).toLocaleDateString()}</div>
+        <div className="font-medium">{formatAmount(Number(p.claimed_amount))} · {p.provider.toUpperCase()}</div>
+        <div className="text-sm text-muted-foreground">{names[p.submitted_by] ?? t("famSavings.member")} · {CATEGORIES[p.category]} · {new Date(p.created_at).toLocaleDateString()}</div>
       </div>
       <div className="flex flex-col items-end gap-1">
         <Badge variant={p.status === "approved" ? "default" : p.status === "rejected" ? "destructive" : "secondary"}>{STATUS_LABEL[p.status]}</Badge>
         {(p.amount_mismatch || p.duplicate_of) && <span className="flex items-center gap-1 text-xs text-destructive"><AlertTriangle className="h-3 w-3" />{t("famPaymentProofs.check")}</span>}
-        {p.requires_dual_review && <span className="text-xs text-muted-foreground">2 reviewers</span>}
+        {p.requires_dual_review && <span className="text-xs text-muted-foreground">{t("phase3b.reviewers")}</span>}
       </div>
-    </button>
+    </Button>
   );
 
   const ex = open?.ai_extracted ?? {};
@@ -206,11 +202,11 @@ const PaymentProofs = () => {
                   <div><Label>{t("phase3b.reference")}</Label><Input value={form.reference} maxLength={64} onChange={(e) => setForm({ ...form, reference: e.target.value })} /></div>
                   <div><Label>{t("famPaymentProofs.receiptImage")}</Label><Input type="file" accept="image/*" capture="environment" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></div>
                 </div>
-                <div><Label>{t("famPaymentProofs.details")}</Label><Textarea maxLength={500} placeholder="e.g. October 2026 contribution" value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} /></div>
+                <div><Label>{t("famPaymentProofs.details")}</Label><Textarea maxLength={500} placeholder={t("phase3b.reasonExample")} value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} /></div>
                 {Number(form.amount) >= Number(fam?.payment_dual_review_threshold ?? 100000) || ["loan_repayment", "savings", "savings_withdrawal"].includes(form.category)
                   ? <p className="flex items-center gap-2 text-sm text-muted-foreground"><ShieldCheck className="h-4 w-4" />{t("famPaymentProofs.thisPaymentNeedsApprovalFrom")}</p> : null}
                 <div className="flex gap-2">
-                  <Button onClick={submit} disabled={submitting || !file}>{submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}Submit proof</Button>
+                  <Button onClick={submit} disabled={submitting || !file}>{submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}{t("phase3b.submitProof")}</Button>
                   <Button variant="outline" onClick={() => setProvider(null)}>{t("famPaymentProofs.cancel")}</Button>
                 </div>
               </CardContent>
@@ -224,7 +220,7 @@ const PaymentProofs = () => {
 
         {isReviewer && (
           <TabsContent value="review" className="space-y-4">
-            {(isFamilyHead || isFamilyAdmin || isTreasurer) && <MomoSettings familyId={family!.id} initial={fam} onSaved={() => window.location.reload()} />}
+            {(isFamilyHead || isFamilyAdmin || isTreasurer) && <MomoSettings familyId={family?.id ?? ""} initial={fam} onSaved={() => window.location.reload()} />}
             {(["pending", "partially_approved", "approved", "rejected"] as const).map((s) => (
               <div key={s} className="space-y-2">
                 <h3 className="font-semibold">{STATUS_LABEL[s]} ({queue(s).length})</h3>
@@ -239,7 +235,7 @@ const PaymentProofs = () => {
         <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
           {open && (<>
             <DialogHeader>
-              <DialogTitle>{Number(open.claimed_amount).toLocaleString()} FCFA · {open.provider.toUpperCase()}</DialogTitle>
+              <DialogTitle>{formatAmount(Number(open.claimed_amount))} · {open.provider.toUpperCase()}</DialogTitle>
               <DialogDescription>{names[open.submitted_by]} · {CATEGORIES[open.category]} · {STATUS_LABEL[open.status]}</DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 md:grid-cols-2">
@@ -250,14 +246,14 @@ const PaymentProofs = () => {
                 {open.duplicate_of && <p className="rounded bg-destructive/10 p-2 text-destructive">{t("famPaymentProofs.possibleDuplicateThisTransactionId")}</p>}
                 {open.amount_mismatch && <p className="rounded bg-destructive/10 p-2 text-destructive">{t("famPaymentProofs.amountOnReceiptDoesNot")}</p>}
                 <ManagementTable className="w-full">
-                  <thead><tr className="text-left text-muted-foreground"><th>{t("famPaymentProofs.field")}</th><th>{t("famPaymentProofs.memberSays")}</th><th>Receipt (AI)</th></tr></thead>
+                  <thead><tr className="text-left text-muted-foreground"><th>{t("famPaymentProofs.field")}</th><th>{t("famPaymentProofs.memberSays")}</th><th>{t("phase3b.receiptAI")}</th></tr></thead>
                   <tbody>
-                    <tr><td>{t("famPaymentProofs.amount")}</td><td>{Number(open.claimed_amount).toLocaleString()}</td><td className={open.amount_mismatch ? "text-destructive font-semibold" : ""}>{String(ex.amount ?? "—")}</td></tr>
-                    <tr><td>{t("famPaymentProofs.provider")}</td><td>{open.provider.toUpperCase()}</td><td>{String(ex.provider ?? "—")}</td></tr>
-                    <tr><td>{t("famPaymentProofs.reference")}</td><td>{open.claimed_reference ?? "—"}</td><td>{String(ex.transaction_reference ?? "—")}</td></tr>
-                    <tr><td>{t("famPaymentProofs.date")}</td><td>{new Date(open.created_at).toLocaleString()}</td><td>{String(ex.transaction_date ?? "—")}</td></tr>
-                    <tr><td>{t("famPaymentProofs.sender")}</td><td>{names[open.submitted_by]}</td><td>{[ex.sender_name, ex.sender_phone].filter(Boolean).join(" · ") || "—"}</td></tr>
-                    <tr><td>{t("famPaymentProofs.recipient")}</td><td>—</td><td>{[ex.recipient_name, ex.recipient_phone].filter(Boolean).join(" · ") || "—"}</td></tr>
+                    <tr><td>{t("famPaymentProofs.amount")}</td><td>{Number(open.claimed_amount).toLocaleString()}</td><td className={open.amount_mismatch ? "text-destructive font-semibold" : ""}>{String(ex.amount ?? "-")}</td></tr>
+                    <tr><td>{t("famPaymentProofs.provider")}</td><td>{open.provider.toUpperCase()}</td><td>{String(ex.provider ?? "-")}</td></tr>
+                    <tr><td>{t("famPaymentProofs.reference")}</td><td>{open.claimed_reference ?? "-"}</td><td>{String(ex.transaction_reference ?? "-")}</td></tr>
+                    <tr><td>{t("famPaymentProofs.date")}</td><td>{new Date(open.created_at).toLocaleString()}</td><td>{String(ex.transaction_date ?? "-")}</td></tr>
+                    <tr><td>{t("famPaymentProofs.sender")}</td><td>{names[open.submitted_by]}</td><td>{[ex.sender_name, ex.sender_phone].filter(Boolean).join(" · ") || "-"}</td></tr>
+                    <tr><td>{t("famPaymentProofs.recipient")}</td><td>-</td><td>{[ex.recipient_name, ex.recipient_phone].filter(Boolean).join(" · ") || "-"}</td></tr>
                     <tr><td>{t("famPaymentProofs.confidence")}</td><td></td><td>{ex.confidence != null ? `${Math.round(Number(ex.confidence) * 100)}%` : open.ai_status}</td></tr>
                   </tbody>
                 </ManagementTable>
@@ -304,9 +300,9 @@ function MomoSettings({ familyId, initial, onSaved }: { familyId: string; initia
     <Card><CardHeader><CardTitle className="text-base">{t("famPaymentProofs.familyReceivingAccounts")}</CardTitle>
       <CardDescription>{t("famPaymentProofs.shownToMembersOnThe")}</CardDescription></CardHeader>
       <CardContent className="grid gap-3 md:grid-cols-2">
-        {f("momo_mtn_number", "MTN number")}{f("momo_mtn_name", "MTN account name")}
-        {f("momo_orange_number", "Orange number")}{f("momo_orange_name", "Orange account name")}
-        {f("payment_dual_review_threshold", "High-value threshold (FCFA, needs 2 reviewers)")}
+        {f("momo_mtn_number", t("phase3b.mtnNumber"))}{f("momo_mtn_name", t("phase3b.mtnName"))}
+        {f("momo_orange_number", t("phase3b.orangeNumber"))}{f("momo_orange_name", t("phase3b.orangeName"))}
+        {f("payment_dual_review_threshold", t("phase3b.threshold"))}
         <div className="flex items-end"><Button onClick={save}>{t("famPaymentProofs.save")}</Button></div>
       </CardContent></Card>
   );
