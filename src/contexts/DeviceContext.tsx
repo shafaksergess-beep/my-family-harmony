@@ -1,4 +1,4 @@
-import { createContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from 'react';
 import { checkIsNativelyApp } from '@/lib/natively';
 
 export interface DeviceInfo {
@@ -31,7 +31,7 @@ export function DeviceProvider({ children }: { children: ReactNode }) {
     queries.forEach(q => q.addEventListener('change', update));
     return () => queries.forEach(q => q.removeEventListener('change', update));
   }, []);
-  useEffect(() => {
+  useLayoutEffect(() => {
     document.documentElement.dataset.device = device.isMobile ? 'mobile' : device.isTablet ? 'tablet' : 'desktop';
     if (device.isNative) document.documentElement.dataset.native = 'true';
     else delete document.documentElement.dataset.native;

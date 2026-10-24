@@ -43,4 +43,5 @@
 - [x] Add authenticated AppShell with context-aware navigation and keyboard handling
 - [x] Add PageHeader and responsive primitives; migrate Analytics and desktop Members headers only
 - [x] Scope touch targets and add safe-area, overflow and dvh utilities with EN/FR labels
-- [ ] Validate foundation tests, signed-in navigation, breakpoints and preview checks
+- [x] Validate foundation tests (53 pass), signed-in navigation, EN/FR, 54 route/viewport checks and clean preview build
+- [ ] Validate physical-device keyboard, safe areas and native orientation (requires Natively iOS/Android builds)
