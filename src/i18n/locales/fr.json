@@ -1,5 +1,7 @@
 {
   "phase4": {
+    "saving": "Enregistrement...",
+    "saveProfile": "Enregistrer le profil",
     "deleteTemplate": "Supprimer le modèle",
   "completed": "Terminée",
   "upcoming": "À venir",

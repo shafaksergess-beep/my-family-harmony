@@ -370,7 +370,7 @@ const FamilyMembers = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <ManagementHeader title={t("admFamilyMembers.familyMembers")} as="header" className="border-b border-border bg-card">
+      <ManagementHeader title={t("admin.members")} as="header" className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-4">
@@ -387,7 +387,7 @@ const FamilyMembers = () => {
             </div>
             
             <div className="flex items-center gap-4">
-              <MemberComparison familyId={familyId!} members={members} />
+              <MemberComparison familyId={familyId || ""} members={members} />
               {members.length > 0 && (
                 <Button variant="outline" size="sm" onClick={handleExport}>
                   <Download className="w-4 h-4 mr-2" />
