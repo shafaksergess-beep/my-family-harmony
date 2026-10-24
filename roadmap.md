@@ -1,9 +1,9 @@
 # Roadmap
 
 ## App-wide UI/UX hardening
-- [ ] Fix shared controls, dialogs, tables, tabs and mobile content sizing
-- [ ] Fix overflowing admin and family page headers/actions without changing permissions
-- [ ] Validate signed-in screens and interactions at mobile, tablet and desktop sizes
+- [x] Fix shared controls, dialogs, tables, tabs and mobile content sizing
+- [x] Fix overflowing admin and family page headers/actions without changing permissions
+- [x] Validate signed-in screens and interactions at mobile, tablet and desktop sizes (136 route/viewport checks, admin forms, 70 authorized family-screen checks; 49 tests pass)
 
 - [x] Replace Median integration with verified Natively bridge
 - [x] Add authenticated self-account deletion with English/French confirmation
