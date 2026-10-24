@@ -287,13 +287,13 @@ const FinancialAnalytics = () => {
               <CardDescription>{t("famFinancialAnalytics.last6MonthsOverview")}</CardDescription>
             </CardHeader>
             <CardContent className="min-w-0">
-              <ChartContainer
+              <ChartContainer responsive={!isMobile}
                 config={{
                   contributions: { label: t("famFinancialAnalytics.contributions"), color: "hsl(var(--primary))" },
                   loans: { label: t("famFinancialAnalytics.loans"), color: "#3b82f6" },
                   savings: { label: t("famFinancialAnalytics.savings"), color: "#10b981" },
                 }}
-                className={isMobile ? "min-w-0" : "h-[300px]"}
+                className={isMobile ? "min-w-0 !block !aspect-auto" : "h-[300px]"}
               >
                 <MobileChart><ResponsiveContainer width="100%" height="100%">
                   <LineChart data={metrics.monthlyTrend}>
@@ -321,12 +321,12 @@ const FinancialAnalytics = () => {
               <CardDescription>{t("famFinancialAnalytics.distributionByStatus")}</CardDescription>
             </CardHeader>
             <CardContent className="min-w-0">
-              <ChartContainer
+              <ChartContainer responsive={!isMobile}
                 config={metrics.contributionStatus.reduce((acc, item) => ({
                   ...acc,
                   [item.status]: { label: item.status, color: item.fill },
                 }), {})}
-                className={isMobile ? "min-w-0" : "h-[300px]"}
+                className={isMobile ? "min-w-0 !block !aspect-auto" : "h-[300px]"}
               >
                 <MobileChart><ResponsiveContainer width="100%" height="100%">
                   <RechartsPie>
@@ -360,12 +360,12 @@ const FinancialAnalytics = () => {
               <CardDescription>{t("famFinancialAnalytics.outstandingAmountsByStatus")}</CardDescription>
             </CardHeader>
             <CardContent className="min-w-0">
-              <ChartContainer
+              <ChartContainer responsive={!isMobile}
                 config={metrics.loanStatus.reduce((acc, item) => ({
                   ...acc,
                   [item.status]: { label: item.status, color: item.fill },
                 }), {})}
-                className={isMobile ? "min-w-0" : "h-[300px]"}
+                className={isMobile ? "min-w-0 !block !aspect-auto" : "h-[300px]"}
               >
                 <MobileChart><ResponsiveContainer width="100%" height="100%">
                   <BarChart data={metrics.loanStatus}>

@@ -71,8 +71,12 @@ export function MobileChart({ children, summary }: { children: ReactElement<any>
     }
     return node;
   });
+  const recordData = Array.isArray(data) ? data : nested.filter(isValidElement).find((n: any) => nameOf(n) === 'Pie')?.props.data;
+  const fallbackSummary = categorical || hasRecordCategories(nested) ? t('phase2.recordsSummary', { count: recordData?.length ?? 0 }) : undefined;
   const last = Array.isArray(data) ? data[data.length - 1] : null; const prior = Array.isArray(data) ? data[data.length - 2] : null;
   const hasLegend = nested.some(node => isValidElement(node) && nameOf(node) === 'Legend');
   const hasPie = nested.some(node => isValidElement(node) && nameOf(node) === 'Pie');
-  return <div className="w-full min-w-0"><AnalyticsSummary current={metric && last && !categorical ? Number(last[metric]) : undefined} previous={metric && prior && !categorical ? Number(prior[metric]) : undefined}>{summary}</AnalyticsSummary>{cloneElement(children, { height: 230, minWidth: 0 }, cloneElement(chart, { data: reduced, accessibilityLayer: true, margin: { top: 8, right: 4, bottom: 4, left: 0 } }, [...adapted, ...(!hasLegend && hasPie ? [<Legend key="mobile-legend" verticalAlign="bottom" wrapperStyle={{ fontSize: 11 }} />] : [])]))}</div>;
+  return <div className="w-full min-w-0"><AnalyticsSummary current={metric && last && !categorical ? Number(last[metric]) : undefined} previous={metric && prior && !categorical ? Number(prior[metric]) : undefined}>{summary ?? fallbackSummary}</AnalyticsSummary>{cloneElement(children, { height: 230, minWidth: 0 }, cloneElement(chart, { data: reduced, accessibilityLayer: true, margin: { top: 8, right: 4, bottom: 4, left: 0 } }, [...adapted, ...(!hasLegend && hasPie ? [<Legend key="mobile-legend" verticalAlign="bottom" wrapperStyle={{ fontSize: 11 }} />] : [])]))}</div>;
 }
+
+function hasRecordCategories(nodes: ReactNode[]) { return nodes.some(n => isValidElement(n) && ((n.type as any).displayName ?? (n.type as any).name) === "Pie"); }
