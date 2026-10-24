@@ -71,5 +71,5 @@
 - [ ] Populated meeting-detail, role-specific financial actions and physical-device validation (requires designated disposable records/native builds)
 
 ## Phase 4 final mobile audit
-- [ ] Close presentation gaps, audit all registered routes and polish sheets/contrast/install metadata
-- [ ] Verify accessible routes at five mobile sizes, French and dark mode; document limitations
+- [x] Close presentation gaps, audit all registered routes and polish sheets/contrast/install metadata
+- [x] Verify accessible routes at five mobile sizes, French and dark mode; document limitations in docs/MOBILE_PHASE4_VALIDATION.md
