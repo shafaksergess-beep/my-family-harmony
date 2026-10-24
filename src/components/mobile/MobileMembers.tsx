@@ -14,6 +14,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { OfflineIndicator } from "./OfflineIndicator";
 import { GovernanceOrganigram } from "@/components/family/GovernanceOrganigram";
+import { canShowMemberActions } from "@/lib/memberManagement";
 
 export interface ManagementMember {
   id: string; user_id: string; role: string; house_name: string | null; is_house_representative: boolean;
@@ -65,7 +66,7 @@ export function MobileMembers(props: Props) {
             status={m => <div className="flex flex-wrap gap-1">{m.assignedRoles.map(role => <Badge key={role} variant="outline">{roleLabel(role)}</Badge>)}{m.is_house_representative && <Badge variant="secondary">{t("famMembers.houseRep")}</Badge>}</div>}
             columns={[{ key: "house", label: t("famMembers.houseName"), render: m => m.house_name || t("phase3.notAssigned") }]}
             onRowClick={m => navigate(`/family/${familySlug}/members/${m.id}`)}
-            actions={m => canManageMembers && m.user_id !== props.userId ? [
+            actions={m => canShowMemberActions(canManageMembers, m.user_id, props.userId) ? [
               { key: "roles", label: t("famMembers.roles"), onClick: () => props.onRoles(m) },
               { key: "edit", label: t("famMembers.edit"), onClick: () => props.onEdit(m) },
               { key: "remove", label: t("famMembers.remove"), onClick: () => props.onRemove(m) },

@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import SEO from "@/components/SEO";
 import { GovernanceOrganigram } from "@/components/family/GovernanceOrganigram";
+import { canShowMemberActions } from "@/lib/memberManagement";
 
 interface Member {
   id: string;
@@ -419,7 +420,7 @@ const Members = () => {
                 </Link>
 
                 {/* Management actions for heads/admins */}
-                {canManageMembers && member.user_id !== userId && (
+                {canShowMemberActions(canManageMembers, member.user_id, userId) && (
                   <div className="flex gap-2 pt-2 border-t border-border">
                     <Button
                       variant="ghost"
@@ -550,6 +551,7 @@ const Members = () => {
                     className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors ${isChecked ? "border-primary bg-primary/5" : ""} ${updatingRole ? "opacity-50 pointer-events-none" : ""}`}
                   >
                     <Checkbox
+                      className={isMobile ? "!h-5 !min-h-5 !w-5 shrink-0" : undefined}
                       checked={isChecked}
                       onCheckedChange={() => toggleRole(selectedMember.id, key, selectedMember.assignedRoles)}
                       disabled={updatingRole}
@@ -586,6 +588,7 @@ const Members = () => {
             <div className={isMobile ? "flex items-center justify-between gap-3" : "flex items-center gap-2"}>
               {isMobile && <Label>{t("famMembers.houseRepresentative")}</Label>}
               <Checkbox
+                className={isMobile ? "!h-5 !min-h-5 !w-5 shrink-0" : undefined}
                 checked={editForm.is_house_representative}
                 onCheckedChange={v => setEditForm(f => ({ ...f, is_house_representative: !!v }))}
               />
