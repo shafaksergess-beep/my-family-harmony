@@ -2036,8 +2036,26 @@
     "success": "Success",
     "youReAllCaughtUp": "You're all caught up!"
   },
+  "inviteFlow": {
+      "title": "Join a family",
+      "subtitle": "Your invitation connects you to your family on Kinsroot.",
+      "codeTitle": "Invitation code",
+      "code": "Reference code",
+      "invalid": "Invalid or expired code. Please check and try again.",
+      "loadFailed": "Unable to check the invitation. Please try again.",
+      "valid": "Valid invitation",
+      "role": "Your invited role: {{role}}",
+      "expires": "Expires: {{date}}",
+      "signupHint": "Create an account or sign in, then confirm that you want to join.",
+      "join": "Join family",
+      "createAccount": "Create account and continue",
+      "signIn": "Already have an account? Sign in",
+      "joinFailed": "Could not join. Check that the invitation is still valid and that you signed in with the invited email, if specified.",
+      "welcome": "Welcome to {{name}}!",
+      "explore": "Open family",
+      "otherCode": "Enter a different code"
+  },
   "famInvitations": {
-    "outsiderFlow": "Invitation signup",
     "accepted": "Accepted",
     "accessDenied": "Access Denied",
     "back": "Back",
