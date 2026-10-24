@@ -32,7 +32,7 @@ export function ShareAppButton({ className }: { className?: string }) {
 export function AppSupport({ userId, financeRole }: { userId: string; financeRole: boolean }) {
   const { t } = useTranslation(); const { isAndroid } = useDevice(); const [tourOpen, setTourOpen] = useState(false);
   const rate = () => rateApp({
-    openMarket: url => { window.location.href = url; },
+    openMarket: url => nativelyBridge.openPlayStore(url),
     openWeb: url => nativelyBridge.openWindow(url, true),
     schedule: callback => { window.setTimeout(() => { if (document.visibilityState === 'visible') callback(); }, 1200); },
   });
