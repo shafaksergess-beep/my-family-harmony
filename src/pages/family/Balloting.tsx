@@ -1,3 +1,4 @@
+import { ManagementHeader } from "@/components/layout/ManagementMobile";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -6,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useFamilyAuth } from "@/hooks/useFamilyAuth";
 import { Loader2, ArrowLeft, Shuffle } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ResponsiveDialog as Dialog, ResponsiveDialogContent as DialogContent, ResponsiveDialogHeader as DialogHeader, ResponsiveDialogTitle as DialogTitle, ResponsiveDialogTrigger as DialogTrigger } from "@/components/ui/responsive-dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BallotingScheduleCard } from "@/components/balloting/BallotingScheduleCard";
@@ -237,7 +238,7 @@ const Balloting = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
+      <ManagementHeader title={t("phase3b.hostTitle")} as="header" className="border-b border-border bg-card" onCreate={canManage ? () => setIsDialogOpen(true) : undefined} createLabel={t("famBalloting.runBalloting")}>
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-4">
@@ -245,15 +246,15 @@ const Balloting = () => {
                 <ArrowLeft className="w-4 h-4 mr-2" /> {t("famBalloting.back")}
               </Button>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">{family?.name} - Balloting</h1>
+                <h1 className="text-2xl font-bold text-foreground">{family?.name} - {t("phase3b.hostTitle")}</h1>
                 <p className="text-sm text-muted-foreground">
-                  {canManage ? "Drag to reorder, edit members, or reshuffle" : "Hosting and Njangi schedule assignments"}
+                  {canManage ? t("phase3b.manageSchedule") : t("phase3b.viewSchedule")}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <Select value={String(selectedYear)} onValueChange={(v) => setSelectedYear(Number(v))}>
-                <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="w-full sm:w-32"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {[...Array(5)].map((_, i) => {
                     const year = new Date().getFullYear() + i;
@@ -268,7 +269,7 @@ const Balloting = () => {
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Run Balloting for {selectedYear}</DialogTitle>
+                      <DialogTitle>{t("phase3b.runYear", { year: selectedYear })}</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4">
                       <div className="space-y-2">
@@ -295,7 +296,7 @@ const Balloting = () => {
             </div>
           </div>
         </div>
-      </header>
+      </ManagementHeader>
 
       <main className="container mx-auto px-4 py-8">
         <div className="grid md:grid-cols-2 gap-6">

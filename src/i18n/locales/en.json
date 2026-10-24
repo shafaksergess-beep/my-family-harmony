@@ -41,7 +41,21 @@
     "partially_approved": "Awaiting second approval",
     "approved": "Approved",
     "rejected": "Rejected"
-  }
+  },
+  "hostTitle": "Host schedule and balloting",
+  "runYear": "Run balloting for {{year}}",
+  "manageSchedule": "Manage schedule assignments",
+  "viewSchedule": "Hosting and Njangi schedule assignments",
+  "reshuffle": "Reshuffle members",
+  "deleteSchedule": "Delete schedule",
+  "deleteScheduleConfirm": "Delete {{title}} for {{year}}? This cannot be undone.",
+  "addMonth": "Add month",
+  "saveChanges": "Save changes",
+  "discard": "Discard",
+  "ballotedOn": "Balloted on: {{date}}",
+  "noSchedule": "No {{title}} for {{year}}",
+  "unknownMember": "Unknown member",
+  "deleteAssignment": "Remove assignment"
 },
   "phase3": {
   "refresh": "Refresh",

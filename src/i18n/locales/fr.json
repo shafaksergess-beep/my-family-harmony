@@ -41,7 +41,21 @@
     "partially_approved": "En attente de deuxième validation",
     "approved": "Approuvé",
     "rejected": "Rejeté"
-  }
+  },
+  "hostTitle": "Calendrier des hôtes et tirage au sort",
+  "runYear": "Tirage au sort pour {{year}}",
+  "manageSchedule": "Gérer les affectations du calendrier",
+  "viewSchedule": "Affectations des hôtes et du Njangi",
+  "reshuffle": "Redistribuer les membres",
+  "deleteSchedule": "Supprimer le calendrier",
+  "deleteScheduleConfirm": "Supprimer {{title}} pour {{year}} ? Cette action est irréversible.",
+  "addMonth": "Ajouter un mois",
+  "saveChanges": "Enregistrer les modifications",
+  "discard": "Annuler les modifications",
+  "ballotedOn": "Tirage effectué le : {{date}}",
+  "noSchedule": "Aucun calendrier {{title}} pour {{year}}",
+  "unknownMember": "Membre inconnu",
+  "deleteAssignment": "Retirer l’affectation"
 },
   "phase3": {
   "refresh": "Actualiser",

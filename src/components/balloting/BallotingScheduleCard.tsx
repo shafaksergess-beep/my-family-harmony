@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,14 +41,11 @@ interface Props {
   onRunBalloting: () => void;
 }
 
-const MONTH_NAMES = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
-
 export const BallotingScheduleCard = ({
   title, year, assignments, ballotedAt, canManage, members, onSave, onDelete, onRunBalloting,
 }: Props) => {
+  const { t, i18n } = useTranslation();
+  const monthName = (month: number) => new Date(year, month - 1, 1).toLocaleDateString(i18n.language, { month: "long" });
   const [localAssignments, setLocalAssignments] = useState<Assignment[] | null>(assignments);
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -135,33 +133,33 @@ export const BallotingScheduleCard = ({
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle className="flex items-center gap-2">
             <Calendar className="w-5 h-5" />
             {title} {year}
           </CardTitle>
           {canManage && localAssignments && (
             <div className="flex items-center gap-1">
-              <Button variant="outline" size="sm" onClick={handleReshuffle} title="Reshuffle members">
+              <Button variant="outline" size="sm" onClick={handleReshuffle} title={t("phase3b.reshuffle")} aria-label={t("phase3b.reshuffle")}>
                 <RotateCcw className="w-4 h-4" />
               </Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="text-destructive hover:text-destructive">
+                  <Button variant="outline" size="sm" aria-label={t("phase3b.deleteSchedule")} className="text-destructive hover:text-destructive">
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Schedule</AlertDialogTitle>
+                    <AlertDialogTitle>{t("phase3b.deleteSchedule")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Are you sure you want to delete the entire {title.toLowerCase()} schedule for {year}? This cannot be undone.
+                      {t("phase3b.deleteScheduleConfirm", { title, year })}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel>{t("famBalloting.cancel")}</AlertDialogCancel>
                     <AlertDialogAction onClick={onDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                      Delete
+                      {t("phase3b.deleteSchedule")}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -189,7 +187,7 @@ export const BallotingScheduleCard = ({
                             >
                               <BallotingAssignmentRow
                                 assignment={assignment}
-                                monthName={MONTH_NAMES[assignment.month - 1] || `Month ${assignment.month}`}
+                                monthName={monthName(assignment.month)}
                                 members={members}
                                 canManage={canManage}
                                 onChangeMember={(memberId) => handleChangeMember(assignment.month, memberId)}
@@ -211,7 +209,7 @@ export const BallotingScheduleCard = ({
                   <BallotingAssignmentRow
                     key={assignment.month}
                     assignment={assignment}
-                    monthName={MONTH_NAMES[assignment.month - 1] || `Month ${assignment.month}`}
+                    monthName={monthName(assignment.month)}
                     members={members}
                     canManage={false}
                     onChangeMember={() => {}}
@@ -223,13 +221,13 @@ export const BallotingScheduleCard = ({
 
             {canManage && localAssignments.length < 12 && (
               <Button variant="outline" size="sm" className="w-full mt-2" onClick={handleAddMonth}>
-                + Add Month
+                {t("phase3b.addMonth")}
               </Button>
             )}
 
             {hasChanges && canManage && (
               <div className="flex gap-2 mt-4 pt-4 border-t">
-                <Button onClick={handleSave} className="flex-1">Save Changes</Button>
+                <Button onClick={handleSave} className="flex-1">{t("phase3b.saveChanges")}</Button>
                 <Button
                   variant="outline"
                   onClick={() => {
@@ -237,24 +235,24 @@ export const BallotingScheduleCard = ({
                     setHasChanges(false);
                   }}
                 >
-                  Discard
+                  {t("phase3b.discard")}
                 </Button>
               </div>
             )}
 
             {ballotedAt && (
               <p className="text-xs text-muted-foreground mt-4">
-                Balloted on: {new Date(ballotedAt).toLocaleDateString()}
+                {t("phase3b.ballotedOn", { date: new Date(ballotedAt).toLocaleDateString(i18n.language) })}
               </p>
             )}
           </div>
         ) : (
           <div className="text-center py-8">
             <Calendar className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <p className="text-muted-foreground">No {title.toLowerCase()} for {year}</p>
+            <p className="text-muted-foreground">{t("phase3b.noSchedule", { title, year })}</p>
             {canManage && (
               <Button className="mt-4" onClick={onRunBalloting}>
-                Run Balloting
+                {t("famBalloting.runBalloting")}
               </Button>
             )}
           </div>
