@@ -12,7 +12,7 @@ interface SEOProps {
 const DEFAULT_DESCRIPTION =
   "Run your family njangi, contributions and meetings — all in one place. Kinsroot tracks savings, loans, assistance and attendance in one platform.";
 
-const ANDROID_PACKAGE = "app.lovable.3138229105464a70a015b86eb65a55a3";
+const ANDROID_PACKAGE = "com.softserge.kinsroot";
 const SITE_ORIGIN = "https://kinsroot.softserge.com";
 
 /**
