@@ -7,3 +7,5 @@
 - Group types: `families.entity_type` is family|association|tontine (default family); creation goes through the 12-arg `create_family_self_service` overload — keep the 11-arg version for older callers.
 - Module activation: modules are default-on; a `family_module_settings` row with `is_enabled=false` hides them. Gate navigation via `useFamilyModules` and routes via `ModuleGate` — never delete data when a module is disabled.
 - Platform roles: super admins in `super_admins`, support team in `support_admins` (read-mostly); check via `is_super_admin`/`is_support_admin` security-definer RPCs, never client storage.
+
+- Responsive sizing is owned by shared UI controls and the app-screens layout scope; wide data tables scroll locally and page headers wrap without hiding actions. Why: ensure consistent mobile, tablet and desktop behavior across modules without changing authorization.

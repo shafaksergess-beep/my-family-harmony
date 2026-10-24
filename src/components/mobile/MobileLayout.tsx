@@ -50,7 +50,7 @@ export function MobileLayout({
   return (
     <div
       className={cn(
-        'min-h-screen bg-background flex flex-col',
+        'min-h-dvh min-w-0 bg-background flex flex-col',
         className
       )}
       style={{
@@ -71,7 +71,7 @@ export function MobileLayout({
 
       <main
         className={cn(
-          'flex-1 overflow-auto',
+          'flex-1 min-w-0 max-w-full',
           showBottomNav && 'pb-20',
           contentClassName
         )}

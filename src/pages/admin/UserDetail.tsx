@@ -28,7 +28,7 @@ interface FamilyMembership {
   family: {
     name: string;
     slug: string;
-  };
+  } | null;
 }
 
 export default function UserDetail() {
@@ -351,12 +351,12 @@ export default function UserDetail() {
                 {memberships.map((membership) => (
                   <div key={membership.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex-1">
-                      <p className="font-medium">{membership.family.name}</p>
+                      <p className="font-medium">{membership.family?.name ?? t("admUsers.unknownFamily")}</p>
                       <Select
                         value={membership.role}
                         onValueChange={(value) => handleUpdateRole(membership.id, value)}
                       >
-                        <SelectTrigger className="w-48 mt-2">
+                        <SelectTrigger className="w-full sm:w-48 mt-2">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -377,7 +377,7 @@ export default function UserDetail() {
                         <AlertDialogHeader>
                           <AlertDialogTitle>{t("admUserDetail.removeFromFamily")}</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Are you sure you want to remove this user from {membership.family.name}?
+                            {t("screenRecovery.removeMember", { family: membership.family?.name ?? t("admUsers.unknownFamily") })}
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
@@ -396,7 +396,7 @@ export default function UserDetail() {
             {availableFamilies.length > 0 && (
               <div className="pt-4 border-t space-y-3">
                 <h4 className="font-medium">{t("admUserDetail.addToFamily")}</h4>
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                   <Select
                     value={newMembership.family_id}
                     onValueChange={(value) => setNewMembership({ ...newMembership, family_id: value })}
@@ -416,7 +416,7 @@ export default function UserDetail() {
                     value={newMembership.role}
                     onValueChange={(value) => setNewMembership({ ...newMembership, role: value })}
                   >
-                    <SelectTrigger className="w-48">
+                    <SelectTrigger className="w-full sm:w-48">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>

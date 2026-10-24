@@ -100,9 +100,9 @@ export const AdminNotificationsList = () => {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <div>
-          <CardTitle className="flex items-center gap-2">
+      <CardHeader className="flex flex-col gap-3 items-start justify-between space-y-0 pb-2 sm:flex-row">
+        <div className="min-w-0">
+          <CardTitle className="flex flex-wrap items-center gap-2">
             <Bell className="w-5 h-5" />
             System Notifications
             {unreadCount > 0 && (
@@ -145,13 +145,13 @@ export const AdminNotificationsList = () => {
                     {getIcon(notification.notification_type)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <p className="font-medium text-sm">{notification.title}</p>
                       {!notification.is_read && (
                         <Badge variant="secondary" className="text-xs">{t("admAdminNotificationsList.new")}</Badge>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground truncate">
+                    <p className="break-words text-sm text-muted-foreground">
                       {notification.message}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">

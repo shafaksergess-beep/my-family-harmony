@@ -1,5 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
+import i18n from '@/i18n/config';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -76,15 +77,15 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+        <div className="min-h-dvh flex items-center justify-center p-4 bg-background">
           <Card className="max-w-2xl w-full">
             <CardHeader>
               <div className="flex items-center gap-3">
                 <AlertCircle className="h-8 w-8 text-destructive" />
                 <div>
-                  <CardTitle>Something went wrong</CardTitle>
+                  <CardTitle>{i18n.t("screenRecovery.title")}</CardTitle>
                   <CardDescription>
-                    We're sorry, but something unexpected happened. Our team has been notified.
+                    {i18n.t("screenRecovery.description")}
                   </CardDescription>
                 </div>
               </div>
@@ -92,12 +93,12 @@ export class ErrorBoundary extends Component<Props, State> {
             <CardContent className="space-y-4">
               {import.meta.env.DEV && this.state.error && (
                 <div className="bg-muted p-4 rounded-md">
-                  <p className="font-mono text-sm text-destructive mb-2">
+                  <p className="font-mono break-words text-sm text-destructive mb-2">
                     {this.state.error.message}
                   </p>
                   <details className="text-xs">
                     <summary className="cursor-pointer text-muted-foreground">
-                      View error details
+                      {i18n.t("screenRecovery.details")}
                     </summary>
                     <pre className="mt-2 text-xs overflow-auto">
                       {this.state.error.stack}
@@ -106,13 +107,13 @@ export class ErrorBoundary extends Component<Props, State> {
                 </div>
               )}
               
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <Button onClick={this.handleReset} variant="outline">
                   <RefreshCw className="mr-2 h-4 w-4" />
-                  Try Again
+                  {i18n.t("screenRecovery.retry")}
                 </Button>
                 <Button onClick={this.handleReload}>
-                  Reload Page
+                  {i18n.t("screenRecovery.reload")}
                 </Button>
               </div>
             </CardContent>

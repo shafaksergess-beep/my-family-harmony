@@ -421,7 +421,7 @@ export default function Contributions() {
       <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={() => navigate(`/family/${familySlug}`)}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -437,7 +437,7 @@ export default function Contributions() {
               <CurrencySelector />
             </div>
           </div>
-          <div className="flex items-center justify-end gap-2 mt-4 border-t pt-4 border-border">
+          <div className="flex flex-wrap items-center justify-end gap-2 mt-4 border-t pt-4 border-border">
             {canManageFinances && (
               <BulkPaymentMenu
                   members={members}
@@ -670,7 +670,7 @@ export default function Contributions() {
             ) : (
             <div className="space-y-4">
               {contributions.map((contribution) => (
-                <div key={contribution.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div key={contribution.id} className="flex flex-wrap items-center justify-between gap-3 p-4 border rounded-lg">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <p className="font-medium">{contribution.family_members?.profiles?.full_name || "Unknown"}</p>

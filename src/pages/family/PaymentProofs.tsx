@@ -157,8 +157,8 @@ const PaymentProofs = () => {
       <Tabs defaultValue="pay">
         <TabsList className="flex w-full overflow-x-auto">
           <TabsTrigger value="pay">{t("famPaymentProofs.pay")}</TabsTrigger>
-          <TabsTrigger value="mine">My submissions ({mine.length})</TabsTrigger>
-          {isReviewer && <TabsTrigger value="review">Review ({queue("pending").length + queue("partially_approved").length})</TabsTrigger>}
+          <TabsTrigger value="mine">{t("mobilePolish.mine")} ({mine.length})</TabsTrigger>
+          {isReviewer && <TabsTrigger value="review">{t("mobilePolish.review")} ({queue("pending").length + queue("partially_approved").length})</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="pay" className="space-y-4">
@@ -168,18 +168,18 @@ const PaymentProofs = () => {
                 <CardHeader>
                   <div className="flex items-center gap-3">
                     <div className={`flex h-12 w-12 items-center justify-center rounded-full text-sm font-bold ${m.cls}`}>{m.id === "mtn" ? "MTN" : "OM"}</div>
-                    <div><CardTitle className="text-lg">{m.name}</CardTitle><CardDescription>Dial {m.ussd}</CardDescription></div>
+                    <div><CardTitle className="text-lg">{m.name}</CardTitle><CardDescription>{t("mobilePolish.dial", { code: m.ussd })}</CardDescription></div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
                   {m.number ? (
                     <div className="flex items-center justify-between rounded-md bg-muted p-2">
                       <div><div className="font-mono text-base">{m.number}</div><div className="text-muted-foreground">{m.holder}</div></div>
-                      <Button size="icon" variant="ghost" aria-label={t("famPaymentProofs.copyNumber")} onClick={() => copy(m.number!)}><Copy className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="ghost" aria-label={t("famPaymentProofs.copyNumber")} onClick={() => copy(m.number ?? "")}><Copy className="h-4 w-4" /></Button>
                     </div>
                   ) : <p className="text-muted-foreground">{t("famPaymentProofs.theTreasurerHasNotSet")}</p>}
                   <ol className="list-decimal space-y-1 pl-5 text-muted-foreground">
-                    <li>Dial {m.ussd} and choose Transfer / Send money</li>
+                    <li>{t("mobilePolish.transfer", { code: m.ussd })}</li>
                     <li>{t("famPaymentProofs.enterTheNumberAboveAnd")}</li>
                     <li>{t("famPaymentProofs.writeYourNameReasonAs")}</li>
                     <li>{t("famPaymentProofs.confirmWithYourPinAnd")}</li>

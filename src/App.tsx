@@ -160,6 +160,7 @@ const App = () => (
           <OfflineIndicator />
           <RoutePageViewTracker />
           <AnnouncementBanner />
+          <div className="app-screens min-w-0">
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
             <Route path="/" element={<Index />} />
@@ -261,6 +262,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
           </Routes>
           </Suspense>
+          </div>
         </BrowserRouter>
         </TooltipProvider>
       </NativelyProvider>

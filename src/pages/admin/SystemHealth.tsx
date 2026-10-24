@@ -31,16 +31,19 @@ const SystemHealth = () => {
 
   const load = async () => {
     setLoading(true);
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) { navigate("/auth"); return; }
-    const { data: h, error } = await supabase.rpc("get_system_health" as any);
-    if (error) {
-      toast({ title: t("admSystemHealth.accessDenied"), description: error.message, variant: "destructive" });
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      if (!session) { navigate("/auth"); return; }
+      const { data: health, error } = await supabase.rpc("get_system_health" as any);
+      if (error) throw error;
+      setData(health as unknown as Health);
+    } catch (error) {
+      toast({ title: t("common.error"), description: error instanceof Error ? error.message : t("screenRecovery.description"), variant: "destructive" });
       navigate("/admin/dashboard");
-      return;
+    } finally {
+      setLoading(false);
     }
-    setData(h as unknown as Health);
-    setLoading(false);
   };
 
   useEffect(() => { load(); }, []);

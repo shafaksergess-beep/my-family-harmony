@@ -426,7 +426,7 @@ export function MobileDashboard() {
           </section>
 
           {/* Highlight cards */}
-          <section className="grid grid-cols-2 gap-3">
+          <section className="grid grid-cols-1 min-[480px]:grid-cols-2 gap-3">
             <Card
               onClick={() => slug && go(`/family/${slug}/payment-proofs`)}
               className="flex min-h-[96px] cursor-pointer items-center gap-3 rounded-2xl p-4 shadow-md active:scale-[0.98] transition-transform"

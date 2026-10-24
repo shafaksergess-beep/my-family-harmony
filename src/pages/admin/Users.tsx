@@ -442,7 +442,7 @@ export default function Users() {
   };
 
   const filteredUsers = users.filter(user =>
-    user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (user.full_name ?? "").toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -453,7 +453,7 @@ export default function Users() {
       Phone: u.phone || "",
       Working: u.is_working ? "yes" : "no",
       "Super admin": u.is_super_admin ? "yes" : "no",
-      Families: u.families.map((f) => `${f.family.name} (${f.role})`).join(" | "),
+      Families: u.families.map((f) => `${f.family?.name ?? t("admUsers.unknownFamily")} (${f.role})`).join(" | "),
       "Joined at": new Date(u.created_at).toISOString().split("T")[0],
     }));
     exportToCSV(rows, `users-${new Date().toISOString().split("T")[0]}`);
@@ -462,7 +462,7 @@ export default function Users() {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
@@ -472,16 +472,16 @@ export default function Users() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-3xl font-bold">{t('common.userManagement')}</h1>
+              <h1 className="text-3xl font-bold">{t('admDashboard.userManagement')}</h1>
               <p className="text-muted-foreground">
                 {userRole === "super_admin" 
-                  ? "Manage all users across the system"
-                  : "Manage users in your families"}
+                  ? t("screenRecovery.manageAll")
+                  : t("screenRecovery.manageFamily")}
               </p>
             </div>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={handleExportCSV} disabled={!filteredUsers.length}>
               <Download className="mr-2 h-4 w-4" /> {t("admUsers.exportCsv")}
             </Button>
@@ -498,7 +498,7 @@ export default function Users() {
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-center lg:justify-between">
                       <Label>CSV Format (paste data below)</Label>
                       <Button
                         type="button"
@@ -588,7 +588,7 @@ export default function Users() {
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="full_name">Full Name *</Label>
+                  <Label htmlFor="full_name">{t("auth.fullName")} *</Label>
                   <Input
                     id="full_name"
                     value={newUser.full_name}
@@ -597,7 +597,7 @@ export default function Users() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email *</Label>
+                  <Label htmlFor="email">{t("auth.email")} *</Label>
                   <Input
                     id="email"
                     type="email"
@@ -607,7 +607,7 @@ export default function Users() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password *</Label>
+                  <Label htmlFor="password">{t("auth.password")} *</Label>
                   <Input
                     id="password"
                     type="password"
@@ -627,17 +627,17 @@ export default function Users() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="family">
-                    Assign to Family {userRole !== "super_admin" ? "*" : "(Optional)"}
+                    {t("screenRecovery.assignFamily")} {userRole !== "super_admin" ? "*" : `(${t("screenRecovery.optional")})`}
                   </Label>
                   <Select
-                    value={newUser.family_id}
-                    onValueChange={(value) => setNewUser({ ...newUser, family_id: value })}
+                    value={newUser.family_id || "none"}
+                    onValueChange={(value) => setNewUser({ ...newUser, family_id: value === "none" ? "" : value })}
                   >
                     <SelectTrigger id="family">
                       <SelectValue placeholder={t("admUsers.selectAFamily")} />
                     </SelectTrigger>
                     <SelectContent>
-                      {userRole === "super_admin" && <SelectItem value="">{t("admUsers.noFamily")}</SelectItem>}
+                      {userRole === "super_admin" && <SelectItem value="none">{t("admUsers.noFamily")}</SelectItem>}
                       {families.map((family) => (
                         <SelectItem key={family.id} value={family.id}>
                           {family.name}
@@ -692,7 +692,7 @@ export default function Users() {
                 />
               </div>
               <Badge variant="secondary">
-                {filteredUsers.length} {filteredUsers.length === 1 ? "user" : "users"}
+                {t("screenRecovery.users", { count: filteredUsers.length })}
               </Badge>
             </div>
           </CardHeader>
@@ -706,9 +706,9 @@ export default function Users() {
                 {filteredUsers.map((user) => (
                   <Card key={user.id} className="hover:bg-accent/50 transition-colors">
                     <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
+                      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
                             <h3 className="font-semibold text-lg">{user.full_name}</h3>
                             {user.is_super_admin && (
                               <Badge variant="destructive">{t("admUsers.superAdmin")}</Badge>
@@ -733,7 +733,7 @@ export default function Users() {
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1">
+                        <div className="flex flex-wrap items-center gap-2">
                           {userRole === "super_admin" && !user.is_super_admin && (
                             <Button
                               variant="outline"
