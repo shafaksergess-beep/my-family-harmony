@@ -15,6 +15,9 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { JoinFamilyOptions } from "@/components/invitations/JoinFamilyOptions";
 import { InstallMenuItem } from "@/components/InstallMenuItem";
 import SEO from "@/components/SEO";
+import { ThemeToggle } from "@/components/settings/ThemeToggle";
+import { AppSupport } from "@/components/settings/AppSupport";
+import { isFinanceTour } from "@/lib/mobileExperience";
 import { DeleteAccount } from "@/components/settings/DeleteAccount";
 
 const Profile = () => {
@@ -176,6 +179,8 @@ const Profile = () => {
       </ManagementHeader>
 
       <main className="container mx-auto px-4 py-8 max-w-2xl space-y-6">
+        <Card><CardContent className="pt-6"><ThemeToggle /></CardContent></Card>
+        <AppSupport userId={profile?.id ?? ""} financeRole={isFinanceTour(userFamilies.map(m => m.role))} />
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2">

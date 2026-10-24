@@ -1,3 +1,6 @@
+import { ThemeToggle } from "@/components/settings/ThemeToggle";
+import { ShareAppButton } from "@/components/settings/AppSupport";
+import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -108,6 +111,8 @@ export default function More() {
     >
       <ScrollArea className="h-full">
         <div className="p-4 space-y-6">
+          <ThemeToggle />
+          <Button variant="outline" className="w-full justify-between" onClick={() => navigate('/profile')}>{t('phase6.profileSettings')}<ChevronRight className="h-5 w-5" /></Button>
           {visibleSections.map((section, sectionIndex) => (
             <div key={section.title}>
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1">
@@ -162,31 +167,12 @@ export default function More() {
               <Download className="h-6 w-6" />
               <span className="text-sm font-medium">{t("famMore.installApp")}</span>
             </button>
-            <button
-              onClick={async () => {
-                await haptics.medium();
-                if (navigator.share) {
-                  navigator.share({
-                    title: 'Kinsroot',
-                    text: 'Join our family on Kinsroot!',
-                    url: window.location.origin,
-                  });
-                }
-              }}
-              className={cn(
-                'flex flex-col items-center gap-2 p-4 rounded-xl',
-                'bg-secondary text-secondary-foreground',
-                'active:opacity-80 transition-opacity'
-              )}
-            >
-              <Share2 className="h-6 w-6" />
-              <span className="text-sm font-medium">{t("famMore.shareApp")}</span>
-            </button>
+            <ShareAppButton className="h-auto min-h-24 min-w-0 flex-col gap-2 whitespace-normal bg-secondary p-4 text-secondary-foreground" />
           </div>
 
           {/* Help */}
           <button
-            onClick={() => handleNavigate('/help')}
+            onClick={() => handleNavigate('/profile')}
             className={cn(
               'w-full flex items-center gap-4 p-4 rounded-xl',
               'bg-muted/50 text-foreground',

@@ -23,6 +23,12 @@ export async function requestNativelyFcmToken(): Promise<string | null> {
 }
 
 export const nativelyBridge = {
+  openPlayStore: (url: string) => {
+    if (url !== 'market://details?id=com.softserge.kinsroot') return;
+    const sdk = checkIsNativelyApp() ? useNatively() : undefined;
+    if (sdk) sdk.openExternalApp(url);
+    else window.location.assign(url);
+  },
   sharePage: async (url: string, text?: string) => {
     if (checkIsNativelyApp()) useNatively()?.shareText([text, url].filter(Boolean).join("\n"));
     else if (navigator.share) await navigator.share({ url, text });
