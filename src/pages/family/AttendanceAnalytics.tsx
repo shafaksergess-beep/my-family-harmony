@@ -1,3 +1,4 @@
+import { DataCards } from "@/components/layout/DataCards";
 import { useDevice } from "@/hooks/useDevice";
 import { AnalyticsKpis, AnalyticsSummary, AnalyticsFilters, MobileChart } from "@/components/analytics/MobileAnalytics";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -266,7 +267,7 @@ const AttendanceAnalytics = () => {
             <CardTitle>{t("famAttendanceAnalytics.detailedMemberStatistics")}</CardTitle>
           </CardHeader>
           <CardContent className="min-w-0">
-            <div className="overflow-x-auto">
+{isMobile ? <DataCards rows={memberStats} getRowKey={row => row.member_id} title={row => row.member_name} columns={[{ key: "0", label: t("famAttendanceAnalytics.meetings"), render: row => row.total_meetings }, { key: "1", label: t("famAttendanceAnalytics.rate"), render: row => <strong className="text-lg text-primary">{row.attendance_rate}%</strong> }, { key: "2", label: t("famAttendanceAnalytics.present"), render: row => row.present }, { key: "3", label: t("famAttendanceAnalytics.absent"), render: row => row.absent }, { key: "4", label: t("famAttendanceAnalytics.excused"), render: row => row.excused }, { key: "5", label: t("phase2.averageLate"), render: row => row.average_lateness }, { key: "6", label: t("famAttendanceAnalytics.fines"), render: row => formatAmount(row.total_fines) }]} /> : (            <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
@@ -299,7 +300,7 @@ const AttendanceAnalytics = () => {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </div>)}
           </CardContent>
         </Card>
 

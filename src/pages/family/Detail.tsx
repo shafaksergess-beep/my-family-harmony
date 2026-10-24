@@ -210,7 +210,7 @@ const FamilyDetail = () => {
         <PageHeader title={family.name} backTo="/dashboard" badge={<Badge variant="secondary" className="max-w-20 truncate text-xs">{entityTerm(family.entity_type, t, 'singular')}</Badge>} actions={[
           { key: 'invite', label: t('famDetail.inviteMembers'), icon: UserPlus, primary: true, hidden: !canManageInvitations, onClick: () => navigate(`/family/${familySlug}/invitations`) },
           { key: 'approvals', label: t('phase2.pendingApprovals'), hidden: !canManageInvitations, onClick: () => navigate(`/family/${familySlug}/pending-approvals`) },
-          { key: 'modules', label: t('phase2.admin.modules'), hidden: !canManageInvitations && !isSuperAdmin, onClick: () => navigate(`/family/${familySlug}/modules`) },
+          { key: 'modules', label: t('phase2.admin.modules'), hidden: !canManageInvitations && !isSuperAdmin, onClick: () => navigate(`/family/${familySlug}/module-settings`) },
         ]} />
         <div className="p-4 space-y-6">
           {canManageInvitations && <><FamilyHealthWidget familyId={family.id} /><Button variant="outline" className="w-full justify-between" onClick={() => navigate(`/family/${familySlug}/pending-approvals`)}>{t('phase2.pendingApprovals')}<Badge variant="secondary">{pendingApprovalsCount}</Badge></Button></>}

@@ -1,3 +1,4 @@
+import { DataCards } from "@/components/layout/DataCards";
 import { useDevice } from "@/hooks/useDevice";
 import { AnalyticsKpis, AnalyticsSummary, AnalyticsFilters, MobileChart } from "@/components/analytics/MobileAnalytics";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -370,7 +371,7 @@ const GlobalAnalytics = () => {
             <CardTitle>{t("admGlobalAnalytics.familyDetails")}</CardTitle>
           </CardHeader>
           <CardContent className="min-w-0">
-            <div className="overflow-x-auto">
+{isMobile ? <DataCards rows={familyStats} getRowKey={row => row.id} title={row => row.name} amount={row => row.totalContributions} columns={[{ key: "0", label: t("admGlobalAnalytics.members"), render: row => row.memberCount }, { key: "1", label: t("admGlobalAnalytics.loans"), render: row => formatAmount(row.totalLoans) }, { key: "2", label: t("admGlobalAnalytics.savings"), render: row => formatAmount(row.totalSavings) }]} /> : (            <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
@@ -401,7 +402,7 @@ const GlobalAnalytics = () => {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </div>)}
           </CardContent>
         </Card>
       </div>

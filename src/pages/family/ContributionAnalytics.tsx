@@ -1,3 +1,4 @@
+import { DataCards } from "@/components/layout/DataCards";
 import { useDevice } from "@/hooks/useDevice";
 import { AnalyticsKpis, AnalyticsSummary, AnalyticsFilters, MobileChart } from "@/components/analytics/MobileAnalytics";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -334,7 +335,7 @@ const ContributionAnalytics = () => {
                 <CardDescription>{t("famContributionAnalytics.individualContributionTrackingAndCreditworthiness")}</CardDescription>
               </CardHeader>
               <CardContent className="min-w-0">
-                <div className="space-y-4">
+                {isMobile ? <DataCards rows={memberSummaries} getRowKey={row => row.member_id} title={row => row.member_name} amount={row => row.total_paid} columns={[{ key: "0", label: t("phase2.outstanding"), render: row => formatAmount(row.total_outstanding) }, { key: "1", label: t("phase2.onTime"), render: row => row.on_time_count }, { key: "2", label: t("phase2.late"), render: row => row.late_count }, { key: "3", label: t("phase2.creditScore"), render: row => row.credit_score ?? 0 }]} /> : (<div className="space-y-4">
                   {memberSummaries.map(summary => (
                     <div key={summary.member_id} className="flex items-center justify-between p-4 border border-border rounded-lg">
                       <div className="flex-1">
@@ -373,7 +374,7 @@ const ContributionAnalytics = () => {
                       </div>
                     </div>
                   ))}
-                </div>
+                </div>)}
               </CardContent>
             </Card>
           </TabsContent>
@@ -388,7 +389,7 @@ const ContributionAnalytics = () => {
                 {latePayments.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">{t("famContributionAnalytics.noLatePayments")}</p>
                 ) : (
-                  <div className="space-y-4">
+                  {isMobile ? <DataCards rows={latePayments} getRowKey={row => row.id} title={row => row.family_members?.profiles?.full_name ?? t("phase2.unknown")} amount={row => row.amount} columns={[{ key: "0", label: t("phase2.dueDate"), render: row => new Date(row.contribution_date).toLocaleDateString() }]} /> : (<div className="space-y-4">
                   {latePayments.map(contribution => {
                       const daysLate = Math.ceil(
                         (new Date().getTime() - new Date(contribution.contribution_date).getTime()) / (1000 * 60 * 60 * 24)
@@ -413,7 +414,7 @@ const ContributionAnalytics = () => {
                         </div>
                       );
                     })}
-                  </div>
+                  </div>)}
                 )}
               </CardContent>
             </Card>

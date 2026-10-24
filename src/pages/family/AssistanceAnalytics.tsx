@@ -1,3 +1,4 @@
+import { DataCards } from "@/components/layout/DataCards";
 import { useDevice } from "@/hooks/useDevice";
 import { AnalyticsKpis, AnalyticsSummary, AnalyticsFilters, MobileChart } from "@/components/analytics/MobileAnalytics";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -302,7 +303,7 @@ export default function AssistanceAnalytics() {
                 <CardDescription>{t("famAssistanceAnalytics.assistanceReceivedByFamilyMembers")}</CardDescription>
               </CardHeader>
               <CardContent className="min-w-0">
-                <div className="space-y-4">
+                {isMobile ? <DataCards rows={memberStats} getRowKey={row => row.name} title={row => row.name} amount={row => row.total} columns={[{ key: "0", label: t("famAssistanceAnalytics.totalEvents"), render: row => row.count }]} /> : (<div className="space-y-4">
                   {memberStats.map((stat, index) => (
                     <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                       <div>
@@ -317,7 +318,7 @@ export default function AssistanceAnalytics() {
                   {memberStats.length === 0 && (
                     <p className="text-center text-muted-foreground py-8">{t("famAssistanceAnalytics.noAssistanceEventsRecorded")}</p>
                   )}
-                </div>
+                </div>)}
               </CardContent>
             </Card>
           </TabsContent>

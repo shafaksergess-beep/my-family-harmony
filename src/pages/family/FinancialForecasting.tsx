@@ -1,3 +1,4 @@
+import { DataCards } from "@/components/layout/DataCards";
 import { useDevice } from "@/hooks/useDevice";
 import { AnalyticsKpis, AnalyticsSummary, AnalyticsFilters, MobileChart } from "@/components/analytics/MobileAnalytics";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -309,7 +310,7 @@ export default function FinancialForecasting() {
             <CardDescription>{t("famFinancialForecasting.expectedLoanRepaymentsByDue")}</CardDescription>
           </CardHeader>
           <CardContent className="min-w-0">
-            <div className="space-y-3">
+            {isMobile ? <DataCards rows={forecast.loanRepaymentsForecast} getRowKey={row => String(row.dueDate) + String(row.expectedAmount)} title={row => t("famFinancialForecasting.expectedRepayment")} amount={row => row.expectedAmount} columns={[{ key: "0", label: t("phase2.dueDate"), render: row => row.dueDate ? new Date(row.dueDate).toLocaleDateString() : t("phase2.unavailable") }]} /> : (<div className="space-y-3">
               {forecast.loanRepaymentsForecast.map((loan: any, idx: number) => (
                 <div key={idx} className="flex items-center justify-between p-3 border rounded-lg">
                   <div className="flex items-center gap-3">
@@ -322,7 +323,7 @@ export default function FinancialForecasting() {
                   <div className="text-lg font-bold">{formatCurrency(loan.expectedAmount)}</div>
                 </div>
               ))}
-            </div>
+            </div>)}
           </CardContent>
         </Card>
       )}

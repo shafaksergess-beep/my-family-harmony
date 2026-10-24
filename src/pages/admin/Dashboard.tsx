@@ -1,3 +1,5 @@
+import { useDevice } from "@/hooks/useDevice";
+import { MobileAdminHome } from "@/components/mobile/MobileAdminHome";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -48,6 +50,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { isMobile } = useDevice();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats>({
     totalFamilies: 0,
@@ -258,6 +261,8 @@ const AdminDashboard = () => {
       </div>
     );
   }
+
+  if (isMobile) return <MobileAdminHome />;
 
   return (
     <div className="min-h-screen bg-background">
