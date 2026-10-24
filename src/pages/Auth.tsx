@@ -17,6 +17,7 @@ import SEO from "@/components/SEO";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PasswordStrength } from "@/components/PasswordStrength";
 import { lovable } from "@/integrations/lovable";
+import { resolveSignInDestination } from "@/lib/membershipSync";
 import {
   syncUserProfile,
   stashOAuthRedirect,
@@ -76,11 +77,13 @@ const Auth = () => {
   const [privacyError, setPrivacyError] = useState<string | null>(null);
 
   useEffect(() => {
+    let mounted = true;
     // Check if user is already logged in
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate(redirectUrl);
+        const target = await resolveSignInDestination(session.user.id, redirectUrl);
+        if (mounted) navigate(target, { replace: true });
       }
       setCheckingAuth(false);
     };
@@ -91,8 +94,10 @@ const Auth = () => {
     checkPendingInvitation();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) {
+        setTimeout(async () => {
+        if (!mounted) return;
         try {
           const { isNewProfile } = await syncUserProfile(session.user);
           if (isNewProfile) {
@@ -102,11 +107,13 @@ const Auth = () => {
           console.warn("profile sync failed", e);
         }
         const stashed = consumeOAuthRedirect();
-        navigate(stashed || redirectUrl, { replace: true });
+        const target = await resolveSignInDestination(session.user.id, stashed || redirectUrl);
+        if (mounted) navigate(target, { replace: true });
+        }, 0);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => { mounted = false; subscription.unsubscribe(); };
   }, [navigate, redirectUrl]);
 
   const checkPendingInvitation = async () => {

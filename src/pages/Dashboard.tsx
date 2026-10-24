@@ -12,6 +12,7 @@ import { CurrencySelector } from "@/components/CurrencySelector";
 import { usePlatform } from "@/hooks/usePlatform";
 import { MobileDashboard } from "@/components/mobile/MobileDashboard";
 import { JoinFamilyCard } from "@/components/dashboard/JoinFamilyCard";
+import { CreateGroupButton } from "@/components/dashboard/CreateGroupButton";
 import { tourSeen, markTourSeen, isFinanceTour } from "@/lib/mobileExperience";
 import { NewUserOnboarding } from "@/components/onboarding/NewUserOnboarding";
 import { NotificationsFeed } from "@/components/dashboard/NotificationsFeed";
@@ -312,8 +313,7 @@ const Dashboard = () => {
                   {t("dash.noFamiliesYet")}
                 </h3>
                 <p className="text-muted-foreground mb-6">
-                  You haven't been added to any family yet.
-                  {isSuperAdmin && " As a super admin, you can create a new family."}
+                  {t("phase2.noFamily")}
                 </p>
                 {isSuperAdmin && (
                   <Button onClick={() => navigate("/admin/families")}>
@@ -321,6 +321,7 @@ const Dashboard = () => {
                     {t("dash.createFamily")}
                   </Button>
                 )}
+                {!isSuperAdmin && <CreateGroupButton />}
               </Card>
               {/* Join Family Card */}
               {!isSuperAdmin && <JoinFamilyCard />}
