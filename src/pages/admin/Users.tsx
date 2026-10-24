@@ -18,6 +18,7 @@ import { ArrowLeft, Plus, Search, UserPlus, Edit, Trash2, Download, MoreVertical
 import { exportToCSV } from "@/lib/export";
 import { useTranslation } from "react-i18next";
 import { UserAdminActions, UserAdminDialogs, useSuspendedUsers } from "@/components/admin/UserAdminActions";
+import { adminUserProfileIds, matchesAdminUserSearch } from "@/lib/memberManagement";
 
 interface UserProfile {
   id: string;
@@ -153,7 +154,12 @@ export default function Users() {
   };
 
   const fetchUsers = async () => {
+    setLoading(true);
     try {
+      if (userRole !== "super_admin" && managedFamilies.length === 0) {
+        setUsers([]);
+        return;
+      }
       // Fetch family memberships - filtered by managed families if not super admin
       let membershipsQuery = supabase
         .from("family_members")
@@ -175,15 +181,17 @@ export default function Users() {
 
       if (membershipsError) throw membershipsError;
 
-      // Get unique user IDs from memberships
-      const userIds = [...new Set(memberships?.map(m => m.user_id) || [])];
-
-      // Fetch profiles for these users
-      const { data: profiles, error: profilesError } = await supabase
+      // Platform admins include unassigned profiles. Family admins stay scoped.
+      const userIds = adminUserProfileIds(userRole === "super_admin", memberships ?? [], managedFamilies);
+      if (userIds?.length === 0) {
+        setUsers([]);
+        return;
+      }
+      let profilesQuery = supabase
         .from("profiles")
-        .select("*")
-        .in("id", userIds)
-        .order("full_name");
+        .select("*");
+      if (userIds !== null) profilesQuery = profilesQuery.in("id", userIds);
+      const { data: profiles, error: profilesError } = await profilesQuery.order("full_name");
 
       if (profilesError) throw profilesError;
 
@@ -448,10 +456,7 @@ export default function Users() {
     }
   };
 
-  const filteredUsers = users.filter(user =>
-    (user.full_name ?? "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredUsers = users.filter(user => matchesAdminUserSearch(user, searchTerm));
 
   const handleExportCSV = () => {
     const rows = filteredUsers.map((u) => ({
