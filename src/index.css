@@ -220,9 +220,7 @@ All colors MUST be HSL.
   }
   
   /* Increase touch targets on mobile */
-  button, 
-  [role="button"],
-  a {
+  :where(button, [role="button"], [role="tab"], [role="menuitem"], a.flex, a.inline-flex, a.touch-target):not([data-compact]) {
     min-height: 44px;
   }
   
